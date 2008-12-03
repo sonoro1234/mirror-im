@@ -2,7 +2,7 @@
  * \brief RAW File Format Open/New Functions
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_fileraw.cpp,v 1.1 2008-10-17 06:10:16 scuri Exp $
+ * $Id: im_fileraw.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
  */
 
 #include "im.h"
@@ -21,7 +21,7 @@ imFile* imFileOpenRaw(const char* file_name, int *error)
 {
   assert(file_name);
 
-  imFormat* iformat = imFormatInitRAW();
+  imFileFormatBase* iformat = imFormatInitRAW();
   *error = iformat->Open(file_name);
   if (*error)
   {
@@ -42,7 +42,7 @@ imFile* imFileNewRaw(const char* file_name, int *error)
 {
   assert(file_name);
 
-  imFormat* iformat = imFormatInitRAW();
+  imFileFormatBase* iformat = imFormatInitRAW();
   *error = iformat->New(file_name);
   if (*error) 
   {
