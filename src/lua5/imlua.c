@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua.c,v 1.1 2008-10-17 06:16:32 scuri Exp $
+ * $Id: imlua.c,v 1.2 2008-12-11 19:02:49 scuri Exp $
  */
 
 #include <string.h>
@@ -185,8 +185,6 @@ static const imlua_constant im_constants[] = {
 
   { "_AUTHOR",  0, IM_AUTHOR },
   { "_COPYRIGHT",  0, IM_COPYRIGHT },
-  { "_VERSION",  0, IM_VERSION },
-  { "_VERSION_NUMBER",  IM_VERSION_NUMBER, NULL },
   { "_VERSION_DATE",  0, IM_VERSION_DATE },
   { "_DESCRIPTION",  0, IM_DESCRIPTION },
   { "_NAME",  0, IM_NAME },
@@ -206,6 +204,14 @@ void imlua_regconstants (lua_State *L, const imlua_constant *imconst)
       lua_pushnumber(L, l->value);
     lua_settable(L, -3);
   }
+
+  lua_pushstring(L, "_VERSION");
+  lua_pushstring(L, imVersion());
+  lua_settable(L, -3);
+
+  lua_pushstring(L, "_VERSION_NUMBER");
+  lua_pushnumber(L, imVersionNumber());
+  lua_settable(L, -3);
 }
 
 static const luaL_reg im_lib[] = {
