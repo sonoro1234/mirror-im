@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.2 2008-11-26 17:25:51 scuri Exp $
+ * $Id: imlua_process.c,v 1.3 2009-06-24 20:42:29 scuri Exp $
  */
 
 #include <memory.h>
@@ -625,10 +625,10 @@ static int imluaProcessCrop (lua_State *L)
   int ymin = luaL_checkint(L, 4);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, xmin > 0 && xmin < src_image->width, 3, "xmin must be > 0 and < width");
-  luaL_argcheck(L, ymin > 0 && ymin < src_image->height, 3, "ymin must be > 0 and < height");
-  luaL_argcheck(L, dst_image->width < (src_image->width - xmin), 2, "destiny image size must be smaller than source image width-xmin, height-ymin");
-  luaL_argcheck(L, dst_image->height < (src_image->height - ymin), 2, "destiny image size must be smaller than source image width-xmin, height-ymin");
+  luaL_argcheck(L, xmin >= 0 && xmin < src_image->width, 3, "xmin must be >= 0 and < width");
+  luaL_argcheck(L, ymin >= 0 && ymin < src_image->height, 3, "ymin must be >= 0 and < height");
+  luaL_argcheck(L, dst_image->width <= (src_image->width - xmin), 2, "destiny image size must be smaller than source image width-xmin, height-ymin");
+  luaL_argcheck(L, dst_image->height <= (src_image->height - ymin), 2, "destiny image size must be smaller than source image width-xmin, height-ymin");
 
   imProcessCrop(src_image, dst_image, xmin, ymin);
   return 0;
@@ -646,8 +646,8 @@ static int imluaProcessInsert (lua_State *L)
   int ymin = luaL_checkint(L, 5);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, xmin > 0 && xmin < src_image->width, 3, "xmin must be > 0 and < width");
-  luaL_argcheck(L, ymin > 0 && ymin < src_image->height, 3, "ymin must be > 0 and < height");
+  luaL_argcheck(L, xmin >= 0 && xmin < src_image->width, 3, "xmin must be >= 0 and < width");
+  luaL_argcheck(L, ymin >= 0 && ymin < src_image->height, 3, "ymin must be >= 0 and < height");
 
   imProcessInsert(src_image, region_image, dst_image, xmin, ymin);
   return 0;
