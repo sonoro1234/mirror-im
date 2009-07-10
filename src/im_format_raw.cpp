@@ -2,7 +2,7 @@
  * \brief RAW File Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_raw.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_raw.cpp,v 1.3 2009-07-10 18:39:37 scuri Exp $
  */
 
 #include "im_format.h"
@@ -73,7 +73,7 @@ int imFileFormatRAW::Open(const char* file_name)
 
   strcpy(this->compression, "NONE");
 
-  this->image_count = 0;
+  this->image_count = 1;  /* at least one image */
   this->padding = 0;
 
   return IM_ERR_NONE;
