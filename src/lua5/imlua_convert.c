@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_convert.c,v 1.1 2008-10-17 06:16:32 scuri Exp $
+ * $Id: imlua_convert.c,v 1.2 2009-08-04 21:35:26 scuri Exp $
  */
 
 #include "im.h"
@@ -25,7 +25,7 @@ static int imluaConvertDataType (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
   int cpx2real = luaL_checkint(L, 3);
   float gamma = (float) luaL_checknumber(L, 4);
-  int abssolute = luaL_checkint(L, 5);
+  int abssolute = lua_toboolean(L, 5);
   int cast_mode = luaL_checkint(L, 6);
 
   imlua_matchcolorspace(L, src_image, dst_image);
@@ -55,7 +55,7 @@ static int imluaConvertToBitmap (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
   int cpx2real = luaL_checkint(L, 3);
   float gamma = (float) luaL_checknumber(L, 4);
-  int abssolute = luaL_checkint(L, 5);
+  int abssolute = lua_toboolean(L, 5);
   int cast_mode = luaL_checkint(L, 6);
 
   imlua_matchsize(L, src_image, dst_image);

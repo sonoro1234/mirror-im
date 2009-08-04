@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_file.c,v 1.1 2008-10-17 06:16:32 scuri Exp $
+ * $Id: imlua_file.c,v 1.2 2009-08-04 21:35:26 scuri Exp $
  */
 
 #include <string.h>
@@ -542,20 +542,20 @@ static int imluaFileWriteImageInfo (lua_State *L)
 }
 
 /*****************************************************************************\
- file:imFileReadImageData(data)
+ file:ReadImageData(data)
 \*****************************************************************************/
 static int imluaFileReadImageData (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
   void* data = lua_touserdata(L, 2);
-  int convert2bitmap = luaL_checkint(L, 3);
+  int convert2bitmap = lua_toboolean(L, 3);
   int color_mode_flags = luaL_checkint(L, 4);
   imlua_pusherror(L, imFileReadImageData(ifile, data, convert2bitmap, color_mode_flags));
   return 1;
 }
 
 /*****************************************************************************\
- file:imFileWriteImageData(data)
+ file:WriteImageData(data)
 \*****************************************************************************/
 static int imluaFileWriteImageData (lua_State *L)
 {
