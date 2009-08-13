@@ -2,7 +2,7 @@
  * \brief GIF - Graphics Interchange Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_gif.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_gif.cpp,v 1.3 2009-08-13 22:34:25 scuri Exp $
  */
 
 #include "im_format.h"
@@ -659,7 +659,7 @@ static void iGIFReadGraphicsControl(imBinFile* handle, imAttribTable* attrib_tab
   if (word_value)
     attrib_table->Set("Delay", IM_USHORT, 1, &word_value);
 
-  /* transparency color */
+  /* transparency index */
   if (byte_value & 0x01)
   {
     imBinFileRead(handle, &byte_value, 1, 1);
@@ -908,7 +908,7 @@ static int iGIFWriteGraphicsControl(imBinFile* handle, imAttribTable* attrib_tab
 
     imBinFileWrite(handle, &word_value, 1, 2);
 
-    /* transparency color */
+    /* transparency index */
     if (attrib_transparency)
     {
       byte_value = *(unsigned char*)attrib_transparency;
