@@ -2,7 +2,7 @@
  * \brief Image Manipulation
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_image.cpp,v 1.2 2009-08-12 04:09:16 scuri Exp $
+ * $Id: im_image.cpp,v 1.3 2009-08-13 02:27:10 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -465,8 +465,10 @@ void imImageSetAttribute(imImage* image, const char* attrib, int data_type, int 
 
     attrib_table->Set(attrib, data_type, count, data);
   }
-  else
+  else if (count == 0)
     attrib_table->UnSet(attrib);
+  else
+    attrib_table->Set(attrib, data_type, count, NULL);
 }
 
 const void* imImageGetAttribute(const imImage* image, const char* attrib, int *data_type, int *count)
