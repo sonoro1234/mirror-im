@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_convert.c,v 1.2 2009-08-04 21:35:26 scuri Exp $
+ * $Id: imlua_convert.c,v 1.3 2009-08-18 02:23:33 scuri Exp $
  */
 
 #include "im.h"
@@ -76,4 +76,21 @@ void imlua_open_convert (lua_State *L)
 {
   /* "im" table is at the top of the stack */
   luaL_register(L, NULL, imconvert_lib);
+#ifdef TEC_BIGENDIAN
+#ifdef TEC_64
+#include "loh/im_convert_be64.loh"
+#else
+#include "loh/im_convert_be32.loh"
+#endif
+#else
+#ifdef TEC_64
+#ifdef WIN64
+#include "loh/im_convert_le64w.loh"
+#else
+#include "loh/im_convert_le64.loh"
+#endif
+#else
+#include "loh/im_convert.loh"
+#endif
+#endif
 }
