@@ -2,7 +2,7 @@
  * \brief PCX - ZSoft Picture
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_pcx.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_pcx.cpp,v 1.3 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include "im_format.h"
@@ -300,7 +300,7 @@ int imFileFormatPCX::ReadImageInfo(int index)
   {
     attrib_table->Set("XResolution", IM_FLOAT, 1, &xres);
     attrib_table->Set("YResolution", IM_FLOAT, 1, &yres);
-    attrib_table->Set("ResolutionUnit", IM_BYTE, 4, "DPI");
+    attrib_table->Set("ResolutionUnit", IM_BYTE, -1, "DPI");
   }
 
   /* jump 3*16+1 bytes (colormap + reserved) */

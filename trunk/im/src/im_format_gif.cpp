@@ -2,7 +2,7 @@
  * \brief GIF - Graphics Interchange Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_gif.cpp,v 1.3 2009-08-13 22:34:25 scuri Exp $
+ * $Id: im_format_gif.cpp,v 1.4 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include "im_format.h"
@@ -651,7 +651,7 @@ static void iGIFReadGraphicsControl(imBinFile* handle, imAttribTable* attrib_tab
       break;
     }
 
-    attrib_table->Set("Disposal", IM_BYTE, 6, disposal);
+    attrib_table->Set("Disposal", IM_BYTE, -1, disposal);
   }
 
   /* delay time */

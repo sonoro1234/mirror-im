@@ -2,7 +2,7 @@
  * \brief File Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_file.cpp,v 1.3 2009-08-13 22:34:25 scuri Exp $
+ * $Id: im_file.cpp,v 1.4 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -56,6 +56,9 @@ imFile* imFileOpen(const char* file_name, int *error)
   imFileClear(ifileformat);
 
   ifileformat->attrib_table = new imAttribTable(599);
+  imFileSetAttribute(ifileformat, "FileFormat", IM_BYTE, -1, ifileformat->iformat->format);
+  imFileSetAttribute(ifileformat, "FileCompression", IM_BYTE, -1, ifileformat->compression);
+  imFileSetAttribute(ifileformat, "FileImageCount", IM_INT, 1, &ifileformat->image_count);
 
   ifileformat->counter = imCounterBegin(file_name);
 
@@ -73,6 +76,9 @@ imFile* imFileOpenAs(const char* file_name, const char* format, int *error)
   imFileClear(ifileformat);
 
   ifileformat->attrib_table = new imAttribTable(599);
+  imFileSetAttribute(ifileformat, "FileFormat", IM_BYTE, -1, ifileformat->iformat->format);
+  imFileSetAttribute(ifileformat, "FileCompression", IM_BYTE, -1, ifileformat->compression);
+  imFileSetAttribute(ifileformat, "FileImageCount", IM_INT, 1, &ifileformat->image_count);
 
   ifileformat->counter = imCounterBegin(file_name);
 

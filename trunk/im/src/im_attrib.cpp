@@ -2,7 +2,7 @@
  * \brief Attributes Table
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_attrib.cpp,v 1.1 2008-10-17 06:10:16 scuri Exp $
+ * $Id: im_attrib.cpp,v 1.2 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -151,6 +151,9 @@ void imAttribTableSet(imAttribTablePrivate* ptable, const char* name, int data_t
 
   int index = iHashIndex(name, ptable->hash_size);
   imAttribNode* first_node = ptable->hash_table[index];
+
+  if (data_type == 0 && count == -1)  /* BYTE */
+    count = strlen((char*)data)+1;
 
   // The name already exists ?
   imAttribNode* cur_node = first_node;

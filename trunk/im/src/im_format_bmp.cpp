@@ -2,7 +2,7 @@
  * \brief BMP - Windows Device Independent Bitmap
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_bmp.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_bmp.cpp,v 1.3 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include "im_format.h"
@@ -541,7 +541,7 @@ int imFileFormatBMP::ReadImageInfo(int index)
     imAttribTable* attrib_table = AttribTable();
     attrib_table->Set("XResolution", IM_FLOAT, 1, &xres);
     attrib_table->Set("YResolution", IM_FLOAT, 1, &yres);
-    attrib_table->Set("ResolutionUnit", IM_BYTE, 4, "DPC");
+    attrib_table->Set("ResolutionUnit", IM_BYTE, -1, "DPC");
   }
 
   if (this->bpp <= 8)
