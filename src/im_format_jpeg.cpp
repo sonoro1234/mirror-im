@@ -3,7 +3,7 @@
  *
  * See Copyright Notice in im_lib.h
  * See libJPEG Copyright Notice in jpeglib.h
- * $Id: im_format_jpeg.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_jpeg.cpp,v 1.3 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include "im_format.h"
@@ -264,9 +264,9 @@ void imFileFormatJPEG::iReadExifAttrib(unsigned char* data, int data_length, imA
           int res_unit = (int)exif_get_short (entry->data, byte_order);
 
           if (res_unit == 2)
-            attrib_table->Set("ResolutionUnit", IM_BYTE, 4, "DPI");
+            attrib_table->Set("ResolutionUnit", IM_BYTE, -1, "DPI");
           else if (res_unit == 3)
-            attrib_table->Set("ResolutionUnit", IM_BYTE, 4, "DPC");
+            attrib_table->Set("ResolutionUnit", IM_BYTE, -1, "DPC");
 
           continue;
         }
@@ -604,9 +604,9 @@ int imFileFormatJPEG::ReadImageInfo(int index)
           yres = (float)this->dinfo.Y_density;
 
     if (this->dinfo.density_unit == 1)
-      attrib_table->Set("ResolutionUnit", IM_BYTE, 4, "DPI");
+      attrib_table->Set("ResolutionUnit", IM_BYTE, -1, "DPI");
     else
-      attrib_table->Set("ResolutionUnit", IM_BYTE, 4, "DPC");
+      attrib_table->Set("ResolutionUnit", IM_BYTE, -1, "DPC");
 
     attrib_table->Set("XResolution", IM_FLOAT, 1, (void*)&xres);
     attrib_table->Set("YResolution", IM_FLOAT, 1, (void*)&yres);
