@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.3 2009-08-18 02:23:33 scuri Exp $
+ * $Id: imlua_image.c,v 1.4 2009-08-19 21:33:55 scuri Exp $
  */
 
 #include <string.h>
@@ -12,6 +12,7 @@
 #include "im.h"
 #include "im_image.h"
 #include "im_util.h"
+#include "im_convert.h"
 
 #include <lua.h>
 #include <lauxlib.h>
