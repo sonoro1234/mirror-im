@@ -2,7 +2,7 @@
  * \brief GIF - Graphics Interchange Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_gif.cpp,v 1.4 2009-08-19 18:39:43 scuri Exp $
+ * $Id: im_format_gif.cpp,v 1.5 2009-08-23 23:57:51 scuri Exp $
  */
 
 #include "im_format.h"
@@ -1247,7 +1247,11 @@ int imFileFormatGIF::GIFWriteImageInfo()
 int imFileFormatGIF::ReadImageInfo(int index)
 {
   imAttribTable* attrib_table = AttribTable();
+
+  /* must clear the attribute list, because it can have multiple images and 
+     has many attributes that may exists only for specific images. */
   attrib_table->RemoveAll();
+  imFileSetBaseAttributes(this);
 
   if (gif_data.screen_width) 
   {

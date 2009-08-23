@@ -3,7 +3,7 @@
  *
  * See Copyright Notice in im_lib.h
  * See libTIFF Copyright Notice in tiff.h
- * $Id: im_format_tiff.cpp,v 1.4 2009-08-22 04:31:04 scuri Exp $
+ * $Id: im_format_tiff.cpp,v 1.5 2009-08-23 23:57:51 scuri Exp $
  */
 
 #include "im_format.h"
@@ -762,8 +762,10 @@ int imFileFormatTIFF::ReadImageInfo(int index)
 
   uint16* sub_ifd = (uint16*)attrib_table->Get("SubIFDSelect");
 
-  /* must clear the attribute list, because TIFF can have many different images */
+  /* must clear the attribute list, because it can have multiple images and 
+     has many attributes that may exists only for specific images. */
   attrib_table->RemoveAll();
+  imFileSetBaseAttributes(this);
 
   void* data = NULL;
   if (TIFFGetField(this->tiff, TIFFTAG_DNGVERSION, &data) == 1 && data)

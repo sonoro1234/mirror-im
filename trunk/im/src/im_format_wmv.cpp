@@ -2,7 +2,7 @@
  * \brief WMV - Windows Media Video Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_wmv.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_wmv.cpp,v 1.3 2009-08-23 23:57:52 scuri Exp $
  */
 
 #include "im_format.h"
@@ -1174,6 +1174,11 @@ int imFileFormatWMV::ReadImageInfo(int index)
     return IM_ERR_NONE;
 
   imAttribTable* attrib_table = AttribTable();
+
+  /* must clear the attribute list, because it can have multiple images and 
+     has many attributes that may exists only for specific images. */
+  attrib_table->RemoveAll();
+  imFileSetBaseAttributes(this);
 
   if (MediaType->formattype == WMFORMAT_VideoInfo)
   {
