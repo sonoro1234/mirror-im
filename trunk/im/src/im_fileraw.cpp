@@ -2,7 +2,7 @@
  * \brief RAW File Format Open/New Functions
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_fileraw.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_fileraw.cpp,v 1.3 2009-09-10 17:33:35 scuri Exp $
  */
 
 #include "im.h"
@@ -21,44 +21,46 @@ imFile* imFileOpenRaw(const char* file_name, int *error)
 {
   assert(file_name);
 
-  imFileFormatBase* iformat = imFormatInitRAW();
-  *error = iformat->Open(file_name);
+  imFormat* iformat = imFormatInitRAW();
+  imFileFormatBase* ifileformat = iformat->Create();
+  *error = ifileformat->Open(file_name);
   if (*error)
   {
-    delete iformat;
+    delete ifileformat;
     return NULL;
   }
 
-  imFileClear(iformat);
+  imFileClear(ifileformat);
 
-  iformat->attrib_table = new imAttribTable(599);
+  ifileformat->attrib_table = new imAttribTable(599);
 
-  iformat->counter = imCounterBegin(file_name);
+  ifileformat->counter = imCounterBegin(file_name);
 
-  return iformat;
+  return ifileformat;
 }
 
 imFile* imFileNewRaw(const char* file_name, int *error)
 {
   assert(file_name);
 
-  imFileFormatBase* iformat = imFormatInitRAW();
-  *error = iformat->New(file_name);
+  imFormat* iformat = imFormatInitRAW();
+  imFileFormatBase* ifileformat = iformat->Create();
+  *error = ifileformat->New(file_name);
   if (*error) 
   {
-    delete iformat;
+    delete ifileformat;
     return NULL;
   }
    
-  imFileClear(iformat);
+  imFileClear(ifileformat);
 
-  iformat->is_new = 1;
-  iformat->image_count = 0;
-  iformat->compression[0] = 0;
+  ifileformat->is_new = 1;
+  ifileformat->image_count = 0;
+  ifileformat->compression[0] = 0;
 
-  iformat->attrib_table = new imAttribTable(101);
+  ifileformat->attrib_table = new imAttribTable(101);
 
-  iformat->counter = imCounterBegin(file_name);
+  ifileformat->counter = imCounterBegin(file_name);
 
-  return iformat;
+  return ifileformat;
 }

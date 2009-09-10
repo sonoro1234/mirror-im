@@ -2,7 +2,7 @@
  * \brief RAW File Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_raw.cpp,v 1.3 2009-07-10 18:39:37 scuri Exp $
+ * $Id: im_format_raw.cpp,v 1.4 2009-09-10 17:33:35 scuri Exp $
  */
 
 #include "im_format.h"
@@ -58,11 +58,23 @@ public:
   int CanWrite(const char* compression, int color_mode, int data_type) const;
 };
 
+static imFormat* raw_format = NULL;
 
-imFileFormatBase* imFormatInitRAW(void)
+void imFormatFinishRAW(void)
 {
-  imFormatRAW iformat;
-  return iformat.Create();
+  if (raw_format)
+  {
+    delete raw_format;
+    raw_format = NULL;
+  }
+}
+
+imFormat* imFormatInitRAW(void)
+{
+  if (!raw_format)
+    raw_format = new imFormatRAW();
+
+  return raw_format;
 }
 
 int imFileFormatRAW::Open(const char* file_name)
