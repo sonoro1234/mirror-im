@@ -2,7 +2,7 @@
  * \brief Additional Image Quantization Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_quantize.cpp,v 1.1 2008-10-17 06:16:33 scuri Exp $
+ * $Id: im_quantize.cpp,v 1.2 2009-09-25 18:40:32 scuri Exp $
  */
 
 
@@ -24,8 +24,7 @@ void imProcessQuantizeRGBUniform(const imImage* src_image, imImage* dst_image, i
          *green_map=(imbyte*)src_image->data[1],
          *blue_map=(imbyte*)src_image->data[2];
 
-  long *palette = imPaletteUniform();
-  imImageSetPalette(dst_image, palette, 256);
+  imImageSetPalette(dst_image, imPaletteUniform(), 256);
 
   for (int y = 0; y < src_image->height; y++)
   {

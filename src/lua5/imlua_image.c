@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.4 2009-08-19 21:33:55 scuri Exp $
+ * $Id: imlua_image.c,v 1.5 2009-09-25 18:40:31 scuri Exp $
  */
 
 #include <string.h>
@@ -479,7 +479,9 @@ static int imluaImageSetPalette (lua_State *L)
 {
   imImage *image = imlua_checkimage(L, 1);
   imluaPalette *pal = imlua_checkpalette(L, 2);
-  imImageSetPalette(image, pal->color, pal->count);
+  long* palette = (long*)malloc(sizeof(long)*256);
+  memcpy(palette, pal->color, pal->count*sizeof(long));
+  imImageSetPalette(image, palette, pal->count);
   return 0;
 }
 
