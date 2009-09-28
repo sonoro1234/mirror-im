@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.6 2009-08-12 04:09:17 scuri Exp $
+ * $Id: imlua_process.c,v 1.7 2009-09-28 20:19:09 scuri Exp $
  */
 
 #include <memory.h>
@@ -441,21 +441,22 @@ static int imluaProcessPerimeterLine (lua_State *L)
 }
 
 /*****************************************************************************\
- im.ProcessPrune(src_image, dst_image, connect, start_size, end_size)
+ im.ProcessRemoveByArea(src_image, dst_image, connect, start_size, end_size, inside)
 \*****************************************************************************/
-static int imluaProcessPrune (lua_State *L)
+static int imluaProcessRemoveByArea (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
   int connect = luaL_checkint(L, 3);
   int start_size = luaL_checkint(L, 4);
   int end_size = luaL_checkint(L, 5);
+  int inside = lua_toboolean(L, 6);
 
   imlua_checkcolorspace(L, 1, src_image, IM_BINARY);
   imlua_match(L, src_image, dst_image);
   luaL_argcheck(L, (connect == 4 || connect == 8), 3, "invalid connect value, must be 4 or 8");
 
-  imProcessPrune(src_image, dst_image, connect, start_size, end_size);
+  imProcessRemoveByArea(src_image, dst_image, connect, start_size, end_size, inside);
   return 0;
 }
 
@@ -2861,7 +2862,7 @@ static const luaL_reg improcess_lib[] = {
   {"AnalyzeMeasureHoles", imluaAnalyzeMeasureHoles},
 
   {"ProcessPerimeterLine", imluaProcessPerimeterLine},
-  {"ProcessPrune", imluaProcessPrune},
+  {"ProcessRemoveByArea", imluaProcessRemoveByArea},
   {"ProcessFillHoles", imluaProcessFillHoles},
 
   {"ProcessHoughLines", imluaProcessHoughLines},
