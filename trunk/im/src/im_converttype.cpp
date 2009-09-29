@@ -2,7 +2,7 @@
  * \brief Image Data Type Conversion
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_converttype.cpp,v 1.2 2008-11-18 20:38:21 scuri Exp $
+ * $Id: im_converttype.cpp,v 1.3 2009-09-29 21:30:57 scuri Exp $
  */
 
 #include "im.h"
@@ -72,7 +72,7 @@ inline int iIntMax()
 template <class T>
 inline T iAbs(const T& v)
 {
-  if (v <= 0)
+  if (v < 0)
     return -1*v;
   return v;
 }
