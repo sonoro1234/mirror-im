@@ -2,7 +2,7 @@
  * \brief System Dependent Binary File Access.
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_sysfile_win32.cpp,v 1.1 2008-10-17 06:10:16 scuri Exp $
+ * $Id: im_sysfile_win32.cpp,v 1.2 2009-10-01 16:12:24 scuri Exp $
  */
 
 #include <windows.h>
@@ -14,6 +14,11 @@
 
 #include "im_util.h"
 #include "im_binfile.h"
+
+/* not defined in VC6 */
+#ifndef INVALID_SET_FILE_POINTER
+#define INVALID_SET_FILE_POINTER ((DWORD)-1)
+#endif
 
 class imBinSystemFile: public imBinFileBase
 {
