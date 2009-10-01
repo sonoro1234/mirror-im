@@ -2,7 +2,7 @@
  * \brief BMP - Windows Device Independent Bitmap
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_bmp.cpp,v 1.3 2009-08-19 18:39:43 scuri Exp $
+ * $Id: im_format_bmp.cpp,v 1.4 2009-10-01 14:15:47 scuri Exp $
  */
 
 #include "im_format.h"
@@ -524,7 +524,7 @@ int imFileFormatBMP::ReadImageInfo(int index)
     return IM_ERR_NONE;
   }
 
-  /* we already readed the compression information */
+  /* we already read the compression information */
   /* jump 8 bytes (compression, image size) */
   imBinFileSeekOffset(handle, 8);
 
