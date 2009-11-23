@@ -2,7 +2,7 @@
  * \brief File Format Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format.cpp,v 1.3 2009-11-23 17:13:05 scuri Exp $
  */
 
 
@@ -194,7 +194,7 @@ imFileFormatBase* imFileFormatBaseOpen(const char* file_name, int *error)
         imFileFormatBase* ifileformat = iformat->Create();
         *error = ifileformat->Open(file_name);                                               
         if (*error != IM_ERR_NONE && *error != IM_ERR_FORMAT)  // Error situation that must abort
-        {                                                      // Only IM_ERR_FORMAT is a valid error here
+        {                                                      // Only IM_ERR_FORMAT is considered here
           free(extension);
           delete [] ext_mark;
           delete ifileformat;
@@ -205,6 +205,11 @@ imFileFormatBase* imFileFormatBaseOpen(const char* file_name, int *error)
           free(extension);
           delete [] ext_mark;
           return ifileformat;
+        }
+        else
+        {
+          /* Other errors, release the format and test another one */
+          delete ifileformat;
         }
       }
     }
@@ -232,6 +237,11 @@ imFileFormatBase* imFileFormatBaseOpen(const char* file_name, int *error)
       {
         delete [] ext_mark;
         return ifileformat;
+      }
+      else
+      {
+        /* Other errors, release the format and test another one */
+        delete ifileformat;
       }
     }
   }
@@ -269,9 +279,12 @@ imFileFormatBase* imFileFormatBaseOpenAs(const char* file_name, const char* form
   }
   else if (*error == IM_ERR_NONE) // Sucessfully oppened the file
     return ifileformat;
-
-  *error = IM_ERR_FORMAT;
-  return NULL;
+  else
+  {
+    *error = IM_ERR_FORMAT;
+    delete ifileformat;
+    return NULL;
+  }
 }
 
 imFileFormatBase* imFileFormatBaseNew(const char* file_name, const char* format, int *error)

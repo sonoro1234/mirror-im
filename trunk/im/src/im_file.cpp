@@ -2,7 +2,7 @@
  * \brief File Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_file.cpp,v 1.5 2009-08-23 23:57:51 scuri Exp $
+ * $Id: im_file.cpp,v 1.6 2009-11-23 17:13:05 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -125,6 +125,7 @@ void imFileClose(imFile* ifile)
   if (ifile->line_buffer) free(ifile->line_buffer);
   
   delete attrib_table;
+  delete ifileformat;
 }
 
 void* imFileHandle(imFile* ifile, int index)
