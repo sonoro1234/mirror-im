@@ -1,4 +1,4 @@
-/* $Id: tiffiop.h,v 1.3 2009-08-22 04:31:04 scuri Exp $ */
+/* $Id: tiffiop.h,v 1.4 2009-12-11 15:17:41 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

@@ -1,4 +1,4 @@
-/* $Id: tif_dirread.c,v 1.2 2009-08-21 04:01:59 scuri Exp $ */
+/* $Id: tif_dirread.c,v 1.3 2009-12-11 15:17:41 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -1426,7 +1426,14 @@ TIFFFetchFloatArray(TIFF* tif, TIFFDirEntry* dir, float* v)
 {
 
 	if (dir->tdir_count == 1) {
-		v[0] = *(float*) &dir->tdir_offset;
+	        union
+		{
+		  float  f;
+		  uint32 i;
+		} float_union;
+
+		float_union.i=dir->tdir_offset;
+		v[0]=float_union.f;
 		TIFFCvtIEEEFloatToNative(tif, dir->tdir_count, v);
 		return (1);
 	} else	if (TIFFFetchData(tif, dir, (char*) v)) {

@@ -1,4 +1,4 @@
-/* $Id: tif_write.c,v 1.3 2009-09-29 21:26:39 scuri Exp $ */
+/* $Id: tif_write.c,v 1.4 2009-12-11 15:17:41 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

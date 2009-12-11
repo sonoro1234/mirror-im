@@ -1,4 +1,4 @@
-/* $Id: tif_dirinfo.c,v 1.2 2009-08-21 04:01:59 scuri Exp $ */
+/* $Id: tif_dirinfo.c,v 1.3 2009-12-11 15:17:41 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -31,6 +31,7 @@
  */
 #include "tiffiop.h"
 #include <stdlib.h>
+#include <string.h>
 
 /*
  * NB: NB: THIS ARRAY IS ASSUMED TO BE SORTED BY TAG.

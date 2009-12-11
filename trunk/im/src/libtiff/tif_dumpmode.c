@@ -1,4 +1,4 @@
-/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_dumpmode.c,v 1.2 2009-08-21 04:01:59 scuri Exp $ */
+/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_dumpmode.c,v 1.3 2009-12-11 15:17:41 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
