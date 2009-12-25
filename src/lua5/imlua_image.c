@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.5 2009-09-25 18:40:31 scuri Exp $
+ * $Id: imlua_image.c,v 1.6 2009-12-25 22:43:50 scuri Exp $
  */
 
 #include <string.h>
@@ -163,6 +163,28 @@ static int imluaImageCopyData (lua_State *L)
 
   imlua_match(L, src_image, dst_image);
   imImageCopyData(src_image, dst_image);
+  return 0;
+}
+
+/*****************************************************************************\
+ image:CopyPlane()
+\*****************************************************************************/
+static int imluaImageCopyPlane(lua_State *L)
+{
+  imImage* src_image = imlua_checkimage(L, 1);
+  int src_plane = luaL_checkint(L, 2);
+  imImage* dst_image = imlua_checkimage(L, 3);
+  int dst_plane = luaL_checkint(L, 4);
+
+  imlua_match(L, src_image, dst_image);
+
+  if (src_plane < 0 || src_plane >= src_image->depth)
+    luaL_argerror(L, 2, "invalid source channel, out of bounds");
+
+  if (dst_plane < 0 || dst_plane >= dst_image->depth)
+    luaL_argerror(L, 4, "invalid destiny channel, out of bounds");
+
+  imImageCopyPlane(src_image, src_plane, dst_image, dst_plane);
   return 0;
 }
 
@@ -992,6 +1014,7 @@ static const luaL_reg imimage_metalib[] = {
   {"Reshape", imluaImageReshape},
   {"Copy", imluaImageCopy},
   {"CopyData", imluaImageCopyData},
+  {"CopyPlane", imluaImageCopyPlane},
   {"Duplicate", imluaImageDuplicate},
   {"Clone", imluaImageClone},
   {"SetAttribute", imluaImageSetAttribute},
