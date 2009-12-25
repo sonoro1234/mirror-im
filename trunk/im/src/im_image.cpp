@@ -2,7 +2,7 @@
  * \brief Image Manipulation
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_image.cpp,v 1.4 2009-08-13 22:34:25 scuri Exp $
+ * $Id: im_image.cpp,v 1.5 2009-12-25 22:43:50 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -300,6 +300,15 @@ void imImageCopyData(const imImage* src_image, imImage* dst_image)
   {
     memcpy(dst_image->data[0], src_image->data[0], (src_image->has_alpha && dst_image->has_alpha)? src_image->size+src_image->plane_size: src_image->size);
   }
+}
+
+void imImageCopyPlane(const imImage* src_image, int src_plane, imImage* dst_image, int dst_plane)
+{
+  assert(src_image);
+  assert(dst_image);
+  assert(imImageMatch(src_image, dst_image));
+
+  memcpy(dst_image->data[src_plane], src_image->data[dst_plane], src_image->plane_size);
 }
 
 imImage* imImageDuplicate(const imImage* image)
