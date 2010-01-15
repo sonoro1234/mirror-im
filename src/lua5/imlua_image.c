@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.7 2010-01-06 20:16:29 scuri Exp $
+ * $Id: imlua_image.c,v 1.8 2010-01-15 17:23:13 scuri Exp $
  */
 
 #include <string.h>
@@ -177,7 +177,7 @@ static int imluaImageCopyPlane(lua_State *L)
   int dst_plane = luaL_checkint(L, 4);
   int src_depth, dst_depth;
 
-  imlua_match(L, src_image, dst_image);
+  imlua_matchdatatype(L, src_image, dst_image);
 
   src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
   if (src_plane < 0 || src_plane >= src_depth)
