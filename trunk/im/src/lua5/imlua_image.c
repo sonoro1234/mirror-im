@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.8 2010-01-15 17:23:13 scuri Exp $
+ * $Id: imlua_image.c,v 1.9 2010-01-17 18:18:12 scuri Exp $
  */
 
 #include <string.h>
@@ -124,6 +124,15 @@ static int imluaImageCreate (lua_State *L)
 static int imluaImageAddAlpha (lua_State *L)
 {
   imImageAddAlpha(imlua_checkimage(L, 1));
+  return 0;
+}
+
+/*****************************************************************************\
+ image:SetAlpha()
+\*****************************************************************************/
+static int imluaImageSetAlpha (lua_State *L)
+{
+  imImageSetAlpha(imlua_checkimage(L, 1), (float)luaL_checknumber(L, 2));
   return 0;
 }
 
@@ -1016,6 +1025,7 @@ static const luaL_reg imimage_lib[] = {
 static const luaL_reg imimage_metalib[] = {
   {"Destroy", imluaImageDestroy},
   {"AddAlpha", imluaImageAddAlpha},
+  {"SetAlpha", imluaImageSetAlpha},
   {"Reshape", imluaImageReshape},
   {"Copy", imluaImageCopy},
   {"CopyData", imluaImageCopyData},
