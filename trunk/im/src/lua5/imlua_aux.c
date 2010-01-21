@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_aux.c,v 1.2 2009-08-04 21:35:26 scuri Exp $
+ * $Id: imlua_aux.c,v 1.3 2010-01-21 18:24:22 scuri Exp $
  */
 
 #include <memory.h>
@@ -46,7 +46,7 @@ int imlua_newarrayint (lua_State *L, int *value, int count, int start)
   lua_newtable(L);
   for (i = 0; i < count; i++)
   {
-    lua_pushnumber(L, value[i]);
+    lua_pushinteger(L, value[i]);
     lua_rawseti(L, -2, i+start);
   }
   return 1;
