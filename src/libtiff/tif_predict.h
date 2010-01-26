@@ -1,4 +1,4 @@
-/* $Id: tif_predict.h,v 1.3 2009-12-11 15:17:41 scuri Exp $ */
+/* $Id: tif_predict.h,v 1.4 2010-01-26 15:56:36 scuri Exp $ */
 
 /*
  * Copyright (c) 1995-1997 Sam Leffler
@@ -40,16 +40,10 @@ typedef struct {
 	int		stride;		/* sample stride over data */
 	tsize_t		rowsize;	/* tile/strip row size */
 
- 	TIFFCodeMethod  encoderow;	/* parent codec encode/decode row */
- 	TIFFCodeMethod  encodestrip;	/* parent codec encode/decode strip */
- 	TIFFCodeMethod  encodetile;	/* parent codec encode/decode tile */ 
- 	TIFFPostMethod  encodepfunc;	/* horizontal differencer */
- 
- 	TIFFCodeMethod  decoderow;	/* parent codec encode/decode row */
- 	TIFFCodeMethod  decodestrip;	/* parent codec encode/decode strip */
- 	TIFFCodeMethod  decodetile;	/* parent codec encode/decode tile */ 
- 	TIFFPostMethod  decodepfunc;	/* horizontal accumulator */
-
+	TIFFPostMethod	pfunc;		/* horizontal differencer/accumulator */
+	TIFFCodeMethod	coderow;	/* parent codec encode/decode row */
+	TIFFCodeMethod	codestrip;	/* parent codec encode/decode strip */
+	TIFFCodeMethod	codetile;	/* parent codec encode/decode tile */
 	TIFFVGetMethod	vgetparent;	/* super-class method */
 	TIFFVSetMethod	vsetparent;	/* super-class method */
 	TIFFPrintMethod	printdir;	/* super-class method */
