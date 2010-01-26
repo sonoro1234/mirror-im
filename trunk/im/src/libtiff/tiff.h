@@ -1,4 +1,4 @@
-/* $Id: tiff.h,v 1.3 2009-12-11 15:17:41 scuri Exp $ */
+/* $Id: tiff.h,v 1.4 2010-01-26 15:56:36 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -43,7 +43,7 @@
  *    (http://partners.adobe.com/asn/developer/PDFS/TN/TIFF6.pdf)
  *
  * For Big TIFF design notes see the following link
- *    http://www.remotesensing.org/libtiff/bigtiffdesign.html
+ *    http://gdal.maptools.org/twiki/bin/view/libtiff/BigTIFFDesign
  */
 #define	TIFF_VERSION	        42
 #define TIFF_BIGTIFF_VERSION    43

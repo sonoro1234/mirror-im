@@ -1,4 +1,4 @@
-/* $Id: tif_packbits.c,v 1.3 2009-12-11 15:17:41 scuri Exp $ */
+/* $Id: tif_packbits.c,v 1.4 2010-01-26 15:56:36 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -240,7 +240,7 @@ PackBitsDecode(TIFF* tif, tidata_t op, tsize_t occ, tsample_t s)
                         if( occ < n )
                         {
 							TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
-                                        "PackBitsDecode: discarding %ld bytes "
+                                        "PackBitsDecode: discarding %d bytes "
                                         "to avoid buffer overrun",
                                         n - occ);
                             n = occ;
@@ -253,7 +253,7 @@ PackBitsDecode(TIFF* tif, tidata_t op, tsize_t occ, tsample_t s)
 			if (occ < n + 1)
                         {
                             TIFFWarningExt(tif->tif_clientdata, tif->tif_name,
-                                        "PackBitsDecode: discarding %ld bytes "
+                                        "PackBitsDecode: discarding %d bytes "
                                         "to avoid buffer overrun",
                                         n - occ + 1);
                             n = occ - 1;
