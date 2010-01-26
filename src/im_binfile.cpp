@@ -2,7 +2,7 @@
  * \brief Binary File Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_binfile.cpp,v 1.2 2009-10-01 14:15:47 scuri Exp $
+ * $Id: im_binfile.cpp,v 1.3 2010-01-26 19:13:02 scuri Exp $
  */
 
 
@@ -499,7 +499,7 @@ int imBinFileSetCurrentModule(int pModule)
   return old_module;
 }
 
-int imBinFileRegisterModule(imBinFileNewFunc pNewFunc)
+extern "C" int imBinFileRegisterModule(imBinFileNewFunc pNewFunc)
 {
   if (iBinFileModuleCount == MAX_MODULES) return -1;
   int id = iBinFileModuleCount;
