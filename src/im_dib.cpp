@@ -2,7 +2,7 @@
  * \brief Windows DIB
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_dib.cpp,v 1.1 2008-10-17 06:10:16 scuri Exp $
+ * $Id: im_dib.cpp,v 1.2 2010-01-26 18:06:01 scuri Exp $
  */
 
 
@@ -964,7 +964,7 @@ void imDibDecodeToMap(const imDib* dib, unsigned char* map, long* palette)
   DIB <-> File
 *******************/
 
-int imDibSaveFile(const imDib* dib, char* filename)
+int imDibSaveFile(const imDib* dib, const char* filename)
 { 
   DWORD dwTmp; 
   HANDLE hFile;                 /* file handle */ 
