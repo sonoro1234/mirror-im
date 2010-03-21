@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.10 2010-01-08 03:49:05 scuri Exp $
+ * $Id: imlua_process.c,v 1.11 2010-03-21 22:29:10 scuri Exp $
  */
 
 #include <memory.h>
@@ -1709,7 +1709,7 @@ static int imluaProcessCompose(lua_State *L)
 {
   imImage *src_image1 = imlua_checkimage(L, 1);
   imImage *src_image2 = imlua_checkimage(L, 2);
-  imImage *dst_image = imlua_checkimage(L, 4);
+  imImage *dst_image = imlua_checkimage(L, 3);
 
   imlua_match(L, src_image1, src_image2);
   imlua_match(L, src_image1, dst_image);
