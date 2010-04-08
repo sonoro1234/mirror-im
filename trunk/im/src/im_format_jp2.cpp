@@ -3,7 +3,7 @@
  *
  * See Copyright Notice in im_lib.h
  * See libJaper Copyright Notice in jasper.h
- * $Id: im_format_jp2.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_jp2.cpp,v 1.3 2010-04-08 13:19:00 scuri Exp $
  */
 
 #include "im_format.h"
@@ -378,6 +378,7 @@ int imFileFormatJP2::WriteImageInfo()
    
     // Adobe XMP
     data = attrib_table->Get("XMLPacket", NULL, &size);
+    if (data)
     {
       jas_metadata_box_t *metabox = &image->metadata.boxes[JAS_IMAGE_BOX_XMP]; 
       jas_box_alloc(metabox, size);
