@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_capture.c,v 1.2 2009-08-12 04:09:17 scuri Exp $
+ * $Id: imlua_capture.c,v 1.3 2010-04-25 21:51:29 scuri Exp $
  */
 
 #include <string.h>
@@ -68,12 +68,22 @@ static int imluaVideoCaptureDeviceDesc (lua_State *L)
 }
 
 /*****************************************************************************\
- im.VideoCaptureDeviceDesc(device)
+ im.VideoCaptureReloadDevices()
 \*****************************************************************************/
 static int imluaVideoCaptureReloadDevices (lua_State *L)
 {
   lua_pushnumber(L, imVideoCaptureReloadDevices());
   return 1;
+}
+
+/*****************************************************************************\
+ im.VideoCaptureReleaseDevices()
+\*****************************************************************************/
+static int imluaVideoCaptureReleaseDevices (lua_State *L)
+{
+  (void)L;
+  imVideoCaptureReleaseDevices();
+  return 0;
 }
 
 /*****************************************************************************\
@@ -381,6 +391,7 @@ static const luaL_reg imcapture_lib[] = {
   {"VideoCaptureDeviceCount", imluaVideoCaptureDeviceCount},
   {"VideoCaptureDeviceDesc", imluaVideoCaptureDeviceDesc},
   {"VideoCaptureReloadDevices", imluaVideoCaptureReloadDevices},
+  {"VideoCaptureReleaseDevices", imluaVideoCaptureReleaseDevices},
   {"VideoCaptureCreate", imluaVideoCaptureCreate},
   {"VideoCaptureDestroy", imluaVideoCaptureDestroy},
   {NULL, NULL}
