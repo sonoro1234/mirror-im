@@ -2,7 +2,7 @@
  * \brief Library Management
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_lib.cpp,v 1.6 2010-04-23 17:45:44 scuri Exp $
+ * $Id: im_lib.cpp,v 1.7 2010-05-04 21:56:17 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -13,6 +13,7 @@
 /* This appears only here to avoid changing the im_lib.h header for bug fixes */
 #define IM_VERSION_FIX ".1"
 #define IM_VERSION_FIX_NUMBER 1
+#define IM_VERSION_FIX_DATE "2010/04/23"
 
 static char *iVersion = "TECVERID.str:IM:LIB:" IM_VERSION IM_VERSION_FIX;
 
@@ -29,7 +30,11 @@ const char* imVersion(void)
 
 const char* imVersionDate(void)
 {
+#ifdef IM_VERSION_FIX_DATE
+  return IM_VERSION_FIX_DATE;
+#else
   return IM_VERSION_DATE;
+#endif
 }
 
 int imVersionNumber(void)
