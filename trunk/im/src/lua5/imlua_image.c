@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.9 2010-01-17 18:18:12 scuri Exp $
+ * $Id: imlua_image.c,v 1.10 2010-05-26 18:29:49 scuri Exp $
  */
 
 #include <string.h>
@@ -674,7 +674,7 @@ static int imluaImageColorSpace(lua_State *L)
 static int imluaImageHasAlpha(lua_State *L)
 {
   imImage *im = imlua_checkimage(L, 1);
-  lua_pushnumber(L, im->has_alpha);
+  lua_pushboolean(L, im->has_alpha);
   return 1;
 }
 
@@ -785,14 +785,14 @@ static int imluaImage_tostring (lua_State *L)
   if (*image_p)
   {
     imImage *image = *image_p;
-    lua_pushfstring(L, "imImage(%p) [width=%d,height=%d,color_space=%s,data_type=%s,depth=%d,has_alpha=%d]", 
+    lua_pushfstring(L, "imImage(%p) [width=%d,height=%d,color_space=%s,data_type=%s,depth=%d,has_alpha=%s]", 
       image_p,
       image->width, 
       image->height,
       imColorModeSpaceName(image->color_space),
       imDataTypeName(image->data_type),
       image->depth,
-      image->has_alpha
+      image->has_alpha? "yes": "no"
     );
   }
   else
