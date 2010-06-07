@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua.c,v 1.2 2008-12-11 19:02:49 scuri Exp $
+ * $Id: imlua.c,v 1.3 2010-06-07 20:59:32 scuri Exp $
  */
 
 #include <string.h>
@@ -242,11 +242,6 @@ int imlua_open (lua_State *L)
 }
 
 int luaopen_imlua(lua_State *L)
-{
-  return imlua_open(L);
-}
-
-int luaopen_imlua51(lua_State *L)
 {
   return imlua_open(L);
 }

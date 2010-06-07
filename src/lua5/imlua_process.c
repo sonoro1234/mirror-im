@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.11 2010-03-21 22:29:10 scuri Exp $
+ * $Id: imlua_process.c,v 1.12 2010-06-07 20:59:32 scuri Exp $
  */
 
 #include <memory.h>
@@ -3130,33 +3130,22 @@ int imlua_open_process(lua_State *L)
 {
   luaL_register(L, "im", improcess_lib);   /* leave "im" table at the top of the stack */
   imlua_regconstants(L, im_process_constants);
-#ifdef TEC_BIGENDIAN
-#ifdef TEC_64
-#include "loh/im_process_be64.loh"
+
+#ifdef IMLUA_USELOH
+#include "im_process.loh"
 #else
-#include "loh/im_process_be32.loh"
-#endif
+#ifdef IMLUA_USELZH
+#include "im_process.lzh"
 #else
-#ifdef TEC_64
-#ifdef WIN64
-#include "loh/im_process_le64w.loh"
-#else
-#include "loh/im_process_le64.loh"
-#endif
-#else
-#include "loh/im_process.loh"
+  luaL_dofile(L, "im_process.lua");
 #endif
 #endif
+
   imlua_open_kernel(L);
   return 1;
 }
 
 int luaopen_imlua_process(lua_State *L)
-{
-  return imlua_open_process(L);
-}
-
-int luaopen_imlua_process51(lua_State *L)
 {
   return imlua_open_process(L);
 }
