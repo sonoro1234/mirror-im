@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_aux.c,v 1.3 2010-01-21 18:24:22 scuri Exp $
+ * $Id: imlua_aux.c,v 1.4 2010-06-10 20:17:40 scuri Exp $
  */
 
 #include <memory.h>
@@ -27,7 +27,11 @@ int imlua_getn (lua_State *L, int index)
 {
   int n;
   lua_pushstring(L, "table");
+#if LUA_VERSION_NUM > 501
+  lua_pushglobaltable(L);
+#else
   lua_gettable(L, LUA_GLOBALSINDEX);
+#endif
   lua_pushstring(L, "getn");
   lua_gettable(L, -2);
   lua_pushvalue(L, index);
