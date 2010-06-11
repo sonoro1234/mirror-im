@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_palette.c,v 1.1 2008-10-17 06:16:32 scuri Exp $
+ * $Id: imlua_palette.c,v 1.2 2010-06-11 17:43:52 scuri Exp $
  */
 
 #include <string.h>
@@ -42,7 +42,7 @@ static imluaPalette* imlua_rawcheckpalette(lua_State *L, int param)
       }
     }
   }
-  luaL_typerror(L, param, "imPalette");  /* else error */
+  luaL_typeerror(L, param, "imPalette");  /* else error */
   return NULL;  /* to avoid warnings */
 }
 
