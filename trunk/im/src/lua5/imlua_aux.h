@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_aux.h,v 1.1 2008-10-17 06:16:32 scuri Exp $
+ * $Id: imlua_aux.h,v 1.2 2010-06-11 17:43:52 scuri Exp $
  */
 
 #ifndef __IMLUA_AUX_H
@@ -74,6 +74,11 @@ void imlua_regconstants(lua_State *L, const imlua_constant *imconst);
 void imlua_open_convert(lua_State *L);  /* imlua_convert.c */
 void imlua_open_util(lua_State *L);     /* imlua_util.c    */
 void imlua_open_file(lua_State *L);     /* imlua_file.c    */
+
+#if LUA_VERSION_NUM < 502
+#define luaL_typeerror luaL_typerror
+#endif
+
 
 #ifdef __cplusplus
 }
