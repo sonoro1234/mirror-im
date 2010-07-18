@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.11 2010-06-07 20:59:32 scuri Exp $
+ * $Id: imlua_image.c,v 1.12 2010-07-18 03:04:23 scuri Exp $
  */
 
 #include <string.h>
@@ -444,7 +444,7 @@ static int imluaImageGetAttributeList (lua_State *L)
 
   imImageGetAttributeList(image, attrib, &attrib_count);
 
-  lua_newtable(L);
+  lua_createtable(L, attrib_count, 0);
   for (i = 0; i < attrib_count; i++)
   {
     lua_pushstring(L, attrib[i]);

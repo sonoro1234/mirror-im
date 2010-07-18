@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua.c,v 1.3 2010-06-07 20:59:32 scuri Exp $
+ * $Id: imlua.c,v 1.4 2010-07-18 03:04:23 scuri Exp $
  */
 
 #include <string.h>
@@ -59,7 +59,7 @@ static int imluaFormatList (lua_State *L)
 
   imFormatList(format_list, &format_count);
 
-  lua_newtable(L);
+  lua_createtable(L, format_count, 0);
   for (i = 0; i < format_count; i++)
   {
     lua_pushstring(L, format_list[i]);
@@ -110,7 +110,7 @@ static int imluaFormatCompressions (lua_State *L)
   if (error)
     return 1;
 
-  lua_newtable(L);
+  lua_createtable(L, comp_count, 0);
   for (i = 0; i < comp_count; i++)
   {
     lua_pushstring(L, comp[i]);

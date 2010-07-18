@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_capture.c,v 1.4 2010-06-07 20:59:32 scuri Exp $
+ * $Id: imlua_capture.c,v 1.5 2010-07-18 03:04:23 scuri Exp $
  */
 
 #include <string.h>
@@ -288,7 +288,7 @@ static int imluaVideoCaptureGetAttributeList (lua_State *L)
   int i;
 
   attribs = imVideoCaptureGetAttributeList(vc, &num_attrib);
-  lua_newtable(L);
+  lua_createtable(L, num_attrib, 0);
   for (i = 0; i < num_attrib; i++)
   {
     lua_pushstring(L, attribs[i]);
