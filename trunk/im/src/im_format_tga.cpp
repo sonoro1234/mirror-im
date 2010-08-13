@@ -2,7 +2,7 @@
  * \brief TGA - Truevision Graphics Adapter File
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_tga.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
+ * $Id: im_format_tga.cpp,v 1.3 2010-08-13 14:19:49 scuri Exp $
  */
 
 #include "im_format.h"
@@ -475,7 +475,14 @@ int imFileFormatTGA::WriteImageInfo()
       this->image_type = 1;
     break;
   case IM_RGB:
-    this->bpp = 24;
+    if (imColorModeHasAlpha(this->user_color_mode))
+    {
+      this->bpp = 32;
+      this->file_color_mode |= IM_ALPHA;
+    }
+    else
+      this->bpp = 24;
+
     this->file_color_mode |= IM_PACKED;
     if (imStrEqual(this->compression, "RLE"))
       this->image_type = 10;
