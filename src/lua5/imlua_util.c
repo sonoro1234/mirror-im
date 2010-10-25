@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_util.c,v 1.1 2008-10-17 06:16:32 scuri Exp $
+ * $Id: imlua_util.c,v 1.2 2010-10-25 18:29:07 scuri Exp $
  */
 
 #include "im.h"
@@ -199,7 +199,7 @@ static int imlua_colorencode(lua_State *L)
 {
   int red_f, green_f, blue_f;
   unsigned char red_i, green_i, blue_i;
-  long int color_i;
+  long color_i;
 
   red_f   = luaL_checkint(L, 1);
   green_f = luaL_checkint(L, 2);
@@ -228,13 +228,13 @@ static int imlua_colorencode(lua_State *L)
 \***************************************************************************/
 static int imlua_colordecode(lua_State *L)
 {
-  long int color_i;
+  long color_i;
   unsigned char red_i, green_i, blue_i;
 
   if (!lua_islightuserdata(L, 1))
     luaL_argerror(L, 1, "color must be a light user data");
 
-  color_i = (long int) lua_touserdata(L,1);
+  color_i = (long)lua_touserdata(L,1);
 
   imColorDecode(&red_i, &green_i, &blue_i, color_i);
   lua_pushnumber(L, red_i);
