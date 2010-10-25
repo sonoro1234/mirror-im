@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.12 2010-07-18 03:04:23 scuri Exp $
+ * $Id: imlua_image.c,v 1.13 2010-10-25 18:29:07 scuri Exp $
  */
 
 #include <string.h>
@@ -114,6 +114,20 @@ static int imluaImageCreate (lua_State *L)
   int data_type = luaL_checkint(L, 4);
 
   imImage *image = imImageCreate(width, height, color_space, data_type);
+  imlua_pushimage(L, image);
+  return 1;
+}
+
+/*****************************************************************************\
+ im.ImageCreateFromOpenGLData(width, height, glformat, gldata)
+\*****************************************************************************/
+static int imluaImageCreateFromOpenGLData (lua_State *L)
+{
+  int width = luaL_checkint(L, 1);
+  int height = luaL_checkint(L, 2);
+  int glformat = luaL_checkint(L, 3);
+  void* gldata = lua_touserdata(L, 4);
+  imImage *image = imImageCreateFromOpenGLData(width, height, glformat, gldata);
   imlua_pushimage(L, image);
   return 1;
 }
@@ -1014,6 +1028,7 @@ static int imluaImage_index (lua_State *L)
 
 static const luaL_reg imimage_lib[] = {
   {"ImageCreate", imluaImageCreate},
+  {"ImageCreateFromOpenGLData", imluaImageCreateFromOpenGLData},
   {"ImageDestroy", imluaImageDestroy},
   {"FileImageLoad", imluaFileImageLoad},
   {"FileImageLoadBitmap", imluaFileImageLoadBitmap},
