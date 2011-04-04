@@ -2,7 +2,7 @@
  * \brief Attributes Table
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_attrib.cpp,v 1.3 2009-08-22 04:31:04 scuri Exp $
+ * $Id: im_attrib.cpp,v 1.4 2011-04-04 20:42:47 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -303,6 +303,20 @@ static int iCopyFunc(void* user_data, int index, const char* name, int data_type
 void imAttribTableCopyFrom(imAttribTablePrivate* ptable_dst, const imAttribTablePrivate* ptable_src)
 {
   imAttribTableForEach(ptable_src, (void*)ptable_dst, iCopyFunc);
+}
+
+static int iMergeFunc(void* user_data, int index, const char* name, int data_type, int count, const void* data)
+{                  
+  (void)index;
+  imAttribTablePrivate* ptable = (imAttribTablePrivate*)user_data;
+  if (!imAttribTableGet(ptable, name, NULL, NULL))
+    imAttribTableSet(ptable, name, data_type, count, data);
+  return 1;
+}
+
+void imAttribTableMergeFrom(imAttribTablePrivate* ptable_dst, const imAttribTablePrivate* ptable_src)
+{
+  imAttribTableForEach(ptable_src, (void*)ptable_dst, iMergeFunc);
 }
 
 static int iCopyArrayFunc(void* user_data, int index, const char* name, int data_type, int count, const void* data)
