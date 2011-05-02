@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.13 2010-06-10 20:17:40 scuri Exp $
+ * $Id: imlua_process.c,v 1.14 2011-05-02 19:23:57 scuri Exp $
  */
 
 #include <memory.h>
@@ -665,8 +665,8 @@ static int imluaProcessAddMargins (lua_State *L)
   int ymin = luaL_checkint(L, 4);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, dst_image->width > (src_image->width + xmin), 2, "destiny image size must be greatter than source image width+xmin, height+ymin");
-  luaL_argcheck(L, dst_image->height > (src_image->height + ymin), 2, "destiny image size must be greatter than source image width+xmin, height+ymin");
+  luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "destiny image size must be greatter or equal than source image width+xmin, height+ymin");
+  luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "destiny image size must be greatter or equal than source image width+xmin, height+ymin");
 
   imProcessAddMargins(src_image, dst_image, xmin, ymin);
   return 0;
