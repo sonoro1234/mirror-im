@@ -2,7 +2,7 @@
  * \brief Image Manipulation
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_image.cpp,v 1.8 2011-04-04 20:42:47 scuri Exp $
+ * $Id: im_image.cpp,v 1.9 2011-08-16 18:22:12 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -87,23 +87,24 @@ static void iImageInit(imImage* image, int width, int height, int color_space, i
     image->data = (void**)malloc(depth * sizeof(void*));
 }
 
-imImage* imImageInit(int width, int height, int color_space, int data_type, void* data_buffer, long* palette, int palette_count)
+imImage* imImageInit(int width, int height, int color_mode, int data_type, void* data_buffer, long* palette, int palette_count)
 {
-  if (!imImageCheckFormat(color_space, data_type))
+  if (!imImageCheckFormat(color_mode, data_type))
     return NULL;
                  
   imImage* image = (imImage*)malloc(sizeof(imImage));
   image->data = 0;
     
-  iImageInit(image, width, height, color_space, data_type, 0);
+  iImageInit(image, width, height, imColorModeSpace(color_mode), data_type, imColorModeHasAlpha(color_mode));
 
   if (data_buffer)
   {
-    for (int d = 0; d < image->depth; d++)
+    int depth = image->has_alpha? image->depth+1: image->depth;
+    for (int d = 0; d < depth; d++)
       image->data[d] = (imbyte*)data_buffer + d*image->plane_size;
   }
 
-  if (imColorModeDepth(color_space) == 1)
+  if (imColorModeDepth(imColorModeSpace(color_mode)) == 1)
   {
     image->palette = palette;
     image->palette_count = palette_count;
