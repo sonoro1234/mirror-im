@@ -3,7 +3,7 @@
  *
  * See Copyright Notice in im_lib.h
  * See libTIFF Copyright Notice in tiff.h
- * $Id: im_format_tiff.cpp,v 1.5 2009-08-23 23:57:51 scuri Exp $
+ * $Id: im_format_tiff.cpp,v 1.6 2011-10-06 23:20:22 scuri Exp $
  */
 
 #include "im_format.h"
@@ -496,9 +496,21 @@ static void iTIFFReadCustomTags(TIFF* tiff, imAttribTable* attrib_table)
       }
       else if (data_count == 1)
       {
-        data = malloc(imDataTypeSize(data_type));
+        int size = imDataTypeSize(data_type);
+        if (fld->field_type == TIFF_DOUBLE)
+          size *= 2;
+        data = malloc(size);
         if (TIFFGetField(tiff, tag, data) == 1)
+        {
+          if (fld->field_type == TIFF_DOUBLE)
+          {
+            double double_data = *(double*)data;
+            float* float_data = (float*)data;
+            *float_data = (float)double_data;
+          }
+
           attrib_table->Set(fld->field_name, data_type, data_count, data);
+        }
         free(data);
         data = NULL;
       }
