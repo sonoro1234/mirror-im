@@ -2,7 +2,7 @@
  * \brief File Access - Buffer Management
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_filebuffer.cpp,v 1.2 2009-08-13 22:34:25 scuri Exp $
+ * $Id: im_filebuffer.cpp,v 1.3 2011-10-08 01:39:14 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -409,7 +409,7 @@ static void iDoSwitchInt(int count, const SRC* src_data, DST* dst_data, int offs
 {
   for (int i = 0; i < count; i++)
   {
-    *dst_data++ = (DST)((int)*src_data++ + offset);
+    *dst_data++ = (DST)((int)(*src_data++) + offset);
   }
 }
 
