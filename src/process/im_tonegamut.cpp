@@ -2,7 +2,7 @@
  * \brief Tone Gamut Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_tonegamut.cpp,v 1.1 2008-10-17 06:16:33 scuri Exp $
+ * $Id: im_tonegamut.cpp,v 1.2 2011-10-09 04:20:49 scuri Exp $
  */
 
 
@@ -138,7 +138,7 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
   {
   case IM_GAMUT_NORMALIZE:
     {
-      if (min >= 0 && max <= 1)
+      if (min >= 0 && max <= 1)  // Already normalized
       {
         for (i = 0; i < count; i++)
           new_map[i] = (T)map[i];
