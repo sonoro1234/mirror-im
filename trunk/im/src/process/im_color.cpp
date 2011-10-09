@@ -2,11 +2,12 @@
  * \brief Color Processing Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_color.cpp,v 1.2 2010-01-06 20:16:30 scuri Exp $
+ * $Id: im_color.cpp,v 1.3 2011-10-09 04:20:49 scuri Exp $
  */
 
 #include <im.h>
 #include <im_util.h>
+#include <im_color.h>
 #include <im_colorhsi.h>
 #include <im_palette.h>
 
@@ -20,7 +21,7 @@ static void rgb2yrgb(imbyte* r, imbyte* g, imbyte* b, imbyte* y)
 {
   int ri,gi,bi;
 
-  *y = (imbyte)((299*(*r) + 587*(*g) + 114*(*b)) / 1000);
+  *y = imColorRGB2Luma(*r, *g, *b);
   ri = (*r) - (*y) + 128;
   gi = (*g) - (*y) + 128;
   bi = (*b) - (*y) + 128;
