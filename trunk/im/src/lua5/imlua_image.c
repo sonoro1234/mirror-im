@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_image.c,v 1.15 2011-10-16 04:33:56 scuri Exp $
+ * $Id: imlua_image.c,v 1.16 2011-10-19 13:25:32 scuri Exp $
  */
 
 #include <string.h>
@@ -237,7 +237,7 @@ static int imluaImageClone (lua_State *L)
 }
 
 /*****************************************************************************\
- image:SetAttribute(attrib, data_type, count, data)
+ image:SetAttribute(attrib, data_type, data)
 \*****************************************************************************/
 static int imluaImageSetAttribute (lua_State *L)
 {
