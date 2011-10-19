@@ -2,7 +2,7 @@
  * \brief Image Statistics Calculations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_statistics.cpp,v 1.3 2011-10-09 04:20:49 scuri Exp $
+ * $Id: im_statistics.cpp,v 1.4 2011-10-19 22:12:28 scuri Exp $
  */
 
 
@@ -17,6 +17,7 @@
 #include <memory.h>
 #include <math.h>
 
+#include <stdio.h>
 
 template <class T>
 static void DoCalcHisto(T* map, int size, unsigned long* histo, int hcount, int cumulative)
@@ -308,6 +309,42 @@ void imCalcHistoImageStatistics(const imImage* image, int* median, int* mode)
         found_mode = 1;
       }
     }
+  }
+
+  delete [] histo;
+}
+
+void imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max)
+{
+  int hcount = 256;
+  if (image->data_type == IM_USHORT)
+    hcount = 65536;
+
+  unsigned long* histo = new unsigned long[hcount];
+  imCalcGrayHistogram(image, histo, 0);
+
+  unsigned long acum, cut = (unsigned long)((image->count * percent) / 100.0f);
+
+  acum = 0;
+  for ((*min = ignore_zero? 1: 0); *min < hcount; (*min)++)
+  {  
+    acum += histo[*min];
+    if (acum > cut)
+      break;
+  }
+
+  acum = 0;
+  for (*max = hcount-1; *max > 0; (*max)--)
+  {  
+    acum += histo[*max];
+    if (acum > cut)
+      break;
+  }
+
+  if (*min >= *max)
+  {
+    *min = 0;
+    *max = hcount-1;
   }
 
   delete [] histo;
