@@ -2,7 +2,7 @@
  * \brief File Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_file.cpp,v 1.6 2009-11-23 17:13:05 scuri Exp $
+ * $Id: im_file.cpp,v 1.7 2011-10-19 13:25:32 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -134,6 +134,8 @@ void* imFileHandle(imFile* ifile, int index)
   imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
   return ifileformat->Handle(index);
 }
+
+#include<stdio.h>
 
 void imFileSetAttribute(imFile* ifile, const char* attrib, int data_type, int count, const void* data)
 {

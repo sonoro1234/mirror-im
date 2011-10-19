@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.16 2011-10-09 04:20:48 scuri Exp $
+ * $Id: imlua_process.c,v 1.17 2011-10-19 13:25:32 scuri Exp $
  */
 
 #include <memory.h>
@@ -1942,7 +1942,9 @@ static int imluaProcessExpandHistogram (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   float percent = (float) luaL_checknumber(L, 3);
 
-  imlua_checkdatatype(L, 1, src_image, IM_BYTE);
+  if (src_image->data_type != IM_BYTE && src_image->data_type != IM_USHORT)
+    luaL_argerror(L, 1, "image data type must be IM_BYTE or IM_USHORT");
+
   imlua_match(L, src_image, dst_image);
   luaL_argcheck(L, src_image->color_space == IM_RGB || src_image->color_space == IM_GRAY, 1, "color space can be RGB or Gray only");
   luaL_argcheck(L, dst_image->color_space == IM_RGB || dst_image->color_space == IM_GRAY, 2, "color space can be RGB or Gray only");
@@ -1959,7 +1961,9 @@ static int imluaProcessEqualizeHistogram (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  imlua_checkdatatype(L, 1, src_image, IM_BYTE);
+  if (src_image->data_type != IM_BYTE && src_image->data_type != IM_USHORT)
+    luaL_argerror(L, 1, "image data type must be IM_BYTE or IM_USHORT");
+
   imlua_match(L, src_image, dst_image);
   luaL_argcheck(L, src_image->color_space == IM_RGB || src_image->color_space == IM_GRAY, 1, "color space can be RGB or Gray only");
   luaL_argcheck(L, dst_image->color_space == IM_RGB || dst_image->color_space == IM_GRAY, 2, "color space can be RGB or Gray only");
