@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_aux.h,v 1.2 2010-06-11 17:43:52 scuri Exp $
+ * $Id: imlua_aux.h,v 1.3 2011-10-30 04:13:38 scuri Exp $
  */
 
 #ifndef __IMLUA_AUX_H
@@ -23,9 +23,9 @@ int imlua_getn(lua_State *L, int index);
 
 /* array */
 
-int imlua_newarrayint(lua_State *L, int *value, int count, int start);
-int imlua_newarrayulong(lua_State *L, unsigned long *value, int count, int start);
-int imlua_newarrayfloat(lua_State *L, float *value, int count, int start);
+int imlua_newarrayint(lua_State *L, const int *value, int count, int start);
+int imlua_newarrayulong(lua_State *L, const unsigned long *value, int count, int start);
+int imlua_newarrayfloat(lua_State *L, const float *value, int count, int start);
 
 int *imlua_toarrayint(lua_State *L, int index, int *count, int start);
 unsigned long *imlua_toarrayulong (lua_State *L, int index, int *count, int start);
