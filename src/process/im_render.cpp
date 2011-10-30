@@ -2,7 +2,7 @@
  * \brief Synthetic Image Render
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_render.cpp,v 1.1 2008-10-17 06:16:33 scuri Exp $
+ * $Id: im_render.cpp,v 1.2 2011-10-30 04:13:38 scuri Exp $
  */
 
 
@@ -51,7 +51,7 @@ static int DoRenderCondOp(T *map, int width, int height, int d, imRenderCondFunc
   return 1;
 }
 
-int imProcessRenderCondOp(imImage* image, imRenderCondFunc render_func, char* render_name, float* param)
+int imProcessRenderCondOp(imImage* image, imRenderCondFunc render_func, const char* render_name, float* param)
 {
   int ret = 0;
 
@@ -117,7 +117,7 @@ static int DoRenderOp(T *map, int width, int height, int d, imRenderFunc render_
   return 1;
 }
 
-int imProcessRenderOp(imImage* image, imRenderFunc render_func, char* render_name, float* param, int plus)
+int imProcessRenderOp(imImage* image, imRenderFunc render_func, const char* render_name, float* param, int plus)
 {
   int ret = 0;
 
