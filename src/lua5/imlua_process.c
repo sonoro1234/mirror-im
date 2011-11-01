@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_process.c,v 1.22 2011-11-01 18:26:31 scuri Exp $
+ * $Id: imlua_process.c,v 1.23 2011-11-01 23:48:05 scuri Exp $
  */
 
 #include <memory.h>
@@ -35,7 +35,7 @@ static void imlua_errorcfloat(lua_State *L, int index)
   luaL_argerror(L, index, "image data type can NOT be cfloat");
 }
 
-#define imlua_checknotcfloat(_L, _i, _a) if ((_i)->data_type != IM_CFLOAT) \
+#define imlua_checknotcfloat(_L, _i, _a) if ((_i)->data_type == IM_CFLOAT) \
                                            imlua_errorcfloat(_L, _a)
 
 
