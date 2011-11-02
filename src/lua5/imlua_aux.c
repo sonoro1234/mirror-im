@@ -2,7 +2,7 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_aux.c,v 1.7 2011-11-01 18:26:31 scuri Exp $
+ * $Id: imlua_aux.c,v 1.8 2011-11-02 21:25:07 scuri Exp $
  */
 
 #include <memory.h>
@@ -80,7 +80,7 @@ int *imlua_toarrayintopt(lua_State *L, int index, int *count, int start)
   int i, n;
   int *value = NULL;
 
-  *count = 0;
+  if (count) *count = 0;
 
   if (lua_istable(L, index))
   {
@@ -116,7 +116,7 @@ unsigned long *imlua_toarrayulongopt(lua_State *L, int index, int *count, int st
   int i, n;
   unsigned long *value = NULL;
 
-  *count = 0;
+  if (count) *count = 0;
 
   if (lua_istable(L, index))
   {
@@ -152,7 +152,7 @@ float *imlua_toarrayfloatopt(lua_State *L, int index, int *count, int start)
   int i, n;
   float *value = NULL;
 
-  *count = 0;
+  if (count) *count = 0;
 
   if (lua_istable(L, index))
   {

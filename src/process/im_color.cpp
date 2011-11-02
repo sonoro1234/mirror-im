@@ -2,7 +2,7 @@
  * \brief Color Processing Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_color.cpp,v 1.4 2011-10-20 12:06:13 scuri Exp $
+ * $Id: im_color.cpp,v 1.5 2011-11-02 21:25:08 scuri Exp $
  */
 
 #include <im.h>
@@ -281,9 +281,9 @@ static void DoSetAlphaColor(ST *src_data, DT *dst_data, int count, int depth, fl
 
 void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, float* src_color, float dst_alpha)
 {
-  if (!dst_image->has_alpha)
-    return;
-  int a = dst_image->depth; // Index of the alpha channel
+  int a = 0; // dst_image is a mask to be used as alpha
+  if (dst_image->has_alpha)
+    a = dst_image->depth; // Index of the alpha channel
 
   switch(src_image->data_type)
   {
