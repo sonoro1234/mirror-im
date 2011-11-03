@@ -2,7 +2,6 @@
  * \brief Unary Arithmetic Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_arithmetic_un.cpp,v 1.4 2011-11-01 18:26:31 scuri Exp $
  */
 
 
@@ -12,7 +11,7 @@
 #include <im_complex.h>
 #include <im_counter.h>
 
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 #include "im_math_op.h"
 
 #include <stdlib.h>

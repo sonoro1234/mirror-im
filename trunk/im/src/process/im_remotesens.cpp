@@ -2,7 +2,6 @@
  * \brief Remote Sensing Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_remotesens.cpp,v 1.1 2011-10-19 18:18:17 scuri Exp $
  */
 
 
@@ -10,7 +9,7 @@
 #include <im_util.h>
 #include <im_math.h>
 
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 
 #include <stdlib.h>
 #include <memory.h>

@@ -2,7 +2,6 @@
  * \brief Image Conversion
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_convertcolor.cpp,v 1.3 2009-08-18 05:13:18 scuri Exp $
  */
 
 #include "im.h"

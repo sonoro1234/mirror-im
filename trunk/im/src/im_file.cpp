@@ -2,7 +2,6 @@
  * \brief File Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_file.cpp,v 1.7 2011-10-19 13:25:32 scuri Exp $
  */
 
 #include <stdlib.h>

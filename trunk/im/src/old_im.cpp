@@ -2,7 +2,6 @@
  * \brief Old API
  *
  * See Copyright Notice in im_lib.h
- * $Id: old_im.cpp,v 1.2 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include <stdlib.h>

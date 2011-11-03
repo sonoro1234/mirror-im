@@ -2,7 +2,6 @@
  * \brief Windows DIB
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_dib.cpp,v 1.2 2010-01-26 18:06:01 scuri Exp $
  */
 
 

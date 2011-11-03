@@ -2,7 +2,6 @@
  * \brief Image Resize
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_resize.cpp,v 1.2 2010-01-07 19:12:53 scuri Exp $
  */
 
 

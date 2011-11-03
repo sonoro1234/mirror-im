@@ -2,7 +2,6 @@
  * \brief Color Processing Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_color.cpp,v 1.5 2011-11-02 21:25:08 scuri Exp $
  */
 
 #include <im.h>
@@ -11,7 +10,7 @@
 #include <im_colorhsi.h>
 #include <im_palette.h>
 
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 
 #include <stdlib.h>
 #include <memory.h>

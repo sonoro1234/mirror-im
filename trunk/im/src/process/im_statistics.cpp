@@ -2,7 +2,6 @@
  * \brief Image Statistics Calculations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_statistics.cpp,v 1.4 2011-10-19 22:12:28 scuri Exp $
  */
 
 

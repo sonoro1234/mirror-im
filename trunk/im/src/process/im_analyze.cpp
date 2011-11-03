@@ -2,7 +2,6 @@
  * \brief Image Analysis
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_analyze.cpp,v 1.5 2010-01-22 19:47:56 scuri Exp $
  */
 
 
@@ -11,7 +10,7 @@
 #include <im_math.h>
 
 #include "im_process_ana.h"
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 
 #include <stdlib.h>
 #include <stdio.h>

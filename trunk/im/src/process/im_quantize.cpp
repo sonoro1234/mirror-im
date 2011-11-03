@@ -2,7 +2,6 @@
  * \brief Additional Image Quantization Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_quantize.cpp,v 1.2 2009-09-25 18:40:32 scuri Exp $
  */
 
 
@@ -11,7 +10,7 @@
 #include <im_palette.h>
 #include <im_math.h>
 
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 
 #include <stdlib.h>
 #include <memory.h>

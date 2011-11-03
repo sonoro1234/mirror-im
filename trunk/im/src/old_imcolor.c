@@ -2,7 +2,6 @@
  * \brief Old resize/stretch functions
  *
  * See Copyright Notice in im_lib.h
- * $Id: old_imcolor.c,v 1.1 2008-10-17 06:10:16 scuri Exp $
  */
 
 #include "old_im.h"

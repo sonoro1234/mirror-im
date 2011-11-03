@@ -2,7 +2,6 @@
  * \brief Binary Data Utilities
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_bin.cpp,v 1.1 2008-10-17 06:10:16 scuri Exp $
  */
 
 #include <assert.h>

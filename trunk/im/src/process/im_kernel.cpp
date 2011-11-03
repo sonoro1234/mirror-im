@@ -3,7 +3,6 @@
  * Creates several known kernels
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_kernel.cpp,v 1.1 2008-10-17 06:16:33 scuri Exp $
  */
 
 #include "im.h"

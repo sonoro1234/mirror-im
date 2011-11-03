@@ -2,7 +2,6 @@
  * \brief File Format Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format.cpp,v 1.3 2009-11-23 17:13:05 scuri Exp $
  */
 
 

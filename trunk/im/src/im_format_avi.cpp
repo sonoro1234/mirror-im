@@ -2,7 +2,6 @@
  * \brief AVI - Windows Audio-Video Interleaved RIFF
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_avi.cpp,v 1.4 2009-06-14 17:02:34 scuri Exp $
  */
 
 #include "im_format.h"

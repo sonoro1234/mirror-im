@@ -2,7 +2,6 @@
  * \brief File Access - Buffer Management
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_filebuffer.cpp,v 1.4 2011-10-16 04:09:23 scuri Exp $
  */
 
 #include <stdlib.h>

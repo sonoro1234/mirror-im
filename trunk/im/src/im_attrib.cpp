@@ -2,7 +2,6 @@
  * \brief Attributes Table
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_attrib.cpp,v 1.4 2011-04-04 20:42:47 scuri Exp $
  */
 
 #include <stdlib.h>

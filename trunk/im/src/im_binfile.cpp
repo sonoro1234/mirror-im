@@ -2,7 +2,6 @@
  * \brief Binary File Access
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_binfile.cpp,v 1.3 2010-01-26 19:13:02 scuri Exp $
  */
 
 

@@ -2,7 +2,6 @@
  * \brief GIF - Graphics Interchange Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_gif.cpp,v 1.5 2009-08-23 23:57:51 scuri Exp $
  */
 
 #include "im_format.h"

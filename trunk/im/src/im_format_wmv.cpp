@@ -2,7 +2,6 @@
  * \brief WMV - Windows Media Video Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_wmv.cpp,v 1.3 2009-08-23 23:57:52 scuri Exp $
  */
 
 #include "im_format.h"

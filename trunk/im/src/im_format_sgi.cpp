@@ -2,7 +2,6 @@
  * \brief SGI - Silicon Graphics Image File Format
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_sgi.cpp,v 1.3 2011-01-19 16:28:59 scuri Exp $
  */
 
 #include "im_format.h"

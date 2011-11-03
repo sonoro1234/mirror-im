@@ -2,7 +2,6 @@
  * \brief System Dependent Binary File Access.
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_sysfile_win32.cpp,v 1.2 2009-10-01 16:12:24 scuri Exp $
  */
 
 #include <windows.h>

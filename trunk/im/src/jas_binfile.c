@@ -3,7 +3,6 @@
  * I/O uses imBinFile instead of libJasper original handlers.
  *
  * See Copyright Notice in im_lib.h
- * $Id: jas_binfile.c,v 1.1 2008-10-17 06:10:16 scuri Exp $
  */
 
 #include <stdlib.h>

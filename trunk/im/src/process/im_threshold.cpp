@@ -2,14 +2,13 @@
  * \brief Threshold Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_threshold.cpp,v 1.3 2011-11-02 21:25:08 scuri Exp $
  */
 
 
 #include <im.h>
 #include <im_util.h>
 
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 #include "im_process_ana.h"
 
 #include <stdlib.h>

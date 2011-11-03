@@ -2,7 +2,6 @@
  * \brief Video Capture Using Direct Show 9
  *
  * See Copyright Notice in im.h
- * $Id: im_capture_dx.cpp,v 1.2 2010-04-25 21:51:29 scuri Exp $
  */
 
 /*

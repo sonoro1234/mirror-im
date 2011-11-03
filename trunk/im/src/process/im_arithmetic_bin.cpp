@@ -2,7 +2,6 @@
  * \brief Binary Arithmetic Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_arithmetic_bin.cpp,v 1.5 2011-04-12 14:49:19 scuri Exp $
  */
 
 
@@ -12,7 +11,7 @@
 #include <im_complex.h>
 #include <im_counter.h>
 
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 #include "im_math_op.h"
 
 #include <stdlib.h>

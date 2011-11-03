@@ -2,7 +2,6 @@
  * \brief Image Manipulation
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_image.cpp,v 1.10 2011-11-02 21:25:07 scuri Exp $
  */
 
 #include <stdlib.h>

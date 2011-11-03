@@ -3,7 +3,6 @@
  *
  * See Copyright Notice in im_lib.h
  * See libPNG Copyright Notice in png.h
- * $Id: im_format_png.cpp,v 1.4 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include "im_format.h"

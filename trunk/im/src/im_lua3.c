@@ -2,7 +2,6 @@
  * \brief LuaBinding for Lua 3
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_lua3.c,v 1.1 2008-10-17 06:10:16 scuri Exp $
  */
 
 #include <stdio.h>
