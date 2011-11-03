@@ -2,7 +2,6 @@
  * \brief PNM - Netpbm Portable Image Map
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_pnm.cpp,v 1.3 2009-10-01 14:15:47 scuri Exp $
  */
 
 #include "im_format.h"

@@ -2,7 +2,6 @@
  * \brief RAS - Sun Raster File
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_ras.cpp,v 1.2 2008-12-03 15:45:34 scuri Exp $
  */
 
 #include "im_format.h"

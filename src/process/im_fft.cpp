@@ -2,7 +2,6 @@
  * \brief Fast Fourier Transform using FFTW library
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_fft.cpp,v 1.2 2009-08-20 12:37:11 scuri Exp $
  */
 
 #include <im.h>

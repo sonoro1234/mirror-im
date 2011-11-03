@@ -2,7 +2,6 @@
  * \brief Library Management
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_lib.cpp,v 1.9 2010-11-09 12:18:08 scuri Exp $
  */
 
 #include <stdlib.h>

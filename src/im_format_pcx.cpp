@@ -2,7 +2,6 @@
  * \brief PCX - ZSoft Picture
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_pcx.cpp,v 1.3 2009-08-19 18:39:43 scuri Exp $
  */
 
 #include "im_format.h"

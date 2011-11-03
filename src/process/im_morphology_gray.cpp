@@ -2,7 +2,6 @@
  * \brief Morphology Operations for Gray Images
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_morphology_gray.cpp,v 1.2 2011-04-05 02:35:10 scuri Exp $
  */
 
 
@@ -12,7 +11,7 @@
 #include <im_convert.h>
 
 #include "im_process_loc.h"
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 
 #include <stdlib.h>
 #include <stdio.h>

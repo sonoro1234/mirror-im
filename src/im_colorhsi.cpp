@@ -2,7 +2,6 @@
  * \brief HSI Color Manipulation
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_colorhsi.cpp,v 1.2 2008-11-18 13:15:46 scuri Exp $
  */
 
 

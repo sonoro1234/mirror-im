@@ -2,7 +2,6 @@
  * \brief ICO - Windows Icon
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_format_ico.cpp,v 1.3 2010-04-30 18:06:31 scuri Exp $
  */
 
 #include "im_format.h"

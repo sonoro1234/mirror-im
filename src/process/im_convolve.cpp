@@ -2,7 +2,6 @@
  * \brief Convolution Operations
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_convolve.cpp,v 1.2 2009-10-01 02:56:58 scuri Exp $
  */
 
 
@@ -15,7 +14,7 @@
 #include <im_kernel.h>
 
 #include "im_process_loc.h"
-#include "im_process_pon.h"
+#include "im_process_pnt.h"
 
 #include <stdlib.h>
 #include <stdio.h>

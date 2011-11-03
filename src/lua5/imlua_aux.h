@@ -2,7 +2,6 @@
  * \brief IM Lua 5 Binding
  *
  * See Copyright Notice in im_lib.h
- * $Id: imlua_aux.h,v 1.4 2011-11-01 18:26:31 scuri Exp $
  */
 
 #ifndef __IMLUA_AUX_H

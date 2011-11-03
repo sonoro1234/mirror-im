@@ -2,7 +2,6 @@
  * \brief Hough Transform
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_houghline.cpp,v 1.1 2008-10-17 06:16:33 scuri Exp $
  */
 
 #include <im.h>
@@ -95,7 +94,7 @@ static listnode* listadd_filtered(listnode* list, listnode* cur_node, point *pt,
 /*C* Initial version from XITE
 
         houghLine
-        $Id: im_houghline.cpp,v 1.1 2008-10-17 06:16:33 scuri Exp $
+        $Id: im_houghline.cpp,v 1.2 2011-11-03 17:03:59 scuri Exp $
         Copyright 1990, Blab, UiO
         Image processing lab, Department of Informatics
         University of Oslo

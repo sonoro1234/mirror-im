@@ -2,7 +2,6 @@
  * \brief Image Conversion
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_convertbitmap.cpp,v 1.4 2010-10-25 18:29:07 scuri Exp $
  */
 
 #include "im.h"

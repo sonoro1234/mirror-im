@@ -2,7 +2,6 @@
  * \brief Image Data Type Conversion
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_converttype.cpp,v 1.3 2009-09-29 21:30:57 scuri Exp $
  */
 
 #include "im.h"
