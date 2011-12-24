@@ -1,4 +1,4 @@
-/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_version.c,v 1.4 2010-01-26 15:56:36 scuri Exp $ */
+/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_version.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
 /*
  * Copyright (c) 1992-1997 Sam Leffler
  * Copyright (c) 1992-1997 Silicon Graphics, Inc.
@@ -31,3 +31,10 @@ TIFFGetVersion(void)
 {
 	return (TIFFVersion);
 }
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */
