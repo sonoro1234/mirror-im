@@ -1,4 +1,4 @@
-/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_extension.c,v 1.4 2010-01-26 15:56:36 scuri Exp $ */
+/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_extension.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -41,13 +41,13 @@ int TIFFGetTagListCount( TIFF *tif )
     return td->td_customValueCount;
 }
 
-ttag_t TIFFGetTagListEntry( TIFF *tif, int tag_index )
+uint32 TIFFGetTagListEntry( TIFF *tif, int tag_index )
 
 {
     TIFFDirectory* td = &tif->tif_dir;
 
     if( tag_index < 0 || tag_index >= td->td_customValueCount )
-        return (ttag_t) -1;
+        return (uint32)(-1);
     else
         return td->td_customValues[tag_index].info->field_tag;
 }
@@ -102,10 +102,17 @@ void TIFFSetClientInfo( TIFF *tif, void *data, const char *name )
     link = (TIFFClientInfoLink *) _TIFFmalloc(sizeof(TIFFClientInfoLink));
     assert (link != NULL);
     link->next = tif->tif_clientinfo;
-    link->name = (char *) _TIFFmalloc(strlen(name)+1);
+    link->name = (char *) _TIFFmalloc((tmsize_t)(strlen(name)+1));
     assert (link->name != NULL);
     strcpy(link->name, name);
     link->data = data;
 
     tif->tif_clientinfo = link;
 }
+/*
+ * Local Variables:
+ * mode: c
+ * c-basic-offset: 8
+ * fill-column: 78
+ * End:
+ */
