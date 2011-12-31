@@ -1,4 +1,4 @@
-/* $Id: tif_strip.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Id: tif_strip.c,v 1.6 2011-12-31 19:18:32 scuri Exp $ */
 
 /*
  * Copyright (c) 1991-1997 Sam Leffler
@@ -305,7 +305,8 @@ TIFFScanlineSize64(TIFF* tif)
 			samplingblocks_hor = TIFFhowmany_32(td->td_imagewidth,ycbcrsubsampling[0]);
 			samplingrow_samples = _TIFFMultiply64(tif,samplingblocks_hor,samplingblock_samples,module);
 			samplingrow_size = TIFFhowmany_64(_TIFFMultiply64(tif,samplingrow_samples,td->td_bitspersample,module),8);
-			scanline_size = (samplingrow_size/ycbcrsubsampling[1]);
+/* IMLIB			scanline_size = (samplingrow_size/ycbcrsubsampling[1]); */
+			scanline_size = samplingrow_size;
 		}
 		else
 		{
