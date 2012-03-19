@@ -94,7 +94,7 @@ static listnode* listadd_filtered(listnode* list, listnode* cur_node, point *pt,
 /*C* Initial version from XITE
 
         houghLine
-        $Id: im_houghline.cpp,v 1.2 2011-11-03 17:03:59 scuri Exp $
+        $Id: im_houghline.cpp,v 1.3 2012-03-19 02:33:51 scuri Exp $
         Copyright 1990, Blab, UiO
         Image processing lab, Department of Informatics
         University of Oslo
@@ -257,7 +257,7 @@ static void drawLine(imImage* image, int theta, int rho)
 {
   int xsize, ysize, xstart, xstop, ystart, ystop, xhalf, yhalf;
   float a, b;
-  imbyte *map = (imbyte*)image->data[0];
+  imbyte *map = (imbyte*)image->data[0];  // gray or red plane
 
   xsize = image->width;
   ysize = image->height;
@@ -391,10 +391,13 @@ static void DrawPoints(imImage *image, listnode* maxima)
 static void ReplaceColor(imImage* NewImage)
 {
   int i;
-  imbyte* map = (imbyte*)NewImage->data[0];
+  imbyte* map = (imbyte*)NewImage->data[0];  // gray or red plane
 
-  NewImage->color_space = IM_MAP;
-  NewImage->palette[254] = imColorEncode(255, 0, 0);
+  if (NewImage->color_space == IM_GRAY)
+  {
+    NewImage->color_space = IM_MAP;
+    NewImage->palette[254] = imColorEncode(255, 0, 0);
+  }
 
   for (i = 0; i < NewImage->count; i++)
   {

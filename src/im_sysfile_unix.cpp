@@ -2,7 +2,7 @@
  * \brief System Dependent Binary File Access (UNIX)
  *
  * See Copyright Notice in im_lib.h
- * $Id: im_sysfile_unix.cpp,v 1.1 2008-10-17 06:10:16 scuri Exp $
+ * $Id: im_sysfile_unix.cpp,v 1.2 2012-03-19 02:33:51 scuri Exp $
  */
 
 #include <stdlib.h>
@@ -56,7 +56,7 @@ void imBinSystemFile::Open(const char* pFileName)
     this->Error = errno;
   else
     this->Error = 0;
-  InitByteOrder(imBinCPUByteOrder());
+  SetByteOrder(imBinCPUByteOrder());
   this->IsNew = 0;
 }
 
@@ -71,7 +71,7 @@ void imBinSystemFile::New(const char* pFileName)
     this->Error = errno;
   else
     this->Error = 0;
-  InitByteOrder(imBinCPUByteOrder());
+  SetByteOrder(imBinCPUByteOrder());
   this->IsNew = 1;
 }
 
@@ -189,7 +189,7 @@ void imBinSystemFileHandle::Open(const char* pFileName)
 
   int *s = (int*)pFileName;
   this->FileHandle = s[0];
-  InitByteOrder(imBinCPUByteOrder());
+  SetByteOrder(imBinCPUByteOrder());
   this->IsNew = 0;
   this->Error = 0;
 }
@@ -200,7 +200,7 @@ void imBinSystemFileHandle::New(const char* pFileName)
 
   int *s = (int*)pFileName;
   this->FileHandle = s[0];
-  InitByteOrder(imBinCPUByteOrder());
+  SetByteOrder(imBinCPUByteOrder());
   this->IsNew = 1;
   this->Error = 0;
 }
