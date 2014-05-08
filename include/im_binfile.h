@@ -60,18 +60,21 @@ unsigned long imBinFileSize(imBinFile* bfile);
  * \ingroup binfile */
 int imBinFileByteOrder(imBinFile* bfile, int pByteOrder);
 
-/** Reads an array of count values with byte sizes: 1, 2, 4, or 8. And invert the byte order if necessary after read.
+/** Reads an array of count values with byte sizes: 1, 2, 4, or 8. And invert the byte order if necessary after read. \n
+ * Returns the actual count of values read.
  * \ingroup binfile */
 unsigned long imBinFileRead(imBinFile* bfile, void* pValues, unsigned long pCount, int pSizeOf);
 
 /** Writes an array of values with sizes: 1, 2, 4, or 8. And invert the byte order if necessary before write.\n
  * <b>ATENTION</b>: The function will not make a temporary copy of the values to invert the byte order.\n
- * So after the call the values will be invalid, if the file byte order is diferent from the CPU byte order. 
+ * So after the call the values will be invalid, if the file byte order is diferent from the CPU byte order. \n
+ * Returns the actual count of values writen.
  * \ingroup binfile */
 unsigned long imBinFileWrite(imBinFile* bfile, void* pValues, unsigned long pCount, int pSizeOf);
 
 /** Writes a string without the NULL terminator. The function uses sprintf to compose the string. \n
- * The internal buffer is fixed at 4096 bytes.
+ * The internal buffer is fixed at 4096 bytes. \n
+ * Returns the actual count of values writen.
  * \ingroup binfile */
 unsigned long imBinFilePrintf(imBinFile* bfile, char *format, ...);
 
