@@ -1,5 +1,5 @@
 APPNAME = im_copy
-APPTYPE = CONSOLE
+APPTYPE = console
 #LINKER = g++
 
 SRC = im_copy.cpp
