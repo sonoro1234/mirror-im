@@ -1,5 +1,5 @@
 APPNAME = im_info
-APPTYPE = CONSOLE
+APPTYPE = console
 LINKER = g++
 
 SRC = im_info.cpp
