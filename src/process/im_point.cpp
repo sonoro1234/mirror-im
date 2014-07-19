@@ -181,7 +181,7 @@ static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height
 int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
 {
   int ret = 0;
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   int dst_depth = dst_image->has_alpha? dst_image->depth+1: dst_image->depth;
 
   int counter = imProcessCounterBegin(op_name? op_name: "UnaryPointColorOp");
@@ -304,7 +304,7 @@ static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int 
 int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
 {
   int ret = 0;
-  int depth = src_image[0]->has_alpha? src_image[0]->depth+1: src_image[0]->depth;
+  int depth = src_image[0]->has_alpha && dst_image->has_alpha? src_image[0]->depth + 1 : src_image[0]->depth;
   void** src_map = new void* [src_count];
 
   int counter = imProcessCounterBegin(op_name? op_name: "MultiPointOp");
@@ -436,7 +436,7 @@ static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int heigh
 int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
 {
   int ret = 0;
-  int src_depth = src_image[0]->has_alpha? src_image[0]->depth+1: src_image[0]->depth;
+  int src_depth = src_image[0]->has_alpha && dst_image->has_alpha ? src_image[0]->depth + 1 : src_image[0]->depth;
   int dst_depth = dst_image->has_alpha? dst_image->depth+1: dst_image->depth;
   void*** src_map = new void** [src_count];
 

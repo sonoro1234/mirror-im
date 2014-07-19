@@ -447,7 +447,7 @@ static void InterlaceSplit(int width,
 
 void imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir)
 {
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   for (int i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
@@ -476,7 +476,7 @@ void imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir)
 
 void imProcessRotate180(const imImage* src_image, imImage* dst_image)
 {
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   for (int i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
@@ -508,7 +508,7 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
   int ret = 0;
 
   int counter = imProcessCounterBegin("Radial Distort");
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
 
   for (int i = 0; i < src_depth; i++)
@@ -549,7 +549,7 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int or
   int ret = 0;
 
   int counter = imProcessCounterBegin("Swirl Distort");
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
 
   for (int i = 0; i < src_depth; i++)
@@ -629,7 +629,7 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
   int ret = 0;
 
   int counter = imProcessCounterBegin("Rotate");
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
 
   if (src_image->color_space == IM_MAP)
@@ -677,7 +677,7 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
   int ret = 0;
 
   int counter = imProcessCounterBegin("RotateRef");
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
 
   if (src_image->color_space == IM_MAP)
@@ -723,7 +723,7 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
 void imProcessMirror(const imImage* src_image, imImage* dst_image)
 {
   int i;
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
 
   for (i = 0; i < src_depth; i++)
   {
@@ -754,7 +754,7 @@ void imProcessMirror(const imImage* src_image, imImage* dst_image)
 void imProcessFlip(const imImage* src_image, imImage* dst_image)
 {
   int i;
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
 
   for (i = 0; i < src_depth; i++)
   {
@@ -785,7 +785,7 @@ void imProcessFlip(const imImage* src_image, imImage* dst_image)
 void imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2)
 {
   int i;
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image1->has_alpha && dst_image2->has_alpha ? src_image->depth + 1 : src_image->depth;
 
   for (i = 0; i < src_depth; i++)
   {
