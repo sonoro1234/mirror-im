@@ -132,7 +132,7 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order)
   int ret = 0;
   int counter = imProcessCounterBegin("Reduce Size");
   const char* int_msg = (order == 1)? "Bilinear Decimation": "Zero Order Decimation";
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, int_msg);
 
   for (int i = 0; i < src_depth; i++)
@@ -181,7 +181,7 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order)
   int ret = 0;
   int counter = imProcessCounterBegin("Resize");
   const char* int_msg = (order == 3)? "Bicubic Interpolation": (order == 1)? "Bilinear Interpolation": "Zero Order Interpolation";
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, int_msg);
 
   for (int i = 0; i < src_depth; i++)
@@ -259,7 +259,7 @@ static void ReduceBy4(int src_width,
 void imProcessReduceBy4(const imImage* src_image, imImage* dst_image)
 {
   int i;
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
 
   for (i = 0; i < src_depth; i++)
   {
@@ -290,7 +290,7 @@ void imProcessReduceBy4(const imImage* src_image, imImage* dst_image)
 void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin)
 {
   int type_size = imDataTypeSize(src_image->data_type);
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   for (int i = 0; i < src_depth; i++)
   {
     imbyte *src_map = (imbyte*)src_image->data[i];
@@ -319,7 +319,7 @@ void imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage
   int rgn_size, rgn_line_size = rgn_image->line_size;
   int src_line_size = src_image->line_size;
   int dst_line_size = dst_image->line_size;
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
 
   if (dst_size2 < 0)
   {
@@ -373,7 +373,7 @@ void imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage
 void imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin, int ymin)
 {
   int type_size = imDataTypeSize(src_image->data_type);
-  int src_depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
+  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   for (int i = 0; i < src_depth; i++)
   {
     imbyte *dst_map = (imbyte*)dst_image->data[i];
