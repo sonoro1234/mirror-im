@@ -25,26 +25,26 @@ extern "C" {
 
 /** Only reduze the image size using the given decimation order. \n
  * Supported decimation orders:
- * \li 0 - zero order (mean) 
- * \li 1 - first order (bilinear decimation)
+ * \li 0 - zero order (mean) [default in Lua for MAP and BINARY]
+ * \li 1 - first order (bilinear decimation)  [default in Lua]
  * Images must be of the same type. If image type is IM_MAP or IM_BINARY, must use order=0. \n
  * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessReduce(src_image: imImage, dst_image: imImage, order: number) -> counter: boolean [in Lua 5] \endverbatim
- * \verbatim im.ProcessReduceNew(image: imImage, width, height, order: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessReduceNew(image: imImage, width, height[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup resize */
 int imProcessReduce(const imImage* src_image, imImage* dst_image, int order);
 
 /** Change the image size using the given interpolation order. \n
  * Supported interpolation orders:
- * \li 0 - zero order (near neighborhood) 
- * \li 1 - first order (bilinear interpolation) 
+ * \li 0 - zero order (near neighborhood) [default in Lua for MAP and BINARY]
+ * \li 1 - first order (bilinear interpolation) [default in Lua] 
  * \li 3 - third order (bicubic interpolation)
  * Images must be of the same type. If image type is IM_MAP or IM_BINARY, must use order=0. \n
  * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessResize(src_image: imImage, dst_image: imImage, order: number) -> counter: boolean [in Lua 5] \endverbatim
- * \verbatim im.ProcessResizeNew(image: imImage, width, height, order: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessResizeNew(image: imImage, width, height[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup resize */
 int imProcessResize(const imImage* src_image, imImage* dst_image, int order);
 
@@ -105,7 +105,7 @@ void imProcessCalcRotateSize(int width, int height, int *new_width, int *new_hei
  * or can be any size, including the original size. The rotation is relative to the center of the image. \n
  * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessRotate(src_image: imImage, dst_image: imImage, cos0: number, sin0: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRotate(src_image: imImage, dst_image: imImage, cos0: number, sin0: number[, order]: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRotateNew(image: imImage, cos0, sin0, order: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, double sin0, int order);
@@ -116,7 +116,7 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
  * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessRotateRef(src_image: imImage, dst_image: imImage, cos0: number, sin0: number, x: number, y: number, to_origin: boolean, order: number) -> counter: boolean [in Lua 5] \endverbatim
- * \verbatim im.ProcessRotateRefNew(image: imImage, cos0: number, sin0: number, x: number, y: number, to_origin: boolean, order: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRotateRefNew(image: imImage, cos0: number, sin0: number, x: number, y: number, to_origin: boolean[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0, double sin0, int x, int y, int to_origin, int order);
 
@@ -159,7 +159,7 @@ void imProcessFlip(const imImage* src_image, imImage* dst_image);
  * Images must be of the same type and size. Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessRadial(src_image: imImage, dst_image: imImage, k1: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
- * \verbatim im.ProcessRadialNew(image: imImage, k1: number, order: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRadialNew(image: imImage, k1: number[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int order);
 
@@ -167,7 +167,7 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
  * Images must be of the same type and size. Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessSwirl(src_image: imImage, dst_image: imImage, k: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
- * \verbatim im.ProcessSwirlNew(image: imImage, k: number, order: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessSwirlNew(image: imImage, k: number[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k1, int order);
 

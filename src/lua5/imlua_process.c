@@ -640,6 +640,26 @@ static int imluaProcessRegionalMaximum (lua_State *L)
  Image Resize
 \*****************************************************************************/
 
+static int imlua_getorder(lua_State *L, imImage* image, int param)
+{
+  int order;
+
+  if (lua_isnoneornil(L, param))
+  {
+    if (image->color_space == IM_MAP || image->color_space == IM_BINARY)
+      order = 0;
+    else
+      order = 1;
+  }
+  else
+  {
+    order = luaL_checkint(L, param);
+    luaL_argcheck(L, (order == 0 || order == 1 || order == 3), param, "invalid order, must be 0, 1 or 3");
+  }
+
+  return order;
+}
+
 /*****************************************************************************\
  im.ProcessReduce(src_image, dst_image, order)
 \*****************************************************************************/
@@ -647,10 +667,10 @@ static int imluaProcessReduce (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
-  int order = luaL_checkint(L, 3);
+  int order = imlua_getorder(L, src_image, 3);
+  luaL_argcheck(L, (order != 3), 3, "invalid order, can only be 0 or 1 here");
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, (order == 0 || order == 1), 3, "invalid order, must be 0 or 1");
 
   lua_pushboolean(L, imProcessReduce(src_image, dst_image, order));
   return 1;
@@ -663,10 +683,9 @@ static int imluaProcessResize (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
-  int order = luaL_checkint(L, 3);
+  int order = imlua_getorder(L, src_image, 3);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, (order == 0 || order == 1 || order == 3), 3, "invalid order, must be 0, 1 or 3");
 
   lua_pushboolean(L, imProcessResize(src_image, dst_image, order));
   return 1;
@@ -779,10 +798,9 @@ static int imluaProcessRotate (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   double cos0 = (double) luaL_checknumber(L, 3);
   double sin0 = (double) luaL_checknumber(L, 4);
-  int order = luaL_checkint(L, 5);
+  int order = imlua_getorder(L, src_image, 5);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, (order == 0 || order == 1 || order == 3), 5, "invalid order, must be 0, 1 or 3");
 
   lua_pushboolean(L, imProcessRotate(src_image, dst_image, cos0, sin0, order));
   return 1;
@@ -800,10 +818,9 @@ static int imluaProcessRotateRef (lua_State *L)
   int x = luaL_checkint(L, 5);
   int y = luaL_checkint(L, 6);
   int to_origin = lua_toboolean(L, 7);
-  int order = luaL_checkint(L, 8);
+  int order = imlua_getorder(L, src_image, 8);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, (order == 0 || order == 1 || order == 3), 5, "invalid order, must be 0, 1, or 3");
 
   lua_pushboolean(L, imProcessRotateRef(src_image, dst_image, cos0, sin0, x, y, to_origin, order));
   return 1;
@@ -903,10 +920,9 @@ static int imluaProcessRadial (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
   float k1 = (float) luaL_checknumber(L, 3);
-  int order = luaL_checkint(L, 4);
+  int order = imlua_getorder(L, src_image, 4);
 
   imlua_match(L, src_image, dst_image);
-  luaL_argcheck(L, (order == 0 || order == 1 || order == 3), 4, "invalid order");
 
   lua_pushboolean(L, imProcessRadial(src_image, dst_image, k1, order));
   return 1;
@@ -920,10 +936,9 @@ static int imluaProcessSwirl(lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
   float k1 = (float) luaL_checknumber(L, 3);
-  int order = luaL_checkint(L, 4);
+  int order = imlua_getorder(L, src_image, 4);
 
   imlua_match(L, src_image, dst_image);
-  luaL_argcheck(L, (order == 0 || order == 1 || order == 3), 4, "invalid order, can be 0, 1 or 3");
 
   lua_pushboolean(L, imProcessSwirl(src_image, dst_image, k1, order));
   return 1;
