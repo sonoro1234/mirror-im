@@ -143,7 +143,7 @@ public:
   int CanWrite(const char* compression, int color_mode, int data_type) const;
 };
 
-static char* ijp2_message = NULL;
+static const char* ijp2_message = NULL;
 static int ijp2_abort = 0;
 static int ijp2_counter = -1;
 
@@ -455,6 +455,9 @@ int imFileFormatJP2::WriteImageData(void* data)
       ret = iJP2WriteLine(image, row, plane, (imbyte*)this->line_buffer);
     else
       ret = iJP2WriteLine(image, row, plane, (imushort*)this->line_buffer);
+
+    if (!ret)
+      return IM_ERR_ACCESS;
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
