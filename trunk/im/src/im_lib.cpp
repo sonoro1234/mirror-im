@@ -14,7 +14,7 @@
 #define IM_VERSION_FIX_NUMBER 2
 #define IM_VERSION_FIX_DATE "2013/11/21"
 
-static char *iVersion = "TECVERID.str:IM:LIB:" IM_VERSION IM_VERSION_FIX;
+static const char *iVersion = "TECVERID.str:IM:LIB:" IM_VERSION IM_VERSION_FIX;
 
 const char iIdent[] =
   "$IM: " IM_VERSION IM_VERSION_FIX " " IM_COPYRIGHT " $\n"

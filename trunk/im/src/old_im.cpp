@@ -308,7 +308,7 @@ int imLoadMap(char *filename, unsigned char *map, long *palette)
   return IM_ERR_NONE;
 }
 
-static char* i_format_old2new[] = {"BMP", "PCX", "GIF", "TIFF", "RAS", "SGI", "JPEG", "LED", "TGA"};
+static const char* i_format_old2new[] = {"BMP", "PCX", "GIF", "TIFF", "RAS", "SGI", "JPEG", "LED", "TGA"};
 
 int imSaveRGB(int width, int height, int format, unsigned char *red, unsigned char *green, unsigned char *blue, char *filename)
 {

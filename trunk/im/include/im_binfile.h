@@ -76,7 +76,7 @@ unsigned long imBinFileWrite(imBinFile* bfile, void* pValues, unsigned long pCou
  * The internal buffer is fixed at 4096 bytes. \n
  * Returns the actual count of values writen.
  * \ingroup binfile */
-unsigned long imBinFilePrintf(imBinFile* bfile, char *format, ...);
+unsigned long imBinFilePrintf(imBinFile* bfile, const char *format, ...);
 
 /** Reads an integer number from the current position until found a non integer character.
  * Returns a non zero value if sucessfull.
@@ -186,6 +186,8 @@ protected:
   }
 
 public:
+
+  virtual ~imBinFileBase(){};
 
   int InitByteOrder(int ByteOrder)
   {

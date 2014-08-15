@@ -22,9 +22,9 @@
 #include <memory.h>
 
 #ifndef IM_PROCESS
-#define IM_INT_PROCESSING     int processing = IM_ERR_NONE;
+#define IM_INT_PROCESSING     
 #define IM_BEGIN_PROCESSING   
-#define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) { processing = IM_ERR_COUNTER; break; }
+#define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) break;
 #define IM_END_PROCESSING
 #endif
 

@@ -156,7 +156,7 @@ static int compare_int(const void *elem1, const void *elem2)
 
 static int thresUniErr(unsigned char* band, int width, int height)
 {
-  int x, y, i, bottom, top, ant2x2, maks1, maks2, maks4, t;
+  int x, y, i, bottom, top, maks1, maks2, maks4, t;
   int xsize, ysize, offset1, offset2;
   double a, b, c, phi;
   int g[4], tab1[256], tab2[256], tab4[256];
@@ -215,7 +215,7 @@ static int thresUniErr(unsigned char* band, int width, int height)
   
   /* Tables are ready, find threshold */
   bottom = 0; top = 255;
-  ant2x2 = (xsize/2)*(ysize/2);
+  /* ant2x2 = (xsize/2)*(ysize/2); */
   maks1 = tab1[0]; /* = ant2x2 * 4; */
   maks2 = tab2[0]; /* = ant2x2 * 6; */
   maks4 = tab4[0]; /* = ant2x2;     */

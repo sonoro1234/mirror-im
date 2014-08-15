@@ -631,7 +631,7 @@ static void iGIFReadGraphicsControl(imBinFile* handle, imAttribTable* attrib_tab
   /* disposal */
   if (byte_value & 0x1C)
   {
-    char* disposal;
+    const char* disposal;
     int disp = (byte_value & 0x1C) >> 2;
 
     switch (disp)

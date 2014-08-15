@@ -185,9 +185,9 @@ static int iTIFFGetDataType(TIFFDataType field_type)
   case TIFF_FLOAT:
   case TIFF_DOUBLE:
     return IM_FLOAT;
+  default:  /* TIFF_NOTYPE, TIFF_IFD, TIFF_LONG8, TIFF_SLONG8, TIFF_IFD8 */
+    return -1;
   }
-
-  return -1;
 }
 
 static int iTIFFWriteTag(TIFF* tiff, int index, const char* name, int data_type, int count, const void* data)

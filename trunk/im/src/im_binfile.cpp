@@ -632,7 +632,7 @@ int imBinFileEndOfFile(imBinFile* bfile)
   return bfile->binfile->EndOfFile();
 }
 
-unsigned long imBinFilePrintf(imBinFile* bfile, char *format, ...)
+unsigned long imBinFilePrintf(imBinFile* bfile, const char *format, ...)
 {
   va_list arglist;
   va_start(arglist, format);
