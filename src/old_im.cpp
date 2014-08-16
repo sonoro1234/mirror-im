@@ -313,7 +313,7 @@ static const char* i_format_old2new[] = {"BMP", "PCX", "GIF", "TIFF", "RAS", "SG
 int imSaveRGB(int width, int height, int format, unsigned char *red, unsigned char *green, unsigned char *blue, char *filename)
 {
   int error;
-  char* new_format = i_format_old2new[format & 0x00FF];  
+  const char* new_format = i_format_old2new[format & 0x00FF];  
   
   imFile* ifile = imFileNew(filename, new_format, &error);
   if (!ifile) return error;
@@ -387,7 +387,7 @@ int imSaveRGB(int width, int height, int format, unsigned char *red, unsigned ch
 int imSaveMap(int width, int height, int format, unsigned char *map, int palette_count, long *palette, char *filename)
 {
   int error;
-  char* new_format = i_format_old2new[format & 0x00FF];
+  const char* new_format = i_format_old2new[format & 0x00FF];
   imFile* ifile = imFileNew(filename, new_format, &error);
   if (!ifile) return error;
   
