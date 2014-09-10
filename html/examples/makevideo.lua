@@ -25,11 +25,13 @@ function ProcessImageFile(file_name, ifile)
   print("Loading File: "..file_name)
   local image, err = im.FileImageLoad(file_name);
   if (err and err ~= im.ERR_NONE) then
+    ifile:Close()
     error(err_msg[err+1])
   end
 
   err = ifile:SaveImage(image)
   if (err and err ~= im.ERR_NONE) then
+    ifile:Close()
     error(err_msg[err+1])
   end
 
