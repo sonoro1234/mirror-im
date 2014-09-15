@@ -202,6 +202,10 @@ EXPORTS
   imRegisterCallback
   imCompressDataZ
   imCompressDataUnZ
+  imCompressDataLZF
+  imCompressDataUnLZF
+  imCompressDataLZO
+  imCompressDataUnLZO
   imAttribArrayCreate
   imAttribArrayGet
   imAttribArraySet

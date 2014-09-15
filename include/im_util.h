@@ -244,12 +244,17 @@ void imBinSwapBytes8(void *data, int count);
 /** \defgroup compress Data Compression Utilities
  * \par
  * Deflate compression support uses zlib version 1.2.5.     \n
- * http://www.zlib.org/                                      \n
+ * http://www.zlib.org/                                     \n
  * Copyright (C) 1995-2011 Jean-loup Gailly and Mark Adler
  * \par
  * LZF compression support uses libLZF version 3.5.       \n
  * http://software.schmorp.de/pkg/liblzf                  \n
  * Copyright (C) 2000-2009 Marc Alexander Lehmann
+ * \par
+ * LZO compression support uses mini-libLZO version 2.07. \n
+ * http://www.oberhumer.com/opensource/lzo/                  \n
+ * Copyright (C) 1996-2014 Markus Franz Xaver Johannes Oberhumer
+ *
  * See \ref im_util.h
  * \ingroup util */
 
@@ -274,6 +279,16 @@ int imCompressDataLZF(const void* src_data, int src_size, void* dst_data, int ds
  * Returns zero if failed.
  * \ingroup compress */
 int imCompressDataUnLZF(const void* src_data, int src_size, void* dst_data, int dst_size);
+
+/** Compresses the data using the libLZO compression. \n
+* Returns the size of the compressed buffer or zero if failed.
+* \ingroup compress */
+int imCompressDataLZO(const void* src_data, int src_size, void* dst_data, int dst_size, int zip_quality);
+
+/** Uncompresses the data compressed with the libLZO compression.
+* Returns zero if failed.
+* \ingroup compress */
+int imCompressDataUnLZO(const void* src_data, int src_size, void* dst_data, int dst_size);
 
 
 #if defined(__cplusplus)
