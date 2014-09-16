@@ -161,6 +161,7 @@ EXPORTS
   imConvertPacking
   imConvertMapToRGB
   imConvertRGB2Map
+  imImageLoadFromResource
   imFileNewRaw
   imFileOpenRaw
   imBinFileNew

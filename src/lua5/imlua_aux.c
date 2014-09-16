@@ -44,7 +44,7 @@ int imlua_newarrayulong (lua_State *L, const unsigned long *value, int count, in
   lua_createtable(L, count, 0);
   for (i = 0; i < count; i++)
   {
-    lua_pushnumber(L, value[i]);
+    lua_pushinteger(L, value[i]);
     lua_rawseti(L, -2, i+start);
   }
   return 1;

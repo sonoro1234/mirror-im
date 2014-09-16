@@ -123,6 +123,129 @@ static int imluaImageCreate (lua_State *L)
   return 1;
 }
 
+static int imluaImageSetPixels(lua_State *L)
+{
+  int i, n, total_count;
+  imImage* image = imlua_checkimage(L, 1);
+  int depth = image->depth;
+  if (image->has_alpha) depth++;
+  if (image->data_type == IM_CFLOAT) depth *= 2;
+
+  luaL_checktype(L, 2, LUA_TTABLE);
+
+  n = imlua_getn(L, 2);
+  total_count = image->width * image->height * depth;
+  if (total_count != n)
+    luaL_error(L, "number of elements in the table must be width*height*depth of the image.");
+
+  for (i = 0; i < n; i++)
+  {
+    lua_rawgeti(L, 2, i+1);
+
+    if (image->data_type == IM_FLOAT || image->data_type == IM_CFLOAT)
+    {
+      lua_Number value = luaL_checknumber(L, -1);
+      float* fdata = (float*)image->data[0];
+      fdata[i] = (float)value;
+    }
+    else
+    {
+      int value = luaL_checkint(L, -1);
+
+      switch (image->data_type)
+      {
+      case IM_BYTE:
+        {
+          imbyte *bdata = (imbyte*)image->data[0];
+          bdata[i] = (imbyte)value;
+          break;
+        }
+      case IM_SHORT:
+        {
+          short *sdata = (short*)image->data[0];
+          sdata[i] = (short)value;
+          break;
+        }
+      case IM_USHORT:
+        {
+          imushort *udata = (imushort*)image->data[0];
+          udata[i] = (imushort)value;
+          break;
+        }
+      case IM_INT:
+        {
+          int *idata = (int*)image->data[0];
+          idata[i] = (int)value;
+          break;
+        }
+      }
+    }
+
+    lua_pop(L, 1);
+  }
+
+  return 0;
+}
+
+static int imluaImageGetPixels(lua_State *L)
+{
+  int i, total_count;
+  imImage* image = imlua_checkimage(L, 1);
+  int depth = image->depth;
+  if (image->has_alpha) depth++;
+  if (image->data_type == IM_CFLOAT) depth *= 2;
+
+  total_count = image->width * image->height * depth;
+  lua_createtable(L, total_count, 0);
+
+  for (i = 0; i < total_count; i++)
+  {
+    if (image->data_type == IM_FLOAT || image->data_type == IM_CFLOAT)
+    {
+      float* fdata = (float*)image->data[0];
+      lua_pushnumber(L, (lua_Number)fdata[i]);
+    }
+    else
+    {
+      lua_Integer value = 0;
+
+      switch (image->data_type)
+      {
+      case IM_BYTE:
+        {
+          imbyte *bdata = (imbyte*)image->data[0];
+          value = (lua_Integer)bdata[i];
+          break;
+        }
+      case IM_SHORT:
+        {
+          short *sdata = (short*)image->data[0];
+          value = (lua_Integer)sdata[i];
+          break;
+        }
+      case IM_USHORT:
+        {
+          imushort *udata = (imushort*)image->data[0];
+          value = (lua_Integer)udata[i];
+          break;
+        }
+      case IM_INT:
+        {
+          int *idata = (int*)image->data[0];
+          value = (lua_Integer)idata[i];
+          break;
+        }
+      }
+
+      lua_pushinteger(L, value);
+    }
+
+    lua_rawseti(L, -2, i + 1);
+  }
+
+  return 1;
+}
+
 /*****************************************************************************\
  im.ImageCreateFromOpenGLData(width, height, glformat, gldata)
 \*****************************************************************************/
@@ -166,11 +289,11 @@ static int imluaImageSetAlpha (lua_State *L)
 \*****************************************************************************/
 static int imluaImageReshape (lua_State *L)
 {
-  imImage* im = imlua_checkimage(L, 1);
+  imImage* image = imlua_checkimage(L, 1);
   int width = luaL_checkint(L, 2);
   int height = luaL_checkint(L, 3);
 
-  imImageReshape(im, width, height);
+  imImageReshape(image, width, height);
   return 0;
 }
 
@@ -277,7 +400,7 @@ static int imluaImageSetAttribute (lua_State *L)
         if (lua_isstring(L, 4))
         {
           const char* str = lua_tostring(L, 4);
-          count = strlen(str)+1;
+          count = (int)strlen(str)+1;
           data = malloc(imDataTypeSize(data_type) * count);
           memcpy(data, str, count);
         }
@@ -708,8 +831,8 @@ static int imluaImageMakeGray (lua_State *L)
 \*****************************************************************************/
 static int imluaImageWidth(lua_State *L)
 {
-  imImage *im = imlua_checkimage(L, 1);
-  lua_pushnumber(L, im->width);
+  imImage* image = imlua_checkimage(L, 1);
+  lua_pushnumber(L, image->width);
   return 1;
 }
 
@@ -718,8 +841,8 @@ static int imluaImageWidth(lua_State *L)
 \*****************************************************************************/
 static int imluaImageHeight(lua_State *L)
 {
-  imImage *im = imlua_checkimage(L, 1);
-  lua_pushnumber(L, im->height);
+  imImage* image = imlua_checkimage(L, 1);
+  lua_pushnumber(L, image->height);
   return 1;
 }
 
@@ -728,8 +851,8 @@ static int imluaImageHeight(lua_State *L)
 \*****************************************************************************/
 static int imluaImageDepth(lua_State *L)
 {
-  imImage *im = imlua_checkimage(L, 1);
-  lua_pushnumber(L, im->depth);
+  imImage* image = imlua_checkimage(L, 1);
+  lua_pushnumber(L, image->depth);
   return 1;
 }
 
@@ -738,8 +861,8 @@ static int imluaImageDepth(lua_State *L)
 \*****************************************************************************/
 static int imluaImageDataType(lua_State *L)
 {
-  imImage *im = imlua_checkimage(L, 1);
-  lua_pushnumber(L, im->data_type);
+  imImage* image = imlua_checkimage(L, 1);
+  lua_pushnumber(L, image->data_type);
   return 1;
 }
 
@@ -748,8 +871,8 @@ static int imluaImageDataType(lua_State *L)
 \*****************************************************************************/
 static int imluaImageColorSpace(lua_State *L)
 {
-  imImage *im = imlua_checkimage(L, 1);
-  lua_pushnumber(L, im->color_space);
+  imImage* image = imlua_checkimage(L, 1);
+  lua_pushnumber(L, image->color_space);
   return 1;
 }
 
@@ -758,8 +881,8 @@ static int imluaImageColorSpace(lua_State *L)
 \*****************************************************************************/
 static int imluaImageHasAlpha(lua_State *L)
 {
-  imImage *im = imlua_checkimage(L, 1);
-  lua_pushboolean(L, im->has_alpha);
+  imImage* image = imlua_checkimage(L, 1);
+  lua_pushboolean(L, image->has_alpha);
   return 1;
 }
 
@@ -931,7 +1054,7 @@ static int imluaImageRow_index (lua_State *L)
   int column = luaL_checkint(L, 2);
   void* channel_buffer = image->data[channel];
 
-  if (column < 0 || column >= imagerow->image->width)
+  if (column < 0 || column >= image->width)
     luaL_argerror(L, 2, "invalid column, out of bounds");
 
   index = row * image->width + column;
@@ -997,7 +1120,7 @@ static int imluaImageRow_newindex (lua_State *L)
   int column = luaL_checkint(L, 2);
   void* channel_buffer = image->data[channel];
 
-  if (column < 0 || column >= imagerow->image->width)
+  if (column < 0 || column >= image->width)
     luaL_argerror(L, 2, "invalid column, out of bounds");
 
   index = row * image->width + column;
@@ -1006,7 +1129,7 @@ static int imluaImageRow_newindex (lua_State *L)
   {
   case IM_BYTE:
     {
-      lua_Number value = luaL_checknumber(L, 3);
+      int value = luaL_checkint(L, 3);
       imbyte *bdata = (imbyte*) channel_buffer;
       bdata[index] = (imbyte) value;
     }
@@ -1014,7 +1137,7 @@ static int imluaImageRow_newindex (lua_State *L)
 
   case IM_SHORT:
     {
-      lua_Number value = luaL_checknumber(L, 3);
+      int value = luaL_checkint(L, 3);
       short *sdata = (short*) channel_buffer;
       sdata[index] = (short) value;
     }
@@ -1022,7 +1145,7 @@ static int imluaImageRow_newindex (lua_State *L)
 
   case IM_USHORT:
     {
-      lua_Number value = luaL_checknumber(L, 3);
+      int value = luaL_checkint(L, 3);
       imushort *udata = (imushort*) channel_buffer;
       udata[index] = (imushort) value;
     }
@@ -1030,7 +1153,7 @@ static int imluaImageRow_newindex (lua_State *L)
 
   case IM_INT:
     {
-      lua_Number value = luaL_checknumber(L, 3);
+      int value = luaL_checkint(L, 3);
       int *idata = (int*) channel_buffer;
       idata[index] = (int) value;
     }
@@ -1127,6 +1250,8 @@ static const luaL_Reg imimage_lib[] = {
 
 static const luaL_Reg imimage_metalib[] = {
   {"Destroy", imluaImageDestroy},
+  {"SetPixels", imluaImageSetPixels},
+  {"GetPixels", imluaImageGetPixels},
   {"AddAlpha", imluaImageAddAlpha},
   {"RemoveAlpha", imluaImageRemoveAlpha},
   {"SetAlpha", imluaImageSetAlpha},
@@ -1173,6 +1298,8 @@ static const luaL_Reg imimage_metalib[] = {
 
 static void createmeta (lua_State *L) 
 {
+  /* image[plane][row][column] */
+
   luaL_newmetatable(L, "imImageChannel"); /* create new metatable for imImageChannel handles */
   lua_pushliteral(L, "__index");
   lua_pushcfunction(L, imluaImageChannel_index);

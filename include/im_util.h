@@ -282,13 +282,13 @@ int imCompressDataLZF(const void* src_data, int src_size, void* dst_data, int ds
  * \ingroup compress */
 int imCompressDataUnLZF(const void* src_data, int src_size, void* dst_data, int dst_size);
 
-/** Compresses the data using the libLZO compression. \n
+/** Compresses the data using the libLZO compression. (Since 3.9) \n
 * Returns the size of the compressed buffer or zero if failed. \n
 * Available in a separate library called "im_lzo" which license is GPL.
 * \ingroup compress */
 int imCompressDataLZO(const void* src_data, int src_size, void* dst_data, int dst_size);
 
-/** Uncompresses the data compressed with the libLZO compression. \n
+/** Uncompresses the data compressed with the libLZO compression. (Since 3.9) \n
 * Returns zero if failed. \n
 * Available in a separate library called "im_lzo" which license is GPL.
 * \ingroup compress */
