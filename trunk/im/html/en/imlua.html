@@ -7,6 +7,23 @@
 <title>Lua Binding</title>
 <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
 <link rel="stylesheet" type="text/css" href="../style.css">
+<style type="text/css">
+.auto-style1 {
+	border-style: solid;
+	border-width: 1px;
+}
+.auto-style3 {
+	border-width: 0;
+	background-color: #E1E1E1;
+}
+.auto-style4 {
+	border-width: 0;
+}
+.auto-style5 {
+	border-width: 0;
+	background-color: #C0C0C0;
+}
+</style>
 </head>
 
 <body>
@@ -100,6 +117,70 @@ imImageXXX(image,... -&gt; image:XXX(...    (for methods)<br /></pre>
       </table>
       </center>
     </div>
+
+    <h3>
+        imImage Usage</h3>
+    <p>
+        <a href="doxygen/struct__imImage.html">imImage</a> structure members are 
+		accessed using member functions in Lua. For instance:</p>
+<table class="auto-style1" align="center" cellpadding="5" cellspacing="0">
+	<tr>
+		<th class="auto-style5">In C</th>
+		<th class="auto-style5" style="width: 50">&nbsp;</th>
+		<th class="auto-style5">In Lua</th>
+	</tr>
+	<tr>
+		<td class="auto-style3">image-&gt;width</td>
+		<td class="auto-style3" style="width: 50">&nbsp;</td>
+		<td class="auto-style3">image:Width()</td>
+	</tr>
+	<tr>
+		<td class="auto-style4">image-&gt;height</td>
+		<td class="auto-style4" style="width: 50">&nbsp;</td>
+		<td class="auto-style4">image:Height()</td>
+	</tr>
+	<tr>
+		<td class="auto-style3" style="height: 28">image-&gt;color_space</td>
+		<td class="auto-style3" style="height: 28; width: 50">&nbsp;</td>
+		<td class="auto-style3" style="height: 28">image:ColorSpace()</td>
+	</tr>
+	<tr>
+		<td class="auto-style4">image-&gt;data_type</td>
+		<td class="auto-style4" style="width: 50">&nbsp;</td>
+		<td class="auto-style4">image:DataType()</td>
+	</tr>
+	<tr>
+		<td class="auto-style3">image-&gt;has_alpha</td>
+		<td class="auto-style3" style="width: 50">&nbsp;</td>
+		<td class="auto-style3">image:HasAlpha()</td>
+	</tr>
+	<tr>
+		<td class="auto-style4">image-&gt;depth</td>
+		<td class="auto-style4" style="width: 50">&nbsp;</td>
+		<td class="auto-style4">image:Depth()</td>
+	</tr>
+</table>
+<p>
+        Data can also be accessed in Lua in two different ways.</p>
+<p>
+        First, using data indexing with plane, row and column. <strong>
+		image[plane]</strong> returns an object that represents an image plane.
+		<strong>image[plane][row]</strong> returns an object that represents an 
+		image row of that plane. And finally <strong>image[plane][row][column]</strong> 
+		returns an object that represents the pixel value of the column in the 
+		row of that plane. All indices use the same start as in C, i.e. all 
+		start at 0. Only the pixel value can has its value changed. When 
+		data_type is IM_CFLOAT then value is a table with two numbers.</p>
+<p>
+        Second, all pixels can be changed or retrieved at once using the
+		<font SIZE="3">
+		&quot;image:<strong>SetPixels</strong>(table)&quot; and &quot;table = image:<strong>GetPixels</strong>()&quot; 
+		member functions. The number of elements in the table must be equal to 
+		&quot;width * height * depth&quot;. If there is alpha the depth must be 
+		incremented by 1. If data_type is IM_CFLOAT depth must be duplicated. 
+		Data organization is the same as in the image-&gt;data member. The table 
+		indices starts at 1.&nbsp; (Since 3.9)</font></p>
+
 
 <h3><a name="Integration with ImLua">Integration with CDLua</a></h3>
 

@@ -880,7 +880,7 @@ void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level)
  * \ingroup remotesens */
 void imProcessNormDiffRatio(const imImage* image1, const imImage* image2, imImage* dst_image);
 
-/** Applies the abnormal pixel correction as described in the article. \n
+/** Applies the abnormal pixel correction as described in the article. (Since 3.8) \n
  * Images must be IM_GRAY. Source and Destiny must have the same datatype, and IM_CFLOAT is not supported. \n
  * image_abnormal is optional, can be NULL. If not NULL, must be IM_BINARY and 
  * it will store the abnormal pixels distribution. \n
