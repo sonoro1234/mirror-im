@@ -556,9 +556,6 @@
     <ClCompile Include="..\src\im_sysfile_unix.cpp">
       <Filter>Source Files\Unix</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\minilzo\minilzo.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\libtiff\t4.h">

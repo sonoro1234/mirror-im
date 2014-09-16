@@ -124,7 +124,6 @@
     <ClCompile Include="..\src\im_palette.cpp" />
     <ClCompile Include="..\src\im_rgb2map.cpp" />
     <ClCompile Include="..\src\im_str.cpp" />
-    <ClCompile Include="..\src\minilzo\minilzo.c" />
     <ClCompile Include="..\src\old_im.cpp" />
     <ClCompile Include="..\src\old_imcolor.c" />
     <ClCompile Include="..\src\old_imresize.c" />
