@@ -64,11 +64,6 @@ SRCLZF = \
 SRCLZF  := $(addprefix liblzf/, $(SRCLZF))
 INCLUDES += liblzf
 
-SRCLZO = \
-    minilzo.c
-SRCLZO  := $(addprefix minilzo/, $(SRCLZO))
-INCLUDES += minilzo
-
 SRC = \
     old_imcolor.c         old_imresize.c      tiff_binfile.c       im_converttype.cpp   \
     im_attrib.cpp         im_format.cpp       im_format_tga.cpp    im_filebuffer.cpp    \
@@ -80,7 +75,7 @@ SRC = \
     im_convertbitmap.cpp  im_format_led.cpp   im_counter.cpp       im_str.cpp        \
     im_convertcolor.cpp   im_fileraw.cpp      im_format_krn.cpp    im_compress.cpp   \
     im_file.cpp           old_im.cpp                                                 \
-    $(SRCJPEG) $(SRCPNG) $(SRCTIFF) $(SRCLZF) $(SRCLZO)
+    $(SRCJPEG) $(SRCPNG) $(SRCTIFF) $(SRCLZF)
     
 ifneq ($(findstring Win, $(TEC_SYSNAME)), )
   SRC += im_sysfile_win32.cpp im_dib.cpp im_dibxbitmap.cpp

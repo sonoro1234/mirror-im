@@ -253,7 +253,9 @@ void imBinSwapBytes8(void *data, int count);
  * \par
  * LZO compression support uses mini-libLZO version 2.07. \n
  * http://www.oberhumer.com/opensource/lzo/                  \n
- * Copyright (C) 1996-2014 Markus Franz Xaver Johannes Oberhumer
+ * Copyright (C) 1996-2014 Markus Franz Xaver Johannes Oberhumer \n
+ * But its License is GPL, so we kept it in a separate library 
+ * called "im_lzo" that is also GPL.
  *
  * See \ref im_util.h
  * \ingroup util */
@@ -273,20 +275,22 @@ int imCompressDataUnZ(const void* src_data, int src_size, void* dst_data, int ds
 /** Compresses the data using the libLZF compression. \n
  * Returns the size of the compressed buffer or zero if failed.
  * \ingroup compress */
-int imCompressDataLZF(const void* src_data, int src_size, void* dst_data, int dst_size, int zip_quality);
+int imCompressDataLZF(const void* src_data, int src_size, void* dst_data, int dst_size);
 
-/** Uncompresses the data compressed with the libLZF compression.
+/** Uncompresses the data compressed with the libLZF compression. \n
  * Returns zero if failed.
  * \ingroup compress */
 int imCompressDataUnLZF(const void* src_data, int src_size, void* dst_data, int dst_size);
 
 /** Compresses the data using the libLZO compression. \n
-* Returns the size of the compressed buffer or zero if failed.
+* Returns the size of the compressed buffer or zero if failed. \n
+* Available in a separate library called "im_lzo" which license is GPL.
 * \ingroup compress */
-int imCompressDataLZO(const void* src_data, int src_size, void* dst_data, int dst_size, int zip_quality);
+int imCompressDataLZO(const void* src_data, int src_size, void* dst_data, int dst_size);
 
-/** Uncompresses the data compressed with the libLZO compression.
-* Returns zero if failed.
+/** Uncompresses the data compressed with the libLZO compression. \n
+* Returns zero if failed. \n
+* Available in a separate library called "im_lzo" which license is GPL.
 * \ingroup compress */
 int imCompressDataUnLZO(const void* src_data, int src_size, void* dst_data, int dst_size);
 
