@@ -487,6 +487,29 @@ void imFormatRegisterTGA(void);
 void imFormatRegisterPNM(void);
 
 
+/** \defgroup pfm PFM - Portable FloatMap Image Format
+* \section Description
+*
+* \par
+* Internal Implementation.
+*
+* \section Features
+*
+\verbatim
+Data Types: Float
+Color Spaces: Gray and RGB
+Compressions:
+  NONE - no compression [default]
+
+No alpha channel.
+Internally the components are always packed.
+Internally the lines are arranged from bottom to top.
+
+\endverbatim
+* \ingroup format */
+void imFormatRegisterPFM(void);
+
+
 /** \defgroup ico ICO - Windows Icon
  * \section Description
  *

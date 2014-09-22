@@ -119,6 +119,7 @@
     <ClCompile Include="..\src\im_fileraw.cpp" />
     <ClCompile Include="..\src\im_format.cpp" />
     <ClCompile Include="..\src\im_format_all.cpp" />
+    <ClCompile Include="..\src\im_format_pfm.cpp" />
     <ClCompile Include="..\src\im_image.cpp" />
     <ClCompile Include="..\src\im_lib.cpp" />
     <ClCompile Include="..\src\im_palette.cpp" />
