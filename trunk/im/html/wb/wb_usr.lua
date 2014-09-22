@@ -158,6 +158,7 @@ wb_usr.tree =
             { link= "doxygen/group__pcx.html", name= {en= "PCX - ZSoft Picture" } },
             { link= "doxygen/group__png.html", name= {en= "PNG - Portable Network Graphic Format" } },
             { link= "doxygen/group__pnm.html", name= {en= "PNM - Netpbm Portable Image Map" } },
+            { link= "doxygen/group__pfm.html", name= {en= "PFM - Portable FloatMap Image Format" } },
             { link= "doxygen/group__ras.html", name= {en= "RAS - Sun Raster File" } },
             { link= "doxygen/group__sgi.html", name= {en= "SGI - Silicon Graphics Image File Format" } },
             { link= "doxygen/group__tga.html", name= {en= "TGA - Truevision Graphics Adapter File" } },

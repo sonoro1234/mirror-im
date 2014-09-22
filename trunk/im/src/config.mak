@@ -50,7 +50,7 @@ SRCJPEG  := $(addprefix libjpeg/, $(SRCJPEG)) im_format_jpeg.cpp
 INCLUDES += libjpeg 
 
 SRCEXIF = \
-    fuji/exif-mnote-data-fuji.c  fuji/mnote-fuji-entry.c  fuji/mnote-fuji-tag.c              \
+    fuji/exif-mnote-data-fuji.c  fuji/mnote-fuji-entry.c  fuji/mnote-fuji-tag.c                    \
     canon/exif-mnote-data-canon.c  canon/mnote-canon-entry.c  canon/mnote-canon-tag.c              \
     olympus/exif-mnote-data-olympus.c  olympus/mnote-olympus-entry.c  olympus/mnote-olympus-tag.c  \
     pentax/exif-mnote-data-pentax.c  pentax/mnote-pentax-entry.c  pentax/mnote-pentax-tag.c        \
@@ -68,13 +68,13 @@ SRC = \
     old_imcolor.c         old_imresize.c      tiff_binfile.c       im_converttype.cpp   \
     im_attrib.cpp         im_format.cpp       im_format_tga.cpp    im_filebuffer.cpp    \
     im_bin.cpp            im_format_all.cpp   im_format_raw.cpp    im_convertopengl.cpp \
-    im_binfile.cpp        im_format_sgi.cpp   im_datatype.cpp      im_format_pcx.cpp \
-    im_colorhsi.cpp       im_format_bmp.cpp   im_image.cpp         im_rgb2map.cpp    \
-    im_colormode.cpp      im_format_gif.cpp   im_lib.cpp           im_format_pnm.cpp \
-    im_colorutil.cpp      im_format_ico.cpp   im_palette.cpp       im_format_ras.cpp \
-    im_convertbitmap.cpp  im_format_led.cpp   im_counter.cpp       im_str.cpp        \
-    im_convertcolor.cpp   im_fileraw.cpp      im_format_krn.cpp    im_compress.cpp   \
-    im_file.cpp           old_im.cpp                                                 \
+    im_binfile.cpp        im_format_sgi.cpp   im_datatype.cpp      im_format_pcx.cpp    \
+    im_colorhsi.cpp       im_format_bmp.cpp   im_image.cpp         im_rgb2map.cpp       \
+    im_colormode.cpp      im_format_gif.cpp   im_lib.cpp           im_format_pnm.cpp    \
+    im_colorutil.cpp      im_format_ico.cpp   im_palette.cpp       im_format_ras.cpp    \
+    im_convertbitmap.cpp  im_format_led.cpp   im_counter.cpp       im_str.cpp           \
+    im_convertcolor.cpp   im_fileraw.cpp      im_format_krn.cpp    im_compress.cpp      \
+    im_file.cpp           old_im.cpp          im_format_pfm.cpp                         \
     $(SRCJPEG) $(SRCPNG) $(SRCTIFF) $(SRCLZF)
     
 ifneq ($(findstring Win, $(TEC_SYSNAME)), )

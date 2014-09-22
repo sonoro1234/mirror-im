@@ -556,6 +556,9 @@
     <ClCompile Include="..\src\im_sysfile_unix.cpp">
       <Filter>Source Files\Unix</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\im_format_pfm.cpp">
+      <Filter>Source Files\formats</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\libtiff\t4.h">

@@ -27,6 +27,7 @@ void imFormatRegisterInternal(void)
   imFormatRegisterRAS();
   imFormatRegisterICO();
   imFormatRegisterPNM();
+  imFormatRegisterPFM();
   imFormatRegisterKRN();
   imFormatRegisterLED();
   imFormatRegisterSGI();

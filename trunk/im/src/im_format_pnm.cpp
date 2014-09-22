@@ -289,7 +289,7 @@ int imFileFormatPNM::WriteImageInfo()
     imBinFileWrite(handle, (void*)"\n", 1, 1);
   }
 
-  imBinFilePrintf(handle, "%d\n", this->width);
+  imBinFilePrintf(handle, "%d ", this->width);
   imBinFilePrintf(handle, "%d\n", this->height);
 
   if (this->image_type != '4' && this->image_type != '1')
