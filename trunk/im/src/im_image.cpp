@@ -57,7 +57,7 @@ static void iImageInit(imImage* image, int width, int height, int color_space, i
   assert(width>0);
   assert(height>0);
   assert(color_space >= IM_RGB && color_space <= IM_XYZ);
-  assert(data_type >= IM_BYTE && data_type <= IM_CFLOAT);
+  assert(data_type >= IM_BYTE && data_type <= IM_CDOUBLE);
 
   image->width = width;
   image->height = height;
@@ -328,6 +328,9 @@ void imImageSetAlpha(imImage* image, float alpha)
     case IM_FLOAT:                                                                           
       iSet((float*)image->data[image->depth], (float)alpha, image->plane_size);
       break;                                                                                
+    case IM_DOUBLE:
+      iSet((double*)image->data[image->depth], (double)alpha, image->plane_size);
+      break;
     }
   }
 }
@@ -410,7 +413,7 @@ void imImageSetAttribute(const imImage* image, const char* attrib, int data_type
   if (data)
   {
     if (count == -1 && data_type == IM_BYTE) // Data is zero terminated like a string
-      count = strlen((char*)data)+1;
+      count = (int)strlen((char*)data)+1;
 
     attrib_table->Set(attrib, data_type, count, data);
   }
@@ -420,12 +423,60 @@ void imImageSetAttribute(const imImage* image, const char* attrib, int data_type
     attrib_table->Set(attrib, data_type, count, NULL);
 }
 
+void imImageSetAttribInteger(const imImage* image, const char* attrib, int data_type, int value)
+{
+  assert(image);
+  assert(attrib);
+  imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
+  attrib_table->SetInteger(attrib, data_type, value);
+}
+
+void imImageSetAttribReal(const imImage* image, const char* attrib, int data_type, double value)
+{
+  assert(image);
+  assert(attrib);
+  imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
+  attrib_table->SetReal(attrib, data_type, value);
+}
+
+void imImageSetAttribString(const imImage* image, const char* attrib, const char* value)
+{
+  assert(image);
+  assert(attrib);
+  imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
+  attrib_table->SetString(attrib, value);
+}
+
 const void* imImageGetAttribute(const imImage* image, const char* attrib, int *data_type, int *count)
 {
   assert(image);
   assert(attrib);
   imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
   return attrib_table->Get(attrib, data_type, count);
+}
+
+int imImageGetAttribInteger(const imImage* image, const char* attrib, int index)
+{
+  assert(image);
+  assert(attrib);
+  imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
+  return attrib_table->GetInteger(attrib, index);
+}
+
+double imImageGetAttribReal(const imImage* image, const char* attrib, int index)
+{
+  assert(image);
+  assert(attrib);
+  imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
+  return attrib_table->GetReal(attrib, index);
+}
+
+const char* imImageGetAttribString(const imImage* image, const char* attrib)
+{
+  assert(image);
+  assert(attrib);
+  imAttribTable* attrib_table = (imAttribTable*)image->attrib_table;
+  return attrib_table->GetString(attrib);
 }
 
 static void iAttributeTableCopy(const void* src_attrib_table, void* dst_attrib_table)

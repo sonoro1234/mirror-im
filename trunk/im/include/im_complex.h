@@ -23,20 +23,21 @@
  * It is not a complete complex class, we just implement constructors inside the class.
  * All the other operators and functions are external to the class.
  * \ingroup cpx */
-class imcfloat
+template<class T>
+class imComplex
 {
 public:
-	float real;  ///< Real part.
-	float imag;  ///< Imaginary part.
+	T real;  ///< Real part.
+	T imag;  ///< Imaginary part.
 
   ///	Default Constructor (0,0).
-	imcfloat():real(0), imag(0) {}
+	imComplex():real(0), imag(0) {}
 
   ///	Constructor from (real, imag)
-	imcfloat(const float& r, const float& i):real(r),imag(i) {}
+	imComplex(const T& r, const T& i):real(r),imag(i) {}
 
   ///	Constructor from (real)
-	imcfloat(const float& r):real(r),imag(0) {}
+	imComplex(const T& r):real(r),imag(0) {}
 };
 
 /** \addtogroup cpx
@@ -44,137 +45,190 @@ public:
  * @{ 
  */
 
-inline int operator <= (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline int operator <= (const imComplex<T>& C1, const imComplex<T>& C2)
 {
   return ((C1.real <= C2.real) && (C1.imag <= C2.imag));
 }
 
-inline int operator <= (const imcfloat& C, const float& F)
+template<class T>
+inline int operator <= (const imComplex<T>& C, const T& R)
 {
-  return ((F <= C.real) && (0 <= C.imag));
+  return ((C.real <= R) && (C.imag <= 0));
 }
 
-inline int operator < (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline int operator < (const imComplex<T>& C1, const imComplex<T>& C2)
 {
   return ((C1.real < C2.real) && (C1.imag < C2.imag));
 }
 
-inline int operator < (const imcfloat& C, const float& F)
+template<class T>
+inline int operator < (const imComplex<T>& C, const T& R)
 {
-  return ((F < C.real) && (0 < C.imag));
+  return ((C.real < R) && (C.imag < 0));
 }
 
-inline int operator > (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline int operator > (const imComplex<T>& C1, const imComplex<T>& C2)
 {
   return ((C1.real > C2.real) && (C1.imag > C2.imag));
 }
 
-inline int operator > (const imcfloat& C, const float& F)
+template<class T>
+inline int operator > (const imComplex<T>& C, const T& R)
 {
-  return ((F > C.real) && (0 > C.imag));
+  return ((C.real > R) && (C.imag > 0));
 }
 
-inline imcfloat operator + (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> operator + (const imComplex<T>& C1, const imComplex<T>& C2)
 {
-  return imcfloat(C1.real + C2.real, C1.imag + C2.imag);
+  return imComplex<T>(C1.real + C2.real, C1.imag + C2.imag);
 }
 
-inline imcfloat operator += (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> operator + (const imComplex<T>& C, const T& R)
 {
-  return imcfloat(C1.real + C2.real, C1.imag + C2.imag);
+  return imComplex<T>(C.real + R, C.imag);
 }
 
-inline imcfloat operator - (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> operator += (const imComplex<T>& C1, const imComplex<T>& C2)
 {
-  return imcfloat(C1.real - C2.real, C1.imag - C2.imag);
+  return imComplex<T>(C1.real + C2.real, C1.imag + C2.imag);
 }
 
-inline imcfloat operator * (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> operator - (const imComplex<T>& C1, const imComplex<T>& C2)
 {
-  return imcfloat(C1.real * C2.real - C1.imag * C2.imag, 
-                        C1.imag * C2.real + C1.real * C2.imag);
+  return imComplex<T>(C1.real - C2.real, C1.imag - C2.imag);
 }
 
-inline imcfloat operator / (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> operator - (const imComplex<T>& C, const T& R)
 {
-  float den = C2.real * C2.real - C2.imag * C2.imag;
-  return imcfloat((C1.real * C2.real + C1.imag * C2.imag) / den, 
-                        (C1.imag * C2.real - C1.real * C2.imag) / den);
+  return imComplex<T>(C.real - R, C.imag);
 }
 
-inline imcfloat operator / (const imcfloat& C, const float& R)
+template<class T>
+inline imComplex<T> operator * (const imComplex<T>& C1, const imComplex<T>& C2)
 {
-  return imcfloat(C.real / R, C.imag / R);
+  return imComplex<T>(C1.real * C2.real - C1.imag * C2.imag, 
+                      C1.imag * C2.real + C1.real * C2.imag);
 }
 
-inline imcfloat operator /= (const imcfloat& C, const float& R)
+template<class T>
+inline imComplex<T> operator / (const imComplex<T>& C1, const imComplex<T>& C2)
 {
-  return imcfloat(C.real / R, C.imag / R);
+  T den = C2.real * C2.real - C2.imag * C2.imag;
+  return imComplex<T>((C1.real * C2.real + C1.imag * C2.imag) / den, 
+                      (C1.imag * C2.real - C1.real * C2.imag) / den);
 }
 
-inline imcfloat operator * (const imcfloat& C, const float& R)
+template<class T>
+inline imComplex<T> operator / (const imComplex<T>& C, const T& R)
 {
-  return imcfloat(C.real * R, C.imag * R);
+  return imComplex<T>(C.real / R, C.imag / R);
 }
 
-inline int operator == (const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> operator /= (const imComplex<T>& C, const T& R)
+{
+  return imComplex<T>(C.real / R, C.imag / R);
+}
+
+template<class T>
+inline imComplex<T> operator * (const imComplex<T>& C, const T& R)
+{
+  return imComplex<T>(C.real * R, C.imag * R);
+}
+
+template<class T>
+inline int operator == (const imComplex<T>& C1, const imComplex<T>& C2)
 {
   return ((C1.real == C2.real) && (C1.imag == C2.imag));
 }
 
-inline float cpxreal(const imcfloat& C)
+template<class T>
+inline T cpxreal(const imComplex<T>& C)
 {
   return C.real;
 }
 
-inline float cpximag(const imcfloat& C)
+template<class T>
+inline T cpximag(const imComplex<T>& C)
 {
   return C.imag;
 }
 
-inline float cpxmag(const imcfloat& C)
+template<class T>
+inline T cpxmag(const imComplex<T>& C)
 {
-  return sqrtf(C.real*C.real + C.imag*C.imag);
+  return sqrt(C.real*C.real + C.imag*C.imag);
 }
 
-inline float cpxphase(const imcfloat& C)
+template<class T>
+inline T cpxphase(const imComplex<T>& C)
 {
-  return atan2f(C.real, C.imag);
+  return atan2(C.real, C.imag);
 }
 
-inline imcfloat cpxconj(const imcfloat& C)
+template<class T>
+inline imComplex<T> cpxconj(const imComplex<T>& C)
 {
-  return imcfloat(C.real, -C.imag);
+  return imComplex<T>(C.real, -C.imag);
 }
 
-inline imcfloat log(const imcfloat& C)
+template<class T>
+inline imComplex<T> cpxpolar(const T& mag, const T& phase)
 {
-  return imcfloat(logf(cpxmag(C)), atan2f(C.real, C.imag));
+  return imComplex<T>(mag * cos(phase), mag * sin(phase));
 }
 
-inline imcfloat exp(const imcfloat& C)
+template<class T>
+inline imComplex<T> log(const imComplex<T>& C)
 {
-  float mag = expf(C.real);
-  return imcfloat(mag * cosf(C.imag), mag * sinf(C.imag));
+  return imComplex<T>(log(cpxmag(C)), atan2(C.real, C.imag));
 }
 
-inline imcfloat pow(const imcfloat& C1, const imcfloat& C2)
+template<class T>
+inline imComplex<T> exp(const imComplex<T>& C)
+{
+  T mag = exp(C.real);
+  return imComplex<T>(mag * cos(C.imag), mag * sin(C.imag));
+}
+
+template<class T>
+inline imComplex<T> pow(const imComplex<T>& C1, const imComplex<T>& C2)
 {
   return exp(C1 * log(C2));
 }
 
-inline imcfloat sqrt(const imcfloat& C)
+template<class T>
+inline imComplex<T> pow(const imComplex<T>& C1, const T& R)
 {
-  float mag = sqrtf(sqrtf(C.real*C.real + C.imag*C.imag));
-  float phase = atan2f(C.real, C.imag) / 2;
-  return imcfloat(mag * cosf(phase), mag * sinf(phase));
+  imComplex<T> C2(R);
+  return pow(C1, C2);
 }
 
-inline imcfloat cpxpolar(const float& mag, const float& phase)
+template<class T>
+inline imComplex<T> sqrt(const imComplex<T>& C)
 {
-  return imcfloat(mag * cosf(phase), mag * sinf(phase));
+  T mag = sqrt(sqrt(C.real*C.real + C.imag*C.imag));
+  T phase = atan2(C.real, C.imag) / 2;
+  return imComplex<T>(mag * cos(phase), mag * sin(phase));
 }
 
 /** @} */
+
+/** complex numbers usign 2 floats
+* \ingroup cpx */
+typedef imComplex<float> imcfloat;
+
+/** complex numbers usign 2 doubles
+* \ingroup cpx */
+typedef imComplex<double> imcdouble;
+
 
 #endif

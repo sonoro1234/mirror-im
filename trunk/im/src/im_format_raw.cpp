@@ -174,7 +174,7 @@ int imFileFormatRAW::iRawUpdateParam(int index)
   {
     int line_size = imImageLineSize(this->width, this->file_color_mode, this->file_data_type);
     if (this->switch_type && (this->file_data_type == IM_FLOAT || this->file_data_type == IM_CFLOAT))
-      line_size *= 2;
+      line_size *= 2;  /* from double to float */
     this->padding = iCalcPad(*pad, line_size);
   }
 
@@ -212,7 +212,7 @@ static int iFileDataTypeSize(int file_data_type, int switch_type)
 {
   int type_size = imDataTypeSize(file_data_type);
   if ((file_data_type == IM_FLOAT || file_data_type == IM_CFLOAT) && switch_type)
-    type_size *= 2;
+    type_size *= 2;  /* from double to float */
   return type_size;
 }
 
@@ -266,7 +266,7 @@ int imFileFormatRAW::ReadImageData(void* data)
   int type_size = iFileDataTypeSize(this->file_data_type, this->switch_type);
 
   // treat complex as 2 real
-  if (this->file_data_type == IM_CFLOAT) 
+  if (this->file_data_type == IM_CFLOAT || this->file_data_type == IM_CDOUBLE)
   {
     type_size /= 2;
     line_count *= 2;
@@ -290,13 +290,21 @@ int imFileFormatRAW::ReadImageData(void* data)
     {
       for (int col = 0; col < line_count; col++)
       {
-        if (this->file_data_type == IM_FLOAT)
+        if (this->file_data_type == IM_FLOAT || this->file_data_type == IM_CFLOAT)
         {
-          float value;
-          if (!imBinFileReadFloat(handle, &value))
+          double value;
+          if (!imBinFileReadReal(handle, &value))
             return IM_ERR_ACCESS;
 
-          ((float*)this->line_buffer)[col] = value;
+          ((float*)this->line_buffer)[col] = (float)value;
+        }
+        else if (this->file_data_type == IM_DOUBLE || this->file_data_type == IM_CDOUBLE)
+        {
+          double value;
+          if (!imBinFileReadReal(handle, &value))
+            return IM_ERR_ACCESS;
+
+          ((double*)this->line_buffer)[col] = value;
         }
         else
         {
@@ -347,7 +355,7 @@ int imFileFormatRAW::WriteImageData(void* data)
   int type_size = iFileDataTypeSize(this->file_data_type, this->switch_type);
 
   // treat complex as 2 real
-  if (this->file_data_type == IM_CFLOAT) 
+  if (this->file_data_type == IM_CFLOAT || this->file_data_type == IM_CDOUBLE)
   {
     type_size /= 2;
     line_count *= 2;
@@ -370,11 +378,18 @@ int imFileFormatRAW::WriteImageData(void* data)
     {
       for (int col = 0; col < line_count; col++)
       {
-        if (this->file_data_type == IM_FLOAT)
+        if (this->file_data_type == IM_FLOAT || this->file_data_type == IM_CFLOAT)
         {
           float value = ((float*)this->line_buffer)[col];
 
-          if (!imBinFilePrintf(handle, "%f ", (double)value))
+          if (!imBinFilePrintf(handle, "%.9f ", value))
+            return IM_ERR_ACCESS;
+        }
+        else if (this->file_data_type == IM_DOUBLE || this->file_data_type == IM_CDOUBLE)
+        {
+          double value = ((double*)this->line_buffer)[col];
+
+          if (!imBinFilePrintf(handle, "%.18f ", value))
             return IM_ERR_ACCESS;
         }
         else

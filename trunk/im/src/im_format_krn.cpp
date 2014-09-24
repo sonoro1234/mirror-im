@@ -16,47 +16,6 @@
 #include <memory.h>
 #include <math.h>
 
-static int iKRNReadDescription(imBinFile* handle, char* comment, int *size)
-{
-  imbyte byte_value = 0;
-
-  // find the first \n
-  while(byte_value != '\n')
-  {
-    imBinFileRead(handle, &byte_value, 1, 1);
-    if (imBinFileError(handle))
-      return 0;
-  }
-
-  *size = 0;
-
-  // Read up to the next \n
-
-  imBinFileRead(handle, &byte_value, 1, 1);
-  if (imBinFileError(handle))
-    return 0;
-
-  while(byte_value != '\n')
-  {
-    if (byte_value != '\r')
-    {
-      comment[*size] = byte_value;
-      (*size)++;
-    }
-
-    imBinFileRead(handle, &byte_value, 1, 1);
-    if (imBinFileError(handle))
-      return 0;
-  }
-
-  if (*size != 0)
-  {
-    comment[*size] = 0;
-    (*size)++;
-  }
-
-  return 1;
-}
 
 static const char* iKRNCompTable[1] = 
 {
@@ -128,6 +87,8 @@ int imFileFormatKRN::Open(const char* file_name)
     return IM_ERR_FORMAT;
   }
 
+  imBinFileSkipLine(handle);
+
   this->image_count = 1;
   strcpy(this->compression, "NONE");
 
@@ -170,8 +131,8 @@ int imFileFormatKRN::ReadImageInfo(int index)
   this->file_color_mode = IM_GRAY|IM_TOPDOWN;
 
   char desc[512];
-  int desc_size;
-  if (!iKRNReadDescription(handle, desc, &desc_size))
+  int desc_size = 512;
+  if (!imBinFileReadLine(handle, desc, &desc_size))
     return IM_ERR_ACCESS;
 
   imAttribTable* attrib_table = AttribTable();
@@ -249,11 +210,11 @@ int imFileFormatKRN::ReadImageData(void* data)
       }
       else
       {
-        float value;
-        if (!imBinFileReadFloat(handle, &value))
+        double value;
+        if (!imBinFileReadReal(handle, &value))
           return IM_ERR_ACCESS;
 
-        ((float*)this->line_buffer)[col] = value;
+        ((float*)this->line_buffer)[col] = (float)value;
       }
     }
 
@@ -287,7 +248,7 @@ int imFileFormatKRN::WriteImageData(void* data)
       {
         float value = ((float*)this->line_buffer)[col];
 
-        if (!imBinFilePrintf(handle, "%f ", (double)value))
+        if (!imBinFilePrintf(handle, "%.9f ", value))
           return IM_ERR_ACCESS;
       }
     }

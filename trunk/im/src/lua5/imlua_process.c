@@ -33,13 +33,14 @@ static lua_State *g_State = NULL;
 /*****************************************************************************\
  Local Utilities
 \*****************************************************************************/
-static void imlua_errorcfloat(lua_State *L, int index)
+static void imlua_errorcomplex(lua_State *L, int index)
 {
-  luaL_argerror(L, index, "image data type can NOT be cfloat");
+  luaL_argerror(L, index, "image data type can NOT be complex");
 }
 
-#define imlua_checknotcfloat(_L, _a, _i) if ((_i)->data_type == IM_CFLOAT) \
-                                           imlua_errorcfloat(_L, _a)
+#define imlua_checknotcomplex(_L, _a, _i) \
+  if ((_i)->data_type == IM_CFLOAT || (_i)->data_type == IM_CDOUBLE) \
+    imlua_errorcomplex(_L, _a)
 
 static int imlua_unpacktable(lua_State *L, int index)
 {
@@ -959,7 +960,7 @@ static int imluaProcessGrayMorphConvolve (lua_State *L)
   imImage *kernel = imlua_checkimage(L, 3);
   int ismax = lua_toboolean(L, 4);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
   imlua_checkdatatype(L, 3, kernel, IM_INT);
   imlua_matchsize(L, src_image, kernel);
@@ -977,7 +978,7 @@ static int imluaProcessGrayMorphErode (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphErode(src_image, dst_image, kernel_size));
@@ -993,7 +994,7 @@ static int imluaProcessGrayMorphDilate (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphDilate(src_image, dst_image, kernel_size));
@@ -1009,7 +1010,7 @@ static int imluaProcessGrayMorphOpen (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphOpen(src_image, dst_image, kernel_size));
@@ -1025,7 +1026,7 @@ static int imluaProcessGrayMorphClose (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphClose(src_image, dst_image, kernel_size));
@@ -1041,7 +1042,7 @@ static int imluaProcessGrayMorphTopHat (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphTopHat(src_image, dst_image, kernel_size));
@@ -1057,7 +1058,7 @@ static int imluaProcessGrayMorphWell (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphWell(src_image, dst_image, kernel_size));
@@ -1073,7 +1074,7 @@ static int imluaProcessGrayMorphGradient (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessGrayMorphGradient(src_image, dst_image, kernel_size));
@@ -1221,7 +1222,7 @@ static int imluaProcessMedianConvolve (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessMedianConvolve(src_image, dst_image, kernel_size));
@@ -1237,7 +1238,7 @@ static int imluaProcessRangeConvolve (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRangeConvolve(src_image, dst_image, kernel_size));
@@ -1253,7 +1254,7 @@ static int imluaProcessRankClosestConvolve (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRankClosestConvolve(src_image, dst_image, kernel_size));
@@ -1269,7 +1270,7 @@ static int imluaProcessRankMaxConvolve (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRankMaxConvolve(src_image, dst_image, kernel_size));
@@ -1285,7 +1286,7 @@ static int imluaProcessRankMinConvolve (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   int kernel_size = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRankMinConvolve(src_image, dst_image, kernel_size));
@@ -1379,7 +1380,7 @@ static int imluaProcessCompassConvolve (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   imImage *kernel = imlua_checkimage(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
   imlua_checkkernel(L, kernel, 3);
 
@@ -1685,8 +1686,8 @@ static int imluaProcessUnaryPointOp(lua_State *L)
   omp_set_num_threads(1);
 #endif
 
-  imlua_checknotcfloat(L, 1, src_image);
-  imlua_checknotcfloat(L, 1, dst_image);
+  imlua_checknotcomplex(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, dst_image);
   imlua_matchsize(L, src_image, dst_image);
   if (src_image->depth != dst_image->depth)
     luaL_error(L, "images must have the same depth");
@@ -1748,8 +1749,8 @@ static int imluaProcessUnaryPointColorOp(lua_State *L)
   params[0] = (float)src_depth;
   params[1] = (float)dst_depth;
 
-  imlua_checknotcfloat(L, 1, src_image);
-  imlua_checknotcfloat(L, 1, dst_image);
+  imlua_checknotcomplex(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, dst_image);
   imlua_matchsize(L, src_image, dst_image);
   luaL_checktype(L, 3, LUA_TFUNCTION);
   luaL_checktype(L, 4, LUA_TTABLE);
@@ -1804,7 +1805,7 @@ static int imluaProcessMultiPointOp(lua_State *L)
   omp_set_num_threads(1);
 #endif
 
-  imlua_checknotcfloat(L, 1, dst_image);
+  imlua_checknotcomplex(L, 1, dst_image);
   luaL_checktype(L, 3, LUA_TFUNCTION);
   luaL_checktype(L, 4, LUA_TTABLE);
   /* no need to check the userdata at 5 */
@@ -1814,7 +1815,7 @@ static int imluaProcessMultiPointOp(lua_State *L)
   if (src_image_list[0]->data_type == IM_CFLOAT)
   {
     free(src_image_list);
-    imlua_errorcfloat(L, 1);
+    imlua_errorcomplex(L, 1);
     return 0;
   }
 
@@ -1888,7 +1889,7 @@ static int imluaProcessMultiPointColorOp(lua_State *L)
   omp_set_num_threads(1);
 #endif
 
-  imlua_checknotcfloat(L, 1, dst_image);
+  imlua_checknotcomplex(L, 1, dst_image);
   luaL_checktype(L, 3, LUA_TFUNCTION);
   luaL_checktype(L, 4, LUA_TTABLE);
   /* no need to check the userdata at 5 */
@@ -1898,7 +1899,7 @@ static int imluaProcessMultiPointColorOp(lua_State *L)
   if (src_image_list[0]->data_type == IM_CFLOAT)
   {
     free(src_image_list);
-    imlua_errorcfloat(L, 1);
+    imlua_errorcomplex(L, 1);
     return 0;
   }
 
@@ -2498,7 +2499,7 @@ static int imluaProcessReplaceColor (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   /* minimize leak when error, checking array after other checks */
@@ -2534,8 +2535,8 @@ static int imluaProcessSetAlphaColor(lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   float dst_alpha = (float)luaL_checknumber(L, 4);
 
-  imlua_checknotcfloat(L, 1, src_image);
-  imlua_checknotcfloat(L, 2, dst_image);
+  imlua_checknotcomplex(L, 1, src_image);
+  imlua_checknotcomplex(L, 2, dst_image);
   imlua_matchsize(L, src_image, dst_image);
 
   /* minimize leak when error, checking array after other checks */
@@ -2665,7 +2666,7 @@ static int imluaProcessRenderOp (lua_State *L)
   omp_set_num_threads(1);
 #endif
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   luaL_checktype(L, 2, LUA_TFUNCTION);
   luaL_checktype(L, 4, LUA_TTABLE);
 
@@ -2714,7 +2715,7 @@ static int imluaProcessRenderCondOp (lua_State *L)
   omp_set_num_threads(1);
 #endif
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   luaL_checktype(L, 2, LUA_TFUNCTION);
   luaL_checktype(L, 4, LUA_TTABLE);
 
@@ -2738,7 +2739,7 @@ static int imluaProcessRenderAddSpeckleNoise (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
   float percent = (float) luaL_checknumber(L, 3);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRenderAddSpeckleNoise(src_image, dst_image, percent));
@@ -2755,7 +2756,7 @@ static int imluaProcessRenderAddGaussianNoise (lua_State *L)
   float mean = (float) luaL_checknumber(L, 3);
   float stddev = (float) luaL_checknumber(L, 4);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRenderAddGaussianNoise(src_image, dst_image, mean, stddev));
@@ -2772,7 +2773,7 @@ static int imluaProcessRenderAddUniformNoise (lua_State *L)
   float mean = (float) luaL_checknumber(L, 3);
   float stddev = (float) luaL_checknumber(L, 4);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   lua_pushboolean(L, imProcessRenderAddUniformNoise(src_image, dst_image, mean, stddev));
@@ -2785,7 +2786,7 @@ static int imluaProcessRenderAddUniformNoise (lua_State *L)
 static int imluaProcessRenderRandomNoise (lua_State *L)
 {
   imImage *image = imlua_checkimage(L, 1);
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   lua_pushboolean(L, imProcessRenderRandomNoise(image));
   return 1;
 }
@@ -2798,7 +2799,7 @@ static int imluaProcessRenderConstant (lua_State *L)
   int count;
   float *value;
   imImage *image = imlua_checkimage(L, 1);
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   /* minimize leak when error, checking array after other checks */
   value = imlua_toarrayfloat (L, 2, &count, 1);
@@ -2824,7 +2825,7 @@ static int imluaProcessRenderWheel (lua_State *L)
   int int_radius = luaL_checkint(L, 2);
   int ext_radius = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderWheel(image, int_radius, ext_radius));
   return 1;
@@ -2838,7 +2839,7 @@ static int imluaProcessRenderCone (lua_State *L)
   imImage *image = imlua_checkimage(L, 1);
   int radius = luaL_checkint(L, 2);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderCone(image, radius));
   return 1;
@@ -2853,7 +2854,7 @@ static int imluaProcessRenderTent (lua_State *L)
   int width = luaL_checkint(L, 2);
   int height = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderTent(image, width, height));
   return 1;
@@ -2869,7 +2870,7 @@ static int imluaProcessRenderRamp (lua_State *L)
   int end = luaL_checkint(L, 3);
   int dir = luaL_checkint(L, 4);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderRamp(image, start, end, dir));
   return 1;
@@ -2884,7 +2885,7 @@ static int imluaProcessRenderBox (lua_State *L)
   int width = luaL_checkint(L, 2);
   int height = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderBox(image, width, height));
   return 1;
@@ -2899,7 +2900,7 @@ static int imluaProcessRenderSinc (lua_State *L)
   float xperiod = (float) luaL_checknumber(L, 2);
   float yperiod = (float) luaL_checknumber(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderSinc(image, xperiod, yperiod));
   return 1;
@@ -2913,7 +2914,7 @@ static int imluaProcessRenderGaussian (lua_State *L)
   imImage *image = imlua_checkimage(L, 1);
   float stddev = (float) luaL_checknumber(L, 2);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderGaussian(image, stddev));
   return 1;
@@ -2927,7 +2928,7 @@ static int imluaProcessRenderLapOfGaussian (lua_State *L)
   imImage *image = imlua_checkimage(L, 1);
   float stddev = (float) luaL_checknumber(L, 2);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderLapOfGaussian(image, stddev));
   return 1;
@@ -2942,7 +2943,7 @@ static int imluaProcessRenderCosine (lua_State *L)
   float xperiod = (float) luaL_checknumber(L, 2);
   float yperiod = (float) luaL_checknumber(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderCosine(image, xperiod, yperiod));
   return 1;
@@ -2957,7 +2958,7 @@ static int imluaProcessRenderGrid (lua_State *L)
   int x_space = luaL_checkint(L, 2);
   int y_space = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderGrid(image, x_space, y_space));
   return 1;
@@ -2972,7 +2973,7 @@ static int imluaProcessRenderChessboard (lua_State *L)
   int x_space = luaL_checkint(L, 2);
   int y_space = luaL_checkint(L, 3);
 
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
 
   lua_pushboolean(L, imProcessRenderChessboard(image, x_space, y_space));
   return 1;
@@ -2994,7 +2995,7 @@ static int imluaProcessToneGamut (lua_State *L)
   int op = luaL_checkint(L, 3);
   float *param = NULL;
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   /* minimize leak when error, checking array after other checks */
@@ -3012,7 +3013,7 @@ static int imluaImageGamma(lua_State *L)
 {
   imImage *image = imlua_checkimage(L, 1);
   float gamma = (float)luaL_checknumber(L, 2);
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   imImageGamma(image, gamma);
   return 0;
 }
@@ -3022,7 +3023,7 @@ static int imluaImageBrightnessContrast(lua_State *L)
   imImage *image = imlua_checkimage(L, 1);
   float bright_shift = (float)luaL_checknumber(L, 2);
   float contrast_factor = (float)luaL_checknumber(L, 3);
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   imImageBrightnessContrast(image, bright_shift, contrast_factor);
   return 0;
 }
@@ -3032,7 +3033,7 @@ static int imluaImageLevel(lua_State *L)
   imImage *image = imlua_checkimage(L, 1);
   float start = (float)luaL_checknumber(L, 2);
   float end = (float)luaL_checknumber(L, 3);
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   imImageLevel(image, start, end);
   return 0;
 }
@@ -3040,7 +3041,7 @@ static int imluaImageLevel(lua_State *L)
 static int imluaImageNegative(lua_State *L)
 {
   imImage *image = imlua_checkimage(L, 1);
-  imlua_checknotcfloat(L, 1, image);
+  imlua_checknotcomplex(L, 1, image);
   imImageNegative(image);
   return 0;
 }
@@ -3119,7 +3120,7 @@ static int imluaProcessNegative (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   imProcessNegative(src_image, dst_image);
@@ -3131,7 +3132,7 @@ static int imluaProcessShiftHSI(lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   imProcessShiftHSI(src_image, dst_image, (float)luaL_checknumber(L, 3), 
@@ -3194,7 +3195,7 @@ static int imluaProcessThreshold (lua_State *L)
   int value = luaL_checkint(L, 4);
 
   imlua_checkcolorspace(L, 1, src_image, IM_GRAY);
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3212,7 +3213,7 @@ static int imluaProcessThresholdByDiff (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 3);
 
   imlua_checkcolorspace(L, 1, src_image1, IM_GRAY);
-  imlua_checknotcfloat(L, 1, src_image1);
+  imlua_checknotcomplex(L, 1, src_image1);
   imlua_match(L, src_image1, src_image2);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image1, dst_image);
@@ -3232,7 +3233,7 @@ static int imluaProcessHysteresisThreshold (lua_State *L)
   int high_thres = luaL_checkint(L, 4);
 
   imlua_checkcolorspace(L, 1, src_image, IM_GRAY);
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3334,7 +3335,7 @@ static int imluaProcessMinMaxThreshold (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 2);
 
   imlua_checkcolorspace(L, 1, src_image, IM_GRAY);
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3370,7 +3371,7 @@ static int imluaProcessSliceThreshold (lua_State *L)
   float end_level = (float)luaL_checknumber(L, 4);
 
   imlua_checkcolorspace(L, 1, src_image, IM_GRAY);
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3437,7 +3438,7 @@ static int imluaProcessAbnormalHyperionCorrection(lua_State *L)
   imImage *image_abnormal = NULL;
 
   imlua_match(L, src_image, dst_image);
-  imlua_checknotcfloat(L, 1, src_image);
+  imlua_checknotcomplex(L, 1, src_image);
 
   if (!lua_isnil(L, 5))
   {

@@ -274,7 +274,7 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
 template <class T>
 static inline T blend_op(const T& v1, const T& v2, const float& alpha)
 {
-  return (T)(alpha*v1 + (1.0f - alpha)*v2);
+  return (T)(v1*alpha + v2*(1.0f - alpha));
 }
 
 template <class T> 

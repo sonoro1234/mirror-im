@@ -16,51 +16,6 @@
 #include <memory.h>
 
 
-/* comments start with '#' after the first \n */
-static int iPNMReadComment(imBinFile* handle, char* comment, int *size)
-{
-  imbyte byte_value = 0;
-
-  // find the first \n
-  while(byte_value != '\n')
-  {
-    imBinFileRead(handle, &byte_value, 1, 1);
-    if (imBinFileError(handle))
-      return 0;
-  }
-
-  *size = 0;
-
-  imBinFileRead(handle, &byte_value, 1, 1);
-  if (imBinFileError(handle))
-    return 0;
-
-  if (byte_value == '#')
-  {
-    while(byte_value != '\n')
-    {
-      imBinFileRead(handle, &byte_value, 1, 1);
-      if (imBinFileError(handle))
-        return 0;
-
-      if (byte_value != '\r')
-      {
-        comment[*size] = byte_value;
-        (*size)++;
-      }
-    }
-  }
-  else
-    imBinFileSeekOffset(handle, -1);
-
-  if (*size != 0)
-  {
-    comment[*size] = 0;
-    (*size)++;
-  }
-
-  return 1;
-}
 
 static const char* iPNMCompTable[2] = 
 {
@@ -137,6 +92,8 @@ int imFileFormatPNM::Open(const char* file_name)
     return IM_ERR_FORMAT;
   }
 
+  imBinFileSkipLine(handle);
+
   this->image_type = sig[1];
   this->image_count = 1;     // increment this if found image after data
 
@@ -198,13 +155,23 @@ int imFileFormatPNM::ReadImageInfo(int index)
 
   imAttribTable* attrib_table = AttribTable();
 
-  char comment[4096];
-  int size;
-  if (!iPNMReadComment(handle, comment, &size))
-    return IM_ERR_ACCESS;
+  imbyte byte_value = 0;
+  imBinFileRead(handle, &byte_value, 1, 1);
+  if (imBinFileError(handle))
+    return 0;
 
-  if (size)
-    attrib_table->Set("Description", IM_BYTE, size, comment);
+  if (byte_value == '#')
+  {
+    char comment[4096];
+    int size = 4096;
+    if (!imBinFileReadLine(handle, comment, &size))
+      return IM_ERR_ACCESS;
+
+    if (size)
+      attrib_table->Set("Description", IM_BYTE, size, comment);
+  }
+  else
+    imBinFileSeekOffset(handle, -1);
 
   if (!imBinFileReadInteger(handle, &this->width))
     return IM_ERR_ACCESS;

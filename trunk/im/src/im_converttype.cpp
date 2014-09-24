@@ -30,6 +30,11 @@
 #define IM_END_PROCESSING
 #endif
 
+/* NOTICE: we use the following nomenclature
+   "Int" - imbyte, short, imushort, int
+   "Real" - float, double
+   "Cpx" - imcfloat, imcdouble
+*/
 
 /* IMPORTANT: leave template functions not "static" 
    because of some weird compiler bizarre errors. 
@@ -52,25 +57,27 @@
      gfactor = log(g+1)
 */
 
-inline float iGammaFactor(float range, float gamma)
+template <class T>
+inline T iGammaFactor(T range, float gamma)
 {
   if (gamma == 0)
     return range;
   else if (gamma < 0)
-    return range/float(log((-gamma) + 1));
+    return range/log(1 - T(gamma));
   else
-    return range/float(exp(gamma) - 1);
+    return range/(exp(T(gamma)) - 1);
 }
 
-inline float iGammaFunc(float factor, float min, float gamma, float value)
+template <class T>
+inline T iGammaFunc(T factor, T min, float gamma, T value)
 {
   // Here  0<value<1   (always)
   if (gamma != 0)
   {
     if (gamma < 0)
-      value = log(value*(-gamma) + 1);
+      value = log(1 - value*T(gamma));
     else
-      value = exp(value*gamma) - 1;
+      value = exp(value*T(gamma)) - 1;
   }
 
   return factor*value + min;
@@ -90,9 +97,12 @@ template <class T>
 inline int iDataType(T tmp)
 {
   // Discover the data type from the template.
+  // Used only for integers.
   int size_of = sizeof(T);
   int data_type = IM_BYTE;
-  if (size_of == 4)
+  if (size_of == 8)
+    data_type = IM_DOUBLE;
+  else if (size_of == 4)
   {
     tmp = (T)0.1;
     if (tmp == 0)
@@ -121,19 +131,19 @@ inline void iDataTypeIntMinMax(T& type_min, T& type_max, int abssolute)
     type_min = 0;
 }
 
-template <class T> 
-inline void iDataTypeRealMinMax(float& min, float& max, int abssolute, T tmp)
+template <class T, class TR> 
+inline void iDataTypeRealMinMax(TR& min, TR& max, int abssolute, T tmp)
 {
   // Used only when converting real<=>int
-  max = 1.0f;
+  max = (TR)1.0;
   min = 0;
 
   if (!abssolute)
   {
     if (iIsNegativeType(tmp))
     {
-      min = -0.5f;
-      max = +0.5f;
+      min = (TR)-0.5;
+      max = (TR)+0.5;
     }
   }
 }
@@ -143,9 +153,9 @@ inline void iDataTypeRealMinMax(float& min, float& max, int abssolute, T tmp)
 
 
 template <class SRCT, class DSTT> 
-IM_STATIC int iPromoteIntDirect(int count, const SRCT *src_map, DSTT *dst_map)
+IM_STATIC int iCopyDirect(int count, const SRCT *src_map, DSTT *dst_map)
 {
-  // small integer to big integer, no need for scale
+  // small range to big range, no need to scale, not crop
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -158,9 +168,9 @@ IM_STATIC int iPromoteIntDirect(int count, const SRCT *src_map, DSTT *dst_map)
 }
   
 template <class SRCT, class DSTT> 
-IM_STATIC int iDemoteIntDirect(int count, const SRCT *src_map, DSTT *dst_map, int abssolute)
+IM_STATIC int iDemoteIntToIntDirect(int count, const SRCT *src_map, DSTT *dst_map, int abssolute)
 {
-  // big integer to small integer, need to crop
+  // big integer to small integer, no need to scale, just need to crop
   DSTT dst_type_min, dst_type_max;
   iDataTypeIntMinMax(dst_type_min, dst_type_max, abssolute);
 
@@ -189,7 +199,7 @@ IM_STATIC int iDemoteIntDirect(int count, const SRCT *src_map, DSTT *dst_map, in
 }
 
 template <class SRCT, class DSTT> 
-IM_STATIC int iPromoteInt(int count, const SRCT *src_map, DSTT *dst_map, int abssolute)
+IM_STATIC int iPromoteIntToInt(int count, const SRCT *src_map, DSTT *dst_map, int abssolute)
 {
   // small integer to big integer, need to shift if necessary
   // also includes ushort <-> short conversion
@@ -225,7 +235,7 @@ IM_STATIC int iPromoteInt(int count, const SRCT *src_map, DSTT *dst_map, int abs
 }
 
 template <class SRCT, class DSTT> 
-IM_STATIC int iDemoteInt(int count, const SRCT *src_map, DSTT *dst_map, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
+IM_STATIC int iDemoteIntToInt(int count, const SRCT *src_map, DSTT *dst_map, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   // big integer to small integer, need to scale down
   SRCT min, max;
@@ -299,12 +309,12 @@ IM_STATIC int iDemoteInt(int count, const SRCT *src_map, DSTT *dst_map, int abss
 /**********************************************************************/
 
 
-template <class SRCT> 
-IM_STATIC int iPromoteReal(int count, const SRCT *src_map, float *dst_map, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
+template <class SRCT, class DSTT>
+IM_STATIC int iPromoteIntToReal(int count, const SRCT *src_map, DSTT *dst_map, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   // integer to real, always have to scale to 0:1 or -0.5:+0.5
   SRCT min, max;
-  float dst_type_min, dst_type_max;
+  DSTT dst_type_min, dst_type_max;
 
   if (cast_mode == IM_CAST_MINMAX)   // search for min-max
     imMinMaxType(src_map, count, min, max, abssolute);
@@ -324,11 +334,11 @@ IM_STATIC int iPromoteReal(int count, const SRCT *src_map, float *dst_map, float
 
   iDataTypeRealMinMax(dst_type_min, dst_type_max, abssolute, *src_map);
 
-  float dst_type_range = 1.0f;
-  float range = float(max - min + 1);
+  DSTT dst_type_range = 1.0f;
+  DSTT range = DSTT(max - min + 1);
 
   gamma = -gamma; // gamma is inverted here, because we are promoting int2real
-  float factor = iGammaFactor(dst_type_range, gamma);
+  DSTT factor = iGammaFactor(dst_type_range, gamma);
 
   IM_INT_PROCESSING;
 
@@ -342,11 +352,11 @@ IM_STATIC int iPromoteReal(int count, const SRCT *src_map, float *dst_map, float
 #endif
     IM_BEGIN_PROCESSING;
 
-    float fvalue;
+    DSTT fvalue;
     if (abssolute)
-      fvalue = (imAbs(src_map[i]) - min + 0.5f)/range; 
+      fvalue = (imAbs(src_map[i]) - min + DSTT(0.5)) / range;
     else
-      fvalue = (src_map[i] - min + 0.5f)/range; 
+      fvalue = (src_map[i] - min + DSTT(0.5)) / range;
 
     // Now 0 <= fvalue <= 1 (if min-max are correct)
 
@@ -367,11 +377,11 @@ IM_STATIC int iPromoteReal(int count, const SRCT *src_map, float *dst_map, float
   return processing;
 }
 
-template <class DSTT> 
-IM_STATIC int iDemoteReal(int count, const float *src_map, DSTT *dst_map, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
+template <class SRCT, class DSTT>
+IM_STATIC int iDemoteRealToInt(int count, const SRCT *src_map, DSTT *dst_map, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   // real to integer, always have to scale from 0:1 or -0.5:+0.5
-  float min, max;
+  SRCT min, max;
   DSTT dst_type_min, dst_type_max;
 
   if (cast_mode == IM_CAST_MINMAX)  // search for min-max
@@ -384,18 +394,18 @@ IM_STATIC int iDemoteReal(int count, const float *src_map, DSTT *dst_map, float 
     if (cast_mode == IM_CAST_USER)  // get min,max from atributes
     {
       float* amin = (float*)attrib_table->Get("UserMin");
-      if (amin) min = *amin;
+      if (amin) min = (SRCT)*amin;
       float* amax = (float*)attrib_table->Get("UserMax");
-      if (amax) max = *amax;
+      if (amax) max = (SRCT)*amax;
     }
   }
 
   iDataTypeIntMinMax(dst_type_min, dst_type_max, abssolute);
 
   int dst_type_range = dst_type_max - dst_type_min + 1;
-  float range = max - min;
+  SRCT range = max - min;
 
-  float factor = iGammaFactor((float)dst_type_range, gamma);
+  SRCT factor = iGammaFactor((SRCT)dst_type_range, gamma);
 
   IM_INT_PROCESSING;
 
@@ -409,9 +419,9 @@ IM_STATIC int iDemoteReal(int count, const float *src_map, DSTT *dst_map, float 
 #endif
     IM_BEGIN_PROCESSING;
 
-    float value;
+    SRCT value;
     if (abssolute)
-      value = ((float)imAbs(src_map[i]) - min)/range; 
+      value = ((SRCT)imAbs(src_map[i]) - min) / range;
     else
       value = (src_map[i] - min)/range; 
 
@@ -423,7 +433,7 @@ IM_STATIC int iDemoteReal(int count, const float *src_map, DSTT *dst_map, float 
       dst_map[i] = dst_type_min;
     else
     {
-      value = iGammaFunc(factor, (float)dst_type_min, gamma, value);
+      value = iGammaFunc(factor, (SRCT)dst_type_min, gamma, value);
       int ivalue = imRound(value);
       if (ivalue >= dst_type_max)
         dst_map[i] = dst_type_max;
@@ -446,10 +456,25 @@ IM_STATIC int iDemoteReal(int count, const float *src_map, DSTT *dst_map, float 
 
 /**********************************************************************/
 
-
-static int iDemoteCpxReal(int count, const imcfloat* src_map, float *dst_map, int cpx2real)
+template <class SRCT, class DSTT>
+static int iCopyCpxDirect(int count, const imComplex<SRCT>* src_map, imComplex<DSTT> *dst_map)
 {
-  float (*CpxCnv)(const imcfloat& cpx) = NULL;
+#ifdef _OPENMP
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#endif
+  for (int i = 0; i < count; i++)
+  {
+    dst_map[i].real = (DSTT)(src_map[i].real);
+    dst_map[i].imag = (DSTT)(src_map[i].imag);
+  }
+
+  return IM_ERR_NONE;
+}
+
+template <class SRCT, class DSTT>
+static int iDemoteCpxToReal(int count, const imComplex<SRCT>* src_map, DSTT *dst_map, int cpx2real)
+{
+  SRCT (*CpxCnv)(const imComplex<SRCT>& cpx) = NULL;
 
   switch(cpx2real)
   {
@@ -464,23 +489,23 @@ static int iDemoteCpxReal(int count, const imcfloat* src_map, float *dst_map, in
 #endif
   for (int i = 0; i < count; i++)
   {
-    dst_map[i] = CpxCnv(src_map[i]);
+    dst_map[i] = (DSTT)CpxCnv(src_map[i]);
   }
 
   return IM_ERR_NONE;
 }
                                                                      
-template <class DSTT> 
-IM_STATIC int iDemoteCpxInt(int count, const imcfloat* src_map, DSTT *dst_map, int cpx2real, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
+template <class SRCT, class DSTT>
+IM_STATIC int iDemoteCpxToInt(int count, const imComplex<SRCT>* src_map, DSTT *dst_map, int cpx2real, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
-  float* real_map = (float*)malloc(count*sizeof(float));
+  SRCT* real_map = (SRCT*)malloc(count*sizeof(SRCT));
   if (!real_map) return IM_ERR_MEM;
 
   // complex to real
-  iDemoteCpxReal(count, src_map, real_map, cpx2real);
+  iDemoteCpxToReal(count, src_map, real_map, cpx2real);
 
   // real to integer
-  if (iDemoteReal(count, real_map, dst_map, gamma, abssolute, cast_mode, counter, attrib_table) != IM_ERR_NONE)
+  if (iDemoteRealToInt(count, real_map, dst_map, gamma, abssolute, cast_mode, counter, attrib_table) != IM_ERR_NONE)
   {
     free(real_map);
     return IM_ERR_COUNTER;
@@ -490,35 +515,35 @@ IM_STATIC int iDemoteCpxInt(int count, const imcfloat* src_map, DSTT *dst_map, i
   return IM_ERR_NONE;
 }
 
-template <class SRCT> 
-IM_STATIC int iPromoteCpxDirect(int count, const SRCT *src_map, imcfloat *dst_map)
+template <class SRCT, class DSTT>
+IM_STATIC int iPromoteToCpxDirect(int count, const SRCT *src_map, imComplex<DSTT> *dst_map)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
-    dst_map[i].real = (float)(src_map[i]);
+    dst_map[i].real = (DSTT)(src_map[i]);
   }
 
   return IM_ERR_NONE;
 }
 
-template <class SRCT> 
-IM_STATIC int iPromoteCpx(int count, const SRCT* src_map, imcfloat *dst_map, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
+template <class SRCT, class DSTT> 
+IM_STATIC int iPromoteIntToCpx(int count, const SRCT* src_map, imComplex<DSTT> *dst_map, float gamma, int abssolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
-  float* real_map = (float*)malloc(count*sizeof(float));
+  DSTT* real_map = (DSTT*)malloc(count*sizeof(DSTT));
   if (!real_map) return IM_ERR_MEM;
 
   // integer to real
-  if (iPromoteReal(count, src_map, real_map, gamma, abssolute, cast_mode, counter, attrib_table) != IM_ERR_NONE)
+  if (iPromoteIntToReal(count, src_map, real_map, gamma, abssolute, cast_mode, counter, attrib_table) != IM_ERR_NONE)
   {
     free(real_map);
     return IM_ERR_COUNTER;
   }
 
   // real to complex
-  iPromoteCpxDirect(count, real_map, dst_map);
+  iPromoteToCpxDirect(count, real_map, dst_map);
 
   free(real_map);
   return IM_ERR_NONE;
@@ -563,33 +588,45 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
     {
     case IM_SHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const imbyte*)src_image->data[0], (short*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const imbyte*)src_image->data[0], (short*)dst_image->data[0]);
       else
-        ret = iPromoteInt(total_count, (const imbyte*)src_image->data[0], (short*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const imbyte*)src_image->data[0], (short*)dst_image->data[0], abssolute);
       break;
     case IM_USHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const imbyte*)src_image->data[0], (imushort*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const imbyte*)src_image->data[0], (imushort*)dst_image->data[0]);
       else
-        ret = iPromoteInt(total_count, (const imbyte*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const imbyte*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
       break;
     case IM_INT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const imbyte*)src_image->data[0], (int*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const imbyte*)src_image->data[0], (int*)dst_image->data[0]);
       else
-        ret = iPromoteInt(total_count, (const imbyte*)src_image->data[0], (int*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const imbyte*)src_image->data[0], (int*)dst_image->data[0], abssolute);
       break;
     case IM_FLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const imbyte*)src_image->data[0], (float*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const imbyte*)src_image->data[0], (float*)dst_image->data[0]);
       else
-        ret = iPromoteReal(total_count, (const imbyte*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToReal(total_count, (const imbyte*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_CFLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteCpxDirect(total_count, (const imbyte*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+        ret = iPromoteToCpxDirect(total_count, (const imbyte*)src_image->data[0], (imcfloat*)dst_image->data[0]);
       else
-        ret = iPromoteCpx(total_count, (const imbyte*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToCpx(total_count, (const imbyte*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_DOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iCopyDirect(total_count, (const imbyte*)src_image->data[0], (double*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToReal(total_count, (const imbyte*)src_image->data[0], (double*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_CDOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iPromoteToCpxDirect(total_count, (const imbyte*)src_image->data[0], (imcdouble*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToCpx(total_count, (const imbyte*)src_image->data[0], (imcdouble*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     }
     break;
@@ -598,33 +635,45 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
     {
     case IM_BYTE:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const short*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const short*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteInt(total_count, (const short*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteIntToInt(total_count, (const short*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_USHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const short*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const short*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
       else
-        ret = iPromoteInt(total_count, (const short*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const short*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
       break;
     case IM_INT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const short*)src_image->data[0], (int*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const short*)src_image->data[0], (int*)dst_image->data[0]);
       else
-        ret = iPromoteInt(total_count, (const short*)src_image->data[0], (int*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const short*)src_image->data[0], (int*)dst_image->data[0], abssolute);
       break;
     case IM_FLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const short*)src_image->data[0], (float*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const short*)src_image->data[0], (float*)dst_image->data[0]);
       else
-        ret = iPromoteReal(total_count, (const short*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToReal(total_count, (const short*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_CFLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteCpxDirect(total_count, (const short*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+        ret = iPromoteToCpxDirect(total_count, (const short*)src_image->data[0], (imcfloat*)dst_image->data[0]);
       else
-        ret = iPromoteCpx(total_count, (const short*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToCpx(total_count, (const short*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_DOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iCopyDirect(total_count, (const short*)src_image->data[0], (double*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToReal(total_count, (const short*)src_image->data[0], (double*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_CDOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iPromoteToCpxDirect(total_count, (const short*)src_image->data[0], (imcdouble*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToCpx(total_count, (const short*)src_image->data[0], (imcdouble*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     }
     break;
@@ -633,33 +682,45 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
     {
     case IM_BYTE:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const imushort*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const imushort*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteInt(total_count, (const imushort*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteIntToInt(total_count, (const imushort*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_SHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const imushort*)src_image->data[0], (short*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const imushort*)src_image->data[0], (short*)dst_image->data[0], abssolute);
       else
-        ret = iPromoteInt(total_count, (const imushort*)src_image->data[0], (short*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const imushort*)src_image->data[0], (short*)dst_image->data[0], abssolute);
       break;
     case IM_INT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const imushort*)src_image->data[0], (int*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const imushort*)src_image->data[0], (int*)dst_image->data[0]);
       else
-        ret = iPromoteInt(total_count, (const imushort*)src_image->data[0], (int*)dst_image->data[0], abssolute);
+        ret = iPromoteIntToInt(total_count, (const imushort*)src_image->data[0], (int*)dst_image->data[0], abssolute);
       break;
     case IM_FLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const imushort*)src_image->data[0], (float*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const imushort*)src_image->data[0], (float*)dst_image->data[0]);
       else
-        ret = iPromoteReal(total_count, (const imushort*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToReal(total_count, (const imushort*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_CFLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteCpxDirect(total_count, (const imushort*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+        ret = iPromoteToCpxDirect(total_count, (const imushort*)src_image->data[0], (imcfloat*)dst_image->data[0]);
       else
-        ret = iPromoteCpx(total_count, (const imushort*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToCpx(total_count, (const imushort*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_DOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iCopyDirect(total_count, (const imushort*)src_image->data[0], (double*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToReal(total_count, (const imushort*)src_image->data[0], (double*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_CDOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iPromoteToCpxDirect(total_count, (const imushort*)src_image->data[0], (imcdouble*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToCpx(total_count, (const imushort*)src_image->data[0], (imcdouble*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     }
     break;
@@ -668,33 +729,45 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
     {
     case IM_BYTE:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const int*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const int*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteInt(total_count, (const int*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteIntToInt(total_count, (const int*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_SHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const int*)src_image->data[0], (short*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const int*)src_image->data[0], (short*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteInt(total_count, (const int*)src_image->data[0], (short*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteIntToInt(total_count, (const int*)src_image->data[0], (short*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_USHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const int*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const int*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteInt(total_count, (const int*)src_image->data[0], (imushort*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteIntToInt(total_count, (const int*)src_image->data[0], (imushort*)dst_image->data[0], abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_FLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteIntDirect(total_count, (const int*)src_image->data[0], (float*)dst_image->data[0]);
+        ret = iCopyDirect(total_count, (const int*)src_image->data[0], (float*)dst_image->data[0]);
       else
-        ret = iPromoteReal(total_count, (const int*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToReal(total_count, (const int*)src_image->data[0], (float*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_CFLOAT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iPromoteCpxDirect(total_count, (const int*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+        ret = iPromoteToCpxDirect(total_count, (const int*)src_image->data[0], (imcfloat*)dst_image->data[0]);
       else
-        ret = iPromoteCpx(total_count, (const int*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iPromoteIntToCpx(total_count, (const int*)src_image->data[0], (imcfloat*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_DOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iCopyDirect(total_count, (const int*)src_image->data[0], (double*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToReal(total_count, (const int*)src_image->data[0], (double*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_CDOUBLE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iPromoteToCpxDirect(total_count, (const int*)src_image->data[0], (imcdouble*)dst_image->data[0]);
+      else
+        ret = iPromoteIntToCpx(total_count, (const int*)src_image->data[0], (imcdouble*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     }
     break;
@@ -703,30 +776,74 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
     {
     case IM_BYTE:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const float*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const float*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteReal(total_count, (const float*)src_image->data[0], (imbyte*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteRealToInt(total_count, (const float*)src_image->data[0], (imbyte*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_SHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const float*)src_image->data[0], (short*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const float*)src_image->data[0], (short*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteReal(total_count, (const float*)src_image->data[0], (short*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteRealToInt(total_count, (const float*)src_image->data[0], (short*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_USHORT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const float*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const float*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteReal(total_count, (const float*)src_image->data[0], (imushort*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteRealToInt(total_count, (const float*)src_image->data[0], (imushort*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_INT:
       if (cast_mode == IM_CAST_DIRECT)
-        ret = iDemoteIntDirect(total_count, (const float*)src_image->data[0], (int*)dst_image->data[0], abssolute);
+        ret = iDemoteIntToIntDirect(total_count, (const float*)src_image->data[0], (int*)dst_image->data[0], abssolute);
       else
-        ret = iDemoteReal(total_count, (const float*)src_image->data[0], (int*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+        ret = iDemoteRealToInt(total_count, (const float*)src_image->data[0], (int*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_DOUBLE:
+      ret = iCopyDirect(total_count, (const float*)src_image->data[0], (double*)dst_image->data[0]);
       break;
     case IM_CFLOAT:
-      ret = iPromoteCpxDirect(total_count, (const float*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+      ret = iPromoteToCpxDirect(total_count, (const float*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+      break;
+    case IM_CDOUBLE:
+      ret = iPromoteToCpxDirect(total_count, (const float*)src_image->data[0], (imcdouble*)dst_image->data[0]);
+      break;
+    }
+    break;
+  case IM_DOUBLE:
+    switch(dst_image->data_type)
+    {
+    case IM_BYTE:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iDemoteIntToIntDirect(total_count, (const double*)src_image->data[0], (imbyte*)dst_image->data[0], abssolute);
+      else
+        ret = iDemoteRealToInt(total_count, (const double*)src_image->data[0], (imbyte*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_SHORT:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iDemoteIntToIntDirect(total_count, (const double*)src_image->data[0], (short*)dst_image->data[0], abssolute);
+      else
+        ret = iDemoteRealToInt(total_count, (const double*)src_image->data[0], (short*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_USHORT:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iDemoteIntToIntDirect(total_count, (const double*)src_image->data[0], (imushort*)dst_image->data[0], abssolute);
+      else
+        ret = iDemoteRealToInt(total_count, (const double*)src_image->data[0], (imushort*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_INT:
+      if (cast_mode == IM_CAST_DIRECT)
+        ret = iDemoteIntToIntDirect(total_count, (const double*)src_image->data[0], (int*)dst_image->data[0], abssolute);
+      else
+        ret = iDemoteRealToInt(total_count, (const double*)src_image->data[0], (int*)dst_image->data[0], gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_FLOAT:
+      ret = iCopyDirect(total_count, (const double*)src_image->data[0], (float*)dst_image->data[0]);
+      break;
+    case IM_CFLOAT:
+      ret = iPromoteToCpxDirect(total_count, (const double*)src_image->data[0], (imcfloat*)dst_image->data[0]);
+      break;
+    case IM_CDOUBLE:
+      ret = iPromoteToCpxDirect(total_count, (const double*)src_image->data[0], (imcdouble*)dst_image->data[0]);
       break;
     }
     break;
@@ -734,19 +851,51 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
     switch(dst_image->data_type)                                                                       
     {
     case IM_BYTE:
-      ret = iDemoteCpxInt(total_count, (const imcfloat*)src_image->data[0], (imbyte*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      ret = iDemoteCpxToInt(total_count, (const imcfloat*)src_image->data[0], (imbyte*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_SHORT:
-      ret = iDemoteCpxInt(total_count, (const imcfloat*)src_image->data[0], (short*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      ret = iDemoteCpxToInt(total_count, (const imcfloat*)src_image->data[0], (short*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_USHORT:
-      ret = iDemoteCpxInt(total_count, (const imcfloat*)src_image->data[0], (imushort*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      ret = iDemoteCpxToInt(total_count, (const imcfloat*)src_image->data[0], (imushort*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_INT:
-      ret = iDemoteCpxInt(total_count, (const imcfloat*)src_image->data[0], (int*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      ret = iDemoteCpxToInt(total_count, (const imcfloat*)src_image->data[0], (int*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
       break;
     case IM_FLOAT:
-      ret = iDemoteCpxReal(total_count, (const imcfloat*)src_image->data[0], (float*)dst_image->data[0], cpx2real);
+      ret = iDemoteCpxToReal(total_count, (const imcfloat*)src_image->data[0], (float*)dst_image->data[0], cpx2real);
+      break;
+    case IM_DOUBLE:
+      ret = iDemoteCpxToReal(total_count, (const imcfloat*)src_image->data[0], (double*)dst_image->data[0], cpx2real);
+      break;
+    case IM_CDOUBLE:
+      ret = iCopyCpxDirect(total_count, (const imcfloat*)src_image->data[0], (imcdouble*)dst_image->data[0]);
+      break;
+    }
+    break;
+  case IM_CDOUBLE:
+    switch (dst_image->data_type)
+    {
+    case IM_BYTE:
+      ret = iDemoteCpxToInt(total_count, (const imcdouble*)src_image->data[0], (imbyte*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_SHORT:
+      ret = iDemoteCpxToInt(total_count, (const imcdouble*)src_image->data[0], (short*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_USHORT:
+      ret = iDemoteCpxToInt(total_count, (const imcdouble*)src_image->data[0], (imushort*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_INT:
+      ret = iDemoteCpxToInt(total_count, (const imcdouble*)src_image->data[0], (int*)dst_image->data[0], cpx2real, gamma, abssolute, cast_mode, counter, attrib_table);
+      break;
+    case IM_FLOAT:
+      ret = iDemoteCpxToReal(total_count, (const imcdouble*)src_image->data[0], (float*)dst_image->data[0], cpx2real);
+      break;
+    case IM_DOUBLE:
+      ret = iDemoteCpxToReal(total_count, (const imcdouble*)src_image->data[0], (double*)dst_image->data[0], cpx2real);
+      break;
+    case IM_CFLOAT:
+      ret = iCopyCpxDirect(total_count, (const imcdouble*)src_image->data[0], (imcfloat*)dst_image->data[0]);
       break;
     }
     break;

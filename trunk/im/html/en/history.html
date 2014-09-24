@@ -28,16 +28,16 @@
 
 <h2>History of Changes</h2>
 <h3 dir="ltr">
-    SVN (22/Sep/2014)</h3>
+    SVN (23/Sep/2014)</h3>
 <ul dir="ltr">
 <font SIZE="3">
 	<li dir="ltr">
 <font SIZE="3">
-	<span class="hist_new">New:</span>&nbsp; function </font><strong>
+	<span class="hist_new">New:</span>&nbsp;function </font><strong>
 	imImageLoadFromResource</strong> only in Windows.</li>
 	<li dir="ltr">
 <font SIZE="3">
-	<span class="hist_new">New:</span>&nbsp; <strong>imCompressDataLZO</strong> and
+	<span class="hist_new">New:</span>&nbsp;<strong>imCompressDataLZO</strong> and
 	<strong>imCompressDataUnLZO</strong> for data compression/decompression 
 	using libLZO in an external library called im_lzo because libLZO is GPL.</font></li>
 	<li dir="ltr">
@@ -48,6 +48,26 @@
 <font SIZE="3">
 	<span class="hist_new">New:</span>&nbsp;&quot;PFM&quot; internal file format (Portable 
 	FloatMap Image Format).</font></li>
+	<li dir="ltr">
+<font SIZE="3">
+	<span class="hist_new">New:</span>&nbsp;utility functions <strong>
+	imImageSetAttribInteger</strong>, <strong>imImageSetAttribReal</strong>,
+	<strong>imImageSetAttribString</strong>, <strong>imImageGetAttribInteger</strong>,
+	<strong>imImageGetAttribReal</strong>, <strong>imImageGetAttribString</strong>,
+	<strong>imFileSetAttribInteger</strong>, <strong>imFileSetAttribReal</strong>,
+	<strong>imFileSetAttribString</strong>, <strong>imFileGetAttribInteger</strong>,
+	<strong>imFileGetAttribReal</strong>, <strong>imFileGetAttribString</strong>.</font></li>
+	<li dir="ltr">
+<font SIZE="3">
+	<span class="hist_new">New:</span>&nbsp;data types IM_DOUBLE and IM_CDOUBLE. All 
+	functions that process IM_FLOAT will also process IM_DOUBLE.</font></li>
+	<li dir="ltr">
+	<font SIZE="3">
+		<span class="hist_changed">Changed:</span> 
+	<span class="style1"><strong>
+		IMPORTANT</strong></span> - the following attributes changed from IM_FLOAT to IM_DOUBLE 
+	in TIFF format (StoNits, GeoTiePoints, GeoTransformationMatrix, &quot;Intergraph 
+	TransformationMatrix&quot;, GeoPixelScale, GeoDoubleParams).</font></li>
 	<li dir="ltr">
 	<font SIZE="3">
 		<span class="hist_changed">Changed:</span> 

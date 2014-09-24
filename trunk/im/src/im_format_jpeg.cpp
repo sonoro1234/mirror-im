@@ -563,8 +563,8 @@ void imFileFormatJPEG::iReadExifAttrib(unsigned char* data, int data_length, imA
             }
           }
           break;
-        case EXIF_FORMAT_FLOAT:  // missing from libEXIF
-        case EXIF_FORMAT_DOUBLE:
+        case EXIF_FORMAT_FLOAT:  // defined but unsupported in libEXIF
+        case EXIF_FORMAT_DOUBLE: // defined but unsupported in libEXIF
           break;
         }
 
@@ -634,9 +634,10 @@ static int iExifGetDataType(ExifFormat format)
     return IM_INT;
   case EXIF_FORMAT_RATIONAL:
   case EXIF_FORMAT_SRATIONAL:
-  case EXIF_FORMAT_FLOAT:
-  case EXIF_FORMAT_DOUBLE:
+  case EXIF_FORMAT_FLOAT:   // defined but unsupported in libEXIF
     return IM_FLOAT;
+  case EXIF_FORMAT_DOUBLE:  // defined but unsupported in libEXIF
+    return IM_DOUBLE;
   }
 
   return -1;
@@ -780,8 +781,8 @@ static int iExifWriteTag(ExifData* exif, int index, const char* name, int data_t
       }
     }
     break;
-  case EXIF_FORMAT_FLOAT:  // missing from libEXIF
-  case EXIF_FORMAT_DOUBLE:
+  case EXIF_FORMAT_FLOAT:   // defined but unsupported in libEXIF
+  case EXIF_FORMAT_DOUBLE:  // defined but unsupported in libEXIF
     break;
   }
 

@@ -515,6 +515,16 @@ void imFileLineBufferWrite(imFile* ifile, const void* data, int line, int plane)
                         ifile->file_color_mode, (imcfloat*)ifile->line_buffer, 
                         ifile->user_color_mode, (const imcfloat*)data);
       break;
+    case IM_DOUBLE:
+      iDoFillLineBuffer(ifile->width, ifile->height, line, plane,  
+                        ifile->file_color_mode, (double*)ifile->line_buffer, 
+                        ifile->user_color_mode, (const double*)data);
+      break;
+    case IM_CDOUBLE:
+      iDoFillLineBuffer(ifile->width, ifile->height, line, plane,  
+                        ifile->file_color_mode, (imcdouble*)ifile->line_buffer, 
+                        ifile->user_color_mode, (const imcdouble*)data);
+      break;
     }
   }
 
@@ -619,6 +629,26 @@ void imFileLineBufferRead(imFile* ifile, void* data, int line, int plane)
         iDoFillData(ifile->width, ifile->height, line, plane,  
                     ifile->file_color_mode, (const imcfloat*)ifile->line_buffer, 
                     ifile->user_color_mode, (imcfloat*)data);
+      break;
+    case IM_DOUBLE:
+      if (convert2bitmap)
+        iDoFillDataBitmap(ifile->width, ifile->height, line, plane, ifile->file_data_type,
+                          ifile->file_color_mode, (const double*)ifile->line_buffer, 
+                          ifile->user_color_mode, (imbyte*)data);
+      else
+        iDoFillData(ifile->width, ifile->height, line, plane,  
+                    ifile->file_color_mode, (const double*)ifile->line_buffer, 
+                    ifile->user_color_mode, (double*)data);
+      break;
+    case IM_CDOUBLE:
+      if (convert2bitmap)
+        iDoFillDataBitmap(ifile->width, ifile->height, line, plane, ifile->file_data_type,
+                          ifile->file_color_mode, (const double*)ifile->line_buffer, 
+                          ifile->user_color_mode, (imbyte*)data);
+      else
+        iDoFillData(ifile->width, ifile->height, line, plane,  
+                    ifile->file_color_mode, (const imcdouble*)ifile->line_buffer, 
+                    ifile->user_color_mode, (imcdouble*)data);
       break;
     }
   }

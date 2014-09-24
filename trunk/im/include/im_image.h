@@ -116,7 +116,7 @@ void imImageAddAlpha(imImage* image);
 
 /** Sets the alpha channel plane to a constant.
  *
- * \verbatim image:SetAlpha() [in Lua 5] \endverbatim
+ * \verbatim image:SetAlpha(alpha: number) [in Lua 5] \endverbatim
  * \ingroup imgclass */
 void imImageSetAlpha(imImage* image, float alpha);
 
@@ -187,9 +187,27 @@ imImage* imImageClone(const imImage* image);
  * See also \ref imDataType.
  *
  * \verbatim image:SetAttribute(attrib: string, data_type: number, data: table of numbers or string) [in Lua 5] \endverbatim
- * If data_type is IM_BYTE, as_string can be used as data.
+ * If data_type is IM_BYTE, a string can be used as data.
  * \ingroup imgclass */
 void imImageSetAttribute(const imImage* image, const char* attrib, int data_type, int count, const void* data);
+
+/** Changes an extended attribute as an integer.
+*
+* \verbatim image:SetAttribInteger(attrib: string, data_type: number, value: number) [in Lua 5] \endverbatim
+* \ingroup imgclass */
+void imImageSetAttribInteger(const imImage* image, const char* attrib, int data_type, int value);
+
+/** Changes an extended attribute as a real.
+*
+* \verbatim image:SetAttribReal(attrib: string, data_type: number, value: number) [in Lua 5] \endverbatim
+* \ingroup imgclass */
+void imImageSetAttribReal(const imImage* image, const char* attrib, int data_type, double value);
+
+/** Changes an extended attribute as a string.
+*
+* \verbatim image:SetAttribString(attrib: string, value: string) [in Lua 5] \endverbatim
+* \ingroup imgclass */
+void imImageSetAttribString(const imImage* image, const char* attrib, const char* value);
 
 /** Returns an extended attribute. \n
  * Returns NULL if not found.
@@ -199,6 +217,24 @@ void imImageSetAttribute(const imImage* image, const char* attrib, int data_type
  * If data_type is IM_BYTE, as_string can be used to return a string instead of a table.
  * \ingroup imgclass */
 const void* imImageGetAttribute(const imImage* image, const char* attrib, int *data_type, int *count);
+
+/** Returns an extended attribute as an integer.
+*
+* \verbatim image:GetAttribInteger(attrib: string, [index: number]) -> value: number [in Lua 5] \endverbatim
+* \ingroup imgclass */
+int imImageGetAttribInteger(const imImage* image, const char* attrib, int index);
+
+/** Returns an extended attribute as a real.
+*
+* \verbatim image:GetAttribReal(attrib: string, [index: number]) -> value: number [in Lua 5] \endverbatim
+* \ingroup imgclass */
+double imImageGetAttribReal(const imImage* image, const char* attrib, int index);
+
+/** Returns an extended attribute as a string.
+*
+* \verbatim image:GetAttribString(attrib: string) -> value: string [in Lua 5] \endverbatim
+* \ingroup imgclass */
+const char* imImageGetAttribString(const imImage* image, const char* attrib);
 
 /** Returns a list of the attribute names. \n
  * "attrib" must contain room enough for "attrib_count" names. Use "attrib=NULL" to return only the count.

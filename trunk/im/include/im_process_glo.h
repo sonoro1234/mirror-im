@@ -120,6 +120,11 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
  * IMPORTANT: The FFTW lib has a GPL license. The license of the "im_fftw" library is automatically the GPL.
  * So you cannot use it for commercial applications without contacting the authors. 
  * \par
+ * FFTW 2.x can have float or double functions, not both. \n
+ * FFTW 3.x can have both, but we use only one to keep the
+ * code compatible with version 2. \n
+ * So by default the pre-compiled binaries are built with "float" support only.
+ * \par
  * See \ref im_process_glo.h
  * \ingroup process */
 

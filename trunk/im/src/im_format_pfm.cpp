@@ -137,8 +137,8 @@ int imFileFormatPFM::ReadImageInfo(int index)
   if (this->height <= 0 || this->width <= 0)
     return IM_ERR_DATA;
 
-  float byte_order = 1.0f;
-  if (!imBinFileReadFloat(handle, &byte_order))
+  double byte_order = 1.0;
+  if (!imBinFileReadReal(handle, &byte_order))
     return IM_ERR_ACCESS;
 
   if (byte_order > 0)

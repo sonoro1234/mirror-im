@@ -99,7 +99,7 @@ static int iTIFFGetCompIndex(uint16 Compression)
     return -1;
   }
 
-  return (comp_result - iTIFFCompIdTable);
+  return (int)(comp_result - iTIFFCompIdTable);
 }
 
 /* this list must follow iTIFFCompIdTable order */
@@ -183,8 +183,9 @@ static int iTIFFGetDataType(TIFFDataType field_type)
   case TIFF_RATIONAL:
   case TIFF_SRATIONAL:
   case TIFF_FLOAT:
-  case TIFF_DOUBLE:
     return IM_FLOAT;
+  case TIFF_DOUBLE:
+    return IM_DOUBLE;
   default:  /* TIFF_NOTYPE, TIFF_IFD, TIFF_LONG8, TIFF_SLONG8, TIFF_IFD8 */
     return -1;
   }
@@ -215,17 +216,6 @@ static int iTIFFWriteTag(TIFF* tiff, int index, const char* name, int data_type,
 
     if (fld->field_passcount)
     {
-      double* double_data = NULL;
-
-      if (fld->field_type==TIFF_DOUBLE)
-      {
-        float* float_data = (float*)data;
-        double_data = new double [count];
-        for (int p = 0; p < count; p++) 
-          double_data[p] = float_data[p];
-        data = double_data;
-      }
-
 			if (fld->field_writecount == TIFF_VARIABLE2)
       {
         uint32 value_count = (uint32)count;
@@ -238,9 +228,6 @@ static int iTIFFWriteTag(TIFF* tiff, int index, const char* name, int data_type,
         if (TIFFSetField(tiff, fld->field_tag, value_count, data) != 1)
           return 1;
       }
-
-      if (fld->field_type==TIFF_DOUBLE)
-        delete [] double_data;
     } 
     else
     {
@@ -288,10 +275,13 @@ static int iTIFFWriteTag(TIFF* tiff, int index, const char* name, int data_type,
         case IM_FLOAT:
           {
             float* float_data = (float*)data;
-            if (fld->field_type==TIFF_DOUBLE)
-              TIFFSetField(tiff, fld->field_tag, (double)*float_data);
-            else
-              TIFFSetField(tiff, fld->field_tag, *float_data);
+            TIFFSetField(tiff, fld->field_tag, *float_data);
+          }
+          break;
+        case IM_DOUBLE:
+          {
+            double* double_data = (double*)data;
+            TIFFSetField(tiff, fld->field_tag, *double_data);
           }
           break;
         default:
@@ -377,19 +367,7 @@ static void iTIFFReadCustomTags(TIFF* tiff, imAttribTable* attrib_table)
       }
 
       if (data && data_count > 0)
-      {
-        if (fld->field_type == TIFF_DOUBLE)
-        {
-          double* double_data = (double*)data;
-          float* float_data = new float [data_count];
-          for (int p = 0; p < data_count; p++) 
-            float_data[p] = (float)double_data[p];
-          attrib_table->Set(fld->field_name, IM_FLOAT, data_count, float_data);
-          delete [] float_data;
-        }
-        else 
-          attrib_table->Set(fld->field_name, data_type, data_count, data);
-      }
+        attrib_table->Set(fld->field_name, data_type, data_count, data);
     } 
     else
     {
@@ -423,77 +401,54 @@ static void iTIFFReadCustomTags(TIFF* tiff, imAttribTable* attrib_table)
 
           if (data_count > 0)
           {
-            if (fld->field_type == TIFF_DOUBLE)
-            {
-              double* double_data = (double*)data;
-              float* float_data = new float [data_count];
-              for (int p = 0; p < data_count; p++) 
-                float_data[p] = (float)double_data[p];
-              attrib_table->Set(fld->field_name, IM_FLOAT, data_count, float_data);
-              delete [] float_data;
-            }
-            else
-            {
-              char* newstr = NULL;
+            char* newstr = NULL;
 
-              if (fld->field_type == TIFF_ASCII && ((char*)data)[data_count-1] != 0)
+            if (fld->field_type == TIFF_ASCII && ((char*)data)[data_count-1] != 0)
+            {
+              int i = data_count-1;
+              char* p = (char*)data;
+              while (i > 0 && p[i] != 0)
+                i--;
+              if (i == 0)
               {
-                int i = data_count-1;
-                char* p = (char*)data;
-                while (i > 0 && p[i] != 0)
-                  i--;
-                if (i == 0)
+                if (fld->field_tag == TIFFTAG_DATETIME ||
+			              fld->field_tag == EXIFTAG_DATETIMEORIGINAL ||
+                    fld->field_tag == EXIFTAG_DATETIMEDIGITIZED)
                 {
-                  if (fld->field_tag == TIFFTAG_DATETIME ||
-			                fld->field_tag == EXIFTAG_DATETIMEORIGINAL ||
-                      fld->field_tag == EXIFTAG_DATETIMEDIGITIZED)
-                  {
-                    /* sometimes theses tags get non standard strings,
-                       libTIIF does not returns the actual number os bytes read,
-                       it returns the standard value of 20.
-                       so we will try to find the actual string size, but we risk in a memory invalid access. */
-                    i = data_count;
-                    while (i < data_count+6 && p[i] != 0)
-                      i++;
-                    if (i < data_count+6)
-                      data_count = i+1;
-                  }
-                  else
-                  {
-                    newstr = (char*)malloc(data_count+1);
-                    memcpy(newstr, data, data_count);
-                    newstr[data_count] = 0;
-                    data_count++;
-                  }
+                  /* sometimes theses tags get non standard strings,
+                      libTIIF does not returns the actual number os bytes read,
+                      it returns the standard value of 20.
+                      so we will try to find the actual string size, but we risk in a memory invalid access. */
+                  i = data_count;
+                  while (i < data_count+6 && p[i] != 0)
+                    i++;
+                  if (i < data_count+6)
+                    data_count = i+1;
                 }
                 else
-                  data_count = i;
+                {
+                  newstr = (char*)malloc(data_count+1);
+                  memcpy(newstr, data, data_count);
+                  newstr[data_count] = 0;
+                  data_count++;
+                }
               }
-
-              attrib_table->Set(fld->field_name, data_type, data_count, data);
-
-              if (newstr) free(newstr);
+              else
+                data_count = i;
             }
+
+            attrib_table->Set(fld->field_name, data_type, data_count, data);
+
+            if (newstr) free(newstr);
           }
         }
       }
       else if (data_count == 1)
       {
         int size = imDataTypeSize(data_type);
-        if (fld->field_type == TIFF_DOUBLE)
-          size *= 2;
         data = malloc(size);
         if (TIFFGetField(tiff, tag, data) == 1)
-        {
-          if (fld->field_type == TIFF_DOUBLE)
-          {
-            double double_data = *(double*)data;
-            float* float_data = (float*)data;
-            *float_data = (float)double_data;
-          }
-
           attrib_table->Set(fld->field_name, data_type, data_count, data);
-        }
         free(data);
         data = NULL;
       }
@@ -965,10 +920,7 @@ int imFileFormatTIFF::ReadImageInfo(int index)
     if (BitsPerSample == 32)
       this->file_data_type = IM_FLOAT;      
     else if (BitsPerSample == 64)
-    {
-      this->switch_type = 1;             // switch double to float
-      this->file_data_type = IM_FLOAT;   
-    }
+      this->file_data_type = IM_DOUBLE;   
     else
       return IM_ERR_DATA;
     break;
@@ -990,10 +942,7 @@ int imFileFormatTIFF::ReadImageInfo(int index)
     if (BitsPerSample == 64)
       this->file_data_type = IM_CFLOAT;      
     else if (BitsPerSample == 128)
-    {
-      this->switch_type = 1;             // switch double to float
-      this->file_data_type = IM_CFLOAT;
-    }
+      this->file_data_type = IM_CDOUBLE;
     else
       return IM_ERR_DATA;
     break;
@@ -1585,7 +1534,7 @@ int imFormatTIFF::CanWrite(const char* compression, int color_mode, int data_typ
 
   /* Pixar log accepts only 3 types */
   if (Compression == COMPRESSION_PIXARLOG && 
-      data_type != IM_BYTE && data_type != IM_USHORT  && data_type != IM_FLOAT)
+      data_type != IM_BYTE && data_type != IM_USHORT && data_type != IM_FLOAT)
     return IM_ERR_COMPRESS;
 
   /* SGI Luv compression restrictions */

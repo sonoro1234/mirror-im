@@ -6,7 +6,6 @@
 
 #include "im.h"
 #include "im_util.h"
-#include "im_complex.h"
 #include "im_image.h"
 #include "im_convert.h"
 #include "im_color.h"
@@ -1034,6 +1033,15 @@ static int iConvertColorSpace(const imImage* src_image, imImage* dst_image)
     return iDoConvertColorSpace(2*src_image->count, src_image->data_type,
                          (const float**)src_image->data, src_image->color_space, 
                                (float**)dst_image->data, dst_image->color_space);
+  case IM_DOUBLE:
+    return iDoConvertColorSpace(src_image->count, src_image->data_type, 
+                         (const double**)src_image->data, src_image->color_space, 
+                               (double**)dst_image->data, dst_image->color_space);
+  case IM_CDOUBLE:
+    /* treat complex as two real values */
+    return iDoConvertColorSpace(2*src_image->count, src_image->data_type,
+                         (const double**)src_image->data, src_image->color_space, 
+                               (double**)dst_image->data, dst_image->color_space);
   }
 
   return IM_ERR_DATA;

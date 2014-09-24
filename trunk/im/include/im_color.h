@@ -67,7 +67,8 @@
  ushort [0,65535]            (2 bytes)
  int    [-8388608,+8388607]  (3 bytes of 4 possible)
  float  [0,1]                (4 bytes)
-\endverbatim
+ double [0,1]                (8 bytes)
+ \endverbatim
  * Usually this intervals are used when converting from real to integer,
  * and when demoting an integer data type.  
  * \ingroup util */
@@ -84,7 +85,9 @@ inline float imColorZeroShift(int data_type)
                   32768.0f,   // [-32768,+32767]
                   0, 
                   0, 
-                  0};      
+                  0,
+                  0,
+                  0 };
   return zero[data_type];
 }
 
@@ -98,7 +101,9 @@ inline int imColorMax(int data_type)
                65535,    
                8388607,  
                1,        
-               0};
+               1,
+               0,
+               0 };
   return max[data_type];
 }
 
@@ -112,7 +117,9 @@ inline int imColorMin(int data_type)
                0,        
                -8388608, 
                0,        
-               0};
+               0,
+               0,
+               0 };
   return min[data_type];
 }
 

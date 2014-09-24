@@ -674,7 +674,7 @@ int imBinFileReadInteger(imBinFile* handle, int *value)
   return 1;
 }
 
-int imBinFileReadFloat(imBinFile* handle, float *value)
+int imBinFileReadReal(imBinFile* handle, double *value)
 {
   int i = 0, found = 0;
   char buffer[17], c;
@@ -695,7 +695,7 @@ int imBinFileReadFloat(imBinFile* handle, float *value)
       if (i > 0)
       {
         buffer[i] = 0;
-        *value = (float)atof(buffer);
+        *value = atof(buffer);
         found = 1;
       }
     }
@@ -705,6 +705,55 @@ int imBinFileReadFloat(imBinFile* handle, float *value)
   } 
 
   return 1;
+}
+
+int imBinFileReadLine(imBinFile* handle, char* comment, int *size)
+{
+  imbyte byte_value = 0;
+  int max_size = 0;
+
+  if (comment)
+  {
+    max_size = *size - 1;
+    *size = 0;
+  }
+
+  while (byte_value != '\n' && byte_value != '\r')
+  {
+    if (comment && *size < max_size)
+    {
+      comment[*size] = byte_value;
+      (*size)++;
+    }
+
+    imBinFileRead(handle, &byte_value, 1, 1);
+    if (imBinFileError(handle))
+      return 0;
+  }
+
+  if (byte_value == '\r')
+  {
+    // check for DOS line breaks
+    imBinFileRead(handle, &byte_value, 1, 1);
+    if (!imBinFileError(handle))
+    {
+      if (byte_value != '\n')
+        imBinFileSeekOffset(handle, -1);
+    }
+  }
+
+  if (comment && *size != 0)
+  {
+    comment[*size] = 0;
+    (*size)++;
+  }
+
+  return 1;
+}
+
+int imBinFileSkipLine(imBinFile* handle)
+{
+  return imBinFileReadLine(handle, NULL, NULL);
 }
 
 static imBinFileBase* iBinFileBaseHandle(const char* pFileName)

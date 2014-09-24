@@ -25,7 +25,22 @@
 #define imConvertDataType imProcessConvertDataType
 #endif
 
-static void iCopyCol(imcfloat *map1, imcfloat *map2, int height, int width1, int width2)
+/* FFTW 2.x can have float or double functions, not both.
+   FFTW 3.x can have both, but we use only one to keep the
+   code compatible with version 2. */
+
+#ifdef FFTW_ENABLE_FLOAT // Defined for FFTW 2.x, but used here for 3.x too
+#define im_real float
+#define im_complex imcfloat
+#define IM_COMPLEX IM_CFLOAT
+#else
+#define im_real double
+#define im_complex imcdouble
+#define IM_COMPLEX IM_CDOUBLE
+#endif
+
+
+static void iCopyCol(im_complex *map1, im_complex *map2, int height, int width1, int width2)
 {
   int i;
   for(i = 0; i < height; i++)
@@ -36,9 +51,9 @@ static void iCopyCol(imcfloat *map1, imcfloat *map2, int height, int width1, int
   }
 }
 
-static void iCenterFFT(imcfloat *map, int width, int height, int inverse)
+static void iCenterFFT(im_complex *map, int width, int height, int inverse)
 {
-  imcfloat *map1, *map2, *map3, *tmp;
+  im_complex *map1, *map2, *map3, *tmp;
   int i, half1_width, half2_width, half1_height, half2_height;
 
   if (inverse)
@@ -58,16 +73,16 @@ static void iCenterFFT(imcfloat *map, int width, int height, int inverse)
     half2_height = height/2;
   }
 
-  tmp = (imcfloat*)malloc(half1_width*sizeof(imcfloat));
+  tmp = (im_complex*)malloc(half1_width*sizeof(im_complex));
 
   map1 = map;
   map2 = map + half1_width;
   map3 = map + half2_width;
   for(i = 0; i < height; i++)
   {
-    memcpy(tmp, map1, half1_width*sizeof(imcfloat));
-    memcpy(map1, map2, half2_width*sizeof(imcfloat));
-    memcpy(map3, tmp, half1_width*sizeof(imcfloat));
+    memcpy(tmp, map1, half1_width*sizeof(im_complex));
+    memcpy(map1, map2, half2_width*sizeof(im_complex));
+    memcpy(map3, tmp, half1_width*sizeof(im_complex));
 
     map1 += width;
     map2 += width;
@@ -76,7 +91,7 @@ static void iCenterFFT(imcfloat *map, int width, int height, int inverse)
 
   free(tmp);
 
-  tmp = (imcfloat*)malloc(half1_height*sizeof(imcfloat));
+  tmp = (im_complex*)malloc(half1_height*sizeof(im_complex));
 
   map1 = map;
   map2 = map + half1_height*width;
@@ -98,14 +113,22 @@ static void iCenterFFT(imcfloat *map, int width, int height, int inverse)
 static void iDoFFT(void *map, int width, int height, int inverse, int center, int normalize)
 {
   if (inverse && center)
-    iCenterFFT((imcfloat*)map, width, height, inverse);
+    iCenterFFT((im_complex*)map, width, height, inverse);
 
 #ifdef USE_FFTW3
+#if IM_COMPLEX == IM_FLOAT
   fftwf_plan plan = fftwf_plan_dft_2d(height, width, 
                       (fftwf_complex*)map, (fftwf_complex*)map, // in-place transform
                       inverse?FFTW_BACKWARD:FFTW_FORWARD, FFTW_ESTIMATE);
   fftwf_execute(plan);
   fftwf_destroy_plan(plan);
+#else
+  fftw_plan plan = fftw_plan_dft_2d(height, width, 
+                     (fftw_complex*)map, (fftw_complex*)map, // in-place transform
+                     inverse ? FFTW_BACKWARD : FFTW_FORWARD, FFTW_ESTIMATE);
+  fftw_execute(plan);
+  fftw_destroy_plan(plan);
+#endif
 #else
   fftwnd_plan plan = fftw2d_create_plan(height, width, inverse?FFTW_BACKWARD:FFTW_FORWARD, FFTW_ESTIMATE|FFTW_IN_PLACE);
   fftwnd(plan, 1, (FFTW_COMPLEX*)map, 1, 0, 0, 0, 0);
@@ -113,17 +136,17 @@ static void iDoFFT(void *map, int width, int height, int inverse, int center, in
 #endif
 
   if (!inverse && center)
-    iCenterFFT((imcfloat*)map, width, height, inverse);
+    iCenterFFT((im_complex*)map, width, height, inverse);
 
   if (normalize)
   {
-    float NM = (float)(width * height);
+    im_real NM = (im_real)(width * height);
     int count = (int)(2*NM);
 
     if (normalize == 1)
-      NM = (float)sqrt(NM);
+      NM = (im_real)sqrt(NM);
 
-    float *fmap = (float*)map;
+    im_real *fmap = (im_real*)map;
     for (int i = 0; i < count; i++)
       *fmap++ /= NM;
   }
@@ -132,7 +155,7 @@ static void iDoFFT(void *map, int width, int height, int inverse, int center, in
 void imProcessSwapQuadrants(imImage* image, int inverse)
 {
   for (int i = 0; i < image->depth; i++)
-    iCenterFFT((imcfloat*)image->data[i], image->width, image->height, inverse);
+    iCenterFFT((im_complex*)image->data[i], image->width, image->height, inverse);
 }
 
 void imProcessFFTraw(imImage* image, int inverse, int center, int normalize)
@@ -143,7 +166,7 @@ void imProcessFFTraw(imImage* image, int inverse, int center, int normalize)
 
 void imProcessFFT(const imImage* src_image, imImage* dst_image)
 {
-  if (src_image->data_type != IM_CFLOAT)
+  if (src_image->data_type != IM_COMPLEX)
     imConvertDataType(src_image, dst_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image, dst_image);
@@ -160,16 +183,16 @@ void imProcessIFFT(const imImage* src_image, imImage* dst_image)
 
 void imProcessCrossCorrelation(const imImage* src_image1, const imImage* src_image2, imImage* dst_image)
 {
-  imImage *tmp_image = imImageCreate(src_image2->width, src_image2->height, src_image2->color_space, IM_CFLOAT);
+  imImage *tmp_image = imImageCreate(src_image2->width, src_image2->height, src_image2->color_space, IM_COMPLEX);
   if (!tmp_image) 
     return;
 
-  if (src_image2->data_type != IM_CFLOAT)
+  if (src_image2->data_type != IM_COMPLEX)
     imConvertDataType(src_image2, tmp_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image2, tmp_image);
 
-  if (src_image1->data_type != IM_CFLOAT)
+  if (src_image1->data_type != IM_COMPLEX)
     imConvertDataType(src_image1, dst_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image1, dst_image);
@@ -187,7 +210,7 @@ void imProcessCrossCorrelation(const imImage* src_image1, const imImage* src_ima
 
 void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image)
 {
-  if (src_image->data_type != IM_CFLOAT)
+  if (src_image->data_type != IM_COMPLEX)
     imConvertDataType(src_image, dst_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image, dst_image);

@@ -8,7 +8,7 @@ SRC = process/im_fft.cpp
 
 INCLUDES = ../include
 
-DEFINES = USE_FFTW3
+DEFINES = USE_FFTW3 FFTW_ENABLE_FLOAT
 
 USE_IM = Yes
 IM = ..

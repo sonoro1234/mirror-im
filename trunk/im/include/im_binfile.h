@@ -78,6 +78,16 @@ unsigned long imBinFileWrite(imBinFile* bfile, void* pValues, unsigned long pCou
  * \ingroup binfile */
 unsigned long imBinFilePrintf(imBinFile* bfile, const char *format, ...);
 
+/** Reads a line until line break. \n
+ * Returns the line in array, must have room enough. Line break is discarted. \n
+ * Use *size to inform buffer size. *size return the actual number os characters read.
+ * \ingroup binfile */
+int imBinFileReadLine(imBinFile* handle, char* comment, int *size);
+
+/** Skips a line, including line break.
+ * \ingroup binfile */
+int imBinFileSkipLine(imBinFile* handle);
+
 /** Reads an integer number from the current position until found a non integer character.
  * Returns a non zero value if sucessfull.
  * \ingroup binfile */
@@ -86,7 +96,7 @@ int imBinFileReadInteger(imBinFile* handle, int *value);
 /** Reads an floating point number from the current position until found a non number character.
  * Returns a non zero value if sucessfull.
  * \ingroup binfile */
-int imBinFileReadFloat(imBinFile* handle, float *value);
+int imBinFileReadReal(imBinFile* handle, double *value);
 
 /** Moves the file pointer from the begining of the file.\n
  * When writing to a file seeking can go beyond the end of the file.

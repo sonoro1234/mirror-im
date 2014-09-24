@@ -56,20 +56,49 @@ public:
   void Set(const char* name, int data_type, int count, const void* data)
     { imAttribTableSet(ptable, name, data_type, count, data); }
 
+  /** Inserts a single integer attribute into the table. */
+  void SetInteger(const char* name, int data_type, int value)
+    { imAttribTableSetInteger(ptable, name, data_type, value); }
+
+  /** Inserts a single real attribute into the table. */
+  void SetReal(const char* name, int data_type, double value)
+    { imAttribTableSetReal(ptable, name, data_type, value); }
+
+  /** Inserts a string attribute into the table. 
+   * data_type=IM_BYTE and is zero terminated. */
+  void SetString(const char* name, const char* value)
+    { imAttribTableSetString(ptable, name, value); }
+
   /** Removes an attribute from the table given its name. */
   void UnSet(const char *name)
     { imAttribTableUnSet(ptable, name); }
 
-  /** Finds an attribute in the table.
+  /** Returns an attribute from the table.
    * Returns the attribute if found, NULL otherwise. 
    * See also \ref imDataType. */
   const void* Get(const char *name, int *data_type = 0, int *count = 0) const
     { return imAttribTableGet(ptable, name, data_type, count); }
 
+  /** Returns the attribute value at given index as an integer. 
+   * If not found or complex returns 0. */
+  int GetInteger(const char *name, int index = 0) const
+    { return imAttribTableGetInteger(ptable, name, index); }
+
+  /** Returns the attribute value at given index as a real. 
+   * If not found or complex returns 0. */
+  double GetReal(const char *name, int index = 0) const
+    { return imAttribTableGetReal(ptable, name, index); }
+
+  /** Returns the attribute value as a string. 
+   * If not found or not a zero terminated string returns 0. */
+  const char* GetString(const char *name) const
+    { return imAttribTableGetString(ptable, name); }
+
   /** For each attribute calls the user callback. If the callback returns 0 the function returns. */
   void ForEach(void* user_data, imAttribTableCallback attrib_func) const
     { imAttribTableForEach(ptable, user_data, attrib_func); }
 };
+
 
 /** \brief Attributes Array Class
  *

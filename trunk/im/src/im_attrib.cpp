@@ -9,6 +9,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include "im.h"
 #include "im_attrib.h"
 #include "im_util.h"
 
@@ -52,7 +53,7 @@ static char* utlStrDup(const char* str)
 
   assert(str);
 
-  size = strlen(str) + 1;
+  size = (int)strlen(str) + 1;
   new_str = (char*)malloc(size);
   memcpy(new_str, str, size);
 
@@ -62,7 +63,7 @@ static char* utlStrDup(const char* str)
 imAttribNode::imAttribNode(const char* name, int _data_type, int _count, const void* _data, imAttribNode* _next)
 {
   if (_data_type == 0 && _count == -1)  /* BYTE meaning a string */
-    _count = strlen((char*)_data)+1;
+    _count = (int)strlen((char*)_data)+1;
 
   this->name = utlStrDup(name);
   this->data_type = _data_type;
@@ -329,4 +330,176 @@ static int iCopyArrayFunc(void* user_data, int index, const char* name, int data
 void imAttribArrayCopyFrom(imAttribTablePrivate* ptable_dst, const imAttribTablePrivate* ptable_src)
 {
   imAttribTableForEach(ptable_src, (void*)ptable_dst, iCopyArrayFunc);
+}
+
+int imAttribTableGetInteger(imAttribTablePrivate* ptable, const char *name, int index)
+{
+  int data_type, count;
+  const void* data = imAttribTableGet(ptable, name, &data_type, &count);
+  if (!data || index < 0 || index >= count) return 0;
+  switch (data_type)
+  {
+  case IM_BYTE:
+    return (int)((imbyte*)data)[index];
+  case IM_SHORT:
+    return (int)((short*)data)[index];
+  case IM_USHORT:
+    return (int)((imushort*)data)[index];
+  case IM_INT:
+    return (int)((int*)data)[index];
+  case IM_FLOAT:
+    return (int)((float*)data)[index];
+  case IM_DOUBLE:
+    return (int)((double*)data)[index];
+  case IM_CFLOAT:
+  case IM_CDOUBLE:
+    return 0;
+  }
+  return 0;
+}
+
+double imAttribTableGetReal(imAttribTablePrivate* ptable, const char *name, int index)
+{
+  int data_type, count;
+  const void* data = imAttribTableGet(ptable, name, &data_type, &count);
+  if (!data || index < 0 || index >= count) return 0;
+  switch (data_type)
+  {
+  case IM_BYTE:
+    return (double)((imbyte*)data)[index];
+  case IM_SHORT:
+    return (double)((short*)data)[index];
+  case IM_USHORT:
+    return (double)((imushort*)data)[index];
+  case IM_INT:
+    return (double)((int*)data)[index];
+  case IM_FLOAT:
+    return (double)((float*)data)[index];
+  case IM_DOUBLE:
+    return (double)((double*)data)[index];
+  case IM_CFLOAT:
+  case IM_CDOUBLE:
+    return 0;
+  }
+  return 0;
+}
+
+static int iFindZero(imbyte* data, int count)
+{
+  while (count)
+  {
+    if (*data == 0)
+      return 1;
+    count--;
+    data++;
+  }
+  return 0;
+}
+
+const char* imAttribTableGetString(imAttribTablePrivate* ptable, const char *name)
+{
+  int data_type, count;
+  const void* data = imAttribTableGet(ptable, name, &data_type, &count);
+  if (!data || data_type != IM_BYTE || !iFindZero((imbyte*)data, count)) return 0;
+  return (const char*)data;
+}
+
+void imAttribTableSetInteger(imAttribTablePrivate* ptable, const char* name, int data_type, int value)
+{
+  switch (data_type)
+  {
+  case IM_BYTE:
+    {
+      imbyte data = (imbyte)value;
+      imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+      break;
+    }
+  case IM_SHORT:
+    {
+      short data = (short)value;
+      imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+      break;
+    }
+  case IM_USHORT:
+    {
+      imushort data = (imushort)value;
+      imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+      break;
+    }
+  case IM_INT:
+    {
+      int data = (int)value;
+      imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+      break;
+    }
+  case IM_FLOAT:
+    {
+      float data = (float)value;
+      imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+      break;
+    }
+  case IM_DOUBLE:
+    {
+      double data = (double)value;
+      imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+      break;
+    }
+  case IM_CFLOAT:
+  case IM_CDOUBLE:
+    break;
+  }
+}
+
+void imAttribTableSetReal(imAttribTablePrivate* ptable, const char* name, int data_type, double value)
+{
+  switch (data_type)
+  {
+  case IM_BYTE:
+  {
+    imbyte data = (imbyte)value;
+    imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+    break;
+  }
+  case IM_SHORT:
+  {
+    short data = (short)value;
+    imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+    break;
+  }
+  case IM_USHORT:
+  {
+    imushort data = (imushort)value;
+    imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+    break;
+  }
+  case IM_INT:
+  {
+    int data = (int)value;
+    imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+    break;
+  }
+  case IM_FLOAT:
+  {
+    float data = (float)value;
+    imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+    break;
+  }
+  case IM_DOUBLE:
+  {
+    double data = (double)value;
+    imAttribTableSet(ptable, name, data_type, 1, (void*)&data);
+    break;
+  }
+  case IM_CFLOAT:
+  case IM_CDOUBLE:
+    break;
+  }
+}
+
+void imAttribTableSetString(imAttribTablePrivate* ptable, const char* name, const char* value)
+{
+  assert(value);
+
+  int count = (int)strlen(value) + 1;
+  imAttribTableSet(ptable, name, IM_BYTE, count, (void*)value);
 }

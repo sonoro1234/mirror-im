@@ -274,7 +274,7 @@ static int imluaFileSetAttribute (lua_State *L)
         if (lua_isstring(L, 4))
         {
           const char* str = lua_tostring(L, 4);
-          count = strlen(str)+1;
+          count = (int)strlen(str)+1;
           data = malloc(imDataTypeSize(data_type) * count);
           memcpy(data, str, count);
         }
@@ -359,10 +359,71 @@ static int imluaFileSetAttribute (lua_State *L)
         }        
       }
       break;
+    case IM_DOUBLE:
+      {
+        double *d = (double*) data;
+        for (i = 0; i < count; i++)
+        {
+          lua_rawgeti(L, 4, i+1);
+          d[i] = (double)luaL_checknumber(L, -1);
+          lua_pop(L, 1);
+        }
+      }
+      break;
+
+    case IM_CDOUBLE:
+      {
+        double *data_float = (double*) data;
+        for (i = 0; i < count; i++)
+        {
+          int two;
+          double *value = imlua_toarraydouble(L, -1, &two, 1);
+          if (two != 2)
+          {
+            free(value);
+            luaL_argerror(L, 4, "invalid value");
+          }
+
+          data_float[i] = value[0];
+          data_float[i+1] = value[1];
+          free(value);
+          lua_pop(L, 1);
+        }        
+      }
+      break;
     }
   }
 
   imFileSetAttribute(ifile, attrib, data_type, count, data);
+  return 0;
+}
+
+static int imluaFileSetAttribInteger(lua_State *L)
+{
+  imFile *ifile = imlua_checkfile(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int data_type = luaL_checkint(L, 3);
+  int value = luaL_checkint(L, 4);
+  imFileSetAttribInteger(ifile, attrib, data_type, value);
+  return 0;
+}
+
+static int imluaFileSetAttribReal(lua_State *L)
+{
+  imFile *ifile = imlua_checkfile(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int data_type = luaL_checkint(L, 3);
+  double value = luaL_checknumber(L, 4);
+  imFileSetAttribReal(ifile, attrib, data_type, value);
+  return 0;
+}
+
+static int imluaFileSetAttribString(lua_State *L)
+{
+  imFile *ifile = imlua_checkfile(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  const char* value = luaL_checkstring(L, 3);
+  imFileSetAttribString(ifile, attrib, value);
   return 0;
 }
 
@@ -466,11 +527,62 @@ static int imluaFileGetAttribute (lua_State *L)
       }        
     }
     break;
+
+  case IM_DOUBLE:
+    {
+      double *data_double = (double*) data;
+      for (i = 0; i < count; i++, data_double++)
+      {
+        lua_pushnumber(L, *data_double);
+        lua_rawseti(L, -2, i+1);
+      }
+    }
+    break;
+
+  case IM_CDOUBLE:
+    {
+      double *data_double = (double*) data;
+      for (i = 0; i < count; i++, data_double += 2)
+      {
+        imlua_newarraydouble(L, data_double, 2, 1);
+        lua_rawseti(L, -2, i+1);
+      }        
+    }
+    break;
   }
 
-  lua_pushnumber(L, data_type);
+  lua_pushinteger(L, data_type);
 
   return 2;
+}
+
+static int imluaFileGetAttribInteger(lua_State *L)
+{
+  imFile *ifile = imlua_checkfile(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int index = luaL_optint(L, 3, 0);
+  int value = imFileGetAttribInteger(ifile, attrib, index);
+  lua_pushinteger(L, value);
+  return 1;
+}
+
+static int imluaFileGetAttribReal(lua_State *L)
+{
+  imFile *ifile = imlua_checkfile(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int index = luaL_optint(L, 3, 0);
+  double value = imFileGetAttribReal(ifile, attrib, index);
+  lua_pushnumber(L, value);
+  return 1;
+}
+
+static int imluaFileGetAttribString(lua_State *L)
+{
+  imFile *ifile = imlua_checkfile(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  const char *value = imFileGetAttribString(ifile, attrib);
+  lua_pushstring(L, value);
+  return 1;
 }
 
 /*****************************************************************************\
@@ -649,8 +761,14 @@ static const luaL_Reg imfile_metalib[] = {
   {"GetInfo", imluaFileGetInfo},
   {"SetInfo", imluaFileSetInfo},
   {"SetAttribute", imluaFileSetAttribute},
+  {"SetAttribInteger", imluaFileSetAttribInteger},
+  {"SetAttribReal", imluaFileSetAttribReal},
+  {"SetAttribString", imluaFileSetAttribString},
   {"GetAttribute", imluaFileGetAttribute},
   {"GetAttributeList", imluaFileGetAttributeList},
+  {"GetAttribInteger", imluaFileGetAttribInteger},
+  {"GetAttribReal", imluaFileGetAttribReal},
+  {"GetAttribString", imluaFileGetAttribString},
   {"GetPalette", imluaFileGetPalette},
   {"SetPalette", imluaFileSetPalette},
   {"ReadImageInfo", imluaFileReadImageInfo},
