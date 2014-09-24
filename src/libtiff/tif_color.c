@@ -126,7 +126,7 @@ TIFFCIELabToRGBInit(TIFFCIELabToRGB* cielab,
 		    const TIFFDisplay *display, float *refWhite)
 {
 	int i;
-	double gamma;
+	double  gamma;
 
 	cielab->range = CIELABTORGB_TABLE_RANGE;
 

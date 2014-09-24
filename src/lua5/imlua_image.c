@@ -148,6 +148,12 @@ static int imluaImageSetPixels(lua_State *L)
       float* fdata = (float*)image->data[0];
       fdata[i] = (float)value;
     }
+    else if (image->data_type == IM_DOUBLE || image->data_type == IM_CDOUBLE)
+    {
+      lua_Number value = luaL_checknumber(L, -1);
+      double* fdata = (double*)image->data[0];
+      fdata[i] = (double)value;
+    }
     else
     {
       int value = luaL_checkint(L, -1);
@@ -203,6 +209,11 @@ static int imluaImageGetPixels(lua_State *L)
     if (image->data_type == IM_FLOAT || image->data_type == IM_CFLOAT)
     {
       float* fdata = (float*)image->data[0];
+      lua_pushnumber(L, (lua_Number)fdata[i]);
+    }
+    else if (image->data_type == IM_DOUBLE || image->data_type == IM_CDOUBLE)
+    {
+      double* fdata = (double*)image->data[0];
       lua_pushnumber(L, (lua_Number)fdata[i]);
     }
     else
@@ -276,7 +287,7 @@ static int imluaImageRemoveAlpha (lua_State *L)
 }
 
 /*****************************************************************************\
- image:SetAlpha()
+ image:SetAlpha(alpha: number)
 \*****************************************************************************/
 static int imluaImageSetAlpha (lua_State *L)
 {
@@ -485,12 +496,75 @@ static int imluaImageSetAttribute (lua_State *L)
         }        
       }
       break;
+
+    case IM_DOUBLE:
+      {
+        double *data_double = (double*) data;
+        for (i = 0; i < count; i++)
+        {
+          lua_rawgeti(L, 4, i+1);
+          data_double[i] = (double) luaL_checknumber(L, -1);
+          lua_pop(L, 1);
+        }
+      }
+      break;
+
+    case IM_CDOUBLE:
+      {
+        double *data_double = (double*) data;
+        for (i = 0; i < count; i++)
+        {
+          int two;
+          double *value = imlua_toarraydouble(L, -1, &two, 1);
+          if (two != 2)
+          {
+            free(value);
+            luaL_argerror(L, 4, "invalid value");
+          }
+
+          data_double[i] = value[0];
+          data_double[i+1] = value[1];
+          free(value);
+          lua_pop(L, 1);
+        }        
+      }
+      break;
     }
   }
 
   imImageSetAttribute(image, attrib, data_type, count, data);
   return 0;
 }
+
+static int imluaImageSetAttribInteger(lua_State *L)
+{
+  imImage *iimage = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int data_type = luaL_checkint(L, 3);
+  int value = luaL_checkint(L, 4);
+  imImageSetAttribInteger(iimage, attrib, data_type, value);
+  return 0;
+}
+
+static int imluaImageSetAttribReal(lua_State *L)
+{
+  imImage *iimage = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int data_type = luaL_checkint(L, 3);
+  double value = luaL_checknumber(L, 4);
+  imImageSetAttribReal(iimage, attrib, data_type, value);
+  return 0;
+}
+
+static int imluaImageSetAttribString(lua_State *L)
+{
+  imImage *iimage = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  const char* value = luaL_checkstring(L, 3);
+  imImageSetAttribString(iimage, attrib, value);
+  return 0;
+}
+
 
 /*****************************************************************************\
  image:GetAttribute(attrib)
@@ -592,11 +666,62 @@ static int imluaImageGetAttribute (lua_State *L)
       }        
     }
     break;
+
+  case IM_DOUBLE:
+    {
+      double *data_double = (double*) data;
+      for (i = 0; i < count; i++, data_double++)
+      {
+        lua_pushnumber(L, *data_double);
+        lua_rawseti(L, -2, i+1);
+      }
+    }
+    break;
+
+  case IM_CDOUBLE:
+    {
+      double *data_double = (double*) data;
+      for (i = 0; i < count; i++, data_double += 2)
+      {
+        imlua_newarraydouble(L, data_double, 2, 1);
+        lua_rawseti(L, -2, i+1);
+      }        
+    }
+    break;
   }
 
   lua_pushnumber(L, data_type);
 
   return 2;
+}
+
+static int imluaImageGetAttribInteger(lua_State *L)
+{
+  imImage *iimage = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int index = luaL_optint(L, 3, 0);
+  int value = imImageGetAttribInteger(iimage, attrib, index);
+  lua_pushinteger(L, value);
+  return 1;
+}
+
+static int imluaImageGetAttribReal(lua_State *L)
+{
+  imImage *iimage = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  int index = luaL_optint(L, 3, 0);
+  double value = imImageGetAttribReal(iimage, attrib, index);
+  lua_pushnumber(L, value);
+  return 1;
+}
+
+static int imluaImageGetAttribString(lua_State *L)
+{
+  imImage *iimage = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+  const char *value = imImageGetAttribString(iimage, attrib);
+  lua_pushstring(L, value);
+  return 1;
 }
 
 /*****************************************************************************\
@@ -1102,6 +1227,20 @@ static int imluaImageRow_index (lua_State *L)
       imlua_newarrayfloat(L, cdata + (2*index), 2, 1);
     }
     break;
+
+  case IM_DOUBLE:
+    {
+      double *fdata = (double*) channel_buffer;
+      lua_pushnumber(L, (lua_Number) fdata[index]);
+    }
+    break;
+    
+  case IM_CDOUBLE:
+    {
+      double *cdata = (double*) channel_buffer;
+      imlua_newarraydouble(L, cdata + (2*index), 2, 1);
+    }
+    break;
   }
 
   return 1;
@@ -1172,6 +1311,31 @@ static int imluaImageRow_newindex (lua_State *L)
       int count;
       float *cdata = (float*) channel_buffer;
       float *value = imlua_toarrayfloat(L, 3, &count, 1);
+      if (count != 2)
+      {
+        free(value);
+        luaL_argerror(L, 3, "invalid value");
+      }
+
+      cdata[2*index] = value[0];
+      cdata[2*index+1] = value[1];
+      free(value);
+    }
+    break;
+
+  case IM_DOUBLE:
+    {
+      lua_Number value = luaL_checknumber(L, 3);
+      double *fdata = (double*) channel_buffer;
+      fdata[index] = (double) value;
+    }
+    break;
+    
+  case IM_CDOUBLE:
+    {
+      int count;
+      double *cdata = (double*) channel_buffer;
+      double *value = imlua_toarraydouble(L, 3, &count, 1);
       if (count != 2)
       {
         free(value);
@@ -1262,7 +1426,13 @@ static const luaL_Reg imimage_metalib[] = {
   {"Duplicate", imluaImageDuplicate},
   {"Clone", imluaImageClone},
   {"SetAttribute", imluaImageSetAttribute},
+  {"SetAttribInteger", imluaImageSetAttribInteger},
+  {"SetAttribReal", imluaImageSetAttribReal},
+  {"SetAttribString", imluaImageSetAttribString},
   {"GetAttribute", imluaImageGetAttribute},
+  {"GetAttribInteger", imluaImageGetAttribInteger},
+  {"GetAttribReal", imluaImageGetAttribReal},
+  {"GetAttribString", imluaImageGetAttribString},
   {"GetAttributeList", imluaImageGetAttributeList},
   {"Clear", imluaImageClear},
   {"IsBitmap", imluaImageIsBitmap},

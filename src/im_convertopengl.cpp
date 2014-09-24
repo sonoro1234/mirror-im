@@ -72,6 +72,12 @@ void imConvertPacking(const void* src_data, void* dst_data, int width, int heigh
   case IM_CFLOAT:
     iDoChangePacking((const imcfloat*)src_data, (imcfloat*)dst_data, width, height, src_depth, dst_depth, src_is_packed); 
     break;
+  case IM_DOUBLE:
+    iDoChangePacking((const double*)src_data, (double*)dst_data, width, height, src_depth, dst_depth, src_is_packed);
+    break;
+  case IM_CDOUBLE:
+    iDoChangePacking((const imcdouble*)src_data, (imcdouble*)dst_data, width, height, src_depth, dst_depth, src_is_packed);
+    break;
   }
 }
 

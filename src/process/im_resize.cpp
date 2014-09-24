@@ -251,7 +251,7 @@ static void ReduceBy4(int src_width,
       dst_map[yd * dst_width + xd] = ((src_map[y * src_width + x] + 
                                        src_map[y * src_width + (x+1)] +
                                        src_map[(y+1) * src_width + x] +
-                                       src_map[(y+1) * src_width + (x+1)])/4);
+                                       src_map[(y+1) * src_width + (x+1)])/DT(4));
     }        
   }
 }

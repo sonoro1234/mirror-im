@@ -30,6 +30,12 @@ EXPORTS
   imFileSaveImage
   imFileLoadBitmap
   imFileLoadImage
+  imFileSetAttribInteger
+  imFileSetAttribReal
+  imFileSetAttribString
+  imFileGetAttribInteger
+  imFileGetAttribReal
+  imFileGetAttribString
   imVersion
   imVersionDate
   imVersionNumber
@@ -94,6 +100,12 @@ EXPORTS
   imAttribTableUnSet
   imAttribTableCopyFrom
   imAttribTableForEach
+  imAttribTableGetInteger
+  imAttribTableGetReal
+  imAttribTableGetString
+  imAttribTableSetInteger
+  imAttribTableSetReal
+  imAttribTableSetString
   imImageGetAttribute
   imImageClone
   imImageCreate
@@ -131,6 +143,12 @@ EXPORTS
   imImageAddAlpha
   imImageRemoveAlpha
   imImageSetAlpha
+  imImageSetAttribInteger
+  imImageSetAttribReal
+  imImageSetAttribString
+  imImageGetAttribInteger
+  imImageGetAttribReal
+  imImageGetAttribString
   imDibToHBitmap
   imDibLogicalPalette
   imDibCaptureScreen
@@ -173,7 +191,9 @@ EXPORTS
   imBinFileSetCurrentModule
   imBinFilePrintf
   imBinFileReadInteger
-  imBinFileReadFloat
+  imBinFileReadReal
+  imBinFileReadLine
+  imBinFileSkipLine
   imBinFileRead
   imBinFileSize
   imBinFileTell

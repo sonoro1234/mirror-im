@@ -22,7 +22,9 @@ enum imDataType
   IM_USHORT, /**< "unsigned short". 2 bytes from 0 to 65,535.             */
   IM_INT,    /**< "int". 4 bytes from -2,147,483,648 to 2,147,483,647.    */
   IM_FLOAT,  /**< "float". 4 bytes single precision IEEE floating point.  */
-  IM_CFLOAT  /**< complex "float". 2 float values in sequence, real and imaginary parts.   */
+  IM_DOUBLE, /**< "double". 8 bytes double precision IEEE floating point. */
+  IM_CFLOAT, /**< complex "float". 2 float values in sequence, real and imaginary parts.   */
+  IM_CDOUBLE /**< complex "double". 2 double values in sequence, real and imaginary parts.   */
 };
 
 /** Image color mode color space descriptors (first byte). \n
@@ -151,6 +153,18 @@ void imFileSetInfo(imFile* ifile, const char* compression);
  * \ingroup file */
 void imFileSetAttribute(imFile* ifile, const char* attrib, int data_type, int count, const void* data);
 
+/** Changes an extended attribute as an integer.
+* \ingroup file */
+void imFileSetAttribInteger(const imFile* ifile, const char* attrib, int data_type, int value);
+
+/** Changes an extended attribute as a real.
+* \ingroup file */
+void imFileSetAttribReal(const imFile* ifile, const char* attrib, int data_type, double value);
+
+/** Changes an extended attribute as a string.
+* \ingroup file */
+void imFileSetAttribString(const imFile* ifile, const char* attrib, const char* value);
+
 /** Returns an extended attribute. \n
  * Returns NULL if not found. data_type and count can be NULL.
  * See also \ref imDataType.
@@ -159,6 +173,18 @@ void imFileSetAttribute(imFile* ifile, const char* attrib, int data_type, int co
  * If data_type is IM_BYTE, as_string can be used to return a string instead of a table.
  * \ingroup file */
 const void* imFileGetAttribute(imFile* ifile, const char* attrib, int *data_type, int *count);
+
+/** Returns an extended attribute as an integer.
+* \ingroup file */
+int imFileGetAttribInteger(const imFile* ifile, const char* attrib, int index);
+
+/** Returns an extended attribute as a real.
+* \ingroup file */
+double imFileGetAttribReal(const imFile* ifile, const char* attrib, int index);
+
+/** Returns an extended attribute as a string.
+* \ingroup file */
+const char* imFileGetAttribString(const imFile* ifile, const char* attrib);
 
 /** Returns a list of the attribute names. \n
  * "attrib" must contain room enough for "attrib_count" names. Use "attrib=NULL" to return only the count.

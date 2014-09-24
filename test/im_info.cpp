@@ -80,8 +80,17 @@ char* AttribData2Str(const void* data, int data_type)
     {
       float *c = (float*)data;
       sprintf(data_str, "%5.2g, %5.2f", (double)*c, (double)*(c+1));
+      break;
     }
+  case IM_DOUBLE:
+    sprintf(data_str, "%5.2f", (*((double*)data)));
     break;
+  case IM_CDOUBLE:
+    {
+      double *c = (double*)data;
+      sprintf(data_str, "%5.2g, %5.2f", *c, *(c + 1));
+      break;
+    }
   }
 
   return data_str;

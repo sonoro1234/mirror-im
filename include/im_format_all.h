@@ -77,7 +77,7 @@ extern "C" {
       YCbCrSubSampling IM_USHORT (2)
       YCbCrPositioning IM_USHORT (1)
       PageNumber IM_USHORT (2)
-      StoNits IM_FLOAT (1)
+      StoNits IM_DOUBLE (1)
       XPosition, YPosition IM_FLOAT (1)
       SMinSampleValue, SMaxSampleValue IM_FLOAT (1)
       HalftoneHints IM_USHORT (2)
@@ -87,7 +87,7 @@ extern "C" {
       MultiBandSelect IM_USHORT (1)   [Band number to read one band of a multiband gray image. Must be set before reading image info.]
       and other TIFF tags as they are described in the TIFF documentation.
       GeoTIFF tags:
-        GeoTiePoints, GeoTransMatrix, IntergraphMatrix, GeoPixelScale, GeoDoubleParams IM_FLOAT (N)
+        GeoTiePoints, GeoTransformationMatrix, "Intergraph TransformationMatrix", GeoPixelScale, GeoDoubleParams IM_DOUBLE (N)
         GeoASCIIParams (string)
       Read-only support for EXIF tags as they are described in the EXIF 2.2 documentation. See http://www.exif.org/
       DNG tags as they are described in the DNG documentation. See http://www.adobe.com/br/products/dng/

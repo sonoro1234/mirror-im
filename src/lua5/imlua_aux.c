@@ -65,6 +65,18 @@ int imlua_newarrayfloat (lua_State *L, const float *value, int count, int start)
   return 1;
 }
 
+int imlua_newarraydouble(lua_State *L, const double *value, int count, int start)
+{
+  int i;
+  lua_createtable(L, count, 0);
+  for (i = 0; i < count; i++)
+  {
+    lua_pushnumber(L, value[i]);
+    lua_rawseti(L, -2, i + start);
+  }
+  return 1;
+}
+
 /*****************************************************************************\
  Retrieve an int array.
 \*****************************************************************************/
@@ -164,6 +176,39 @@ float *imlua_toarrayfloatopt(lua_State *L, int index, int *count, int start)
     {
       lua_rawgeti(L, index, i+start);
       value[i] = (float) luaL_checknumber(L, -1);
+      lua_pop(L, 1);
+    }
+  }
+  else if (!lua_isnil(L, index))
+    luaL_argerror(L, index, "must be a table or nil");
+
+  return value;
+}
+
+double *imlua_toarraydouble(lua_State *L, int index, int *count, int start)
+{
+  luaL_checktype(L, index, LUA_TTABLE);
+  return imlua_toarraydoubleopt(L, index, count, start);
+}
+
+double *imlua_toarraydoubleopt(lua_State *L, int index, int *count, int start)
+{
+  int i, n;
+  double *value = NULL;
+
+  if (count) *count = 0;
+
+  if (lua_istable(L, index))
+  {
+    n = imlua_getn(L, index);
+    if (start == 0) n++;
+    if (count) *count = n;
+
+    value = (double*)malloc(sizeof(double) * n);
+    for (i = 0; i < n; i++)
+    {
+      lua_rawgeti(L, index, i + start);
+      value[i] = (double)luaL_checknumber(L, -1);
       lua_pop(L, 1);
     }
   }

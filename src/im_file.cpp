@@ -47,11 +47,11 @@ void imFileClear(imFile* ifile)
 void imFileSetBaseAttributes(imFile* ifile)
 {
   imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
-  imAttribTable* atable = (imAttribTable*)ifileformat->attrib_table;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
 
-  atable->Set("FileFormat", IM_BYTE, -1, ifileformat->iformat->format);
-  atable->Set("FileCompression", IM_BYTE, -1, ifileformat->compression);
-  atable->Set("FileImageCount", IM_INT, 1, &ifileformat->image_count);
+  attrib_table->Set("FileFormat", IM_BYTE, -1, ifileformat->iformat->format);
+  attrib_table->Set("FileCompression", IM_BYTE, -1, ifileformat->compression);
+  attrib_table->Set("FileImageCount", IM_INT, 1, &ifileformat->image_count);
 }
 
 imFile* imFileOpen(const char* file_name, int *error)
@@ -141,11 +141,38 @@ void imFileSetAttribute(imFile* ifile, const char* attrib, int data_type, int co
   assert(ifile);
   assert(attrib);
   imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
-  imAttribTable* atable = (imAttribTable*)ifileformat->attrib_table;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
   if (data)
-    atable->Set(attrib, data_type, count, data);
+    attrib_table->Set(attrib, data_type, count, data);
   else
-    atable->UnSet(attrib);
+    attrib_table->UnSet(attrib);
+}
+
+void imFileSetAttribInteger(const imFile* ifile, const char* attrib, int data_type, int value)
+{
+  assert(ifile);
+  assert(attrib);
+  imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
+  attrib_table->SetInteger(attrib, data_type, value);
+}
+
+void imFileSetAttribReal(const imFile* ifile, const char* attrib, int data_type, double value)
+{
+  assert(ifile);
+  assert(attrib);
+  imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
+  attrib_table->SetReal(attrib, data_type, value);
+}
+
+void imFileSetAttribString(const imFile* ifile, const char* attrib, const char* value)
+{
+  assert(ifile);
+  assert(attrib);
+  imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
+  attrib_table->SetString(attrib, value);
 }
 
 const void* imFileGetAttribute(imFile* ifile, const char* attrib, int *data_type, int *count)
@@ -155,6 +182,33 @@ const void* imFileGetAttribute(imFile* ifile, const char* attrib, int *data_type
   imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
   imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
   return attrib_table->Get(attrib, data_type, count);
+}
+
+int imFileGetAttribInteger(const imFile* ifile, const char* attrib, int index)
+{
+  assert(ifile);
+  assert(attrib);
+  imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
+  return attrib_table->GetInteger(attrib, index);
+}
+
+double imFileGetAttribReal(const imFile* ifile, const char* attrib, int index)
+{
+  assert(ifile);
+  assert(attrib);
+  imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
+  return attrib_table->GetReal(attrib, index);
+}
+
+const char* imFileGetAttribString(const imFile* ifile, const char* attrib)
+{
+  assert(ifile);
+  assert(attrib);
+  imFileFormatBase* ifileformat = (imFileFormatBase*)ifile;
+  imAttribTable* attrib_table = (imAttribTable*)ifileformat->attrib_table;
+  return attrib_table->GetString(attrib);
 }
 
 static int iAttribCB(void* user_data, int index, const char* name, int data_type, int count, const void* data)

@@ -29,6 +29,7 @@ extern "C" {
 int imlua_newarrayint(lua_State *L, const int *value, int count, int start);
 int imlua_newarrayulong(lua_State *L, const unsigned long *value, int count, int start);
 int imlua_newarrayfloat(lua_State *L, const float *value, int count, int start);
+int imlua_newarraydouble(lua_State *L, const double *value, int count, int start);
 
 int *imlua_toarrayint(lua_State *L, int index, int *count, int start);
 int *imlua_toarrayintopt(lua_State *L, int index, int *count, int start);
@@ -36,6 +37,8 @@ unsigned long *imlua_toarrayulong (lua_State *L, int index, int *count, int star
 unsigned long *imlua_toarrayulongopt(lua_State *L, int index, int *count, int start);
 float *imlua_toarrayfloat(lua_State *L, int index, int *count, int start);
 float *imlua_toarrayfloatopt(lua_State *L, int index, int *count, int start);
+double *imlua_toarraydouble(lua_State *L, int index, int *count, int start);
+double *imlua_toarraydoubleopt(lua_State *L, int index, int *count, int start);
 imImage* *imlua_toarrayimage(lua_State *L, int index, int *count, int start);
 
 /* other parameter checking */

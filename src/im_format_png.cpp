@@ -167,10 +167,10 @@ void* imFileFormatPNG::Handle(int index)
 
 void imFileFormatPNG::iReadAttrib(imAttribTable* attrib_table)
 {
-  double gamma;
-  if (png_get_gAMA(png_ptr, info_ptr, &gamma))
+  double dgamma;
+  if (png_get_gAMA(png_ptr, info_ptr, &dgamma))
   {
-    float fvalue = (float)gamma;
+    float fvalue = (float)dgamma;
     attrib_table->Set("Gamma", IM_FLOAT, 1, &fvalue);
   }
 
