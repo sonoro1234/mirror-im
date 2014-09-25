@@ -58,6 +58,10 @@ void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, float
     doThresholdSlice((float*)src_image->data[0], (imbyte*)dst_image->data[0], 
                              src_image->count, (float)start_level, (float)end_level);
     break;                                                                                
+  case IM_DOUBLE:
+    doThresholdSlice((double*)src_image->data[0], (imbyte*)dst_image->data[0], 
+                             src_image->count, (double)start_level, (double)end_level);
+    break;                                                                                
   }
 }
 
@@ -95,6 +99,9 @@ void imProcessThresholdByDiff(const imImage* src_image1, const imImage* src_imag
   case IM_FLOAT:
     doThresholdByDiff((float*)src_image1->data[0], (float*)src_image2->data[0], (imbyte*)dst_image->data[0], src_image1->count);
     break;                                                                                
+  case IM_DOUBLE:
+    doThresholdByDiff((double*)src_image1->data[0], (double*)src_image2->data[0], (imbyte*)dst_image->data[0], src_image1->count);
+    break;
   }
 }
 
@@ -136,6 +143,10 @@ void imProcessThreshold(const imImage* src_image, imImage* dst_image, float leve
   case IM_FLOAT:
     doThreshold((float*)src_image->data[0], (imbyte*)dst_image->data[0], 
                              src_image->count, (float)level, value);
+    break;                                                                                
+  case IM_DOUBLE:
+    doThreshold((double*)src_image->data[0], (imbyte*)dst_image->data[0], 
+                             src_image->count, (double)level, value);
     break;                                                                                
   }
 }
@@ -482,6 +493,10 @@ void imProcessHysteresisThreshold(const imImage* src_image, imImage* dst_image, 
   case IM_FLOAT:
     doHysteresisThreshold((float*)src_image->data[0], (imbyte*)dst_image->data[0], 
                              src_image->width, src_image->height, (float)low_thres, (float)high_thres);
+    break;                                                                                
+  case IM_DOUBLE:
+    doHysteresisThreshold((double*)src_image->data[0], (imbyte*)dst_image->data[0], 
+                             src_image->width, src_image->height, (double)low_thres, (double)high_thres);
     break;                                                                                
   }
 }

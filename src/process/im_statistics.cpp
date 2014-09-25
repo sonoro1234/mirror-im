@@ -300,6 +300,9 @@ void imCalcImageStatistics(const imImage* image, imStats* stats)
     case IM_FLOAT:                                                                           
       DoStats((float*)image->data[i], image->count, &stats[i]);
       break;                                                                                
+    case IM_DOUBLE:
+      DoStats((double*)image->data[i], image->count, &stats[i]);
+      break;
     }
   }
 }
@@ -488,6 +491,12 @@ float imCalcRMSError(const imImage* image1, const imImage* image2)
     break;
   case IM_CFLOAT:
     rmserror = DoRMSOp((float*)image1->data[0], (float*)image2->data[0], 2*count);
+    break;
+  case IM_DOUBLE:
+    rmserror = DoRMSOp((double*)image1->data[0], (double*)image2->data[0], count);
+    break;
+  case IM_CDOUBLE:
+    rmserror = DoRMSOp((double*)image1->data[0], (double*)image2->data[0], 2 * count);
     break;
   }
 

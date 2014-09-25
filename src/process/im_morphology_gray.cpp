@@ -128,9 +128,10 @@ int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, con
 
   imImage* fkernel = NULL;
     
-  if (src_image->data_type == IM_FLOAT && kernel->data_type != IM_FLOAT)
+  if ((src_image->data_type == IM_FLOAT || src_image->data_type == IM_DOUBLE) && 
+       kernel->data_type != src_image->data_type)
   {
-    fkernel = imImageCreate(kernel->width, kernel->height, IM_GRAY, IM_FLOAT);
+    fkernel = imImageCreate(kernel->width, kernel->height, IM_GRAY, src_image->data_type);
     imProcessConvertDataType(kernel, fkernel, 0, 0, 0, IM_CAST_DIRECT);
     kernel = fkernel;
   }
@@ -154,6 +155,9 @@ int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, con
     case IM_FLOAT:
       ret = DoGrayMorphConvolve((float*)src_image->data[i], (float*)dst_image->data[i], src_image->width, src_image->height, kernel, counter, ismax, (float)0);
       break;                                                                                
+    case IM_DOUBLE:
+      ret = DoGrayMorphConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, kernel, counter, ismax, (double)0);
+      break;
     }
     
     if (!ret) 

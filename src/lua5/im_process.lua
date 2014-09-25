@@ -271,7 +271,14 @@ TwoSourcesOneDest("ProcessBlendConst")
 ThreeSourcesOneDest("ProcessBlend")
 TwoSourcesOneDest("ProcessCompose")
 OneSourceTwoDests("ProcessSplitComplex")
-TwoSourcesOneDest("ProcessMergeComplex", nil, nil, nil, im.CFLOAT)
+
+function im.ProcessMergeComplexNew (src_image1, src_image2, dst_image, polar)
+  local data_type = im.CFLOAT
+  if (src_image1:DataType() == im.DOUBLE) then data_type = im.CDOUBLE end
+  local dst_image = im.ImageCreateBased(src_image1, nil, nil, nil, data_type)
+  im.ProcessMergeComplex(src_image1, src_image2, dst_image, polar)
+  return dst_image
+end
 
 function im.ProcessMultipleMeanNew (src_image_list, dst_image)
   local dst_image = im.ImageCreateBased(src_image_list[1])

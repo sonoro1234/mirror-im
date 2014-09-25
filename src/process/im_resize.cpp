@@ -169,6 +169,16 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order)
                     dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], 
                     imcfloat(0,0), order, counter);
       break;
+    case IM_DOUBLE:
+      ret = iReduce(src_image->width, src_image->height, (const double*)src_image->data[i],  
+                    dst_image->width, dst_image->height, (double*)dst_image->data[i], 
+                    double(0), order, counter);
+      break;
+//    case IM_CDOUBLE:
+//      ret = iReduce(src_image->width, src_image->height, (const imcdouble*)src_image->data[i],  
+//                    dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], 
+//                    imcdouble(0,0), order, counter);
+//      break;
     }
   }
 
@@ -218,6 +228,16 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order)
                     dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], 
                     imcfloat(0,0), order, counter);
       break;
+    case IM_DOUBLE:
+      ret = iResize(src_image->width, src_image->height, (const double*)src_image->data[i],  
+                    dst_image->width, dst_image->height, (double*)dst_image->data[i], 
+                    double(0), order, counter);
+      break;
+//    case IM_CDOUBLE:
+//      ret = iResize(src_image->width, src_image->height, (const imcdouble*)src_image->data[i],  
+//                    dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], 
+//                    imcdouble(0,0), order, counter);
+//      break;
     }
   }
 
@@ -282,6 +302,12 @@ void imProcessReduceBy4(const imImage* src_image, imImage* dst_image)
       break;
     case IM_CFLOAT:
       ReduceBy4(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i]);
+      break;
+    case IM_DOUBLE:
+      ReduceBy4(src_image->width, src_image->height, (double*)src_image->data[i], dst_image->width, dst_image->height, (double*)dst_image->data[i]);
+      break;
+    case IM_CDOUBLE:
+      ReduceBy4(src_image->width, src_image->height, (imcdouble*)src_image->data[i], dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i]);
       break;
     }
   }

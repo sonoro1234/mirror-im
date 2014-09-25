@@ -88,7 +88,7 @@ static int DoConvolveRankFunc(T *map, DT* new_map, int width, int height, int kw
   return processing;
 }
 
-static int compare_imReal(const void *elem1, const void *elem2) 
+static int compare_imFloat(const void *elem1, const void *elem2) 
 {
   float* v1 = (float*)elem1;
   float* v2 = (float*)elem2;
@@ -102,7 +102,21 @@ static int compare_imReal(const void *elem1, const void *elem2)
   return 0;
 }
 
-static int compare_imInt(const void *elem1, const void *elem2) 
+static int compare_imDouble(const void *elem1, const void *elem2)
+{
+  double* v1 = (double*)elem1;
+  double* v2 = (double*)elem2;
+
+  if (*v1 < *v2)
+    return -1;
+
+  if (*v1 > *v2)
+    return 1;
+
+  return 0;
+}
+
+static int compare_imInt(const void *elem1, const void *elem2)
 {
   int* v1 = (int*)elem1;
   int* v2 = (int*)elem2;
@@ -186,11 +200,18 @@ static int median_op_int(int* value, int count, int center)
   return value[count/2];
 }
 
-static float median_op_real(float* value, int count, int center)
+static float median_op_float(float* value, int count, int center)
 {
   (void)center;
-  qsort(value, count, sizeof(float), compare_imReal);
+  qsort(value, count, sizeof(float), compare_imFloat);
   return value[count/2];
+}
+
+static double median_op_double(double* value, int count, int center)
+{
+  (void)center;
+  qsort(value, count, sizeof(double), compare_imDouble);
+  return value[count / 2];
 }
 
 int imProcessMedianConvolve(const imImage* src_image, imImage* dst_image, int ks)
@@ -223,8 +244,12 @@ int imProcessMedianConvolve(const imImage* src_image, imImage* dst_image, int ks
       break;                                                                                
     case IM_FLOAT:                                                                           
       ret = DoConvolveRankFunc((float*)src_image->data[i], (float*)dst_image->data[i], 
-                               src_image->width, src_image->height, ks, ks, median_op_real, counter);
+                               src_image->width, src_image->height, ks, ks, median_op_float, counter);
       break;                                                                                
+    case IM_DOUBLE:
+      ret = DoConvolveRankFunc((double*)src_image->data[i], (double*)dst_image->data[i],
+                               src_image->width, src_image->height, ks, ks, median_op_double, counter);
+      break;
     }
     
     if (!ret) 
@@ -268,12 +293,20 @@ static int range_op_int(int* value, int count, int center)
   return max-min;
 }
 
-static float range_op_real(float* value, int count, int center)
+static float range_op_float(float* value, int count, int center)
 {
   float min, max;
   (void)center;
   imMinMax(value, count, min, max);
   return max-min;
+}
+
+static double range_op_double(double* value, int count, int center)
+{
+  double min, max;
+  (void)center;
+  imMinMax(value, count, min, max);
+  return max - min;
 }
 
 int imProcessRangeConvolve(const imImage* src_image, imImage* dst_image, int ks)
@@ -306,7 +339,11 @@ int imProcessRangeConvolve(const imImage* src_image, imImage* dst_image, int ks)
       break;                                                                                
     case IM_FLOAT:                                                                           
       ret = DoConvolveRankFunc((float*)src_image->data[i], (float*)dst_image->data[i], 
-                               src_image->width, src_image->height, ks, ks, range_op_real, counter);
+                               src_image->width, src_image->height, ks, ks, range_op_float, counter);
+      break;                                                                                
+    case IM_DOUBLE:                                                                           
+      ret = DoConvolveRankFunc((double*)src_image->data[i], (double*)dst_image->data[i], 
+                               src_image->width, src_image->height, ks, ks, range_op_double, counter);
       break;                                                                                
     }
 
@@ -610,7 +647,7 @@ static int rank_closest_op_int(int* value, int count, int center)
     return max;
 }
 
-static float rank_closest_op_real(float* value, int count, int center)
+static float rank_closest_op_float(float* value, int count, int center)
 {
   float v = value[center];
   float min, max;
@@ -618,6 +655,19 @@ static float rank_closest_op_real(float* value, int count, int center)
   imMinMax(value, count, min, max);
 
   if (v - min < max - v) 
+    return min;
+  else
+    return max;
+}
+
+static double rank_closest_op_double(double* value, int count, int center)
+{
+  double v = value[center];
+  double min, max;
+
+  imMinMax(value, count, min, max);
+
+  if (v - min < max - v)
     return min;
   else
     return max;
@@ -654,7 +704,11 @@ int imProcessRankClosestConvolve(const imImage* src_image, imImage* dst_image, i
       break;                                                                                
     case IM_FLOAT:                                                                           
       ret = DoConvolveRankFunc((float*)src_image->data[i], (float*)dst_image->data[i], 
-                               src_image->width, src_image->height, ks, ks, rank_closest_op_real, counter);
+                               src_image->width, src_image->height, ks, ks, rank_closest_op_float, counter);
+      break;                                                                                
+    case IM_DOUBLE:                                                                           
+      ret = DoConvolveRankFunc((double*)src_image->data[i], (double*)dst_image->data[i], 
+                               src_image->width, src_image->height, ks, ks, rank_closest_op_double, counter);
       break;                                                                                
     }
     
@@ -699,9 +753,17 @@ static int rank_max_op_int(int* value, int count, int center)
   return max;
 }
 
-static float rank_max_op_real(float* value, int count, int center)
+static float rank_max_op_float(float* value, int count, int center)
 {
   float min, max;
+  (void)center;
+  imMinMax(value, count, min, max);
+  return max;
+}
+
+static double rank_max_op_double(double* value, int count, int center)
+{
+  double min, max;
   (void)center;
   imMinMax(value, count, min, max);
   return max;
@@ -737,7 +799,11 @@ int imProcessRankMaxConvolve(const imImage* src_image, imImage* dst_image, int k
       break;                                                                                
     case IM_FLOAT:                                                                           
       ret = DoConvolveRankFunc((float*)src_image->data[i], (float*)dst_image->data[i], 
-                               src_image->width, src_image->height, ks, ks, rank_max_op_real, counter);
+                               src_image->width, src_image->height, ks, ks, rank_max_op_float, counter);
+      break;                                                                                
+    case IM_DOUBLE:                                                                           
+      ret = DoConvolveRankFunc((double*)src_image->data[i], (double*)dst_image->data[i], 
+                               src_image->width, src_image->height, ks, ks, rank_max_op_double, counter);
       break;                                                                                
     }
     
@@ -782,9 +848,17 @@ static int rank_min_op_int(int* value, int count, int center)
   return min;
 }
 
-static float rank_min_op_real(float* value, int count, int center)
+static float rank_min_op_float(float* value, int count, int center)
 {
   float min, max;
+  (void)center;
+  imMinMax(value, count, min, max);
+  return min;
+}
+
+static double rank_min_op_double(double* value, int count, int center)
+{
+  double min, max;
   (void)center;
   imMinMax(value, count, min, max);
   return min;
@@ -820,8 +894,12 @@ int imProcessRankMinConvolve(const imImage* src_image, imImage* dst_image, int k
       break;                                                                                
     case IM_FLOAT:                                                                           
       ret = DoConvolveRankFunc((float*)src_image->data[i], (float*)dst_image->data[i], 
-                               src_image->width, src_image->height, ks, ks, rank_min_op_real, counter);
+                               src_image->width, src_image->height, ks, ks, rank_min_op_float, counter);
       break;                                                                                
+    case IM_DOUBLE:
+      ret = DoConvolveRankFunc((double*)src_image->data[i], (double*)dst_image->data[i],
+                               src_image->width, src_image->height, ks, ks, rank_min_op_double, counter);
+      break;
     }
     
     if (!ret) 
