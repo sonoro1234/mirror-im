@@ -150,7 +150,8 @@ static void DoBinaryOpByte(imbyte *map1, imbyte *map2, imbyte *map, int count, i
   }
 }
 
-static void DoBinaryOpCpxReal(imcfloat *map1, float *map2, imcfloat *map, int count, int op)
+template <class T>
+static void DoBinaryOpCpxReal(imComplex<T> *map1, T *map2, imComplex<T> *map, int count, int op)
 {
   int i;
 
@@ -182,7 +183,7 @@ static void DoBinaryOpCpxReal(imcfloat *map1, float *map2, imcfloat *map, int co
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
     for (i = 0; i < count; i++)
-      map[i] = div_op(map1[i], (imcfloat)map2[i]);
+      map[i] = div_op(map1[i], map2[i]);
     break;
   case IM_BIN_DIFF:
 #ifdef _OPENMP
@@ -222,7 +223,9 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
   switch(src_image1->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryOp((imbyte*)src_image1->data[0], (imbyte*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryOp((imbyte*)src_image1->data[0], (imbyte*)src_image2->data[0], (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_SHORT)
       DoBinaryOp((imbyte*)src_image1->data[0], (imbyte*)src_image2->data[0], (short*)dst_image->data[0], count, op);
@@ -234,7 +237,9 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
       DoBinaryOpByte((imbyte*)src_image1->data[0], (imbyte*)src_image2->data[0], (imbyte*)dst_image->data[0], count, op);
     break;
   case IM_SHORT:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryOp((short*)src_image1->data[0], (short*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryOp((short*)src_image1->data[0], (short*)src_image2->data[0], (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_INT)
       DoBinaryOp((short*)src_image1->data[0], (short*)src_image2->data[0], (int*)dst_image->data[0], count, op);
@@ -244,7 +249,9 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
       DoBinaryOp((short*)src_image1->data[0], (short*)src_image2->data[0], (short*)dst_image->data[0], count, op);
     break;
   case IM_USHORT:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryOp((imushort*)src_image1->data[0], (imushort*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryOp((imushort*)src_image1->data[0], (imushort*)src_image2->data[0], (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_INT)
       DoBinaryOp((imushort*)src_image1->data[0], (imushort*)src_image2->data[0], (int*)dst_image->data[0], count, op);
@@ -254,7 +261,9 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
       DoBinaryOp((imushort*)src_image1->data[0], (imushort*)src_image2->data[0], (imushort*)dst_image->data[0], count, op);
     break;
   case IM_INT:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryOp((int*)src_image1->data[0], (int*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryOp((int*)src_image1->data[0], (int*)src_image2->data[0], (float*)dst_image->data[0], count, op);
     else
       DoBinaryOp((int*)src_image1->data[0], (int*)src_image2->data[0], (int*)dst_image->data[0], count, op);
@@ -268,7 +277,22 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
     else
       DoBinaryOp((imcfloat*)src_image1->data[0], (imcfloat*)src_image2->data[0], (imcfloat*)dst_image->data[0], count, op);
     break;
+  case IM_DOUBLE:
+    DoBinaryOp((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    break;
+  case IM_CDOUBLE:
+    if (src_image2->data_type == IM_DOUBLE)
+      DoBinaryOpCpxReal((imcdouble*)src_image1->data[0], (double*)src_image2->data[0], (imcdouble*)dst_image->data[0], count, op);
+    else
+      DoBinaryOp((imcdouble*)src_image1->data[0], (imcdouble*)src_image2->data[0], (imcdouble*)dst_image->data[0], count, op);
+    break;
   }
+}
+
+template <class T>
+static inline imComplex<T> blend_op(const imComplex<T>& v1, const imComplex<T>& v2, const float& alpha)
+{
+  return v1*T(alpha) + v2*T(1.0f - alpha);
 }
 
 template <class T>
@@ -311,6 +335,12 @@ void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, i
   case IM_CFLOAT:
     DoBlendConst((imcfloat*)src_image1->data[0], (imcfloat*)src_image2->data[0], (imcfloat*)dst_image->data[0], count, alpha);
     break;
+  case IM_DOUBLE:
+    DoBlendConst((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)dst_image->data[0], count, alpha);
+    break;
+  case IM_CDOUBLE:
+    DoBlendConst((imcdouble*)src_image1->data[0], (imcdouble*)src_image2->data[0], (imcdouble*)dst_image->data[0], count, alpha);
+    break;
   }
 }
 
@@ -348,6 +378,12 @@ void imProcessBlend(const imImage* src_image1, const imImage* src_image2, const 
     break;
   case IM_CFLOAT:
     DoBlend((imcfloat*)src_image1->data[0], (imcfloat*)src_image2->data[0], (float*)alpha->data[0], (imcfloat*)dst_image->data[0], count, type_max);
+    break;
+  case IM_DOUBLE:
+    DoBlend((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)alpha->data[0], (double*)dst_image->data[0], count, type_max);
+    break;
+  case IM_CDOUBLE:
+    DoBlend((imcdouble*)src_image1->data[0], (imcdouble*)src_image2->data[0], (double*)alpha->data[0], (imcdouble*)dst_image->data[0], count, type_max);
     break;
   }
 }
@@ -483,6 +519,9 @@ void imProcessCompose(const imImage* src_image1, const imImage* src_image2, imIm
     case IM_FLOAT:
       DoCompose((float*)src_image1->data[i], (float*)src_image2->data[i], (float*)src_image1->data[src_alpha], (float*)src_image2->data[src_alpha], (float*)dst_image->data[i], count, (float)type_max);
       break;
+    case IM_DOUBLE:
+      DoCompose((double*)src_image1->data[i], (double*)src_image2->data[i], (double*)src_image1->data[src_alpha], (double*)src_image2->data[src_alpha], (double*)dst_image->data[i], count, (double)type_max);
+      break;
     }
   }
 
@@ -504,10 +543,14 @@ void imProcessCompose(const imImage* src_image1, const imImage* src_image2, imIm
   case IM_FLOAT:
     DoComposeAlpha((float*)src_image1->data[src_alpha], (float*)src_image2->data[src_alpha], (float*)dst_image->data[src_alpha], count, (float)type_max);
     break;
+  case IM_DOUBLE:
+    DoComposeAlpha((double*)src_image1->data[src_alpha], (double*)src_image2->data[src_alpha], (double*)dst_image->data[src_alpha], count, (double)type_max);
+    break;
   }
 }
 
-static void DoBinaryConstOpCpxReal(imcfloat *map1, float value, imcfloat *map, int count, int op)
+template <class T>
+static void DoBinaryConstOpCpxReal(imComplex<T> *map1, T value, imComplex<T> *map, int count, int op)
 {
   int i;
 
@@ -539,7 +582,7 @@ static void DoBinaryConstOpCpxReal(imcfloat *map1, float value, imcfloat *map, i
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
     for (i = 0; i < count; i++)
-      map[i] = div_op(map1[i], (imcfloat)value);
+      map[i] = div_op(map1[i], value);
     break;
   case IM_BIN_DIFF:
 #ifdef _OPENMP
@@ -711,7 +754,9 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
   switch(src_image1->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryConstOp((imbyte*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryConstOp((imbyte*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_SHORT)
       DoBinaryConstOp((imbyte*)src_image1->data[0], (short)value, (short*)dst_image->data[0], count, op);
@@ -723,7 +768,9 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
       DoBinaryConstOpByte((imbyte*)src_image1->data[0], (int)value, (imbyte*)dst_image->data[0], count, op);
     break;
   case IM_SHORT:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryConstOp((short*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryConstOp((short*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_INT)
       DoBinaryConstOp((short*)src_image1->data[0], (int)value, (int*)dst_image->data[0], count, op);
@@ -735,7 +782,9 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
       DoBinaryConstOp((short*)src_image1->data[0], (int)value, (short*)dst_image->data[0], count, op);
     break;
   case IM_USHORT:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryConstOp((imushort*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryConstOp((imushort*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_INT)
       DoBinaryConstOp((imushort*)src_image1->data[0], (int)value, (int*)dst_image->data[0], count, op);
@@ -747,7 +796,9 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
       DoBinaryConstOp((imushort*)src_image1->data[0], (int)value, (imushort*)dst_image->data[0], count, op);
     break;
   case IM_INT:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryConstOp((int*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoBinaryConstOp((int*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
     else if (dst_image->data_type == IM_SHORT)
       DoBinaryConstOp((int*)src_image1->data[0], (int)value, (short*)dst_image->data[0], count, op);
@@ -763,6 +814,12 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
     break;
   case IM_CFLOAT:
     DoBinaryConstOpCpxReal((imcfloat*)src_image1->data[0], (float)value, (imcfloat*)dst_image->data[0], count, op);
+    break;
+  case IM_DOUBLE:
+    DoBinaryConstOp((double*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
+    break;
+  case IM_CDOUBLE:
+    DoBinaryConstOpCpxReal((imcdouble*)src_image1->data[0], (double)value, (imcdouble*)dst_image->data[0], count, op);
     break;
   }
 }
@@ -857,8 +914,8 @@ static float AutoCovCalc(int width, int height, DT *src_map, DT *mean_map, int x
   return (float)(value/(double)count);
 }
 
-template <class DT> 
-static int doAutoCov(int width, int height, DT *src_map, DT *mean_map, float *dst_map, int counter)
+template <class ST, class DT> 
+static int doAutoCov(int width, int height, ST *src_map, ST *mean_map, DT *dst_map, int counter)
 {
   int count = width*height;
   IM_INT_PROCESSING;
@@ -914,6 +971,9 @@ int imProcessAutoCovariance(const imImage* src_image, const imImage* mean_image,
       break;
     case IM_FLOAT:
       ret = doAutoCov(src_image->width, src_image->height, (float*)src_image->data[i], (float*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      break;
+    case IM_DOUBLE:
+      ret = doAutoCov(src_image->width, src_image->height, (double*)src_image->data[i], (double*)mean_image->data[i], (double*)dst_image->data[i], counter);
       break;
     }
 

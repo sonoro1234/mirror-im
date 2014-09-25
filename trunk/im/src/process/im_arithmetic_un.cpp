@@ -24,15 +24,25 @@ static inline short conj_op(const short& v) {return v;}
 static inline imushort conj_op(const imushort& v) {return v;}
 static inline int conj_op(const int& v) {return v;}
 static inline float conj_op(const float& v) {return v;}
-static inline imbyte cpxnorm_op(const imbyte& v) {return v;}
+static inline double conj_op(const double& v) { return v; }
+static inline imbyte cpxnorm_op(const imbyte& v) { return v; }
 static inline short cpxnorm_op(const short& v) {return v;}
 static inline imushort cpxnorm_op(const imushort& v) {return v;}
 static inline int cpxnorm_op(const int& v) {return v;}
 static inline float cpxnorm_op(const float& v) {return v;}
+static inline double cpxnorm_op(const double& v) { return v; }
 
 static inline imcfloat conj_op(const imcfloat& v)
 {
   imcfloat r;
+  r.real = v.real;
+  r.imag = -v.imag;
+  return r;
+}
+
+static inline imcdouble conj_op(const imcdouble& v)
+{
+  imcdouble r;
   r.real = v.real;
   r.imag = -v.imag;
   return r;
@@ -46,6 +56,23 @@ static inline imcfloat cpxnorm_op(const imcfloat& v)
   {
     r.real = v.real/rmag;
     r.imag = v.imag/rmag;
+  }
+  else
+  {
+    r.real = 0.0f;
+    r.imag = 0.0f;
+  }
+  return r;
+}
+
+static inline imcdouble cpxnorm_op(const imcdouble& v)
+{
+  imcdouble r;
+  double rmag = cpxmag(v);
+  if (rmag != 0.0f)
+  {
+    r.real = v.real / rmag;
+    r.imag = v.imag / rmag;
   }
   else
   {
@@ -262,7 +289,9 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
   switch(src_image->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      DoUnaryOp((imbyte*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
+    else if (dst_image->data_type == IM_FLOAT)
       DoUnaryOp((imbyte*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
     else if (dst_image->data_type == IM_INT)
       DoUnaryOp((imbyte*)src_image->data[0], (int*)dst_image->data[0], total_count, op);
@@ -282,6 +311,8 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
       DoUnaryOp((short*)src_image->data[0], (int*)dst_image->data[0], total_count, op);
     else if (dst_image->data_type == IM_FLOAT)
       DoUnaryOp((short*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
+    else if (dst_image->data_type == IM_DOUBLE)
+      DoUnaryOp((short*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
     else
       DoUnaryOp((short*)src_image->data[0], (short*)dst_image->data[0], total_count, op);
     break;                                                                                
@@ -294,6 +325,8 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
       DoUnaryOp((imushort*)src_image->data[0], (int*)dst_image->data[0], total_count, op);
     else if (dst_image->data_type == IM_FLOAT)
       DoUnaryOp((imushort*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
+    else if (dst_image->data_type == IM_DOUBLE)
+      DoUnaryOp((imushort*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
     else
       DoUnaryOp((imushort*)src_image->data[0], (imushort*)dst_image->data[0], total_count, op);
     break;                                                                                
@@ -306,6 +339,8 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
       DoUnaryOp((int*)src_image->data[0], (imushort*)dst_image->data[0], total_count, op);
     else if (dst_image->data_type == IM_FLOAT)
       DoUnaryOp((int*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
+    else if (dst_image->data_type == IM_DOUBLE)
+      DoUnaryOp((int*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
     else
       DoUnaryOp((int*)src_image->data[0], (int*)dst_image->data[0], total_count, op);
     break;                                                                                
@@ -314,6 +349,12 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
     break;                                                                                
   case IM_CFLOAT:            
     DoUnaryOp((imcfloat*)src_image->data[0], (imcfloat*)dst_image->data[0], total_count, op);
+    break;
+  case IM_DOUBLE:
+    DoUnaryOp((double*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
+    break;
+  case IM_CDOUBLE:
+    DoUnaryOp((imcdouble*)src_image->data[0], (imcdouble*)dst_image->data[0], total_count, op);
     break;
   }
 }

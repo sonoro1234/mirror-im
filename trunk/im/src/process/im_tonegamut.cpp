@@ -24,7 +24,7 @@
 template <class T>
 static inline T line_op(const T& v, const T& min, const T& max, const float& a, const float& b)
 {
-  float r = v * a + b;
+  float r = (float)(v * a + b);
   if (r > (float)max) return max;
   if (r < (float)min) return min;
   return (T)r;
@@ -85,7 +85,7 @@ static inline T tonecrop_op(const T& v, const T& start, const T& end)
 template <class T>
 static inline T expand_op(const T& v, const T& min, const T& max, const T& start, const float& norm)
 {
-  float r = (v - start)*norm + min;
+  float r = (float)((v - start)*norm + min);
   if (r > (float)max) return max;
   if (r < (float)min) return min;
   return (T)r;
@@ -240,7 +240,7 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     }
   case IM_GAMUT_BRIGHTCONT:
     {
-      float bs = (args[0] * range) / 100.0f;
+      float bs = (args[0] * (float)range) / 100.0f;
       float a = (float)tan((45+args[1]*0.449999)/57.2957795);
       float b = bs + (float)range*(1.0f - a)/2.0f;
 #ifdef _OPENMP
@@ -274,6 +274,9 @@ void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, fl
   case IM_FLOAT:                                                                           
     DoNormalizedUnaryOp((float*)src_image->data[0], (float*)dst_image->data[0], count, op, args);
     break;                                                                                
+  case IM_DOUBLE:
+    DoNormalizedUnaryOp((double*)src_image->data[0], (double*)dst_image->data[0], count, op, args);
+    break;
   }
 }
 
@@ -374,6 +377,9 @@ void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shi
   case IM_FLOAT:                                                                           
     DoShiftHSI((float**)src_image->data, (float**)dst_image->data, src_image->count, h_shift, s_shift, i_shift);
     break;                                                                                
+  case IM_DOUBLE:
+    DoShiftHSI((double**)src_image->data, (double**)dst_image->data, src_image->count, h_shift, s_shift, i_shift);
+    break;
   }
 }
 
@@ -456,6 +462,9 @@ void imProcessDirectConv(const imImage* src_image, imImage* dst_image)
   case IM_FLOAT:                                                                           
     DoDirectConv((float*)src_image->data[0], (imbyte*)dst_image->data[0], count);
     break;                                                                                
+  case IM_DOUBLE:
+    DoDirectConv((double*)src_image->data[0], (imbyte*)dst_image->data[0], count);
+    break;
   }
 }
 

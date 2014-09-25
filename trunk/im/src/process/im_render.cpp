@@ -79,6 +79,9 @@ int imProcessRenderCondOp(imImage* image, imRenderCondFunc render_func, const ch
     case IM_FLOAT:                                                                           
       ret = DoRenderCondOp((float*)image->data[d], image->width, image->height, d, render_func, param, counter);
       break;                                                                                
+    case IM_DOUBLE:
+      ret = DoRenderCondOp((double*)image->data[d], image->width, image->height, d, render_func, param, counter);
+      break;
     }
 
     if (!ret) 
@@ -112,7 +115,7 @@ static int DoRenderOp(T *map, int width, int height, int d, imRenderFunc render_
       if (plus)
       {
         int size_of = sizeof(imbyte);
-        float value = map[offset + x] + render_func(x, y, d, param);
+        float value = (float)map[offset + x] + render_func(x, y, d, param);
         if (sizeof(T) == size_of)
           map[offset + x] = (T)IM_BYTECROP(value);
         else
@@ -159,6 +162,9 @@ int imProcessRenderOp(imImage* image, imRenderFunc render_func, const char* rend
     case IM_FLOAT:                                                                           
       ret = DoRenderOp((float*)image->data[d], image->width, image->height, d, render_func, param, counter, plus);
       break;                                                                                
+    case IM_DOUBLE:
+      ret = DoRenderOp((double*)image->data[d], image->width, image->height, d, render_func, param, counter, plus);
+      break;
     }
 
     if (!ret) 

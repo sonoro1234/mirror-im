@@ -16,16 +16,16 @@
 #include <memory.h>
 
 
-template <class T> 
-static void DoNormDiffRatio(T *map1, T *map2, float *new_map, int count)
+template <class T, class DT> 
+static void DoNormDiffRatio(T *map1, T *map2, DT *new_map, int count)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
-    float num   = (float)(map1[i] - map2[i]);
-    float denom = (float)(map1[i] + map2[i]);
+    DT num = (DT)(map1[i] - map2[i]);
+    DT denom = (DT)(map1[i] + map2[i]);
 
     if (denom == 0) 
       new_map[i] = 0;
@@ -55,6 +55,9 @@ void imProcessNormDiffRatio(const imImage* image1, const imImage* image2, imImag
   case IM_FLOAT:                                                                           
     DoNormDiffRatio((float*)image1->data[0], (float*)image2->data[0], (float*)dst_image->data[0], count);
     break;                                                                                
+  case IM_DOUBLE:
+    DoNormDiffRatio((double*)image1->data[0], (double*)image2->data[0], (double*)dst_image->data[0], count);
+    break;
   }
 }
 
@@ -192,6 +195,9 @@ void imProcessAbnormalHyperionCorrection(const imImage* src_image, imImage* dst_
   case IM_FLOAT:                                                                           
     DoAbnormalCorrection((float*)src_image->data[0], (float*)dst_image->data[0], src_image->width, src_image->height, (imbyte*)abnormal->data[0], threshold_consecutive, threshold_percent);
     break;                                                                                
+  case IM_DOUBLE:
+    DoAbnormalCorrection((double*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, (imbyte*)abnormal->data[0], threshold_consecutive, threshold_percent);
+    break;
   }
 
   if (!image_abnormal)

@@ -116,7 +116,7 @@ static void iDoFFT(void *map, int width, int height, int inverse, int center, in
     iCenterFFT((im_complex*)map, width, height, inverse);
 
 #ifdef USE_FFTW3
-#if IM_COMPLEX == IM_FLOAT
+#if (IM_COMPLEX==IM_FLOAT)
   fftwf_plan plan = fftwf_plan_dft_2d(height, width, 
                       (fftwf_complex*)map, (fftwf_complex*)map, // in-place transform
                       inverse?FFTW_BACKWARD:FFTW_FORWARD, FFTW_ESTIMATE);
