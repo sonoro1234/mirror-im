@@ -46,7 +46,7 @@ static int DoUnaryPointOp(T1 *src_map, T2 *dst_map, int width, int height, int d
     if (x == width-1)
     {
       IM_COUNT_PROCESSING;
-  #ifdef _OPENMP
+#ifdef _OPENMP
 #pragma omp flush (processing)
 #endif
       IM_END_PROCESSING;
@@ -67,7 +67,9 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
   switch(src_image->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointOp((imbyte*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if(dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointOp((imbyte*)src_image->data[0], (float*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoUnaryPointOp((imbyte*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
@@ -87,6 +89,8 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
       ret = DoUnaryPointOp((short*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointOp((short*)src_image->data[0], (float*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointOp((short*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointOp((short*)src_image->data[0], (short*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     break;                                                                                
@@ -99,6 +103,8 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
       ret = DoUnaryPointOp((imushort*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointOp((imushort*)src_image->data[0], (float*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointOp((imushort*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointOp((imushort*)src_image->data[0], (imushort*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     break;                                                                                
@@ -111,6 +117,8 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
       ret = DoUnaryPointOp((int*)src_image->data[0], (imushort*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointOp((int*)src_image->data[0], (float*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointOp((int*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointOp((int*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     break;                                                                                
@@ -123,9 +131,25 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
       ret = DoUnaryPointOp((float*)src_image->data[0], (imushort*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoUnaryPointOp((float*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointOp((double*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointOp((float*)src_image->data[0], (float*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
     break;                                                                                
+  case IM_DOUBLE:
+    if (dst_image->data_type == IM_BYTE)
+      ret = DoUnaryPointOp((double*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_SHORT)
+      ret = DoUnaryPointOp((double*)src_image->data[0], (short*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_USHORT)
+      ret = DoUnaryPointOp((double*)src_image->data[0], (imushort*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_INT)
+      ret = DoUnaryPointOp((double*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointOp((double*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    else
+      ret = DoUnaryPointOp((double*)src_image->data[0], (double*)dst_image->data[0], src_image->width, src_image->height, depth, func, params, userdata, counter);
+    break;
   }
 
   imProcessCounterEnd(counter);
@@ -168,7 +192,7 @@ static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height
     if (x == width-1)
     {
       IM_COUNT_PROCESSING;
-  #ifdef _OPENMP
+#ifdef _OPENMP
 #pragma omp flush (processing)
 #endif
       IM_END_PROCESSING;
@@ -190,7 +214,9 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
   switch(src_image->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointColorOp((imbyte**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointColorOp((imbyte**)src_image->data, (float**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoUnaryPointColorOp((imbyte**)src_image->data, (int**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
@@ -210,6 +236,8 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
       ret = DoUnaryPointColorOp((short**)src_image->data, (int**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointColorOp((short**)src_image->data, (float**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointColorOp((short**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointColorOp((short**)src_image->data, (short**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     break;                                                                                
@@ -222,6 +250,8 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
       ret = DoUnaryPointColorOp((imushort**)src_image->data, (int**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointColorOp((imushort**)src_image->data, (float**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointColorOp((imushort**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointColorOp((imushort**)src_image->data, (imushort**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     break;                                                                                
@@ -234,6 +264,8 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
       ret = DoUnaryPointColorOp((int**)src_image->data, (imushort**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoUnaryPointColorOp((int**)src_image->data, (float**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointColorOp((int**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointColorOp((int**)src_image->data, (int**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     break;                                                                                
@@ -246,9 +278,25 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
       ret = DoUnaryPointColorOp((float**)src_image->data, (imushort**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoUnaryPointColorOp((float**)src_image->data, (int**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointColorOp((double**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     else
       ret = DoUnaryPointColorOp((float**)src_image->data, (float**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
     break;                                                                                
+  case IM_DOUBLE:
+    if (dst_image->data_type == IM_BYTE)
+      ret = DoUnaryPointColorOp((double**)src_image->data, (imbyte**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_SHORT)
+      ret = DoUnaryPointColorOp((double**)src_image->data, (short**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_USHORT)
+      ret = DoUnaryPointColorOp((double**)src_image->data, (imushort**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_INT)
+      ret = DoUnaryPointColorOp((double**)src_image->data, (int**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoUnaryPointColorOp((double**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    else
+      ret = DoUnaryPointColorOp((double**)src_image->data, (double**)dst_image->data, src_image->width, src_image->height, src_depth, dst_depth, func, params, userdata, counter);
+    break;
   }
 
   imProcessCounterEnd(counter);
@@ -290,7 +338,7 @@ static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int 
     if (x == width-1)
     {
       IM_COUNT_PROCESSING;
-  #ifdef _OPENMP
+#ifdef _OPENMP
 #pragma omp flush (processing)
 #endif
       IM_END_PROCESSING;
@@ -316,7 +364,9 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
   switch(src_image[0]->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointOp((imbyte**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointOp((imbyte**)src_map, (float*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoMultiPointOp((imbyte**)src_map, (int*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
@@ -336,6 +386,8 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
       ret = DoMultiPointOp((short**)src_map, (int*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointOp((short**)src_map, (float*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointOp((short**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointOp((short**)src_map, (short*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     break;                                                                                
@@ -348,6 +400,8 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
       ret = DoMultiPointOp((imushort**)src_map, (int*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointOp((imushort**)src_map, (float*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointOp((imushort**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointOp((imushort**)src_map, (imushort*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     break;                                                                                
@@ -360,6 +414,8 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
       ret = DoMultiPointOp((int**)src_map, (imushort*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointOp((int**)src_map, (float*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointOp((int**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointOp((int**)src_map, (int*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     break;                                                                                
@@ -372,9 +428,25 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
       ret = DoMultiPointOp((float**)src_map, (imushort*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoMultiPointOp((float**)src_map, (int*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointOp((double**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointOp((float**)src_map, (float*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
     break;                                                                                
+  case IM_DOUBLE:
+    if (dst_image->data_type == IM_BYTE)
+      ret = DoMultiPointOp((double**)src_map, (imbyte*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_SHORT)
+      ret = DoMultiPointOp((double**)src_map, (short*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_USHORT)
+      ret = DoMultiPointOp((double**)src_map, (imushort*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_INT)
+      ret = DoMultiPointOp((double**)src_map, (int*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointOp((double**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    else
+      ret = DoMultiPointOp((double**)src_map, (double*)dst_image->data[0], src_image[0]->width, src_image[0]->height, depth, src_count, func, params, userdata, counter);
+    break;
   }
 
   delete [] src_map;
@@ -422,7 +494,7 @@ static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int heigh
     if (x == width-1)
     {
       IM_COUNT_PROCESSING;
-  #ifdef _OPENMP
+#ifdef _OPENMP
 #pragma omp flush (processing)
 #endif
       IM_END_PROCESSING;
@@ -449,7 +521,9 @@ int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage
   switch(src_image[0]->data_type)
   {
   case IM_BYTE:
-    if (dst_image->data_type == IM_FLOAT)
+    if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointColorOp((imbyte***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointColorOp((imbyte***)src_map, (float**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoMultiPointColorOp((imbyte***)src_map, (int**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
@@ -469,6 +543,8 @@ int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage
       ret = DoMultiPointColorOp((short***)src_map, (int**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointColorOp((short***)src_map, (float**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointColorOp((short***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointColorOp((short***)src_map, (short**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     break;                                                                                
@@ -481,6 +557,8 @@ int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage
       ret = DoMultiPointColorOp((imushort***)src_map, (int**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointColorOp((imushort***)src_map, (float**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointColorOp((imushort***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointColorOp((imushort***)src_map, (imushort**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     break;                                                                                
@@ -493,6 +571,8 @@ int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage
       ret = DoMultiPointColorOp((int***)src_map, (imushort**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_FLOAT)
       ret = DoMultiPointColorOp((int***)src_map, (float**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointColorOp((int***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointColorOp((int***)src_map, (int**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     break;                                                                                
@@ -505,9 +585,25 @@ int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage
       ret = DoMultiPointColorOp((float***)src_map, (imushort**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else if (dst_image->data_type == IM_INT)
       ret = DoMultiPointColorOp((float***)src_map, (int**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointColorOp((double***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     else
       ret = DoMultiPointColorOp((float***)src_map, (float**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
     break;                                                                                
+  case IM_DOUBLE:
+    if (dst_image->data_type == IM_BYTE)
+      ret = DoMultiPointColorOp((double***)src_map, (imbyte**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_SHORT)
+      ret = DoMultiPointColorOp((double***)src_map, (short**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_USHORT)
+      ret = DoMultiPointColorOp((double***)src_map, (imushort**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_INT)
+      ret = DoMultiPointColorOp((double***)src_map, (int**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else if (dst_image->data_type == IM_DOUBLE)
+      ret = DoMultiPointColorOp((double***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    else
+      ret = DoMultiPointColorOp((double***)src_map, (double**)dst_image->data, src_image[0]->width, src_image[0]->height, src_depth, dst_depth, src_count, func, params, userdata, counter);
+    break;
   }
 
   delete [] src_map;
