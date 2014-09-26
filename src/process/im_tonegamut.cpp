@@ -406,13 +406,9 @@ float imProcessCalcAutoGamma(const imImage* image)
   return (float)(log((double)((mean-min)/(max-min)))/log(0.5));
 }
 
-void imProcessUnNormalize(const imImage* src_image, imImage* dst_image)
+template <class T>
+static void DoUnNormalize(T* map, imbyte* new_map, int count)
 {
-  int count = src_image->count*src_image->depth;
-
-  float* map = (float*)src_image->data[0];
-  imbyte* new_map = (imbyte*)dst_image->data[0];
-
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -423,8 +419,19 @@ void imProcessUnNormalize(const imImage* src_image, imImage* dst_image)
     else if (map[i] < 0)
       new_map[i] = (imbyte)0;
     else
-      new_map[i] = (imbyte)(map[i]*255);
+      new_map[i] = (imbyte)(map[i] * 255);
   }
+}
+
+void imProcessUnNormalize(const imImage* src_image, imImage* dst_image)
+{
+  int count = src_image->count*src_image->depth;
+  imbyte* new_map = (imbyte*)dst_image->data[0];
+
+  if (src_image->data_type == IM_FLOAT)
+    DoUnNormalize((float*)src_image->data[0], new_map, count);
+  else
+    DoUnNormalize((double*)src_image->data[0], new_map, count);
 }
 
 template <class T> 

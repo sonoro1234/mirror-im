@@ -87,6 +87,7 @@ void imCalcUShortHistogram(const unsigned short* data, int count, unsigned long*
 void imCalcShortHistogram(const short* data, int count, unsigned long* histo, int cumulative);
 
 /** Alocates an histogram data based on the image data type. \n
+ * Data type can be IM_BYTE, IM_SHORT or IM_USHORT. \n
  * Not available in Lua.
  * \ingroup stats */
 unsigned long* imHistogramNew(int data_type, int *hcount);
@@ -123,7 +124,7 @@ typedef struct _imStats
 
 /** Calculates the statistics about the image data. \n
  * There is one stats for each depth plane. For ex: stats[0]=red stats, stats[0]=green stats, ... \n
- * Supports all data types except IM_CFLOAT. \n
+ * Supports all data types except complex. \n
  *
  * \verbatim im.CalcImageStatistics(image: imImage) -> stats: table [in Lua 5] \endverbatim
  * Table contains the following fields: max, min, positive, negative, zeros, mean, stddev. 
