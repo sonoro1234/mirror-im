@@ -338,6 +338,12 @@ int imProcessCompassConvolve(const imImage* src_image, imImage* dst_image, imIma
       else
         ret = DoCompassConvolve((float*)src_image->data[i], (float*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel->data[0], kernel->width, counter, (float)0);
       break;                                                                                
+    case IM_DOUBLE:
+      if (kernel->data_type == IM_INT)
+        ret = DoCompassConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, counter, (double)0);
+      else
+        ret = DoCompassConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, counter, (double)0);
+      break;
     }
     
     if (!ret) 
@@ -438,8 +444,8 @@ static int DoConvolveDual(T* map, T* new_map, int width, int height, KT* kernel_
   return processing;
 }
 
-template <class KT> 
-static int DoConvolveDualCpx(imcfloat* map, imcfloat* new_map, int width, int height, KT* kernel_map1, KT* kernel_map2, int kernel_width, int kernel_height, int counter)
+template <class T, class KT> 
+static int DoConvolveDualCpx(imComplex<T>* map, imComplex<T>* new_map, int width, int height, KT* kernel_map1, KT* kernel_map2, int kernel_width, int kernel_height, int counter)
 {
   KT total1, total2, *kernel_line;
 
@@ -468,8 +474,8 @@ static int DoConvolveDualCpx(imcfloat* map, imcfloat* new_map, int width, int he
 
     for(int i = 0; i < width; i++)
     {
-      imcfloat value1 = 0;
-      imcfloat value2 = 0;
+      imComplex<T> value1 = 0;
+      imComplex<T> value2 = 0;
     
       for(int y = -kh2; y <= kh2; y++)
       {
@@ -570,6 +576,18 @@ int imProcessConvolveDual(const imImage* src_image, imImage* dst_image, const im
       else
         ret = DoConvolveDualCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel1->data[0], (float*)kernel2->data[0], kernel1->width, kernel1->height, counter);
       break;
+    case IM_DOUBLE:
+      if (kernel1->data_type == IM_INT)
+        ret = DoConvolveDual((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel1->data[0], (int*)kernel2->data[0], kernel1->width, kernel1->height, counter, (double)0);
+      else
+        ret = DoConvolveDual((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel1->data[0], (double*)kernel2->data[0], kernel1->width, kernel1->height, counter, (double)0);
+      break;
+    case IM_CDOUBLE:
+      if (kernel1->data_type == IM_INT)
+        ret = DoConvolveDualCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel1->data[0], (int*)kernel2->data[0], kernel1->width, kernel1->height, counter);
+      else
+        ret = DoConvolveDualCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel1->data[0], (double*)kernel2->data[0], kernel1->width, kernel1->height, counter);
+      break;
     }
     
     if (!ret) 
@@ -655,8 +673,8 @@ static int DoConvolve(T* map, T* new_map, int width, int height, KT* kernel_map,
   return processing;
 }
 
-template <class KT> 
-static int DoConvolveCpx(imcfloat* map, imcfloat* new_map, int width, int height, KT* kernel_map, int kernel_width, int kernel_height, int counter)
+template <class T, class KT> 
+static int DoConvolveCpx(imComplex<T>* map, imComplex<T>* new_map, int width, int height, KT* kernel_map, int kernel_width, int kernel_height, int counter)
 {
   KT total, *kernel_line;
 
@@ -684,7 +702,7 @@ static int DoConvolveCpx(imcfloat* map, imcfloat* new_map, int width, int height
 
     for(int i = 0; i < width; i++)
     {
-      imcfloat value = 0;
+      imComplex<T> value = 0;
     
       for(int y = -kh2; y <= kh2; y++)
       {
@@ -768,6 +786,18 @@ static int DoConvolveStep(const imImage* src_image, imImage* dst_image, const im
         ret = DoConvolveCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter);
       else
         ret = DoConvolveCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel->data[0], kernel->width, kernel->height, counter);
+      break;
+    case IM_DOUBLE:
+      if (kernel->data_type == IM_INT)
+        ret = DoConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
+      else
+        ret = DoConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
+      break;
+    case IM_CDOUBLE:
+      if (kernel->data_type == IM_INT)
+        ret = DoConvolveCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter);
+      else
+        ret = DoConvolveCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter);
       break;
     }
     
@@ -969,11 +999,11 @@ static int DoConvolveSep(T* map, T* new_map, int width, int height, KT* kernel_m
 }
 
 
-template <class KT> 
-static int DoConvolveSepCpx(imcfloat* map, imcfloat* new_map, int width, int height, KT* kernel_map, int kernel_width, int kernel_height, int counter)
+template <class T, class KT> 
+static int DoConvolveSepCpx(imComplex<T>* map, imComplex<T>* new_map, int width, int height, KT* kernel_map, int kernel_width, int kernel_height, int counter)
 {
   KT totalH, totalW, *kernel_line;
-  imcfloat* aux_line;
+  imComplex<T>* aux_line;
 
   int kh2 = kernel_height/2;
   int kw2 = kernel_width/2;
@@ -986,7 +1016,7 @@ static int DoConvolveSepCpx(imcfloat* map, imcfloat* new_map, int width, int hei
   totalH = iKernelTotalH(kernel_map, kernel_width, kernel_height);
   totalW = iKernelTotalW(kernel_map, kernel_width);
 
-  aux_line = (imcfloat*)malloc(width*sizeof(imcfloat));
+  aux_line = (imComplex<T>*)malloc(width*sizeof(imComplex<T>));
 
   IM_INT_PROCESSING;
 
@@ -1004,7 +1034,7 @@ static int DoConvolveSepCpx(imcfloat* map, imcfloat* new_map, int width, int hei
 
     for(int i = 0; i < width; i++)
     {
-      imcfloat value = 0;
+      imComplex<T> value = 0;
 
       // first pass, only for columns
     
@@ -1059,7 +1089,7 @@ static int DoConvolveSepCpx(imcfloat* map, imcfloat* new_map, int width, int hei
     for(int i = 0; i < width; i++)
     {
       int x;
-      imcfloat value = 0;
+      imComplex<T> value = 0;
 
       // second pass, only for lines, but has to use an auxiliar buffer
     
@@ -1080,7 +1110,7 @@ static int DoConvolveSepCpx(imcfloat* map, imcfloat* new_map, int width, int hei
       aux_line[i] = value;
     }    
 
-    memcpy(new_map + new_offset, aux_line, width*sizeof(imcfloat));
+    memcpy(new_map + new_offset, aux_line, width*sizeof(imComplex<T>));
 
     IM_COUNT_PROCESSING;
 #ifdef _OPENMP
@@ -1141,6 +1171,18 @@ int imProcessConvolveSep(const imImage* src_image, imImage* dst_image, const imI
         ret = DoConvolveSepCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter);
       else
         ret = DoConvolveSepCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel->data[0], kernel->width, kernel->height, counter);
+      break;
+    case IM_DOUBLE:
+      if (kernel->data_type == IM_INT)
+        ret = DoConvolveSep((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
+      else
+        ret = DoConvolveSep((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
+      break;
+    case IM_CDOUBLE:
+      if (kernel->data_type == IM_INT)
+        ret = DoConvolveSepCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter);
+      else
+        ret = DoConvolveSepCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter);
       break;
     }
     
@@ -1278,12 +1320,18 @@ void imProcessZeroCrossing(const imImage* src_image, imImage* dst_image)
   {
     switch(src_image->data_type)
     {
-    case IM_INT:                                                                           
+    case IM_SHORT:
+      do_crossing((short*)src_image->data[i], (short*)dst_image->data[i], src_image->width, src_image->height, (short)0);
+      break;
+    case IM_INT:
       do_crossing((int*)src_image->data[i], (int*)dst_image->data[i], src_image->width, src_image->height, 0);
       break;                                                                                
     case IM_FLOAT:                                                                           
       do_crossing((float*)src_image->data[i], (float*)dst_image->data[i], src_image->width, src_image->height, 0.0f);
       break;                                                                                
+    case IM_DOUBLE:
+      do_crossing((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, 0.0);
+      break;
     }
   }
 }
@@ -1602,6 +1650,9 @@ static void doSharp(const imImage* src_image, imImage* dst_image, float amount, 
       break;
     case IM_FLOAT:
       DoSharpOp((float*)src_image->data[i], (float*)dst_image->data[i], count, amount, (float)threshold, gauss);
+      break;
+    case IM_DOUBLE:
+      DoSharpOp((double*)src_image->data[i], (double*)dst_image->data[i], count, amount, (double)threshold, gauss);
       break;
     }
   }
