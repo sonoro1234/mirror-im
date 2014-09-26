@@ -25,7 +25,7 @@
 #endif
 
 
-/* NOTE: This can breaks on multithread ONLY if using multiple states. */
+/* NOTE: This can breaks on multi-thread ONLY if using multiple states. */
 /* Used ONLY in im.ProcessRenderOp and im.ProcessRenderCondOp. */
 static lua_State *g_State = NULL;
 
@@ -195,8 +195,7 @@ static int imluaCalcImageStatistics (lua_State *L)
   imStats stats[4];
   imImage *image = imlua_checkimage(L, 1);
 
-  if (image->data_type == IM_CFLOAT)
-    luaL_argerror(L, 1, "data type can NOT be of type cfloat");
+  imlua_checknotcomplex(L, 1, image);
 
   imCalcImageStatistics(image, stats);
 
@@ -1535,7 +1534,11 @@ static int imluaProcessZeroCrossing (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  luaL_argcheck(L, src_image->data_type == IM_INT || src_image->data_type == IM_FLOAT, 1, "image data type can be int or float only");
+  luaL_argcheck(L, src_image->data_type == IM_SHORT || 
+                   src_image->data_type == IM_INT ||
+                   src_image->data_type == IM_FLOAT ||
+                   src_image->data_type == IM_DOUBLE, 1, 
+                   "image data type can be short, int, float or double only");
   imlua_match(L, src_image, dst_image);
 
   imProcessZeroCrossing(src_image, dst_image);
@@ -1812,7 +1815,7 @@ static int imluaProcessMultiPointOp(lua_State *L)
 
   /* minimize leak when error, checking array after other checks */
   src_image_list = imlua_toarrayimage(L, 1, &src_count, 1);
-  if (src_image_list[0]->data_type == IM_CFLOAT)
+  if (src_image_list[0]->data_type == IM_CFLOAT || src_image_list[0]->data_type == IM_CDOUBLE)
   {
     free(src_image_list);
     imlua_errorcomplex(L, 1);
@@ -1896,7 +1899,7 @@ static int imluaProcessMultiPointColorOp(lua_State *L)
 
   /* minimize leak when error, checking array after other checks */
   src_image_list = imlua_toarrayimage(L, 1, &src_count, 1);
-  if (src_image_list[0]->data_type == IM_CFLOAT)
+  if (src_image_list[0]->data_type == IM_CFLOAT || src_image_list[0]->data_type == IM_CDOUBLE)
   {
     free(src_image_list);
     imlua_errorcomplex(L, 1);
