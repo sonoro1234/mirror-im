@@ -139,21 +139,27 @@ inline imComplex<T> operator / (const imComplex<T>& C, const double& R)
 }
 
 template<class T>
-inline imComplex<T> operator /= (const imComplex<T>& C, const T& R)
+inline imComplex<T> operator /= (const imComplex<T>& C, const float& R)
 {
-  return imComplex<T>(C.real / R, C.imag / R);
+  return imComplex<T>(C.real / (T)R, C.imag / (T)R);
 }
 
 template<class T>
-inline imComplex<T> operator * (const imComplex<T>& C, const double& R)
+inline imComplex<T> operator /= (const imComplex<T>& C, const double& R)
 {
-  return imComplex<T>(C.real * R, C.imag * R);
+  return imComplex<T>(C.real / (T)R, C.imag / (T)R);
 }
 
 template<class T>
 inline imComplex<T> operator * (const imComplex<T>& C, const float& R)
 {
-  return imComplex<T>(C.real * R, C.imag * R);
+  return imComplex<T>(C.real * (T)R, C.imag * (T)R);
+}
+
+template<class T>
+inline imComplex<T> operator * (const imComplex<T>& C, const double& R)
+{
+  return imComplex<T>(C.real * (T)R, C.imag * (T)R);
 }
 
 template<class T>
