@@ -373,7 +373,7 @@ static int imluaFileSetAttribute (lua_State *L)
 
     case IM_CDOUBLE:
       {
-        double *data_float = (double*) data;
+        double *data_double = (double*) data;
         for (i = 0; i < count; i++)
         {
           int two;
@@ -384,8 +384,8 @@ static int imluaFileSetAttribute (lua_State *L)
             luaL_argerror(L, 4, "invalid value");
           }
 
-          data_float[i] = value[0];
-          data_float[i+1] = value[1];
+          data_double[i] = value[0];
+          data_double[i+1] = value[1];
           free(value);
           lua_pop(L, 1);
         }        

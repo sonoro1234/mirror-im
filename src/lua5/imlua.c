@@ -157,7 +157,9 @@ static const imlua_constant im_constants[] = {
   { "USHORT", IM_USHORT, NULL },
   { "INT", IM_INT, NULL },
   { "FLOAT", IM_FLOAT, NULL },
+  { "DOUBLE", IM_DOUBLE, NULL },
   { "CFLOAT", IM_CFLOAT, NULL },
+  { "CDOUBLE", IM_CDOUBLE, NULL },
 
   { "RGB", IM_RGB, NULL },
   { "MAP", IM_MAP, NULL },
