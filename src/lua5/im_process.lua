@@ -326,7 +326,6 @@ function im.ProcessMergeComponentsNew (src_image_list)
   return dst_image
 end
 
-OneSourceOneDest("ProcessNormalizeComponents", nil, nil, nil, im.FLOAT)
 OneSourceOneDest("ProcessReplaceColor")
 TwoSourcesOneDest("ProcessBitwiseOp")
 OneSourceOneDest("ProcessBitwiseNot")
@@ -350,5 +349,20 @@ OneSourceOneDest("ProcessSliceThreshold", nil, nil, im.BINARY, nil)
 OneSourceOneDest("ProcessPixelate")
 OneSourceOneDest("ProcessPosterize")
 
-TwoSourcesOneDest("ProcessNormDiffRatio", nil, nil, nil, im.FLOAT)
 OneSourceOneDest("ProcessAbnormalHyperionCorrection")
+
+function im.ProcessNormalizeComponentsNew(src_image)
+  local data_type = im.FLOAT
+  if (src_image:DataType() == im.DOUBLE) then data_type = im.DOUBLE end
+  local dst_image = im.ImageCreateBased(src_image, nil, nil, nil, data_type)
+  im.ProcessNormalizeComponents(src_image, dst_image)
+  return dst_image
+end
+
+function im.ProcessNormDiffRatioNew(src_image1, src_image2)
+  local data_type = im.FLOAT
+  if (src_image1:DataType() == im.DOUBLE) then data_type = im.DOUBLE end
+  local dst_image = im.ImageCreateBased(src_image1, nil, nil, nil, data_type)
+  im.ProcessNormDiffRatio(src_image1, src_image2, dst_image)
+  return dst_image
+end
