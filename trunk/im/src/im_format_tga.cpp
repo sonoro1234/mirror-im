@@ -197,7 +197,7 @@ static int iTGAEncodeScanLine(imbyte* EncodedBuffer, const imbyte* DecodedBuffer
     x += runcount;
   }
 
-  return EncodedBuffer-StartBuffer;      /* Return the number of unsigned chars written to buffer */
+  return (int)(EncodedBuffer-StartBuffer);      /* Return the number of unsigned chars written to buffer */
 }
 
 static const char* iTGACompTable[2] = 
@@ -737,7 +737,7 @@ int imFileFormatTGA::LoadExtensionArea()
       char* str = ctime(&tt);
       if (str) 
       {
-        int size = strlen(str);
+        int size = (int)strlen(str);
         str[size-1] = 0;   // remove "\n"
         attrib_table->Set("DateTimeModified", IM_BYTE, size, str);
       }

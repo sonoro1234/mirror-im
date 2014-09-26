@@ -143,10 +143,8 @@ enum imUnaryOp {
 /** Apply an arithmetic unary operation. \n
  * Can be done in-place, images must match size. \n
  * Destiny image can be several types depending on source: \n
- * \li byte -> byte, short, ushort, int, float
- * \li ushort -> byte, short, ushort, int, float
- * \li int -> byte, short, ushort, int, float
- * \li float -> float
+ * \li any integer -> any integer or real
+ * \li real -> real
  * \li complex -> complex
  * If destiny is byte, then the result is cropped to 0-255.
  *
@@ -172,12 +170,11 @@ enum imBinaryOp {
 /** Apply a binary arithmetic operation. \n
  * Can be done in-place, images must match size. \n
  * Source images must match type, destiny image can be several types depending on source: \n
- * \li byte -> byte, short, ushort, int, float
- * \li ushort -> short, ushort, int, float
- * \li int -> int, float
- * \li float -> float
+ * \li any integer -> any integer+ or real
+ * \li real -> real
  * \li complex -> complex
- * One exception is that you can combine complex with float resulting complex.
+ * One exception is that you can use src1=complex src2=real resulting dst=complex. \n
+ * If destiny is integer then it must have equal or more precision than the source. \n
  * If destiny is byte, then the result is cropped to 0-255.
  * Alpha channel is not included.
  *
@@ -190,10 +187,8 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
 /** Apply a binary arithmetic operation with a constant value. \n
  * Can be done in-place, images must match size. \n
  * Destiny image can be several types depending on source: \n
- * \li byte -> byte, short, ushort, int, float
- * \li ushort -> byte, short, ushort, int, float
- * \li int -> byte, short, ushort, int, float
- * \li float -> float
+ * \li any integer -> any integer or real
+ * \li real -> real
  * \li complex -> complex
  * The constant value is type casted to an apropriate type before the operation.
  * If destiny is byte, then the result is cropped to 0-255.
@@ -214,7 +209,8 @@ void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, i
 
 /** Blend two images using an alpha channel = [a * alpha + b * (1 - alpha)]. \n
  * Can be done in-place, images must match size and type. \n
- * alpha_image must have the same data type except for complex images that must be float, and color_space must be IM_GRAY.
+ * alpha_image must have the same data type except for complex images that must be real, 
+ * and color_space must be IM_GRAY.
  * Maximum alpha values are baed in \ref imColorMax. Minimum is always 0.
  * \verbatim im.ProcessBlend(src_image1: imImage, src_image2: imImage, alpha_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessBlendNew(image1: imImage, image2: imImage, alpha_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -231,7 +227,7 @@ void imProcessCompose(const imImage* src_image1, const imImage* src_image2, imIm
 
 /** Split a complex image into two images with real and imaginary parts \n
  * or magnitude and phase parts (polar). \n
- * Source image must be IM_CFLOAT, destiny images must be IM_FLOAT.
+ * Source image must be complex, destiny images must be real.
  *
  * \verbatim im.ProcessSplitComplex(src_image: imImage, dst_image1: imImage, dst_image2: imImage, polar: boolean) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSplitComplexNew(image: imImage, polar: boolean) -> dst_image1: imImage, dst_image2: imImage [in Lua 5] \endverbatim
@@ -240,7 +236,7 @@ void imProcessSplitComplex(const imImage* src_image, imImage* dst_image1, imImag
 
 /** Merges two images as the real and imaginary parts of a complex image, \n
  * or as magnitude and phase parts (polar = 1). \n
- * Source images must be IM_FLOAT, destiny image must be IM_CFLOAT.
+ * Source images must be real, destiny image must be complex.
  *
  * \verbatim im.ProcessMergeComplex(src_image1: imImage, src_image2: imImage, dst_image: imImage, polar: boolean) [in Lua 5] \endverbatim
  * \verbatim im.ProcessMergeComplexNew(image1: imImage, image2: imImage, polar: boolean) -> new_image: imImage [in Lua 5] \endverbatim
@@ -265,7 +261,7 @@ void imProcessMultipleStdDev(const imImage** src_image_list, int src_image_count
 
 /** Calculates the auto-covariance of an image with the mean of a set of images. \n
  * Images must match size and type. Returns zero if the counter aborted. \n
- * Destiny is IM_FLOAT.
+ * Destiny is IM_FLOAT, except if source is IM_DOUBLE.
  * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessAutoCovariance(src_image: imImage, mean_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
@@ -356,8 +352,9 @@ void imProcessEqualizeHistogram(const imImage* src_image, imImage* dst_image);
 void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* chroma_image);
 
 /** Split a RGB image into HSI planes. \n
- * Source image must be IM_RGB/IM_BYTE,IM_FLOAT. Destiny images are all IM_GRAY/IM_FLOAT. \n
- * Source images must normalized to 0-1 if type is IM_FLOAT (\ref imProcessToneGamut can be used). See \ref hsi for a definition of the color conversion.\n
+ * Source image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. Destiny images are all IM_GRAY/IM_FLOAT. \n
+ * Source images must normalized to 0-1 if type is IM_FLOAT (\ref imProcessToneGamut can be used). 
+ * See \ref hsi for a definition of the color conversion.\n
  * Source and destiny must have the same size. 
  *
  * \verbatim im.ProcessSplitHSI(src_image: imImage, h_image: imImage, s_image: imImage, i_image: imImage) [in Lua 5] \endverbatim
@@ -366,7 +363,7 @@ void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* 
 void imProcessSplitHSI(const imImage* src_image, imImage* h_image, imImage* s_image, imImage* i_image);
 
 /** Merge HSI planes into a RGB image. \n
- * Source images must be IM_GRAY/IM_FLOAT. Destiny image can be IM_RGB/IM_BYTE,IM_FLOAT. \n
+ * Source images must be IM_GRAY/IM_FLOAT. Destiny image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. \n
  * Source and destiny must have the same size. See \ref hsi for a definition of the color conversion.
  *
  * \verbatim im.ProcessMergeHSI(h_image: imImage, s_image: imImage, i_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -394,7 +391,7 @@ void imProcessMergeComponents(const imImage** src_image_list, imImage* dst_image
 
 /** Normalize the color components by their sum. Example: c1 = c1/(c1+c2+c3). \n
  * It will not change the alpha channel if any.
- * Destiny image must be IM_FLOAT. 
+ * Destiny is IM_FLOAT, except if source is IM_DOUBLE.
  *
  * \verbatim im.ProcessNormalizeComponents(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessNormalizeComponentsNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -404,7 +401,7 @@ void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image);
 /** Replaces the source color by the destiny color. \n
  * The color will be type casted to the image data type. \n
  * The colors must have the same number of components of the images. \n
- * Supports all color spaces and all data types except IM_CFLOAT.
+ * Supports all color spaces and all data types except complex.
  *
  * \verbatim im.ProcessReplaceColor(src_image: imImage, dst_image: imImage, src_color: table of numbers, dst_color: table of numbers) [in Lua 5] \endverbatim
  * \verbatim im.ProcessReplaceColorNew(src_image: imImage, src_color: table of numbers, dst_color: table of numbers) -> new_image: imImage [in Lua 5] \endverbatim
@@ -415,7 +412,7 @@ void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* 
  * elsewhere alpha remains untouched. \n
  * The color must have the same number of components of the source image. \n
  * If destiny does not have an alpha channel, then its plane=0 is used. \n
- * Supports all color spaces for source and all data types except IM_CFLOAT.
+ * Supports all color spaces for source and all data types except complex.
  * Images must have the same size.
  *
  * \verbatim im.ProcessSetAlphaColor(src_image: imImage, dst_image: imImage, src_color: table of numbers, dst_alpha: number) [in Lua 5] \endverbatim
@@ -477,7 +474,7 @@ void imProcessBitPlane(const imImage* src_image, imImage* dst_image, int plane, 
 /** \defgroup render Synthetic Image Render
  * \par
  * Renders some 2D mathematical functions as images. All the functions operates in-place 
- * and supports all data types except IM_CFLOAT.
+ * and supports all data types except complex.
  * \par
  * See \ref im_process_pnt.h
  * \ingroup process */
@@ -621,7 +618,7 @@ int imProcessRenderChessboard(imImage* image, int x_space, int y_space);
 /** Tone Gamut Operations.
  * \ingroup tonegamut */
 enum imToneGamut {
-  IM_GAMUT_NORMALIZE, /**< normalize = (a-min) / (max-min)     (images must be IM_FLOAT)   */
+  IM_GAMUT_NORMALIZE, /**< normalize = (a-min) / (max-min)     (result is always real)   */
   IM_GAMUT_POW,       /**< pow       = ((a-min) / (max-min))^gamma * (max-min) + min                  \n
                                        params[0]=gamma                                             */
   IM_GAMUT_LOG,       /**< log       = log(K * (a-min) / (max-min) + 1))*(max-min)/log(K+1) + min     \n
@@ -652,8 +649,8 @@ enum imToneGamutFlags {
 };
 
 /** Apply a gamut operation with arguments. \n
- * Supports all data types except IM_CFLOAT. \n
- * For IM_GAMUT_NORMALIZE when min > 0 and max < 1, it forces min=0 and max=1. \n
+ * Supports all data types except complex. \n
+ * For IM_GAMUT_NORMALIZE when min > 0 and max < 1, it will just do a copy. \n
  * IM_BYTE images have min=0 and max=255 always. \n
  * To control min and max values use the IM_GAMUT_MINMAX flag.
  * Can be done in-place. When there is no extra parameters, params can use NULL.
@@ -665,14 +662,14 @@ enum imToneGamutFlags {
 void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, float* params);
 
 /** Converts from (0-1) to (0-255), crop out of bounds values. \n
- * Source image must be IM_FLOAT, and destiny image must be IM_BYTE.
+ * Source image must be real, and destiny image must be IM_BYTE.
  *
  * \verbatim im.ProcessUnNormalize(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessUnNormalizeNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup tonegamut */
 void imProcessUnNormalize(const imImage* src_image, imImage* dst_image);
 
-/** Directly converts IM_SHORT, IM_USHORT, IM_INT and IM_FLOAT into IM_BYTE images. \n
+/** Directly converts integer and real data types into IM_BYTE images. \n
  * This can also be done using \ref imConvertDataType with IM_CAST_DIRECT flag.
  *
  * \verbatim im.ProcessDirectConv(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -681,7 +678,7 @@ void imProcessUnNormalize(const imImage* src_image, imImage* dst_image);
 void imProcessDirectConv(const imImage* src_image, imImage* dst_image);
 
 /** A negative effect. Uses \ref imProcessToneGamut with IM_GAMUT_INVERT for non MAP images. \n
- * Supports all color spaces and all data types except IM_CFLOAT. \n
+ * Supports all color spaces and all data types except complex. \n
  * Can be done in-place. 
  *
  * \verbatim im.ProcessNegative(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -698,7 +695,7 @@ void imProcessNegative(const imImage* src_image, imImage* dst_image);
 float imProcessCalcAutoGamma(const imImage* image);
 
 /** Apply a shift using HSI coordinates. \n
- * Supports all data types except IM_CFLOAT. \n
+ * Supports all data types except complex. \n
  * Can be done in-place.
  *
  * \verbatim im.ProcessShiftHSI(src_image: imImage, dst_image: imImage, h_shift, s_shift, i_shift: number) [in Lua 5] \endverbatim
@@ -718,7 +715,7 @@ void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shi
  * threshold = a <= level ? 0: value \n
  * Normal value is 1 but another common value is 255. Can be done in-place for IM_BYTE source. \n
  * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
- * IM_CFLOAT is not supported. \n
+ * complex is not supported. \n
  *
  * \verbatim im.ProcessThreshold(src_image: imImage, dst_image: imImage, level: number, value: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessThresholdNew(src_image: imImage, level: number, value: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -728,7 +725,7 @@ void imProcessThreshold(const imImage* src_image, imImage* dst_image, float leve
 /** Apply a threshold by the difference of two images. \n
  * threshold = a1 <= a2 ? 0: 1   \n
  * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
- * IM_CFLOAT is not supported. Can be done in-place for IM_BYTE source. \n
+ * complex is not supported. Can be done in-place for IM_BYTE source. \n
  *
  * \verbatim im.ProcessThresholdByDiff(src_image1: imImage, src_image2: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessThresholdByDiffNew(src_image1: imImage, src_image2: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -739,7 +736,7 @@ void imProcessThresholdByDiff(const imImage* src_image1, const imImage* src_imag
  * Hysteresis thersholding of edge pixels. Starting at pixels with a
  * value greater than the HIGH threshold, trace a connected sequence
  * of pixels that have a value greater than the LOW threhsold. \n
- * IM_CFLOAT is not supported. Can be done in-place for IM_BYTE source. \n
+ * complex is not supported. Can be done in-place for IM_BYTE source. \n
  * Note: could not find the original source code author name.
  *
  * \verbatim im.ProcessHysteresisThreshold(src_image: imImage, dst_image: imImage, low_thres: number, high_thres: number) [in Lua 5] \endverbatim
@@ -810,7 +807,7 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image);
 /** Calculates the threshold level for manual threshold using (max-min)/2. \n
  * Returns the used level. \n
  * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
- * IM_CFLOAT is not supported. Can be done in-place for IM_BYTE source. \n
+ * complex is not supported. Can be done in-place for IM_BYTE source. \n
  *
  * \verbatim im.ProcessMinMaxThreshold(src_image: imImage, dst_image: imImage) -> level: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessMinMaxThresholdNew(src_image: imImage) -> level: number, new_image: imImage [in Lua 5] \endverbatim
@@ -828,7 +825,7 @@ void imProcessLocalMaxThresEstimate(const imImage* image, int *level);
  * threshold = start_level <= a <= end_level ? 1: 0 \n
  * Normal value is 1 but another common value is 255. \n
  * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
- * IM_CFLOAT is not supported. Can be done in-place for IM_BYTE source. \n
+ * complex is not supported. Can be done in-place for IM_BYTE source. \n
  *
  * \verbatim im.ProcessSliceThreshold(src_image: imImage, dst_image: imImage, start_level: number, end_level: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSliceThresholdNew(src_image: imImage, start_level: number, end_level: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -873,7 +870,7 @@ void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level)
 /** Calculates the Normalized Difference Ratio. \n
  * Uses the formula NormDiffRatio = (a-b)/(a+b), \n
  * The result image has [-1,1] interval. \n
- * Images must be IM_GRAY, and the destiny image must be IM_FLOAT.
+ * Images must be IM_GRAY, and the destiny image must be IM_FLOAT, except if source is IM_DOUBLE.
  *
  * \verbatim im.ProcessNormDiffRatio(image1: imImage, image2: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessNormDiffRatioNew(image1: imImage, image2: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -881,7 +878,7 @@ void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level)
 void imProcessNormDiffRatio(const imImage* image1, const imImage* image2, imImage* dst_image);
 
 /** Applies the abnormal pixel correction as described in the article. (Since 3.8) \n
- * Images must be IM_GRAY. Source and Destiny must have the same datatype, and IM_CFLOAT is not supported. \n
+ * Images must be IM_GRAY. Source and Destiny must have the same datatype, and complex is not supported. \n
  * image_abnormal is optional, can be NULL. If not NULL, must be IM_BINARY and 
  * it will store the abnormal pixels distribution. \n
  * Can be done in-place. \n

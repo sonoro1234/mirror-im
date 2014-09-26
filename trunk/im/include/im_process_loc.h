@@ -188,7 +188,7 @@ void imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imIm
  * \ingroup process */
 
 /** Base gray morphology convolution. \n
- * Supports all data types except IM_CFLOAT. Can be applied on color images. \n
+ * Supports all data types except complex. Can be applied on color images. \n
  * Kernel is always IM_INT. Use kernel size odd for better results. \n
  * Use -1 for don't care positions in kernel. Kernel values are added to image values, then \n
  * you can use the maximum or the minimum within the kernel area. \n
@@ -332,7 +332,7 @@ void imProcessBinMorphThin(const imImage* src_image, imImage* dst_image);
 
 /** Rank convolution using the median value. \n
  * Returns zero if the counter aborted. \n
- * Supports all data types except IM_CFLOAT. Can be applied on color images.
+ * Supports all data types except complex. Can be applied on color images.
  *
  * \verbatim im.ProcessMedianConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessMedianConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -341,7 +341,7 @@ int imProcessMedianConvolve(const imImage* src_image, imImage* dst_image, int ke
 
 /** Rank convolution using (maximum-minimum) value. \n
  * Returns zero if the counter aborted. \n
- * Supports all data types except IM_CFLOAT. Can be applied on color images.
+ * Supports all data types except complex. Can be applied on color images.
  *
  * \verbatim im.ProcessRangeConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRangeConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -350,7 +350,7 @@ int imProcessRangeConvolve(const imImage* src_image, imImage* dst_image, int ker
 
 /** Rank convolution using the closest maximum or minimum value. \n
  * Returns zero if the counter aborted. \n
- * Supports all data types except IM_CFLOAT. Can be applied on color images.
+ * Supports all data types except complex. Can be applied on color images.
  *
  * \verbatim im.ProcessRankClosestConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRankClosestConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -359,7 +359,7 @@ int imProcessRankClosestConvolve(const imImage* src_image, imImage* dst_image, i
 
 /** Rank convolution using the maximum value. \n
  * Returns zero if the counter aborted. \n
- * Supports all data types except IM_CFLOAT. Can be applied on color images.
+ * Supports all data types except complex. Can be applied on color images.
  *
  * \verbatim im.ProcessRankMaxConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRankMaxConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -368,7 +368,7 @@ int imProcessRankMaxConvolve(const imImage* src_image, imImage* dst_image, int k
 
 /** Rank convolution using the minimum value. \n
  * Returns zero if the counter aborted. \n
- * Supports all data types except IM_CFLOAT. Can be applied on color images.
+ * Supports all data types except complex. Can be applied on color images.
  *
  * \verbatim im.ProcessRankMinConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRankMinConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -452,7 +452,7 @@ int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imI
 /** Convolve with a kernel rotating it 8 times and getting the absolute maximum value. \n
  * Kernel must be square. \n
  * The rotation is implemented only for kernel sizes 3x3, 5x5 and 7x7. \n
- * Supports all data types except IM_CFLOAT.
+ * Supports all data types except complex.
  * Returns zero if the counter aborted.\n
  * If the kernel image attribute "Description" exists it is used by the counter.
  *
@@ -534,7 +534,7 @@ int imProcessPrewittConvolve(const imImage* src_image, imImage* dst_image);
  * \ingroup convolve */
 int imProcessSplineEdgeConvolve(const imImage* src_image, imImage* dst_image);
 
-/** Finds the zero crossings of IM_INT and IM_FLOAT images. Crossings are marked with non zero values
+/** Finds the zero crossings of IM_SHORT, IM_INT, IM_FLOAT and IM_DOUBLE images. Crossings are marked with non zero values
  * indicating the intensity of the edge. It is usually used after a second derivative, laplace. \n
  * Extracted from XITE, Copyright 1991, Blab, UiO \n
  * http://www.ifi.uio.no/~blab/Software/Xite/
