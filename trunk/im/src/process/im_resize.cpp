@@ -7,8 +7,8 @@
 
 #include <im.h>
 #include <im_util.h>
-#include <im_math.h>
 #include <im_complex.h>
+#include <im_math.h>
 
 #include "im_process_counter.h"
 #include "im_process_loc.h"
@@ -174,11 +174,11 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order)
                     dst_image->width, dst_image->height, (double*)dst_image->data[i], 
                     double(0), order, counter);
       break;
-//    case IM_CDOUBLE:
-//      ret = iReduce(src_image->width, src_image->height, (const imcdouble*)src_image->data[i],  
-//                    dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], 
-//                    imcdouble(0,0), order, counter);
-//      break;
+    case IM_CDOUBLE:
+      ret = iReduce(src_image->width, src_image->height, (const imcdouble*)src_image->data[i],  
+                    dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], 
+                    imcdouble(0,0), order, counter);
+      break;
     }
   }
 
@@ -233,11 +233,11 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order)
                     dst_image->width, dst_image->height, (double*)dst_image->data[i], 
                     double(0), order, counter);
       break;
-//    case IM_CDOUBLE:
-//      ret = iResize(src_image->width, src_image->height, (const imcdouble*)src_image->data[i],  
-//                    dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], 
-//                    imcdouble(0,0), order, counter);
-//      break;
+    case IM_CDOUBLE:
+      ret = iResize(src_image->width, src_image->height, (const imcdouble*)src_image->data[i],  
+                    dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], 
+                    imcdouble(0,0), order, counter);
+      break;
     }
   }
 
