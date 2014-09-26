@@ -129,7 +129,7 @@ static int imluaImageSetPixels(lua_State *L)
   imImage* image = imlua_checkimage(L, 1);
   int depth = image->depth;
   if (image->has_alpha) depth++;
-  if (image->data_type == IM_CFLOAT) depth *= 2;
+  if (image->data_type == IM_CFLOAT || image->data_type == IM_CDOUBLE) depth *= 2;
 
   luaL_checktype(L, 2, LUA_TTABLE);
 
@@ -199,7 +199,7 @@ static int imluaImageGetPixels(lua_State *L)
   imImage* image = imlua_checkimage(L, 1);
   int depth = image->depth;
   if (image->has_alpha) depth++;
-  if (image->data_type == IM_CFLOAT) depth *= 2;
+  if (image->data_type == IM_CFLOAT || image->data_type == IM_CDOUBLE) depth *= 2;
 
   total_count = image->width * image->height * depth;
   lua_createtable(L, total_count, 0);
