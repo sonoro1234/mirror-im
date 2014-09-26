@@ -470,6 +470,12 @@ void imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir)
     case IM_CFLOAT:
       Rotate90(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i], dir);
       break;
+    case IM_DOUBLE:
+      Rotate90(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], dir);
+      break;
+    case IM_CDOUBLE:
+      Rotate90(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], dir);
+      break;
     }
   }
 }
@@ -498,6 +504,12 @@ void imProcessRotate180(const imImage* src_image, imImage* dst_image)
       break;
     case IM_CFLOAT:
       Rotate180(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i]);
+      break;
+    case IM_DOUBLE:
+      Rotate180(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i]);
+      break;
+    case IM_CDOUBLE:
+      Rotate180(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i]);
       break;
     }
   }
@@ -532,6 +544,12 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
       break;
     case IM_CFLOAT:
       ret = Radial(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], k1, counter, imcfloat(0,0), order);
+      break;
+    case IM_DOUBLE:
+      ret = Radial(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], k1, counter, double(0), order);
+      break;
+    case IM_CDOUBLE:
+      ret = Radial(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], k1, counter, imcdouble(0, 0), order);
       break;
     }
 
@@ -573,6 +591,12 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int or
       break;
     case IM_CFLOAT:
       ret = Swirl(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], k, counter, imcfloat(0,0), order);
+      break;
+    case IM_DOUBLE:
+      ret = Swirl(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], k, counter, double(0), order);
+      break;
+    case IM_CDOUBLE:
+      ret = Swirl(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], k, counter, imcdouble(0, 0), order);
       break;
     }
 
@@ -660,6 +684,12 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
       case IM_CFLOAT:
         ret = RotateCenter(src_image->width, src_image->height, (imcfloat*)src_image->data[i], dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], cos0, sin0, counter, imcfloat(0,0), order);
         break;
+      case IM_DOUBLE:
+        ret = RotateCenter(src_image->width, src_image->height, (double*)src_image->data[i], dst_image->width, dst_image->height, (double*)dst_image->data[i], cos0, sin0, counter, double(0), order);
+        break;
+      case IM_CDOUBLE:
+        ret = RotateCenter(src_image->width, src_image->height, (imcdouble*)src_image->data[i], dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], cos0, sin0, counter, imcdouble(0, 0), order);
+        break;
       }
 
       if (!ret)
@@ -708,6 +738,12 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
       case IM_CFLOAT:
         ret = Rotate(src_image->width, src_image->height, (imcfloat*)src_image->data[i], dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, imcfloat(0,0), order);
         break;
+      case IM_DOUBLE:
+        ret = Rotate(src_image->width, src_image->height, (double*)src_image->data[i], dst_image->width, dst_image->height, (double*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, double(0), order);
+        break;
+      case IM_CDOUBLE:
+        ret = Rotate(src_image->width, src_image->height, (imcdouble*)src_image->data[i], dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, imcdouble(0, 0), order);
+        break;
       }
 
       if (!ret)
@@ -747,6 +783,12 @@ void imProcessMirror(const imImage* src_image, imImage* dst_image)
     case IM_CFLOAT:
       Mirror(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i]);
       break;
+    case IM_DOUBLE:
+      Mirror(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i]);
+      break;
+    case IM_CDOUBLE:
+      Mirror(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i]);
+      break;
     }
   }
 }
@@ -778,6 +820,12 @@ void imProcessFlip(const imImage* src_image, imImage* dst_image)
     case IM_CFLOAT:
       Flip(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i]);
       break;
+    case IM_DOUBLE:
+      Flip(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i]);
+      break;
+    case IM_CDOUBLE:
+      Flip(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i]);
+      break;
     }
   }
 }
@@ -808,6 +856,12 @@ void imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imIm
       break;
     case IM_CFLOAT:
       InterlaceSplit(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image1->data[i], (imcfloat*)dst_image2->data[i]);
+      break;
+    case IM_DOUBLE:
+      InterlaceSplit(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image1->data[i], (double*)dst_image2->data[i]);
+      break;
+    case IM_CDOUBLE:
+      InterlaceSplit(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image1->data[i], (imcdouble*)dst_image2->data[i]);
       break;
     }
   }

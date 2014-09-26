@@ -118,7 +118,7 @@ inline T imZeroOrderDecimation(int width, int height, T *map, float xl, float yl
     return (T)Value;
   }
 
-  return (T)(Value/(TU)Count);
+  return (T)(Value/double(Count));
 }
 
 /** Does Bilinear Decimation.
@@ -176,7 +176,7 @@ inline T imBilinearDecimation(int width, int height, T *map, float xl, float yl,
     return (T)Value;
   }
 
-  return (T)(Value/(TU)Norm);
+  return (T)(Value/Norm);
 }
 
 /** Does Zero Order Interpolation (Nearest Neighborhood).
@@ -321,7 +321,7 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
   }
 
   TU LineValue, Value;
-  double LineNorm, Norm;
+  float LineNorm, Norm;
 
   Value = 0;
   Norm = 0;
@@ -347,7 +347,7 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
     return (T)Value;
   }
 
-  Value = (Value/(TU)Norm);
+  Value = (Value/Norm);
 
   int size = sizeof(T); 
   if (size == 1)
