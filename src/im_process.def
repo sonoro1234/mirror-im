@@ -93,6 +93,7 @@ EXPORTS
   imProcessMergeHSI
   imProcessMirror
   imProcessMultipleMean
+  imProcessMultipleMedian
   imProcessMultipleStdDev
   imProcessQuantizeGrayUniform
   imProcessQuantizeRGBUniform

@@ -332,7 +332,7 @@ static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int 
     for(int j = 0; j < src_count; j++)
       src_value[toffset + j] = (float)(src_map[j])[i];
 
-    if (func(src_value + toffset, &dst_value, params, userdata, x, y, d))
+    if (func(src_value + toffset, &dst_value, params, userdata, x, y, d, src_count))
       dst_map[i] = (T2)dst_value;
 
     if (x == width-1)
@@ -485,7 +485,7 @@ static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int heigh
         src_value[toffset + j*src_depth + d] = (float)((src_map[j])[d])[i];
     }
 
-    if (func(src_value + toffset, dst_value, params, userdata, x, y))
+    if (func(src_value + toffset, dst_value, params, userdata, x, y, src_count, src_depth, dst_depth))
     {
       for(int d = 0; d < dst_depth; d++)
         (dst_map[d])[i] = (T2)dst_value[d];

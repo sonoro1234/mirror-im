@@ -30,7 +30,7 @@ typedef int (*imUnaryPointOpFunc)(float src_value, float *dst_value, float* para
 /** Apply an unary point operation using a custom function.
  * One pixel from the source affects the same pixel on destiny. \n
  * Can be done in-place, images must match size and depth. 
- * Data type can be different, but IM_CFLOAT is not supported. \n
+ * Data type can be different, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL.  
  * Returns zero if the counter aborted.
  *
@@ -53,7 +53,7 @@ typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value,
 /** Apply an unary point color operation using a custom function.
  * One pixel from the source affects the same pixel on destiny. \n
  * Can be done in-place, images must match size, depth can be different.
- * Data type can be different, but IM_CFLOAT is not supported. \n
+ * Data type can be different, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL.
  * Returns zero if the counter aborted.
  *
@@ -65,18 +65,19 @@ typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value,
 int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name);
 
 /** Custom multiple point funtion. \n
+ * Source values are copies, so they can be changed inside the function without affecting the original image. \n
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value1: number, src_value2: number, ... , params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
  * And the returned value contains only the destiny values to update, or nil (also no return value) to leave destiny intact.
  * \ingroup point */
-typedef int (*imMultiPointOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d);
+typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_count);
 
 /** Apply an multiple point operation using a custom function.
  * One pixel from each source affects the same pixel on destiny. \n
  * All source images must match in size, depth and data type.
  * Can be done in-place, source and destiny must match size and depth.
- * Data type can be different between sources and destiny, but IM_CFLOAT is not supported. \n
+ * Data type can be different between sources and destiny, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL.
  * Returns zero if the counter aborted.
  *
@@ -88,19 +89,20 @@ typedef int (*imMultiPointOpFunc)(const float* src_value, float *dst_value, floa
 int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name);
 
 /** Custom multiple point color funtion. \n
+ * Source values are copies, so they can be changed inside the function without affecting the original image. \n
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value1_plane0: number, src_value1_plane1: number, ..., src_value2_plane0: number, src_value2_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
  * Also each color plane is passed as a separe value, instead of inside an array.
  * And the returned value contains only the destiny values to update, or nil (also no return value) to leave destiny intact.
  * \ingroup point */
-typedef int (*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float* params, void* userdata, int x, int y);
+typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float* params, void* userdata, int x, int y, int src_count, int src_depth, int dst_depth);
 
 /** Apply an multiple point color operation using a custom function.
  * One pixel from each source affects the same pixel on destiny. \n
  * All source images must match in size, depth and data type.
  * Can be done in-place, source and destiny must match size, depth can be different.
- * Data type can be different between sources and destiny, but IM_CFLOAT is not supported. \n
+ * Data type can be different between sources and destiny, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL. 
  * Returns zero if the counter aborted.
  *
@@ -141,11 +143,12 @@ enum imUnaryOp {
 };
 
 /** Apply an arithmetic unary operation. \n
- * Can be done in-place, images must match size. \n
+ * Can be done in-place, images must match color space and size. \n
  * Destiny image can be several types depending on source: \n
  * \li any integer -> any integer or real
  * \li real -> real
  * \li complex -> complex
+ * If source is complex, destiny complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
  * If destiny is byte, then the result is cropped to 0-255.
  *
  * \verbatim im.ProcessUnArithmeticOp(src_image: imImage, dst_image: imImage, op: number) [in Lua 5] \endverbatim
@@ -168,12 +171,13 @@ enum imBinaryOp {
 };
 
 /** Apply a binary arithmetic operation. \n
- * Can be done in-place, images must match size. \n
- * Source images must match type, destiny image can be several types depending on source: \n
+ * Can be done in-place, images must match color space and size. \n
+ * Source images must match, destiny image can be several types depending on source: \n
  * \li any integer -> any integer+ or real
  * \li real -> real
  * \li complex -> complex
  * One exception is that you can use src1=complex src2=real resulting dst=complex. \n
+ * If source is complex, destiny complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
  * If destiny is integer then it must have equal or more precision than the source. \n
  * If destiny is byte, then the result is cropped to 0-255.
  * Alpha channel is not included.
@@ -185,12 +189,13 @@ enum imBinaryOp {
 void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int op);
 
 /** Apply a binary arithmetic operation with a constant value. \n
- * Can be done in-place, images must match size. \n
+ * Can be done in-place, images must match color space and size. \n
  * Destiny image can be several types depending on source: \n
  * \li any integer -> any integer or real
  * \li real -> real
  * \li complex -> complex
- * The constant value is type casted to an apropriate type before the operation.
+ * The constant value is type casted to an apropriate type before the operation. \n
+ * If source is complex, destiny complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
  * If destiny is byte, then the result is cropped to 0-255.
  *
  * \verbatim im.ProcessArithmeticConstOp(src_image: imImage, src_const: number, dst_image: imImage, op: number) [in Lua 5] \endverbatim
@@ -199,7 +204,7 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
 void imProcessArithmeticConstOp(const imImage* src_image, float src_const, imImage* dst_image, int op);
 
 /** Blend two images using an alpha value = [a * alpha + b * (1 - alpha)]. \n
- * Can be done in-place, images must match size and type. \n
+ * Can be done in-place, images must match. \n
  * alpha value must be in the interval [0.0 - 1.0].
  *
  * \verbatim im.ProcessBlendConst(src_image1: imImage, src_image2: imImage, dst_image: imImage, alpha: number) [in Lua 5] \endverbatim
@@ -208,7 +213,7 @@ void imProcessArithmeticConstOp(const imImage* src_image, float src_const, imIma
 void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, float alpha);
 
 /** Blend two images using an alpha channel = [a * alpha + b * (1 - alpha)]. \n
- * Can be done in-place, images must match size and type. \n
+ * Can be done in-place, images must match. \n
  * alpha_image must have the same data type except for complex images that must be real, 
  * and color_space must be IM_GRAY.
  * Maximum alpha values are baed in \ref imColorMax. Minimum is always 0.
@@ -218,7 +223,7 @@ void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, i
 void imProcessBlend(const imImage* src_image1, const imImage* src_image2, const imImage* alpha_image, imImage* dst_image);
 
 /** Compose two images that have an alpha channel using the OVER operator. \n
- * Can be done in-place, images must match size and type. \n
+ * Can be done in-place, images must match. \n
  * Maximum alpha values are baed in \ref imColorMax. Minimum is always 0.
  * \verbatim im.ProcessCompose(src_image1: imImage, src_image2: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessComposeNew(image1: imImage, image2: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -259,8 +264,17 @@ void imProcessMultipleMean(const imImage** src_image_list, int src_image_count, 
  * \ingroup arithm */
 void imProcessMultipleStdDev(const imImage** src_image_list, int src_image_count, const imImage *mean_image, imImage* dst_image);
 
+/** Calculates the median of multiple images. \n
+ * Images must match size and type. Complex is not supported.\n
+ * Uses \ref imProcessMultiPointOp internally.
+ *
+ * \verbatim im.ProcessMultipleMedian(src_image_list: table of imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessMultipleMedianNew(src_image_list: table of imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
+ * \ingroup arithm */
+int imProcessMultipleMedian(const imImage** src_image_list, int src_image_count, imImage* dst_image);
+
 /** Calculates the auto-covariance of an image with the mean of a set of images. \n
- * Images must match size and type. Returns zero if the counter aborted. \n
+ * Images must match. Returns zero if the counter aborted. \n
  * Destiny is IM_FLOAT, except if source is IM_DOUBLE.
  * Returns zero if the counter aborted.
  *

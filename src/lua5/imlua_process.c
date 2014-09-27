@@ -48,6 +48,22 @@ static void imlua_errorcomplex(lua_State *L, int index)
 #define imlua_checkreal(_L, _a, _i) \
   luaL_argcheck(L, ((_i)->data_type != IM_FLOAT && (_i)->data_type != IM_DOUBLE), _a, "image data type can be real only");
 
+#define imlua_checkcomplex(_L, _a, _i) \
+  luaL_argcheck(L, ((_i)->data_type != IM_CFLOAT && (_i)->data_type != IM_CDOUBLE), _a, "image data type can be complex only");
+
+#define imlua_checkreal_dst(_L, _da, _si, _di)                          \
+  if ((_si)->data_type == IM_DOUBLE || (_si)->data_type == IM_CDOUBLE)  \
+    imlua_checkdatatype(_L, _da, _di, IM_DOUBLE);                       \
+  else                                                                  \
+    imlua_checkdatatype(_L, _da, _di, IM_FLOAT)
+
+#define imlua_checkcomplex_dst(_L, _da, _si, _di)                       \
+  if ((_si)->data_type == IM_DOUBLE || (_si)->data_type == IM_CDOUBLE)  \
+    imlua_checkdatatype(_L, _da, _di, IM_CDOUBLE);                      \
+    else                                                                \
+    imlua_checkdatatype(_L, _da, _di, IM_CFLOAT)
+
+
 
 static int imlua_unpacktable(lua_State *L, int index)
 {
@@ -1653,7 +1669,37 @@ static int imluaProcessUnArithmeticOp (lua_State *L)
 
   imlua_matchcolorspace(L, src_image, dst_image);
 
-  //TODO
+  switch (src_image->data_type)
+  {
+  case IM_BYTE:
+    imlua_checknotcomplex(L, 2, dst_image);
+    break;
+  case IM_SHORT:
+    imlua_checknotcomplex(L, 2, dst_image);
+    break;
+  case IM_USHORT:
+    imlua_checknotcomplex(L, 2, dst_image);
+    break;
+  case IM_INT:
+    imlua_checknotcomplex(L, 2, dst_image);
+    break;
+  case IM_FLOAT:
+    imlua_checkreal(L, 2, dst_image);
+    break;
+  case IM_CFLOAT:
+    luaL_argcheck(L,
+      dst_image->data_type == IM_CFLOAT,
+      2, "source image is float complex, destiny image data type can be float complex only.");
+    break;
+  case IM_DOUBLE:
+    imlua_checkreal(L, 2, dst_image);
+    break;
+  case IM_CDOUBLE:
+    luaL_argcheck(L,
+      dst_image->data_type == IM_CDOUBLE,
+      2, "source image is double complex, destiny image data type can be double complex only.");
+    break;
+  }
 
   imProcessUnArithmeticOp(src_image, dst_image, op);
   return 0;
@@ -1775,22 +1821,23 @@ static int imluaProcessUnaryPointColorOp(lua_State *L)
   return 1;
 }
 
-static int imluaMultiOpFunc(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d)
+static int imluaMultiOpFunc(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_count)
 {
   lua_State *L = userdata;
-  int ret = 0, n, i, 
-    src_count = (int)params[0];
+  int ret = 0, n, i;
+  (void)params;
 
   lua_pushvalue(L, 3);  /* func is passed in the stack */
   for (i = 0; i < src_count; i++)
     lua_pushnumber(L, src_value[i]);
-  n = imlua_unpacktable(L, 4);  /* params is passed in the stack */
+  n = imlua_unpacktable(L, 4);  /* params in Lua is passed in the stack */
   lua_pushvalue(L, 5);  /* userdata is passed in the stack */
   lua_pushinteger(L, x);
   lua_pushinteger(L, y);
   lua_pushinteger(L, d);
+  lua_pushinteger(L, src_count);
 
-  lua_call(L, src_count+n+4, 1);
+  lua_call(L, src_count+n+5, 1);
 
   if (!lua_isnil(L, -1))
   {
@@ -1808,7 +1855,6 @@ static int imluaProcessMultiPointOp(lua_State *L)
   imImage **src_image_list;
   imImage *dst_image = imlua_checkimage(L, 2);
   const char *op_name = luaL_optstring(L, 6, NULL);
-  float params[1];
 
 #ifdef _OPENMP
   int old_num_threads = omp_get_num_threads();
@@ -1843,9 +1889,7 @@ static int imluaProcessMultiPointOp(lua_State *L)
     return 0;
   }
 
-  params[0] = (float)src_count;
-
-  lua_pushboolean(L, imProcessMultiPointOp((const imImage**)src_image_list, src_count, dst_image, imluaMultiOpFunc, params, L, op_name));
+  lua_pushboolean(L, imProcessMultiPointOp((const imImage**)src_image_list, src_count, dst_image, imluaMultiOpFunc, NULL, L, op_name));
 
   free(src_image_list);
 
@@ -1856,24 +1900,23 @@ static int imluaProcessMultiPointOp(lua_State *L)
   return 1;
 }
 
-static int imluaMultiColorOpFunc(float* src_value, float *dst_value, float* params, void* userdata, int x, int y)
+static int imluaMultiColorOpFunc(float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int src_count, int src_depth, int dst_depth)
 {
   lua_State *L = userdata;
-  int n, d, m, i, ret = 0, 
-    src_count = (int)params[0],
-    src_depth = (int)params[1],
-    dst_depth = (int)params[2];
+  int n, d, m, i, ret = 0;
+  (void)params;
 
   lua_pushvalue(L, 3);  /* func is passed in the stack */
   m = src_depth*src_count;
   for (i = 0; i < m; i++)
     lua_pushnumber(L, src_value[i]);
-  n = imlua_unpacktable(L, 4);  /* params is passed in the stack */
+  n = imlua_unpacktable(L, 4);  /* params in Lua is passed in the stack */
   lua_pushvalue(L, 5);  /* userdata is passed in the stack */
   lua_pushinteger(L, x);
   lua_pushinteger(L, y);
+  lua_pushinteger(L, src_count);
 
-  lua_call(L, m+n+3, dst_depth);
+  lua_call(L, m+n+4, dst_depth);
 
   if (!lua_isnil(L, -dst_depth))
   {
@@ -1892,7 +1935,6 @@ static int imluaProcessMultiPointColorOp(lua_State *L)
   imImage **src_image_list;
   imImage *dst_image = imlua_checkimage(L, 2);
   const char *op_name = luaL_optstring(L, 6, NULL);
-  float params[3];
 
 #ifdef _OPENMP
   int old_num_threads = omp_get_num_threads();
@@ -1923,11 +1965,7 @@ static int imluaProcessMultiPointColorOp(lua_State *L)
   src_depth = src_image_list[0]->has_alpha? src_image_list[0]->depth+1: src_image_list[0]->depth;
   dst_depth = dst_image->has_alpha? dst_image->depth+1: dst_image->depth;
 
-  params[0] = (float)src_count;
-  params[1] = (float)src_depth;
-  params[2] = (float)dst_depth;
-
-  lua_pushboolean(L, imProcessMultiPointColorOp((const imImage**)src_image_list, src_count, dst_image, imluaMultiColorOpFunc, params, L, op_name));
+  lua_pushboolean(L, imProcessMultiPointColorOp((const imImage**)src_image_list, src_count, dst_image, imluaMultiColorOpFunc, NULL, L, op_name));
 
   free(src_image_list);
 
@@ -1949,51 +1987,44 @@ static int imluaProcessArithmeticOp (lua_State *L)
   int op = luaL_checkint(L, 4);
 
   imlua_match(L, src_image1, src_image2);
-  imlua_matchsize(L, src_image1, dst_image);
-  imlua_matchsize(L, src_image2, dst_image);
+  imlua_matchcolorspace(L, src_image1, dst_image);
+  imlua_matchcolorspace(L, src_image2, dst_image);
 
   switch (src_image1->data_type)
   {
   case IM_BYTE:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_BYTE ||
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is byte, destiny image data type can be byte, short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
     break;
   case IM_SHORT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is short, destiny image data type can be short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
+    luaL_argcheck(L, dst_image->data_type != IM_BYTE,
+      2, "source image is short, destiny can NOT be byte.");
     break;
   case IM_USHORT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is ushort, destiny image data type can be short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
+    luaL_argcheck(L, dst_image->data_type != IM_BYTE,
+      2, "source image is ushort, destiny can NOT be byte.");
     break;
   case IM_INT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is int, destiny image data type can be int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
+    luaL_argcheck(L, dst_image->data_type >= IM_INT,
+      2, "source image is int, destiny can NOT be byte, short or ushort.");
     break;
   case IM_FLOAT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is float, destiny image data type can be float only.");
+    imlua_checkreal(L, 2, dst_image);
     break;
   case IM_CFLOAT:
     luaL_argcheck(L,
       dst_image->data_type == IM_CFLOAT,
-      2, "source image is cfloat, destiny image data type can be cfloat only.");
+      2, "source image is float complex, destiny image data type can be float complex only.");
+    break;
+  case IM_DOUBLE:
+    imlua_checkreal(L, 2, dst_image);
+    break;
+  case IM_CDOUBLE:
+    luaL_argcheck(L,
+      dst_image->data_type == IM_CDOUBLE,
+      2, "source image is double complex, destiny image data type can be double complex only.");
     break;
   }
 
@@ -2011,55 +2042,37 @@ static int imluaProcessArithmeticConstOp (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 3);
   int op = luaL_checkint(L, 4);
 
-  imlua_matchsize(L, src_image, dst_image);
+  imlua_matchcolorspace(L, src_image, dst_image);
 
   switch (src_image->data_type)
   {
   case IM_BYTE:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_BYTE ||
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is byte, destiny image data type can be byte, short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
     break;
   case IM_SHORT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_BYTE ||
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is short, destiny image data type can be byte, short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
     break;
   case IM_USHORT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_BYTE ||
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is ushort, destiny image data type can be byte, short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
     break;
   case IM_INT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_BYTE ||
-      dst_image->data_type == IM_SHORT ||
-      dst_image->data_type == IM_USHORT ||
-      dst_image->data_type == IM_INT ||
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is int, destiny image data type can be byte, short, ushort, int and float only.");
+    imlua_checknotcomplex(L, 2, dst_image);
     break;
   case IM_FLOAT:
-    luaL_argcheck(L,
-      dst_image->data_type == IM_FLOAT,
-      2, "source image is float, destiny image data type can be float only.");
+    imlua_checkreal(L, 2, dst_image);
     break;
   case IM_CFLOAT:
     luaL_argcheck(L,
       dst_image->data_type == IM_CFLOAT,
-      2, "source image is cfloat, destiny image data type can be cfloat only.");
+      2, "source image is float complex, destiny image data type can be float complex only.");
+    break;
+  case IM_DOUBLE:
+    imlua_checkreal(L, 2, dst_image);
+    break;
+  case IM_CDOUBLE:
+    luaL_argcheck(L,
+      dst_image->data_type == IM_CDOUBLE,
+      2, "source image is double complex, destiny image data type can be double complex only.");
     break;
   }
 
@@ -2128,11 +2141,10 @@ static int imluaProcessSplitComplex (lua_State *L)
   imImage *dst_image2 = imlua_checkimage(L, 3);
   int polar = lua_toboolean(L, 4);
 
-  imlua_checkdatatype(L, 1, src_image, IM_CFLOAT);
-  imlua_checkdatatype(L, 2, dst_image1, IM_FLOAT);
-  imlua_checkdatatype(L, 3, dst_image2, IM_FLOAT);
+  imlua_checkcomplex(L, 1, src_image);
   imlua_matchcolorspace(L, src_image, dst_image1);
-  imlua_matchcolorspace(L, src_image, dst_image2);
+  imlua_checkreal_dst(L, 2, src_image, dst_image1);
+  imlua_match(L, dst_image1, dst_image2);
 
   imProcessSplitComplex(src_image, dst_image1, dst_image2, polar);
   return 0;
@@ -2148,11 +2160,10 @@ static int imluaProcessMergeComplex (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 3);
   int polar = lua_toboolean(L, 4);
 
-  imlua_checkdatatype(L, 1, src_image1, IM_FLOAT);
-  imlua_checkdatatype(L, 2, src_image2, IM_FLOAT);
-  imlua_checkdatatype(L, 3, dst_image, IM_CFLOAT);
-  imlua_matchcolorspace(L, src_image1, src_image2);
+  imlua_checkreal(L, 1, src_image1);
+  imlua_match(L, src_image1, src_image2);
   imlua_matchcolorspace(L, src_image1, dst_image);
+  imlua_checkcomplex_dst(L, 3, src_image1, dst_image);
 
   imProcessMergeComplex(src_image1, src_image2, dst_image, polar);
   return 0;
@@ -2210,6 +2221,32 @@ static int imluaProcessMultipleStdDev (lua_State *L)
   return 0;
 }
 
+
+/*****************************************************************************\
+im.ProcessMultipleMedian
+\*****************************************************************************/
+static int imluaProcessMultipleMedian(lua_State *L)
+{
+  int src_image_count;
+  imImage* *src_image_list;
+  imImage* dst_image = imlua_checkimage(L, 2);
+
+  /* minimize leak when error, checking array after other checks */
+  src_image_list = imlua_toarrayimage(L, 1, &src_image_count, 1);
+
+  if (!imImageMatch(src_image_list[0], dst_image))
+  {
+    free(src_image_list);
+    imlua_errormatch(L);
+    return 0;
+  }
+
+  lua_pushboolean(L, imProcessMultipleMedian((const imImage**)src_image_list, src_image_count, dst_image));
+
+  free(src_image_list);
+  return 1;
+}
+
 /*****************************************************************************\
  im.ProcessAutoCovariance
 \*****************************************************************************/
@@ -2218,13 +2255,11 @@ static int imluaProcessAutoCovariance (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *mean_image = imlua_checkimage(L, 2);
   imImage *dst_image = imlua_checkimage(L, 3);
-  int data_type = IM_FLOAT;
-  if (src_image->data_type == IM_DOUBLE) data_type = IM_DOUBLE;
 
   imlua_match(L, src_image, mean_image);
   imlua_matchcolorspace(L, src_image, dst_image);
   imlua_checkreal(L, 3, dst_image);
-  imlua_checkdatatype(L, 3, dst_image, data_type);
+  imlua_checkreal_dst(L, 3, src_image, dst_image);
 
   lua_pushboolean(L, imProcessAutoCovariance(src_image, mean_image, dst_image));
   return 1;
@@ -2494,10 +2529,8 @@ static int imluaProcessNormalizeComponents (lua_State *L)
 {
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
-  int data_type = IM_FLOAT;
-  if (src_image->data_type == IM_DOUBLE) data_type = IM_DOUBLE;
 
-  imlua_checkdatatype(L, 2, dst_image, data_type);
+  imlua_checkreal_dst(L, 2, src_image, dst_image);
   imlua_matchcolorspace(L, src_image, dst_image);
 
   imProcessNormalizeComponents(src_image, dst_image);
@@ -3432,13 +3465,11 @@ static int imluaProcessNormDiffRatio(lua_State *L)
   imImage *src_image1 = imlua_checkimage(L, 1);
   imImage *src_image2 = imlua_checkimage(L, 2);
   imImage *dst_image = imlua_checkimage(L, 3);
-  int data_type = IM_FLOAT;
-  if (src_image1->data_type == IM_DOUBLE) data_type = IM_DOUBLE;
 
   imlua_match(L, src_image1, src_image2);
   imlua_matchcolorspace(L, src_image1, dst_image);
   imlua_checkreal(L, 3, dst_image);
-  imlua_checkdatatype(L, 3, dst_image, data_type);
+  imlua_checkreal_dst(L, 3, src_image1, dst_image);
 
   imProcessNormDiffRatio(src_image1, src_image2, dst_image);
   return 0;
@@ -3581,7 +3612,8 @@ static const luaL_Reg improcess_lib[] = {
   {"ProcessMergeComplex", imluaProcessMergeComplex},
   {"ProcessMultipleMean", imluaProcessMultipleMean},
   {"ProcessMultipleStdDev", imluaProcessMultipleStdDev},
-  {"ProcessAutoCovariance", imluaProcessAutoCovariance},
+  { "ProcessMultipleMedian", imluaProcessMultipleMedian },
+  { "ProcessAutoCovariance", imluaProcessAutoCovariance },
   {"ProcessMultiplyConj", imluaProcessMultiplyConj},
 
   {"ProcessQuantizeRGBUniform", imluaProcessQuantizeRGBUniform},
