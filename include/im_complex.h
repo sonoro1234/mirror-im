@@ -52,9 +52,15 @@ inline int operator <= (const imComplex<T>& C1, const imComplex<T>& C2)
 }
 
 template<class T>
-inline int operator <= (const imComplex<T>& C, const T& R)
+inline int operator <= (const imComplex<T>& C, const float& R)
 {
-  return ((C.real <= R) && (C.imag <= 0));
+  return ((C.real <= (T)R) && (C.imag <= 0));
+}
+
+template<class T>
+inline int operator <= (const imComplex<T>& C, const double& R)
+{
+  return ((C.real <= (T)R) && (C.imag <= 0));
 }
 
 template<class T>
