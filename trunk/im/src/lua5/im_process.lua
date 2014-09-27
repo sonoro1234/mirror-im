@@ -292,6 +292,12 @@ function im.ProcessMultipleStdDevNew (src_image_list, mean_image)
   return dst_image
 end
 
+function im.ProcessMultipleMedianNew (src_image_list, dst_image)
+  local dst_image = im.ImageCreateBased(src_image_list[1])
+  local ret = im.ProcessMultipleMedian(src_image_list, dst_image)
+  return ret, dst_image
+end
+
 TwoSourcesOneDest("ProcessAutoCovariance")
 OneSourceOneDest("ProcessMultiplyConj")
 OneSourceOneDest("ProcessQuantizeRGBUniform", nil, nil, im.MAP, nil)

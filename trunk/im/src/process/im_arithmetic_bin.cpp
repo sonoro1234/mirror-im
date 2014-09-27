@@ -218,7 +218,7 @@ static void DoBinaryOpCpxReal(imComplex<T> *map1, T *map2, imComplex<T> *map, in
 
 void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int op)
 {
-  int count = src_image1->count*src_image1->depth;
+  int count = src_image1->count*src_image1->depth;  /* do NOT include alpha here */
 
   switch(src_image1->data_type)
   {
@@ -269,7 +269,10 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
       DoBinaryOp((int*)src_image1->data[0], (int*)src_image2->data[0], (int*)dst_image->data[0], count, op);
     break;
   case IM_FLOAT:
-    DoBinaryOp((float*)src_image1->data[0], (float*)src_image2->data[0], (float*)dst_image->data[0], count, op);
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryOp((float*)src_image1->data[0], (float*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    else
+      DoBinaryOp((float*)src_image1->data[0], (float*)src_image2->data[0], (float*)dst_image->data[0], count, op);
     break;
   case IM_CFLOAT:
     if (src_image2->data_type == IM_FLOAT)
@@ -278,7 +281,10 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
       DoBinaryOp((imcfloat*)src_image1->data[0], (imcfloat*)src_image2->data[0], (imcfloat*)dst_image->data[0], count, op);
     break;
   case IM_DOUBLE:
-    DoBinaryOp((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)dst_image->data[0], count, op);
+    if (dst_image->data_type == IM_FLOAT)
+      DoBinaryOp((double*)src_image1->data[0], (double*)src_image2->data[0], (float*)dst_image->data[0], count, op);
+    else
+      DoBinaryOp((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)dst_image->data[0], count, op);
     break;
   case IM_CDOUBLE:
     if (src_image2->data_type == IM_DOUBLE)
@@ -749,7 +755,7 @@ static void DoBinaryConstOpByte(T1 *map1, int value, imbyte *map, int count, int
 
 void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage* dst_image, int op)
 {
-  int count = src_image1->count*src_image1->depth;
+  int count = src_image1->count*src_image1->depth;  /* do NOT include alpha here */
 
   switch(src_image1->data_type)
   {
@@ -810,13 +816,19 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
       DoBinaryConstOp((int*)src_image1->data[0], (int)value, (int*)dst_image->data[0], count, op);
     break;
   case IM_FLOAT:
-    DoBinaryConstOp((float*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
+    if (dst_image->data_type == IM_DOUBLE)
+      DoBinaryConstOp((float*)src_image1->data[0], (float)value, (double*)dst_image->data[0], count, op);
+    else
+      DoBinaryConstOp((float*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
     break;
   case IM_CFLOAT:
     DoBinaryConstOpCpxReal((imcfloat*)src_image1->data[0], (float)value, (imcfloat*)dst_image->data[0], count, op);
     break;
   case IM_DOUBLE:
-    DoBinaryConstOp((double*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
+    if (dst_image->data_type == IM_FLOAT)
+      DoBinaryConstOp((double*)src_image1->data[0], (double)value, (float*)dst_image->data[0], count, op);
+    else
+      DoBinaryConstOp((double*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
     break;
   case IM_CDOUBLE:
     DoBinaryConstOpCpxReal((imcdouble*)src_image1->data[0], (double)value, (imcdouble*)dst_image->data[0], count, op);
@@ -889,7 +901,40 @@ void imProcessMultipleStdDev(const imImage** src_image_list, int src_image_count
   imImageDestroy(aux_image);
 }
 
-template <class DT> 
+static int compare_imFloat(const void *elem1, const void *elem2)
+{
+  float* v1 = (float*)elem1;
+  float* v2 = (float*)elem2;
+
+  if (*v1 < *v2)
+    return -1;
+
+  if (*v1 > *v2)
+    return 1;
+
+  return 0;
+}
+
+static int imMultiMedianFunc(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_count)
+{
+  (void)params;
+  (void)userdata;
+  (void)x;
+  (void)y;
+  (void)d;
+
+  qsort((float*)src_value, src_count, sizeof(float), compare_imFloat);
+  *dst_value = src_value[src_count / 2];
+
+  return 1;
+}
+
+int imProcessMultipleMedian(const imImage** src_image_list, int src_image_count, imImage* dst_image)
+{
+  return imProcessMultiPointOp(src_image_list, src_image_count, dst_image, imMultiMedianFunc, NULL, NULL, "MultipleMedian");
+}
+
+template <class DT>
 static float AutoCovCalc(int width, int height, DT *src_map, DT *mean_map, int x, int y, int count)
 {
   double value = 0;

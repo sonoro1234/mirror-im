@@ -284,7 +284,7 @@ static void DoUnaryOpByte(T1 *map, imbyte *new_map, int count, int op)
 
 void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int op)
 {
-  int total_count = src_image->count * src_image->depth;
+  int total_count = src_image->count * src_image->depth;  /* do NOT include alpha here */
 
   switch(src_image->data_type)
   {
@@ -345,13 +345,19 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
       DoUnaryOp((int*)src_image->data[0], (int*)dst_image->data[0], total_count, op);
     break;                                                                                
   case IM_FLOAT:                                                                           
-    DoUnaryOp((float*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
-    break;                                                                                
+    if (dst_image->data_type == IM_DOUBLE)
+      DoUnaryOp((float*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
+    else
+      DoUnaryOp((float*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
+    break;
   case IM_CFLOAT:            
     DoUnaryOp((imcfloat*)src_image->data[0], (imcfloat*)dst_image->data[0], total_count, op);
     break;
   case IM_DOUBLE:
-    DoUnaryOp((double*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
+    if (dst_image->data_type == IM_FLOAT)
+      DoUnaryOp((double*)src_image->data[0], (float*)dst_image->data[0], total_count, op);
+    else
+      DoUnaryOp((double*)src_image->data[0], (double*)dst_image->data[0], total_count, op);
     break;
   case IM_CDOUBLE:
     DoUnaryOp((imcdouble*)src_image->data[0], (imcdouble*)dst_image->data[0], total_count, op);
@@ -359,14 +365,9 @@ void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int o
   }
 }
 
-void imProcessSplitComplex(const imImage* src_image, imImage* dst_image1, imImage* dst_image2, int polar)
+template <class T>
+static void doSplitComplex(imComplex<T>* map, T* map1, T* map2, int total_count, int polar)
 {
-  int total_count = src_image->count*src_image->depth;
-
-  imcfloat* map = (imcfloat*)src_image->data[0];
-  float* map1 = (float*)dst_image1->data[0];
-  float* map2 = (float*)dst_image2->data[0];
-
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(total_count))
 #endif
@@ -384,15 +385,20 @@ void imProcessSplitComplex(const imImage* src_image, imImage* dst_image1, imImag
     }
   }
 }
-                  
-void imProcessMergeComplex(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int polar)
+
+void imProcessSplitComplex(const imImage* src_image, imImage* dst_image1, imImage* dst_image2, int polar)
 {
-  int total_count = src_image1->count*src_image1->depth;
+  int total_count = src_image->count*src_image->depth;
 
-  imcfloat* map = (imcfloat*)dst_image->data[0];
-  float* map1 = (float*)src_image1->data[0];
-  float* map2 = (float*)src_image2->data[0];
-
+  if (src_image->data_type == IM_CFLOAT)
+    doSplitComplex((imcfloat*)src_image->data[0], (float*)dst_image1->data[0], (float*)dst_image2->data[0], total_count, polar);
+  else
+    doSplitComplex((imcdouble*)src_image->data[0], (double*)dst_image1->data[0], (double*)dst_image2->data[0], total_count, polar);
+}
+                  
+template <class T>
+static void doMergeComplex(T* map1, T* map2, imComplex<T>* map, int total_count, int polar)
+{
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(total_count))
 #endif
@@ -400,12 +406,12 @@ void imProcessMergeComplex(const imImage* src_image1, const imImage* src_image2,
   {
     if (polar)
     {
-      float phase = map2[i];
-      if (phase > 180) phase -= 360;   
+      T phase = map2[i];
+      if (phase > 180) phase -= 360;
       phase /= 57.2957795f;
 
-      map[i].real = (float)(map1[i] * cos(phase));
-      map[i].imag = (float)(map1[i] * sin(phase));
+      map[i].real = (T)(map1[i] * cos(phase));
+      map[i].imag = (T)(map1[i] * sin(phase));
     }
     else
     {
@@ -413,4 +419,14 @@ void imProcessMergeComplex(const imImage* src_image1, const imImage* src_image2,
       map[i].imag = map2[i];
     }
   }
+}
+
+void imProcessMergeComplex(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int polar)
+{
+  int total_count = src_image1->count*src_image1->depth;
+
+  if (src_image1->data_type == IM_FLOAT)
+    doMergeComplex((float*)src_image1->data[0], (float*)src_image2->data[0], (imcfloat*)dst_image->data[0], total_count, polar);
+  else
+    doMergeComplex((double*)src_image1->data[0], (double*)src_image2->data[0], (imcdouble*)dst_image->data[0], total_count, polar);
 }
