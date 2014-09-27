@@ -42,6 +42,13 @@ static void imlua_errorcomplex(lua_State *L, int index)
   if ((_i)->data_type == IM_CFLOAT || (_i)->data_type == IM_CDOUBLE) \
     imlua_errorcomplex(_L, _a)
 
+#define imlua_checkinteger(_L, _a, _i) \
+  luaL_argcheck(_L, ((_i)->data_type < IM_FLOAT), _a, "image data type can be integer only")
+
+#define imlua_checkreal(_L, _a, _i) \
+  luaL_argcheck(L, ((_i)->data_type != IM_FLOAT && (_i)->data_type != IM_DOUBLE), _a, "image data type can be real only");
+
+
 static int imlua_unpacktable(lua_State *L, int index)
 {
   int i, n = imlua_getn(L, index);
@@ -501,7 +508,7 @@ static int imluaProcessPerimeterLine (lua_State *L)
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
 
-  luaL_argcheck(L, (src_image->data_type < IM_FLOAT), 1, "image data type can be integer only");
+  imlua_checkinteger(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   imProcessPerimeterLine(src_image, dst_image);
@@ -2211,10 +2218,13 @@ static int imluaProcessAutoCovariance (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *mean_image = imlua_checkimage(L, 2);
   imImage *dst_image = imlua_checkimage(L, 3);
+  int data_type = IM_FLOAT;
+  if (src_image->data_type == IM_DOUBLE) data_type = IM_DOUBLE;
 
   imlua_match(L, src_image, mean_image);
   imlua_matchcolorspace(L, src_image, dst_image);
-  imlua_checkdatatype(L, 3, dst_image, IM_FLOAT);
+  imlua_checkreal(L, 3, dst_image);
+  imlua_checkdatatype(L, 3, dst_image, data_type);
 
   lua_pushboolean(L, imProcessAutoCovariance(src_image, mean_image, dst_image));
   return 1;
@@ -2484,8 +2494,10 @@ static int imluaProcessNormalizeComponents (lua_State *L)
 {
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
+  int data_type = IM_FLOAT;
+  if (src_image->data_type == IM_DOUBLE) data_type = IM_DOUBLE;
 
-  imlua_checkdatatype(L, 2, dst_image, IM_FLOAT);
+  imlua_checkdatatype(L, 2, dst_image, data_type);
   imlua_matchcolorspace(L, src_image, dst_image);
 
   imProcessNormalizeComponents(src_image, dst_image);
@@ -2572,7 +2584,7 @@ static int imluaProcessBitwiseOp (lua_State *L)
   imImage *dst_image = imlua_checkimage(L, 3);
   int op = luaL_checkint(L, 4);
 
-  luaL_argcheck(L, (src_image1->data_type < IM_FLOAT), 1, "image data type can be integer only");
+  imlua_checkinteger(L, 1, src_image1);
   imlua_match(L, src_image1, src_image2);
   imlua_match(L, src_image1, dst_image);
 
@@ -2588,7 +2600,7 @@ static int imluaProcessBitwiseNot (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  luaL_argcheck(L, (src_image->data_type < IM_FLOAT), 1, "image data type can be integer only");
+  imlua_checkinteger(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   imProcessBitwiseNot(src_image, dst_image);
@@ -3086,7 +3098,7 @@ static int imluaProcessUnNormalize (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  imlua_checkdatatype(L, 1, src_image, IM_FLOAT);
+  imlua_checkreal(L, 1, src_image);
   imlua_checkdatatype(L, 2, dst_image, IM_BYTE);
   imlua_matchcolorspace(L, src_image, dst_image);
 
@@ -3102,12 +3114,7 @@ static int imluaProcessDirectConv (lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
-  luaL_argcheck(L,
-    src_image->data_type == IM_SHORT ||
-    src_image->data_type == IM_USHORT ||
-    src_image->data_type == IM_INT ||
-    src_image->data_type == IM_FLOAT,
-    1, "data type can be short, ushort, int or float only");
+  imlua_checknotcomplex(L, 1, src_image);
   imlua_checkdatatype(L, 2, dst_image, IM_BYTE);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3160,7 +3167,7 @@ static int imluaProcessRangeContrastThreshold (lua_State *L)
   int min_range = luaL_checkint(L, 4);
 
   imlua_checkcolorspace(L, 1, src_image, IM_GRAY);
-  luaL_argcheck(L, (src_image->data_type < IM_FLOAT), 1, "image data type can be integer only");
+  imlua_checkinteger(L, 1, src_image);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3179,7 +3186,7 @@ static int imluaProcessLocalMaxThreshold (lua_State *L)
   int min_thres = luaL_checkint(L, 4);
 
   imlua_checkcolorspace(L, 1, src_image, IM_GRAY);
-  luaL_argcheck(L, (src_image->data_type < IM_FLOAT), 1, "image data type can be integer only");
+  imlua_checkinteger(L, 1, src_image);
   imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
   imlua_matchsize(L, src_image, dst_image);
 
@@ -3425,10 +3432,13 @@ static int imluaProcessNormDiffRatio(lua_State *L)
   imImage *src_image1 = imlua_checkimage(L, 1);
   imImage *src_image2 = imlua_checkimage(L, 2);
   imImage *dst_image = imlua_checkimage(L, 3);
+  int data_type = IM_FLOAT;
+  if (src_image1->data_type == IM_DOUBLE) data_type = IM_DOUBLE;
 
   imlua_match(L, src_image1, src_image2);
   imlua_matchcolorspace(L, src_image1, dst_image);
-  imlua_checkdatatype(L, 3, dst_image, IM_FLOAT);
+  imlua_checkreal(L, 3, dst_image);
+  imlua_checkdatatype(L, 3, dst_image, data_type);
 
   imProcessNormDiffRatio(src_image1, src_image2, dst_image);
   return 0;
