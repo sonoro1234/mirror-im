@@ -175,7 +175,7 @@ inline unsigned int isqrt(unsigned int number)
   unsigned int n = 1;
   unsigned int n1 = ISQRT_NEXT(n, number);
 
-  while (abs((int)(n1 - n)) > 1) {
+  while (imAbs((int)(n1 - n)) > 1) {
     n = n1;
     n1 = ISQRT_NEXT(n, number);
   }
