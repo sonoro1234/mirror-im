@@ -856,7 +856,7 @@ static int imluaProcessRotate90 (lua_State *L)
 {
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
-  int dir = lua_toboolean(L, 3);
+  int dir = luaL_checkint(L, 3);
 
   imlua_matchcolor(L, src_image, dst_image);
   luaL_argcheck(L, dst_image->width == src_image->height && dst_image->height == src_image->width, 2, "destiny width and height must have the source height and width");
