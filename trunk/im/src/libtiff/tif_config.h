@@ -79,9 +79,6 @@
 /* Define to 1 if you have the `lfind' function. */
 #undef HAVE_LFIND
 
-/* Define to 1 if you have the `c' library (-lc). */
-#undef HAVE_LIBC
-
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
 
@@ -297,7 +294,7 @@
 #define TIFF_INT16_T short                    /* IMLIB */
 
 /* Signed 32-bit type formatter */
-#define TIFF_INT32_FORMAT
+#define TIFF_INT32_FORMAT                     /* IMLIB */
 
 /* Signed 32-bit type */
 #define TIFF_INT32_T  int                     /* IMLIB */
@@ -379,6 +376,11 @@
 
 /* Support Deflate compression */
 #define ZIP_SUPPORT         /* IMLIB */
+
+/* Enable large inode numbers on Mac OS X 10.5.  */
+#ifndef _DARWIN_USE_64_BIT_INODE
+# define _DARWIN_USE_64_BIT_INODE 1
+#endif
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

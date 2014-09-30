@@ -1,4 +1,4 @@
-/* $Id: tif_color.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Id: tif_color.c,v 1.19 2010-12-14 02:22:42 faxguy Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -126,7 +126,7 @@ TIFFCIELabToRGBInit(TIFFCIELabToRGB* cielab,
 		    const TIFFDisplay *display, float *refWhite)
 {
 	int i;
-	double  gamma;
+	double gamma;
 
 	cielab->range = CIELABTORGB_TABLE_RANGE;
 

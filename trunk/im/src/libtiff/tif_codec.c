@@ -1,4 +1,4 @@
-/* $Id: tif_codec.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Id: tif_codec.c,v 1.15 2010-12-14 12:53:00 dron Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

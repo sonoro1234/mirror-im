@@ -1,4 +1,4 @@
-/* $Id: t4.h,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Id: t4.h,v 1.3 2010-03-10 18:56:48 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

@@ -1,4 +1,4 @@
-/* $Header: /home/users/s/sc/scuri/imtoolkit-cvsbackup/im/src/libtiff/tif_error.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Header: /cvs/maptools/cvsroot/libtiff/libtiff/tif_error.c,v 1.5 2010-03-10 18:56:48 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
