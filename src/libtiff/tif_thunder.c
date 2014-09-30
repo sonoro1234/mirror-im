@@ -1,4 +1,4 @@
-/* $Id: tif_thunder.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Id: tif_thunder.c,v 1.12 2011-04-02 20:54:09 bfriesen Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler

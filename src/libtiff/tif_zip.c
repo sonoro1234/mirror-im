@@ -1,4 +1,4 @@
-/* $Id: tif_zip.c,v 1.5 2011-12-24 13:41:58 scuri Exp $ */
+/* $Id: tif_zip.c,v 1.31 2011-01-06 16:00:23 fwarmerdam Exp $ */
 
 /*
  * Copyright (c) 1995-1997 Sam Leffler

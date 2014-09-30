@@ -1,4 +1,4 @@
-/* $Id: tif_fax3.c,v 1.6 2014-03-19 17:47:51 scuri Exp $ */
+/* $Id: tif_fax3.c,v 1.74 2012-06-21 02:01:31 fwarmerdam Exp $ */
 
 /*
  * Copyright (c) 1990-1997 Sam Leffler
@@ -526,6 +526,7 @@ Fax3SetupState(TIFF* tif)
 					       "for Group 3/4 run arrays");
 	if (dsp->runs == NULL)
 		return (0);
+	memset( dsp->runs, 0, TIFFSafeMultiply(uint32,nruns,2)*sizeof(uint32));
 	dsp->curruns = dsp->runs;
 	if (needsRefLine)
 		dsp->refruns = dsp->runs + nruns;
@@ -803,7 +804,7 @@ static	int32 find1span(unsigned char*, int32, int32);
  * table.  The ``base'' of the bit string is supplied
  * along with the start+end bit indices.
  */
-INLINE static int32
+INLINE static int32  /* IMLIB */
 find0span(unsigned char* bp, int32 bs, int32 be)
 {
 	int32 bits = be - bs;
@@ -862,7 +863,7 @@ find0span(unsigned char* bp, int32 bs, int32 be)
 	return (span);
 }
 
-INLINE static int32
+INLINE static int32  /* IMLIB */
 find1span(unsigned char* bp, int32 bs, int32 be)
 {
 	int32 bits = be - bs;

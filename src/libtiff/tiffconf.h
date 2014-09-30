@@ -7,6 +7,8 @@
 #ifndef _TIFFCONF_
 #define _TIFFCONF_
 
+/* IMLIB - removed undef(s) */
+
 /*
  * Feature support definitions.
  * XXX: These macros are obsoleted. Don't use them in your apps!
