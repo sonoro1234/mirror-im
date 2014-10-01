@@ -332,7 +332,7 @@ wb_usr.tree =
             { link= "doxygen/classimAttribTable.html", name= {en= "imAttribTable" } },
             { link= "doxygen/classimBinFileBase.html", name= {en= "imBinFileBase" } },
             { link= "doxygen/classimCapture.html", name= {en= "imCapture" } },
-            { link= "doxygen/classimcfloat.html", name= {en= "imcfloat" } },
+            { link= "doxygen/classimComplex.html", name= {en= "imComplex" } },
             { link= "doxygen/classimFileFormatBase.html", name= {en= "imFileFormatBase" } },
             { link= "doxygen/classimFormat.html", name= {en= "imFormat" } },
             { link= "doxygen/classimImageFile.html", name= {en= "imImageFile" } },
