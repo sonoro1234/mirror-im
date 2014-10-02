@@ -148,18 +148,19 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  * Internal Predefined File Formats:
  * \li "BMP" - Windows Device Independent Bitmap
- * \li "PCX" - ZSoft Picture
  * \li "GIF" - Graphics Interchange Format
- * \li "TIFF" - Tagged Image File Format
- * \li "RAS" - Sun Raster File
- * \li "SGI" - Silicon Graphics Image File Format
+ * \li "ICO" - Windows Icon 
  * \li "JPEG" - JPEG File Interchange Format
  * \li "LED" - IUP image in LED
- * \li "TGA" - Truevision Targa
- * \li "RAW" - RAW File
- * \li "PNM" - Netpbm Portable Image Map 
- * \li "ICO" - Windows Icon 
+ * \li "PCX" - ZSoft Picture
+ * \li "PFM" - Portable FloatMap Image Format
  * \li "PNG" - Portable Network Graphic Format 
+ * \li "PNM" - Netpbm Portable Image Map 
+ * \li "RAS" - Sun Raster File
+ * \li "RAW" - RAW File
+ * \li "SGI" - Silicon Graphics Image File Format
+ * \li "TGA" - Truevision Targa
+ * \li "TIFF" - Tagged Image File Format
  *
  * Other Supported File Formats:
  * \li "JP2" - JPEG-2000 JP2 File Format 
