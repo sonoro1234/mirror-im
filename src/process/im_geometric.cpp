@@ -155,7 +155,7 @@ static int Radial(int width, int height, DT *src_map, DT *dst_map,
 
 //*******************************************************************************************
 //rotate_invtransf
-//   shift the center to the origin of the destiny image
+//   shift the center to the origin of the target image
 //   rotates centrered in the origin
 //   shift the origin back to the center of the original image
 //*******************************************************************************************
@@ -521,7 +521,7 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
 
   int counter = imProcessCounterBegin("Radial Distort");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
-  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
+  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the target image */
 
   for (int i = 0; i < src_depth; i++)
   {
@@ -568,7 +568,7 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int or
 
   int counter = imProcessCounterBegin("Swirl Distort");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
-  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
+  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the target image */
 
   for (int i = 0; i < src_depth; i++)
   {
@@ -654,7 +654,7 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
 
   int counter = imProcessCounterBegin("Rotate");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
-  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
+  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the target image */
 
   if (src_image->color_space == IM_MAP)
   {
@@ -708,7 +708,7 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
 
   int counter = imProcessCounterBegin("RotateRef");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
-  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the destiny image */
+  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the target image */
 
   if (src_image->color_space == IM_MAP)
   {

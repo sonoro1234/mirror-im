@@ -404,15 +404,15 @@ static inline T compose_op(const T& v1, const T& v2, const T& alpha1, const T& a
   {                                                                                                                    
     if (alpha1 != 0) /* source not full transparent */                                                             
     {                                                                                                                  
-      if (alpha2 == 0) /* destiny full transparent */                                                            
+      if (alpha2 == 0) /* target full transparent */                                                            
       {                                                                                                                
         return v1;                                                                                           
       }                                                                                                                
-      else if (alpha2 == max) /* destiny opaque */                                                               
+      else if (alpha2 == max) /* target opaque */                                                               
       {                                                                                                                
         return ALPHA_BLEND(v1, v2, alpha1);                                                   
       }                                                                                                                
-      else /* (0<alpha2<max && 0<alpha1<max) destiny and source are semi-transparent */                      
+      else /* (0<alpha2<max && 0<alpha1<max) target and source are semi-transparent */                      
       {                                                                                                                
         /* Closed Compositing SRC over DST  (see smith95a.pdf)        */                                               
         /* Colors NOT Premultiplied by Alpha                          */                                               
@@ -443,16 +443,16 @@ static inline T compose_alpha_op(const T& alpha1, const T& alpha2, const TA& max
   {                                                                                                                    
     if (alpha1 != 0) /* source not full transparent */                                                             
     {                                                                                                                  
-      if (alpha2 == 0) /* destiny full transparent */                                                            
+      if (alpha2 == 0) /* target full transparent */                                                            
       {                                                                                                                
         return alpha1;                                                                                     
       }                                                                                                                
-      else if (alpha2 == max) /* destiny opaque */                                                               
+      else if (alpha2 == max) /* target opaque */                                                               
       {                                                                                                                
         /* alpha2 is not changed */                                                                              
         return alpha2;
       }                                                                                                                
-      else /* (0<alpha2<max && 0<alpha1<max) destiny and source are semi-transparent */                      
+      else /* (0<alpha2<max && 0<alpha1<max) target and source are semi-transparent */                      
       {                                                                                                                
         /* Closed Compositing SRC over DST  (see smith95a.pdf)        */                                               
         /* Colors NOT Premultiplied by Alpha                          */                                               
@@ -473,7 +473,7 @@ static inline T compose_alpha_op(const T& alpha1, const T& alpha2, const TA& max
   }                                                                                                                    
   else  /* (alpha1 == max) source has no alpha = opaque */                                                         
   {                                                                                                                    
-    return (unsigned char)max;   /* set destiny as opaque */                                                   
+    return (unsigned char)max;   /* set target as opaque */                                                   
   }                                                                                                                    
 }
 

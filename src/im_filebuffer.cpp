@@ -444,22 +444,22 @@ static void iFileSwitchToType(imFile* ifile)
   int line_count = imImageLineCount(ifile->width, ifile->file_color_mode);
   switch(ifile->file_data_type)
   {
-  case IM_BYTE:    // Destiny is char
+  case IM_BYTE:    // Target is char
     iDoSwitchInt(line_count, (const imbyte*)ifile->line_buffer, (char*)ifile->line_buffer, -128);
     break;
-  case IM_SHORT:  // Destiny is ushort
+  case IM_SHORT:  // Target is ushort
     iDoSwitchInt(line_count, (const short*)ifile->line_buffer, (imushort*)ifile->line_buffer, 32768);
     break;
-  case IM_USHORT:  // Destiny is short
+  case IM_USHORT:  // Target is short
     iDoSwitchInt(line_count, (const imushort*)ifile->line_buffer, (short*)ifile->line_buffer, -32768);
     break;
-  case IM_INT:     // Destiny is uint
+  case IM_INT:     // Target is uint
     iDoSwitchInt(line_count, (const int*)ifile->line_buffer, (unsigned int*)ifile->line_buffer, 2147483648);
     break;
-  case IM_FLOAT:   // Destiny is double
+  case IM_FLOAT:   // Target is double
     iDoSwitchReal(line_count, (const float*)ifile->line_buffer, (double*)ifile->line_buffer);
     break;
-  case IM_CFLOAT:  // Destiny is complex double
+  case IM_CFLOAT:  // Target is complex double
     iDoSwitchReal(2*line_count, (const float*)ifile->line_buffer, (double*)ifile->line_buffer);
     break;
   }

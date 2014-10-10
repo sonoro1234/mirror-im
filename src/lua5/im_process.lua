@@ -73,7 +73,7 @@ local function ThreeSourcesOneDest (funcname, width, height, color_space, data_t
 end
 
 -------------------------------------------------------------------------------
--- This function is similar to OneSourceOneDest, but it creates two destiny
+-- This function is similar to OneSourceOneDest, but it creates two target
 -- images.
 
 local function OneSourceTwoDests (funcname, width, height, color_space, data_type)
@@ -97,7 +97,7 @@ local function OneSourceTwoDests (funcname, width, height, color_space, data_typ
 end
 
 -------------------------------------------------------------------------------
--- This function is similar to OneSourceOneDest, but it creates three destiny
+-- This function is similar to OneSourceOneDest, but it creates three target
 -- images.
 
 local function OneSourceThreeDests (funcname, width, height, color_space, data_type)

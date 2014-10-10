@@ -26,7 +26,7 @@ extern "C" {
  * It will detect white lines in a black background. So the source image must be a IM_BINARY image 
  * with the white lines of interest enhanced. The better the threshold with the white lines the better 
  * the line detection. \n
- * The destiny image must have IM_GRAY, IM_INT, hg_width=180, hg_height=2*rmax+1, 
+ * The target image must have IM_GRAY, IM_INT, hg_width=180, hg_height=2*rmax+1, 
  * where rmax is the image diagonal/2 (rmax = srqrt(width*width + height*height)). \n
  * The hough transform defines  "cos(theta) * X  + sin(theta) * Y = rho" and the parameters are in the interval: \n
  * theta = "0 .. 179", rho = "-hg_height/2 .. hg_height/2" .\n
@@ -43,7 +43,7 @@ extern "C" {
 int imProcessHoughLines(const imImage* src_image, imImage* dst_image);
 
 /** Draw detected hough lines. \n
- * The source and destiny images can be IM_MAP, IM_GRAY or IM_RGB, with data type IM_BYTE. \n
+ * The source and target images can be IM_MAP, IM_GRAY or IM_RGB, with data type IM_BYTE. \n
  * Can be done in-place. \n
  * If the hough transform is not NULL, then the hough points are filtered to include only lines
  * that are significally different from each other. \n
@@ -52,8 +52,8 @@ int imProcessHoughLines(const imImage* src_image, imImage* dst_image);
  * The hough points image is a hough transform image that was thresholded to a IM_BINARY image, 
  * usually using a Local Max threshold operation (see \ref imProcessLocalMaxThreshold). Again the better the threshold the better the results. \n
  * The detected lines will be drawn using a red color.
- * If the destiny image is IM_GRAY, it will be changed to IM_MAP. \n
- * If the destiny image is IM_RGB, then only the red plane will be changed.
+ * If the target image is IM_GRAY, it will be changed to IM_MAP. \n
+ * If the target image is IM_RGB, then only the red plane will be changed.
  * Returns the number of detected lines. \n
  * Not using OpenMP when enabled.
  *
@@ -64,7 +64,7 @@ int imProcessHoughLinesDraw(const imImage* src_image, const imImage* hough, cons
 
 /** Calculates the Cross Correlation in the frequency domain. \n 
  * CrossCorr(a,b) = IFFT(Conj(FFT(a))*FFT(b)) \n
- * Images must be of the same size and only destiny image must be of type complex.
+ * Images must be of the same size and only target image must be of type complex.
  *
  * \verbatim im.ProcessCrossCorrelation(src_image1: imImage, src_image2: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessCrossCorrelationNew(image1: imImage, image2: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -73,7 +73,7 @@ void imProcessCrossCorrelation(const imImage* src_image1, const imImage* src_ima
 
 /** Calculates the Auto Correlation in the frequency domain. \n 
  * Uses the cross correlation.
- * Images must be of the same size and only destiny image must be of type complex.
+ * Images must be of the same size and only target image must be of type complex.
  *
  * \verbatim im.ProcessAutoCorrelation(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessAutoCorrelationNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -86,7 +86,7 @@ void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image);
  * assigned a value equal to its distance from the nearest
  * black pixel. \n
  * Uses a two-pass algorithm incrementally calculating the distance. \n
- * Source image must be IM_BINARY, destiny must be IM_FLOAT.
+ * Source image must be IM_BINARY, target must be IM_FLOAT.
  *
  * \verbatim im.ProcessDistanceTransform(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessDistanceTransformNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -94,7 +94,7 @@ void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image);
 void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image);
 
 /** Marks all the regional maximum of the distance transform. \n
- * source is IMGRAY/IM_FLOAT destiny in IM_BINARY. \n
+ * source is IMGRAY/IM_FLOAT target in IM_BINARY. \n
  * We consider maximum all connected pixel values that have smaller pixel values around it.
  *
  * \verbatim im.ProcessRegionalMaximum(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -131,7 +131,7 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
 /** Forward FFT. \n
  * The result has its lowest frequency at the center of the image. \n
  * This is an unnormalized fft. \n
- * Images must be of the same size. Destiny image must be of type float complex.
+ * Images must be of the same size. Target image must be of type float complex.
  *
  * \verbatim im.ProcessFFT(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessFFTNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim

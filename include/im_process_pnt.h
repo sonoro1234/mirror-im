@@ -23,12 +23,12 @@ extern "C" {
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value: number, params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the params table is unpacked.
- * And the returned value contains only the destiny values to update, or nil (also no return value) to leave destiny intact.
+ * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
 typedef int (*imUnaryPointOpFunc)(float src_value, float *dst_value, float* params, void* userdata, int x, int y, int d);
 
 /** Apply an unary point operation using a custom function.
- * One pixel from the source affects the same pixel on destiny. \n
+ * One pixel from the source affects the same pixel on target. \n
  * Can be done in-place, images must match size and depth. 
  * Data type can be different, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL.  
@@ -46,12 +46,12 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
  * \verbatim func(src_value_plane0: number, src_value_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the params table is unpacked.
  * Also each color plane is passed as a separe value, instead of inside an array.
- * And the returned value contains only the destiny values to update, or nil (also no return value) to leave destiny intact.
+ * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
 typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y);
 
 /** Apply an unary point color operation using a custom function.
- * One pixel from the source affects the same pixel on destiny. \n
+ * One pixel from the source affects the same pixel on target. \n
  * Can be done in-place, images must match size, depth can be different.
  * Data type can be different, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL.
@@ -69,15 +69,15 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value1: number, src_value2: number, ... , params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
- * And the returned value contains only the destiny values to update, or nil (also no return value) to leave destiny intact.
+ * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
 typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_count);
 
 /** Apply an multiple point operation using a custom function.
- * One pixel from each source affects the same pixel on destiny. \n
+ * One pixel from each source affects the same pixel on target. \n
  * All source images must match in size, depth and data type.
- * Can be done in-place, source and destiny must match size and depth.
- * Data type can be different between sources and destiny, but complex is not supported. \n
+ * Can be done in-place, source and target must match size and depth.
+ * Data type can be different between sources and target, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL.
  * Returns zero if the counter aborted.
  *
@@ -94,15 +94,15 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
  * \verbatim func(src_value1_plane0: number, src_value1_plane1: number, ..., src_value2_plane0: number, src_value2_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
  * Also each color plane is passed as a separe value, instead of inside an array.
- * And the returned value contains only the destiny values to update, or nil (also no return value) to leave destiny intact.
+ * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
 typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float* params, void* userdata, int x, int y, int src_count, int src_depth, int dst_depth);
 
 /** Apply an multiple point color operation using a custom function.
- * One pixel from each source affects the same pixel on destiny. \n
+ * One pixel from each source affects the same pixel on target. \n
  * All source images must match in size, depth and data type.
- * Can be done in-place, source and destiny must match size, depth can be different.
- * Data type can be different between sources and destiny, but complex is not supported. \n
+ * Can be done in-place, source and target must match size, depth can be different.
+ * Data type can be different between sources and target, but complex is not supported. \n
  * op_name is used only by the counter and can be NULL. 
  * Returns zero if the counter aborted.
  *
@@ -144,12 +144,12 @@ enum imUnaryOp {
 
 /** Apply an arithmetic unary operation. \n
  * Can be done in-place, images must match color space and size. \n
- * Destiny image can be several types depending on source: \n
+ * Target image can be several types depending on source: \n
  * \li any integer -> any integer or real
  * \li real -> real
  * \li complex -> complex
- * If source is complex, destiny complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
- * If destiny is byte, then the result is cropped to 0-255.
+ * If source is complex, target complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
+ * If target is byte, then the result is cropped to 0-255.
  *
  * \verbatim im.ProcessUnArithmeticOp(src_image: imImage, dst_image: imImage, op: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessUnArithmeticOpNew(image: imImage, op: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -172,14 +172,14 @@ enum imBinaryOp {
 
 /** Apply a binary arithmetic operation. \n
  * Can be done in-place, images must match color space and size. \n
- * Source images must match, destiny image can be several types depending on source: \n
+ * Source images must match, target image can be several types depending on source: \n
  * \li any integer -> any integer+ or real
  * \li real -> real
  * \li complex -> complex
  * One exception is that you can use src1=complex src2=real resulting dst=complex. \n
- * If source is complex, destiny complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
- * If destiny is integer then it must have equal or more precision than the source. \n
- * If destiny is byte, then the result is cropped to 0-255.
+ * If source is complex, target complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
+ * If target is integer then it must have equal or more precision than the source. \n
+ * If target is byte, then the result is cropped to 0-255.
  * Alpha channel is not included.
  *
  * \verbatim im.ProcessArithmeticOp(src_image1: imImage, src_image2: imImage, dst_image: imImage, op: number) [in Lua 5] \endverbatim
@@ -190,13 +190,13 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
 
 /** Apply a binary arithmetic operation with a constant value. \n
  * Can be done in-place, images must match color space and size. \n
- * Destiny image can be several types depending on source: \n
+ * Target image can be several types depending on source: \n
  * \li any integer -> any integer or real
  * \li real -> real
  * \li complex -> complex
  * The constant value is type casted to an apropriate type before the operation. \n
- * If source is complex, destiny complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
- * If destiny is byte, then the result is cropped to 0-255.
+ * If source is complex, target complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
+ * If target is byte, then the result is cropped to 0-255.
  *
  * \verbatim im.ProcessArithmeticConstOp(src_image: imImage, src_const: number, dst_image: imImage, op: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessArithmeticConstOpNew(image: imImage, src_const: number, op: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -232,7 +232,7 @@ void imProcessCompose(const imImage* src_image1, const imImage* src_image2, imIm
 
 /** Split a complex image into two images with real and imaginary parts \n
  * or magnitude and phase parts (polar). \n
- * Source image must be complex, destiny images must be real.
+ * Source image must be complex, target images must be real.
  *
  * \verbatim im.ProcessSplitComplex(src_image: imImage, dst_image1: imImage, dst_image2: imImage, polar: boolean) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSplitComplexNew(image: imImage, polar: boolean) -> dst_image1: imImage, dst_image2: imImage [in Lua 5] \endverbatim
@@ -241,7 +241,7 @@ void imProcessSplitComplex(const imImage* src_image, imImage* dst_image1, imImag
 
 /** Merges two images as the real and imaginary parts of a complex image, \n
  * or as magnitude and phase parts (polar = 1). \n
- * Source images must be real, destiny image must be complex.
+ * Source images must be real, target image must be complex.
  *
  * \verbatim im.ProcessMergeComplex(src_image1: imImage, src_image2: imImage, dst_image: imImage, polar: boolean) [in Lua 5] \endverbatim
  * \verbatim im.ProcessMergeComplexNew(image1: imImage, image2: imImage, polar: boolean) -> new_image: imImage [in Lua 5] \endverbatim
@@ -275,7 +275,7 @@ int imProcessMultipleMedian(const imImage** src_image_list, int src_image_count,
 
 /** Calculates the auto-covariance of an image with the mean of a set of images. \n
  * Images must match. Returns zero if the counter aborted. \n
- * Destiny is IM_FLOAT, except if source is IM_DOUBLE.
+ * Target is IM_FLOAT, except if source is IM_DOUBLE.
  * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessAutoCovariance(src_image: imImage, mean_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
@@ -310,8 +310,8 @@ void imProcessMultiplyConj(const imImage* src_image1, const imImage* src_image2,
 void imProcessQuantizeRGBUniform(const imImage* src_image, imImage* dst_image, int do_dither);
 
 /** Quantizes a gray scale image in less that 256 grays using uniform quantization. \n
- * Both images should be IM_BYTE/IM_GRAY, the destiny can be IM_MAP. Can be done in-place. \n
- * The result is in the 0-255 range, except when destiny is IM_MAP that is in the 0-(grays-1) range.
+ * Both images should be IM_BYTE/IM_GRAY, the target can be IM_MAP. Can be done in-place. \n
+ * The result is in the 0-255 range, except when target is IM_MAP that is in the 0-(grays-1) range.
  *
  * \verbatim im.ProcessQuantizeGrayUniform(src_image: imImage, dst_image: imImage, grays: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessQuantizeGrayUniformNew(src_image: imImage, grays: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -358,7 +358,7 @@ void imProcessEqualizeHistogram(const imImage* src_image, imImage* dst_image);
 /** Split a RGB image into luma and chroma. \n
  * Chroma is calculated as R-Y,G-Y,B-Y. Source image must be IM_RGB/IM_BYTE. \n
  * luma image is IM_GRAY/IM_BYTE and chroma is IM_RGB/IM_BYTE. \n
- * Source and destiny must have the same size. 
+ * Source and target must have the same size. 
  *
  * \verbatim im.ProcessSplitYChroma(src_image: imImage, y_image: imImage, chroma_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSplitYChromaNew(src_image: imImage) -> y_image: imImage, chroma_image: imImage [in Lua 5] \endverbatim
@@ -366,10 +366,10 @@ void imProcessEqualizeHistogram(const imImage* src_image, imImage* dst_image);
 void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* chroma_image);
 
 /** Split a RGB image into HSI planes. \n
- * Source image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. Destiny images are all IM_GRAY/IM_FLOAT. \n
+ * Source image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. Target images are all IM_GRAY/IM_FLOAT. \n
  * Source images must normalized to 0-1 if type is IM_FLOAT (\ref imProcessToneGamut can be used). 
  * See \ref hsi for a definition of the color conversion.\n
- * Source and destiny must have the same size. 
+ * Source and target must have the same size. 
  *
  * \verbatim im.ProcessSplitHSI(src_image: imImage, h_image: imImage, s_image: imImage, i_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSplitHSINew(src_image: imImage) -> h_image: imImage, s_image: imImage, i_image: imImage [in Lua 5] \endverbatim
@@ -377,8 +377,8 @@ void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* 
 void imProcessSplitHSI(const imImage* src_image, imImage* h_image, imImage* s_image, imImage* i_image);
 
 /** Merge HSI planes into a RGB image. \n
- * Source images must be IM_GRAY/IM_FLOAT. Destiny image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. \n
- * Source and destiny must have the same size. See \ref hsi for a definition of the color conversion.
+ * Source images must be IM_GRAY/IM_FLOAT. Target image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. \n
+ * Source and target must have the same size. See \ref hsi for a definition of the color conversion.
  *
  * \verbatim im.ProcessMergeHSI(h_image: imImage, s_image: imImage, i_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessMergeHSINew(h_image: imImage, s_image: imImage, i_image: imImage) -> dst_image: imImage [in Lua 5] \endverbatim
@@ -386,8 +386,8 @@ void imProcessSplitHSI(const imImage* src_image, imImage* h_image, imImage* s_im
 void imProcessMergeHSI(const imImage* h_image, const imImage* s_image, const imImage* i_image, imImage* dst_image);
 
 /** Split a multicomponent image into separate components, including alpha.\n
- * Destiny images must be IM_GRAY. Size and data types must be all the same.\n
- * The number of destiny images must match the depth of the source image, including alpha.
+ * Target images must be IM_GRAY. Size and data types must be all the same.\n
+ * The number of target images must match the depth of the source image, including alpha.
  *
  * \verbatim im.ProcessSplitComponents(src_image: imImage, dst_image_list: table of imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSplitComponentsNew(src_image: imImage) -> dst_image_list: table of imImage [in Lua 5] \endverbatim
@@ -396,7 +396,7 @@ void imProcessSplitComponents(const imImage* src_image, imImage** dst_image_list
 
 /** Merges separate components into a multicomponent image, including alpha.\n
  * Source images must be IM_GRAY. Size and data types must be all the same.\n
- * The number of source images must match the depth of the destiny image, including alpha.
+ * The number of source images must match the depth of the target image, including alpha.
  *
  * \verbatim im.ProcessMergeComponents(src_image_list: table of imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessMergeComponentsNew(src_image_list: table of imImage) -> dst_image: imImage [in Lua 5] \endverbatim
@@ -405,14 +405,14 @@ void imProcessMergeComponents(const imImage** src_image_list, imImage* dst_image
 
 /** Normalize the color components by their sum. Example: c1 = c1/(c1+c2+c3). \n
  * It will not change the alpha channel if any.
- * Destiny is IM_FLOAT, except if source is IM_DOUBLE.
+ * Target is IM_FLOAT, except if source is IM_DOUBLE.
  *
  * \verbatim im.ProcessNormalizeComponents(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessNormalizeComponentsNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup colorproc */
 void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image);
 
-/** Replaces the source color by the destiny color. \n
+/** Replaces the source color by the target color. \n
  * The color will be type casted to the image data type. \n
  * The colors must have the same number of components of the images. \n
  * Supports all color spaces and all data types except complex.
@@ -422,10 +422,10 @@ void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image);
  * \ingroup colorproc */
 void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* src_color, float* dst_color);
 
-/** Sets the alpha channel in destiny where the given color occours in source,
+/** Sets the alpha channel in target where the given color occours in source,
  * elsewhere alpha remains untouched. \n
  * The color must have the same number of components of the source image. \n
- * If destiny does not have an alpha channel, then its plane=0 is used. \n
+ * If target does not have an alpha channel, then its plane=0 is used. \n
  * Supports all color spaces for source and all data types except complex.
  * Images must have the same size.
  *
@@ -676,7 +676,7 @@ enum imToneGamutFlags {
 void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, float* params);
 
 /** Converts from (0-1) to (0-255), crop out of bounds values. \n
- * Source image must be real, and destiny image must be IM_BYTE.
+ * Source image must be real, and target image must be IM_BYTE.
  *
  * \verbatim im.ProcessUnNormalize(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessUnNormalizeNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -728,7 +728,7 @@ void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shi
 /** Apply a manual threshold. \n
  * threshold = a <= level ? 0: value \n
  * Normal value is 1 but another common value is 255. Can be done in-place for IM_BYTE source. \n
- * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
+ * Source color space must be IM_GRAY, and target color space must be IM_BINARY.
  * complex is not supported. \n
  *
  * \verbatim im.ProcessThreshold(src_image: imImage, dst_image: imImage, level: number, value: number) [in Lua 5] \endverbatim
@@ -738,7 +738,7 @@ void imProcessThreshold(const imImage* src_image, imImage* dst_image, float leve
 
 /** Apply a threshold by the difference of two images. \n
  * threshold = a1 <= a2 ? 0: 1   \n
- * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
+ * Source color space must be IM_GRAY, and target color space must be IM_BINARY.
  * complex is not supported. Can be done in-place for IM_BYTE source. \n
  *
  * \verbatim im.ProcessThresholdByDiff(src_image1: imImage, src_image2: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -788,7 +788,7 @@ int imProcessUniformErrThreshold(const imImage* src_image, imImage* dst_image);
 
 /** Apply a dithering on each image channel by using a difusion error method. \n
  * It can be applied on any IM_BYTE images. It will "threshold" each channel indivudually, so
- * source and destiny must be of the same depth.
+ * source and target must be of the same depth.
  * Not using OpenMP when enabled.
  *
  * \verbatim im.ProcessDifusionErrThreshold(src_image: imImage, dst_image: imImage, level: number) [in Lua 5] \endverbatim
@@ -799,7 +799,7 @@ void imProcessDifusionErrThreshold(const imImage* src_image, imImage* dst_image,
 /** Calculates the threshold level for manual threshold using a percentage of pixels
  * that should stay bellow the threshold. \n
  * Image data type can be IM_BYTE, IM_SHORT or IM_USHORT. \n
- * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
+ * Source color space must be IM_GRAY, and target color space must be IM_BINARY.
  * Returns the used level.
  *
  * \verbatim im.ProcessPercentThreshold(src_image: imImage, dst_image: imImage, percent: number) -> level: number [in Lua 5] \endverbatim
@@ -809,7 +809,7 @@ int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, floa
 
 /** Calculates the threshold level for manual threshold using the Otsu approach. \n
  * Image can be IM_BYTE, IM_SHORT or IM_USHORT. \n
- * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
+ * Source color space must be IM_GRAY, and target color space must be IM_BINARY.
  * Returns the used level. \n
  * Original implementation by Flavio Szenberg.
  *
@@ -820,7 +820,7 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image);
 
 /** Calculates the threshold level for manual threshold using (max-min)/2. \n
  * Returns the used level. \n
- * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
+ * Source color space must be IM_GRAY, and target color space must be IM_BINARY.
  * complex is not supported. Can be done in-place for IM_BYTE source. \n
  *
  * \verbatim im.ProcessMinMaxThreshold(src_image: imImage, dst_image: imImage) -> level: number [in Lua 5] \endverbatim
@@ -838,7 +838,7 @@ void imProcessLocalMaxThresEstimate(const imImage* image, int *level);
 /** Apply a manual threshold using an interval. \n
  * threshold = start_level <= a <= end_level ? 1: 0 \n
  * Normal value is 1 but another common value is 255. \n
- * Source color space must be IM_GRAY, and destiny color space must be IM_BINARY.
+ * Source color space must be IM_GRAY, and target color space must be IM_BINARY.
  * complex is not supported. Can be done in-place for IM_BYTE source. \n
  *
  * \verbatim im.ProcessSliceThreshold(src_image: imImage, dst_image: imImage, start_level: number, end_level: number) [in Lua 5] \endverbatim
@@ -884,7 +884,7 @@ void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level)
 /** Calculates the Normalized Difference Ratio. \n
  * Uses the formula NormDiffRatio = (a-b)/(a+b), \n
  * The result image has [-1,1] interval. \n
- * Images must be IM_GRAY, and the destiny image must be IM_FLOAT, except if source is IM_DOUBLE.
+ * Images must be IM_GRAY, and the target image must be IM_FLOAT, except if source is IM_DOUBLE.
  *
  * \verbatim im.ProcessNormDiffRatio(image1: imImage, image2: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessNormDiffRatioNew(image1: imImage, image2: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -892,7 +892,7 @@ void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level)
 void imProcessNormDiffRatio(const imImage* image1, const imImage* image2, imImage* dst_image);
 
 /** Applies the abnormal pixel correction as described in the article. (Since 3.8) \n
- * Images must be IM_GRAY. Source and Destiny must have the same datatype, and complex is not supported. \n
+ * Images must be IM_GRAY. Source and Target must have the same datatype, and complex is not supported. \n
  * image_abnormal is optional, can be NULL. If not NULL, must be IM_BINARY and 
  * it will store the abnormal pixels distribution. \n
  * Can be done in-place. \n

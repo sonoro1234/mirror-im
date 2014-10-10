@@ -249,7 +249,7 @@ void imAnalyzeMeasurePerimeter(const imImage* image, float* perim, int region_co
 void imProcessPerimeterLine(const imImage* src_image, imImage* dst_image);
 
 /** Eliminates regions that have area size outside or inside the given interval. \n
- * Source and destiny are a binary images. Regions can be 4 connected or 8 connected. \n
+ * Source and target are a binary images. Regions can be 4 connected or 8 connected. \n
  * Can be done in-place. end_size can be zero to indicate no upper limit or an area with width*height size. \n
  * When searching inside the region the limits are inclusive (<= size >=), when searching outside the limits are exclusive (> size <).
  *
@@ -259,7 +259,7 @@ void imProcessPerimeterLine(const imImage* src_image, imImage* dst_image);
 void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int connect, int start_size, int end_size, int inside);
 
 /** Fill holes inside white regions. \n
- * Source and destiny are a binary images. Regions can be 4 connected or 8 connected. \n
+ * Source and target are a binary images. Regions can be 4 connected or 8 connected. \n
  * Can be done in-place. 
  *
  * \verbatim im.ProcessFillHoles(src_image: imImage, dst_image: imImage, connect: number) [in Lua 5] \endverbatim

@@ -515,7 +515,7 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image)
     }
   }
 
-  // update destiny with remaining maximum
+  // update target with remaining maximum
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(src_image->count))
 #endif

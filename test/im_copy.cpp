@@ -1,6 +1,6 @@
 /* IM 3 sample that copies an image from one file to another. 
    It is good to test the file formats read and write.
-   If the destiny does not supports the input image it aborts and returns an error.
+   If the target does not supports the input image it aborts and returns an error.
 
   Needs "im.lib".
 
