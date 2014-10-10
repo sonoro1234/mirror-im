@@ -49,7 +49,7 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order);
 int imProcessResize(const imImage* src_image, imImage* dst_image, int order);
 
 /** Reduze the image area by 4 (w/2,h/2). \n
- * Images must be of the same type. Destiny image size must be source image width/2, height/2.
+ * Images must be of the same type. Target image size must be source image width/2, height/2.
  * Can not operate on IM_MAP nor IM_BINARY images.
  *
  * \verbatim im.ProcessReduceBy4(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -58,7 +58,7 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order);
 void imProcessReduceBy4(const imImage* src_image, imImage* dst_image);
 
 /** Extract a rectangular region from an image. \n
- * Images must be of the same type. Destiny image size must be smaller than source image width-xmin, height-ymin. \n
+ * Images must be of the same type. Target image size must be smaller than source image width-xmin, height-ymin. \n
  * ymin and xmin must be >0 and <size.
  *
  * \verbatim im.ProcessCrop(src_image: imImage, dst_image: imImage, xmin: number, ymin: number) [in Lua 5] \endverbatim
@@ -69,7 +69,7 @@ void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int y
 /** Insert a rectangular region in an image. \n
  * Images must be of the same type. Region image size can be larger than source image. \n
  * ymin and xmin must be >0 and <size. \n
- * Source and destiny must be of the same size. Can be done in-place.
+ * Source and target must be of the same size. Can be done in-place.
  *
  * \verbatim im.ProcessInsert(src_image: imImage, region_image: imImage, dst_image: imImage, xmin: number, ymin: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessInsertNew(image: imImage, region_image: imImage, xmin: number, ymin: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -77,7 +77,7 @@ void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int y
 void imProcessInsert(const imImage* src_image, const imImage* region_image, imImage* dst_image, int xmin, int ymin);
 
 /** Increase the image size by adding pixels with zero value. \n
- * Images must be of the same type. Destiny image size must be greatter or equal than source image width+xmin, height+ymin.
+ * Images must be of the same type. Target image size must be greatter or equal than source image width+xmin, height+ymin.
  *
  * \verbatim im.ProcessAddMargins(src_image: imImage, dst_image: imImage, xmin: number, ymin: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessAddMarginsNew(image: imImage, xmin, xmax, ymin, ymax: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -101,7 +101,7 @@ void imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin,
 void imProcessCalcRotateSize(int width, int height, int *new_width, int *new_height, double cos0, double sin0);
 
 /** Rotates the image using the given interpolation order (see \ref imProcessResize). \n
- * Images must be of the same type. The destiny size can be calculated using \ref imProcessCalcRotateSize to fit the new image size, 
+ * Images must be of the same type. The target size can be calculated using \ref imProcessCalcRotateSize to fit the new image size, 
  * or can be any size, including the original size. The rotation is relative to the center of the image. \n
  * Returns zero if the counter aborted.
  *
@@ -111,7 +111,7 @@ void imProcessCalcRotateSize(int width, int height, int *new_width, int *new_hei
 int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, double sin0, int order);
 
 /** Rotates the image using the given interpolation order (see \ref imProcessResize). \n
- * Images must be of the same type. Destiny can have any size, including the original size. \n
+ * Images must be of the same type. Target can have any size, including the original size. \n
  * The rotation is relative to the reference point. But the result can be shifted to the origin. \n
  * Returns zero if the counter aborted.
  *
@@ -121,7 +121,7 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
 int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0, double sin0, int x, int y, int to_origin, int order);
 
 /** Rotates the image in 90 degrees counterclockwise or clockwise. Swap columns by lines. \n
- * Images must be of the same type. Destiny width and height must be source height and width. \n
+ * Images must be of the same type. Target width and height must be source height and width. \n
  * Direction can be clockwise (1) or counter clockwise (-1).
  *
  * \verbatim im.ProcessRotate90(src_image: imImage, dst_image: imImage, dir_clockwise: boolean) [in Lua 5] \endverbatim
@@ -376,7 +376,7 @@ int imProcessRankMaxConvolve(const imImage* src_image, imImage* dst_image, int k
 int imProcessRankMinConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Threshold using a rank convolution with a range contrast function. \n
- * Supports all integer IM_GRAY images as source, and IM_BINARY as destiny. \n
+ * Supports all integer IM_GRAY images as source, and IM_BINARY as target. \n
  * Local variable threshold by the method of Bernsen. \n
  * Extracted from XITE, Copyright 1991, Blab, UiO \n
  * http://www.ifi.uio.no/~blab/Software/Xite/
@@ -395,7 +395,7 @@ int imProcessRangeContrastThreshold(const imImage* src_image, imImage* dst_image
 
 /** Threshold using a rank convolution with a local max function.  \n
  * Returns zero if the counter aborted. \n
- * Supports all integer IM_GRAY images as source, and IM_BINARY as destiny.
+ * Supports all integer IM_GRAY images as source, and IM_BINARY as target.
  *
  * \verbatim im.ProcessLocalMaxThreshold(src_image: imImage, dst_image: imImage, kernel_size: number, min_level: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessLocalMaxThresholdNew(image: imImage, kernel_size: number, min_level: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -469,7 +469,7 @@ void imProcessRotateKernel(imImage* kernel);
 
 /** Difference(Gaussian1, Gaussian2). \n
  * Supports all data types, 
- * but if source is IM_BYTE or IM_USHORT destiny image must be of type IM_INT.
+ * but if source is IM_BYTE or IM_USHORT target image must be of type IM_INT.
  *
  * \verbatim im.ProcessDiffOfGaussianConvolve(src_image: imImage, dst_image: imImage, stddev1: number, stddev2: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessDiffOfGaussianConvolveNew(image: imImage, stddev1: number, stddev2: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -478,7 +478,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
 
 /** Convolution with a laplacian of a gaussian kernel. \n
  * Supports all data types, 
- * but if source is IM_BYTE or IM_USHORT destiny image must be of type IM_INT.
+ * but if source is IM_BYTE or IM_USHORT target image must be of type IM_INT.
  *
  * \verbatim im.ProcessLapOfGaussianConvolve(src_image: imImage, dst_image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessLapOfGaussianConvolveNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim

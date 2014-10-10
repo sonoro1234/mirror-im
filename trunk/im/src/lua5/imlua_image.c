@@ -353,7 +353,7 @@ static int imluaImageCopyPlane(lua_State *L)
 
   dst_depth = dst_image->has_alpha? dst_image->depth+1: dst_image->depth;
   if (dst_plane < 0 || dst_plane >= dst_depth)
-    luaL_argerror(L, 4, "invalid destiny channel, out of bounds");
+    luaL_argerror(L, 4, "invalid target channel, out of bounds");
 
   imImageCopyPlane(src_image, src_plane, dst_image, dst_plane);
   return 0;

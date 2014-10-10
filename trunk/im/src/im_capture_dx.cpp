@@ -460,10 +460,10 @@ static void vc_NukeDownstream(IGraphBuilder* filter_builder, IBaseFilter *filter
   pEnumPins->Release();
 }
 
-static int vc_DisconnectFilters(IGraphBuilder* filter_builder, IBaseFilter* source, IBaseFilter* destiny)
+static int vc_DisconnectFilters(IGraphBuilder* filter_builder, IBaseFilter* source, IBaseFilter* target)
 {
   IPin *pOut = vc_GetPin(source, PINDIR_OUTPUT);
-  IPin *pIn = vc_GetPin(destiny, PINDIR_INPUT);
+  IPin *pIn = vc_GetPin(target, PINDIR_INPUT);
   HRESULT hr = filter_builder->Disconnect(pOut);
   hr = filter_builder->Disconnect(pIn);
   pOut->Release(); 
@@ -498,11 +498,11 @@ static int vc_DisconnectFilterPin(IGraphBuilder* filter_builder, IBaseFilter* fi
   return 1;
 }
 
-static int vc_ConnectFilters(IGraphBuilder* filter_builder, IBaseFilter* source, IBaseFilter* destiny, int direct)
+static int vc_ConnectFilters(IGraphBuilder* filter_builder, IBaseFilter* source, IBaseFilter* target, int direct)
 {
   HRESULT hr;
   IPin *pOut = vc_GetPin(source, PINDIR_OUTPUT);
-  IPin *pIn = vc_GetPin(destiny, PINDIR_INPUT);
+  IPin *pIn = vc_GetPin(target, PINDIR_INPUT);
   if (direct)
     hr = filter_builder->ConnectDirect(pOut, pIn, NULL);
   else

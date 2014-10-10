@@ -725,7 +725,7 @@ static int imluaProcessReduceBy4 (lua_State *L)
   imlua_matchcolor(L, src_image, dst_image);
   luaL_argcheck(L,
     dst_image->width == (src_image->width / 2) &&
-    dst_image->height == (src_image->height / 2), 3, "destiny image size must be source image width/2, height/2");
+    dst_image->height == (src_image->height / 2), 3, "target image size must be source image width/2, height/2");
 
   imProcessReduceBy4(src_image, dst_image);
   return 0;
@@ -744,8 +744,8 @@ static int imluaProcessCrop (lua_State *L)
   imlua_matchcolor(L, src_image, dst_image);
   luaL_argcheck(L, xmin >= 0 && xmin < src_image->width, 3, "xmin must be >= 0 and < width");
   luaL_argcheck(L, ymin >= 0 && ymin < src_image->height, 4, "ymin must be >= 0 and < height");
-  luaL_argcheck(L, dst_image->width <= (src_image->width - xmin), 2, "destiny image size must be smaller than source image width-xmin");
-  luaL_argcheck(L, dst_image->height <= (src_image->height - ymin), 2, "destiny image size must be smaller than source image height-ymin");
+  luaL_argcheck(L, dst_image->width <= (src_image->width - xmin), 2, "target image size must be smaller than source image width-xmin");
+  luaL_argcheck(L, dst_image->height <= (src_image->height - ymin), 2, "target image size must be smaller than source image height-ymin");
 
   imProcessCrop(src_image, dst_image, xmin, ymin);
   return 0;
@@ -781,8 +781,8 @@ static int imluaProcessAddMargins (lua_State *L)
   int ymin = luaL_checkint(L, 4);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "destiny image size must be greatter or equal than source image width+xmin, height+ymin");
-  luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "destiny image size must be greatter or equal than source image width+xmin, height+ymin");
+  luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "target image size must be greatter or equal than source image width+xmin, height+ymin");
+  luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "target image size must be greatter or equal than source image width+xmin, height+ymin");
 
   imProcessAddMargins(src_image, dst_image, xmin, ymin);
   return 0;
@@ -859,7 +859,7 @@ static int imluaProcessRotate90 (lua_State *L)
   int dir = luaL_checkint(L, 3);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, dst_image->width == src_image->height && dst_image->height == src_image->width, 2, "destiny width and height must have the source height and width");
+  luaL_argcheck(L, dst_image->width == src_image->height && dst_image->height == src_image->width, 2, "target width and height must have the source height and width");
   luaL_argcheck(L, (dir == -1 || dir == 1), 3, "invalid dir, can be -1 or 1 only");
 
   imProcessRotate90(src_image, dst_image, dir);
@@ -919,17 +919,17 @@ static int imluaProcessInterlaceSplit (lua_State *L)
 
   imlua_matchcolor(L, src_image, dst_image1);
   imlua_matchcolor(L, src_image, dst_image2);
-  luaL_argcheck(L, dst_image1->width == src_image->width && dst_image2->width == src_image->width, 2, "destiny width must be equal to source width");
+  luaL_argcheck(L, dst_image1->width == src_image->width && dst_image2->width == src_image->width, 2, "target width must be equal to source width");
 
   if (src_image->height%2)
   {
     int dst_height1 = src_image->height/2 + 1;
-    luaL_argcheck(L, dst_image1->height == dst_height1, 2, "destiny1 height must be equal to source height/2+1 if height odd");
+    luaL_argcheck(L, dst_image1->height == dst_height1, 2, "dst_image1 height must be equal to source height/2+1 if height odd");
   }
   else
-    luaL_argcheck(L, dst_image1->height == src_image->height/2, 2, "destiny1 height must be equal to source height/2 if height even");
+    luaL_argcheck(L, dst_image1->height == src_image->height/2, 2, "dst_image1 height must be equal to source height/2 if height even");
 
-  luaL_argcheck(L, dst_image2->height == src_image->height/2, 2, "destiny2 height must be equal to source height/2");
+  luaL_argcheck(L, dst_image2->height == src_image->height/2, 2, "dst_image2 height must be equal to source height/2");
 
   imProcessInterlaceSplit(src_image, dst_image1, dst_image2);
   return 0;
@@ -1689,7 +1689,7 @@ static int imluaProcessUnArithmeticOp (lua_State *L)
   case IM_CFLOAT:
     luaL_argcheck(L,
       dst_image->data_type == IM_CFLOAT,
-      2, "source image is float complex, destiny image data type can be float complex only.");
+      2, "source image is float complex, target image data type can be float complex only.");
     break;
   case IM_DOUBLE:
     imlua_checkreal(L, 2, dst_image);
@@ -1697,7 +1697,7 @@ static int imluaProcessUnArithmeticOp (lua_State *L)
   case IM_CDOUBLE:
     luaL_argcheck(L,
       dst_image->data_type == IM_CDOUBLE,
-      2, "source image is double complex, destiny image data type can be double complex only.");
+      2, "source image is double complex, target image data type can be double complex only.");
     break;
   }
 
@@ -1885,7 +1885,7 @@ static int imluaProcessMultiPointOp(lua_State *L)
   if (src_image_list[0]->depth != dst_image->depth)
   {
     free(src_image_list);
-    luaL_error(L, "source and destiny images must have the same depth");
+    luaL_error(L, "source and target images must have the same depth");
     return 0;
   }
 
@@ -1998,17 +1998,17 @@ static int imluaProcessArithmeticOp (lua_State *L)
   case IM_SHORT:
     imlua_checknotcomplex(L, 2, dst_image);
     luaL_argcheck(L, dst_image->data_type != IM_BYTE,
-      2, "source image is short, destiny can NOT be byte.");
+      2, "source image is short, target can NOT be byte.");
     break;
   case IM_USHORT:
     imlua_checknotcomplex(L, 2, dst_image);
     luaL_argcheck(L, dst_image->data_type != IM_BYTE,
-      2, "source image is ushort, destiny can NOT be byte.");
+      2, "source image is ushort, target can NOT be byte.");
     break;
   case IM_INT:
     imlua_checknotcomplex(L, 2, dst_image);
     luaL_argcheck(L, dst_image->data_type >= IM_INT,
-      2, "source image is int, destiny can NOT be byte, short or ushort.");
+      2, "source image is int, target can NOT be byte, short or ushort.");
     break;
   case IM_FLOAT:
     imlua_checkreal(L, 2, dst_image);
@@ -2016,7 +2016,7 @@ static int imluaProcessArithmeticOp (lua_State *L)
   case IM_CFLOAT:
     luaL_argcheck(L,
       dst_image->data_type == IM_CFLOAT,
-      2, "source image is float complex, destiny image data type can be float complex only.");
+      2, "source image is float complex, target image data type can be float complex only.");
     break;
   case IM_DOUBLE:
     imlua_checkreal(L, 2, dst_image);
@@ -2024,7 +2024,7 @@ static int imluaProcessArithmeticOp (lua_State *L)
   case IM_CDOUBLE:
     luaL_argcheck(L,
       dst_image->data_type == IM_CDOUBLE,
-      2, "source image is double complex, destiny image data type can be double complex only.");
+      2, "source image is double complex, target image data type can be double complex only.");
     break;
   }
 
@@ -2064,7 +2064,7 @@ static int imluaProcessArithmeticConstOp (lua_State *L)
   case IM_CFLOAT:
     luaL_argcheck(L,
       dst_image->data_type == IM_CFLOAT,
-      2, "source image is float complex, destiny image data type can be float complex only.");
+      2, "source image is float complex, target image data type can be float complex only.");
     break;
   case IM_DOUBLE:
     imlua_checkreal(L, 2, dst_image);
@@ -2072,7 +2072,7 @@ static int imluaProcessArithmeticConstOp (lua_State *L)
   case IM_CDOUBLE:
     luaL_argcheck(L,
       dst_image->data_type == IM_CDOUBLE,
-      2, "source image is double complex, destiny image data type can be double complex only.");
+      2, "source image is double complex, target image data type can be double complex only.");
     break;
   }
 
@@ -2450,7 +2450,7 @@ static int imluaProcessSplitComponents (lua_State *L)
   if (dst_count != src_depth)
   {
     free(dst_image_list);
-    luaL_error(L, "number of destiny images must match the depth of the source image");
+    luaL_error(L, "number of target images must match the depth of the source image");
     return 0;
   }
 

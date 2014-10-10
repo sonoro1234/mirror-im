@@ -61,7 +61,7 @@ enum imCastMode
 /** Changes the image data type, using a complex2real conversion, 
  * a gamma factor, and an abssolute mode (modulus). \n
  * When demoting the data type the function will scan source for min/max values or use fixed values (cast_mode)
- * to scale the result according to the destiny range. \n
+ * to scale the result according to the target range. \n
  * Except complex to real that will use only the complex2real conversion. \n
  * Images must be of the same size and color mode. If data type is the same nothing is done. \n
  * Returns IM_ERR_NONE, IM_ERR_DATA or IM_ERR_COUNTER, see also \ref imErrorCodes. \n
