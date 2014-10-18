@@ -456,7 +456,7 @@ long* imPaletteUniform(void)
         *(ct++) = imColorEncode(red, green, blue);
       }
 
-  /* We initialize only 216 colors (6x6x6), rest 40 colors.*/
+  /* We initialized only 216 colors (6x6x6), rest 40 colors.*/
   /* Fill them with a gray scale palette.*/
   for (int lIndex = 6; lIndex < 246; lIndex += 6)
   {
