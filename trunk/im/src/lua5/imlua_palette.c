@@ -211,6 +211,12 @@ static int imluaPaletteBlackBody (lua_State *L)
   return 1;
 }
 
+static int imluaPaletteLinear(lua_State *L)
+{
+  imlua_pushpalette(L, imPaletteLinear(), 256);
+  return 1;
+}
+
 /*****************************************************************************\
  im.PaletteHighContrast
 \*****************************************************************************/
@@ -355,7 +361,8 @@ static const luaL_Reg impalette_lib[] = {
   {"PaletteBlueIce", imluaPaletteBlueIce },
   {"PaletteHotIron", imluaPaletteHotIron },
   {"PaletteBlackBody", imluaPaletteBlackBody },
-  {"PaletteHighContrast", imluaPaletteHighContrast },
+  { "PaletteLinear", imluaPaletteLinear },
+  { "PaletteHighContrast", imluaPaletteHighContrast },
   {"PaletteUniform", imluaPaletteUniform },
   {"PaletteUniformIndex", imluaPaletteUniformIndex },
   {"PaletteUniformIndexHalftoned", imluaPaletteUniformIndexHalftoned },

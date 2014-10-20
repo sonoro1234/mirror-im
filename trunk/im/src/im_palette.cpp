@@ -388,8 +388,9 @@ long* imPaletteHighContrast(void)
   long* palette = (long*)malloc(sizeof(long)*256);
   long* ct = palette;
   int lIndex;
+#define NUM_HC 128
 
-  static struct{unsigned char r, g, b;} HighContrastColors[65] = {
+  static struct{ unsigned char r, g, b; } HighContrastColors[NUM_HC] = {
     { 0,0,0 },     
 
     { 255,0,0 },      { 128,0,0 },      { 64,0,0 },       { 192,0,0 },
@@ -414,15 +415,31 @@ long* imPaletteHighContrast(void)
     { 128,64,128 },   { 128,192,128 },   
     { 64,128,128 },   { 192,128,128 },   
     
-    { 192,64,64 },
-    { 64,192,64 },  
-    { 64,64,192 },  
-    { 192,192,64 }, 
-    { 192,64,192 }, 
-    { 64,192,192 }, 
-  };
+   { 160,0,0 },      { 32,0,0 },       { 224,0,0 },       { 96,0,0 },    
+   { 0,160,0 },      { 0,32,0 },       { 0,224,0 },       { 0,96,0 },    
+   { 0,0,160 },      { 0,0,32 },       { 0,0,224 },       { 0,0,96 },    
+   { 160,160,0 },    { 32,32,0 },      { 224,224,0 },     { 96,96,0 },   
+   { 160,0,160 },    { 32,0,32 },      { 224,0,224 },     { 96,0,96 },   
+   { 0,160,160 },    { 0,32,32 },      { 0,224,224 },     { 0,96,96 },   
+   { 160,160,160 },  { 32,32,32 },     { 224,224,224 },   { 96,96,96 },  
 
-  for (lIndex = 0; lIndex < 65; lIndex++)
+    { 255,160,160 },  { 32,255,255 },   { 224,255,255 },     { 96,255,255 },  
+    { 160,255,160 },  { 255,32,255 },   { 255,224,255 },     { 255,96,255 },   
+    { 160,160,255 },  { 255,255,32 },   { 255,255,224 },     { 255,255,96 },   
+    { 255,255,160 },  { 32,32,255 },    { 224,224,255 },     { 96,96,255 },   
+    { 255,160,255 },  { 32,255,32 },    { 224,255,224 },     { 96,255,96 },   
+    { 160,255,255 },  { 255,32,32 },    { 255,224,224 },     { 255,96,96 },  
+
+    { 128,32,32 },    { 64,192,192 },      { 64,224,224 },
+    { 32,128,32 },    { 192,64,192 },      { 224,64,224 },
+    { 32,32,128 },    { 192,192,64 },      { 224,224,64 },
+    { 128,128,32 },   { 64,64,192 },       { 64,64,224 }, 
+    { 128,32,128 },   { 64,192,64 },       { 64,224,64 }, 
+    { 32,128,128 },   { 192,64,64 },       
+
+ };
+
+  for (lIndex = 0; lIndex < NUM_HC; lIndex++)
   {
     *(ct++) = imColorEncode(HighContrastColors[lIndex].r, 
                             HighContrastColors[lIndex].g, 
@@ -431,8 +448,44 @@ long* imPaletteHighContrast(void)
 
   for (; lIndex < 256; lIndex++)
   {
-    *(ct++) = imColorEncode((imbyte)lIndex, (imbyte)lIndex, (imbyte)lIndex);
+    *(ct++) = imColorEncode(HighContrastColors[lIndex - NUM_HC].r,
+                            HighContrastColors[lIndex - NUM_HC].g, 
+                            HighContrastColors[lIndex - NUM_HC].b);
   }
+
+  return palette;
+}
+
+long* imPaletteLinear(void)
+{
+  long* palette = (long*)malloc(sizeof(long) * 256);
+  long* ct = palette;
+  int lIndex, lHue;
+  unsigned char r, g, b;
+
+  for (lIndex = 0; lIndex < 256; lIndex += 8)
+  {
+    float intensity = lIndex / 256.0f;
+
+    for (lHue = 0; lHue < 8; lHue++)
+    {
+      float hue = (lHue * 360.0f) / 8.0f;
+
+      imColorHSI2RGBbyte(hue, 1.0f, intensity, &r, &g, &b);
+
+      *(ct++) = imColorEncode(r, g, b);
+    }
+  }
+
+#if 0
+  for (lIndex = 0; lIndex < 256; lIndex++)
+  {
+    float norm = (float)lIndex / 256.0f;
+    imColorHSI2RGBbyte(norm * 360, 1.0f, norm, &r, &g, &b);
+
+    *(ct++) = imColorEncode(r, g, b);
+  }
+#endif
 
   return palette;
 }
