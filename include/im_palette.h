@@ -142,11 +142,18 @@ long* imPaletteBlackBody(void);
  * \ingroup palette */
 long* imPaletteHighContrast(void);
 
-/** Creates a palette of an uniform range of colors from black to white.
- *  This is a 2^(2.6) bits per pixel palette.
+/** Creates a palette of a sequence of colors from black to white 
+ *  with 32 linear intensity values combined with 8 hue variations.
  *
- * \verbatim im.PaletteUniform() -> pal: imPalette [in Lua 5] \endverbatim
+ * \verbatim im.PaletteLinear() -> pal: imPalette [in Lua 5] \endverbatim
  * \ingroup palette */
+long* imPaletteLinear(void);
+
+/** Creates a palette of an uniform sub-division of colors from black to white.
+*  This is a 2^(2.6) bits per pixel palette.
+*
+* \verbatim im.PaletteUniform() -> pal: imPalette [in Lua 5] \endverbatim
+* \ingroup palette */
 long* imPaletteUniform(void);
 
 /** Returns the index of the correspondent RGB color of an uniform palette.

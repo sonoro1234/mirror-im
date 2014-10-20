@@ -55,6 +55,7 @@ EXPORTS
   imPaletteRainbow
   imPaletteRed
   imPaletteUniform
+  imPaletteLinear
   imPaletteYellow
   imPaletteHighContrast
   imFormatRegister
