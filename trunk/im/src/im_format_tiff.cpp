@@ -397,7 +397,7 @@ static void iTIFFReadCustomTags(TIFF* tiff, imAttribTable* attrib_table)
         if (data)
         {
           if (fld->field_type == TIFF_ASCII && data_count == -1)
-            data_count = strlen((char*)data)+1;
+            data_count = (int)strlen((char*)data)+1;
 
           if (data_count > 0)
           {
@@ -507,7 +507,7 @@ static void iTIFFReadAttributes(TIFF* tiff, imAttribTable* attrib_table)
     TIFFGetField(tiff, TIFFTAG_NUMBEROFINKS, &numinks);
     int inknameslen = 0;
     for (int k = 0; k < (int)numinks; k++)
-      inknameslen += strlen(inknames+inknameslen)+1;
+      inknameslen += (int)strlen(inknames + inknameslen) + 1;
     attrib_table->Set("InkNames", IM_BYTE, inknameslen, inknames);
   }
 
@@ -584,16 +584,19 @@ static void iTIFFWriteAttributes(TIFF* tiff, imAttribTable* attrib_table)
 class imFileFormatTIFF: public imFileFormatBase
 {
   TIFF* tiff;
+
   int invert,      // must invert black and white reference
-      cpx_int,     // original data is a complex integer
-      lab_fix,     // convert CIE Lab to unsigned
-      extra_sample_size, // eliminate extra samples if more than one
-      sample_size,
-      h_subsample, v_subsample,
-      start_plane; // first band to read in a multiband image
+      lab_fix;     // convert CIE Lab to unsigned
+
+  int cpx_int,     // original data is a complex integer (when reading)
+      extra_sample_size, // extra samples fix, eliminate if more than one (when reading)
+      sample_size_no_extra, // extra samples fix (when reading)
+      h_subsample, v_subsample, // (when reading)
+      start_plane; // first band to read in a multiband image (when reading)
 
   void** tile_buf;
-  int tile_buf_count, tile_width, tile_height, start_row, tile_line_size, tile_line_raw_size;
+  int tile_buf_count, tile_width, tile_height, 
+      tile_start_row, tile_line_size, tile_line_raw_size;
 
   int ReadTileline(void* line_buffer, int row, int plane);
   void InvertBits(void* line_buffer, int size);
@@ -655,7 +658,7 @@ int imFileFormatTIFF::Open(const char* file_name)
   strcpy(this->compression, iTIFFCompTable[comp_index]);
 
   this->image_count = TIFFNumberOfDirectories(this->tiff);
-  this->tile_buf = 0;
+  this->tile_buf = NULL;
   this->start_plane = 0;
 
   return IM_ERR_NONE;
@@ -667,7 +670,7 @@ int imFileFormatTIFF::New(const char* file_name)
   if (this->tiff == NULL)
     return IM_ERR_OPEN;
 
-  this->tile_buf = 0;
+  this->tile_buf = NULL;
 
   return IM_ERR_NONE;
 }
@@ -703,6 +706,7 @@ int imFileFormatTIFF::ReadImageInfo(int index)
   this->invert = 0;
   this->lab_fix = 0;
   this->extra_sample_size = 0;
+  this->sample_size_no_extra = 0;
   this->h_subsample = 1;
   this->v_subsample = 1;
 
@@ -870,7 +874,7 @@ int imFileFormatTIFF::ReadImageInfo(int index)
   else if ((ExtraSamples > 1) && (PlanarConfig == PLANARCONFIG_CONTIG))
   {
     /* usually a multi band image, we read only one band */
-    this->sample_size = (BitsPerSample*(SamplesPerPixel-ExtraSamples) + 7)/8; 
+    this->sample_size_no_extra = (BitsPerSample*(SamplesPerPixel-ExtraSamples) + 7)/8; 
     this->extra_sample_size = (BitsPerSample*SamplesPerPixel + 7)/8;
 
     /* add space for the line buffer (this is more than necessary) */
@@ -986,10 +990,10 @@ int imFileFormatTIFF::ReadImageInfo(int index)
       this->tile_buf_count *= SamplesPerPixel;
     this->tile_line_size = TIFFTileRowSize(this->tiff);
     this->tile_line_raw_size = TIFFScanlineSize(this->tiff);
-    this->start_row = 0;
+    this->tile_start_row = 0;
 
     this->tile_buf = (void**)malloc(sizeof(void*)*this->tile_buf_count);
-    int tile_size = TIFFTileSize(this->tiff);
+    size_t tile_size = TIFFTileSize(this->tiff);
     for (int t = 0; t < this->tile_buf_count; t++)
       this->tile_buf[t] = malloc(tile_size);
   }
@@ -1030,7 +1034,9 @@ int imFileFormatTIFF::WriteImageInfo()
 {
   this->file_color_mode = this->user_color_mode;
   this->file_data_type = this->user_data_type;
+
   this->lab_fix = 0;
+  this->invert = 0;
 
   uint16 Compression = iTIFFCompCalc(this->compression, this->file_color_mode, this->file_data_type);
   if (Compression == (uint16)-1)
@@ -1134,6 +1140,8 @@ int imFileFormatTIFF::WriteImageInfo()
     SAMPLEFORMAT_UINT,  
     SAMPLEFORMAT_INT,     
     SAMPLEFORMAT_IEEEFP,  
+    SAMPLEFORMAT_IEEEFP,
+    SAMPLEFORMAT_COMPLEXIEEEFP,
     SAMPLEFORMAT_COMPLEXIEEEFP
   };
   uint16 SampleFormat = datatype2format[this->file_data_type];
@@ -1165,17 +1173,20 @@ int imFileFormatTIFF::WriteImageInfo()
   if (imColorModeSpace(this->file_color_mode) == IM_MAP)
   {
     uint16 rmap[256], gmap[256], bmap[256];
-    memset(rmap, 0, 256 * 2);
-    memset(gmap, 0, 256 * 2);
-    memset(bmap, 0, 256 * 2);
+    memset(rmap, 0, 256 * sizeof(uint16));
+    memset(gmap, 0, 256 * sizeof(uint16));
+    memset(bmap, 0, 256 * sizeof(uint16));
 
     unsigned char r, g, b;
     for (int c = 0; c < this->palette_count; c++)
     {
       imColorDecode(&r, &g, &b, this->palette[c]);
-      rmap[c] = (uint16)(((uint16)r) << 8);
-      gmap[c] = (uint16)(((uint16)g) << 8);
-      bmap[c] = (uint16)(((uint16)b) << 8);
+      rmap[c] = r;
+      gmap[c] = g;
+      bmap[c] = b;
+      rmap[c] <<= 8;
+      gmap[c] <<= 8;
+      bmap[c] <<= 8;
     }
 
     TIFFSetField(this->tiff, TIFFTAG_COLORMAP, rmap, gmap, bmap);
@@ -1220,12 +1231,12 @@ static void iTIFFExpandComplexInt(void* line_buffer, int count, int cpx_int)
   }
 }
 
-static void iTIFFExtraSamplesFix(unsigned char* line_buffer, int width, int sample_size, int extra_sample_size, int plane)
+static void iTIFFExtraSamplesFix(unsigned char* line_buffer, int width, int sample_size_no_extra, int extra_sample_size, int plane)
 {
   /* ignore all the other extra samples, here the samples are packed */
   for (int i = 1; i < width; i++)
   {
-    memcpy(line_buffer + i*sample_size, line_buffer + i*extra_sample_size + plane, sample_size);
+    memcpy(line_buffer + i*sample_size_no_extra, line_buffer + i*extra_sample_size + plane, sample_size_no_extra);
   }
 }
 
@@ -1318,18 +1329,18 @@ int imFileFormatTIFF::ReadTileline(void* line_buffer, int row, int plane)
   int t;
 
   if (row == 0)
-    this->start_row = 0;
+    this->tile_start_row = 0;
 
-  if (row == this->start_row + this->tile_height)
-    this->start_row = row;
+  if (row == this->tile_start_row + this->tile_height)
+    this->tile_start_row = row;
 
   // load a line of tiles
-  if (row == this->start_row)
+  if (row == this->tile_start_row)
   {
     int x = 0;
     for (t = 0; t < this->tile_buf_count; t++)
     {
-      if (TIFFReadTile(this->tiff, this->tile_buf[t], x, start_row, 0, (tsample_t)plane) <= 0)
+      if (TIFFReadTile(this->tiff, this->tile_buf[t], x, tile_start_row, 0, (tsample_t)plane) <= 0)
         return -1;
 
       x += this->tile_width;
@@ -1337,7 +1348,7 @@ int imFileFormatTIFF::ReadTileline(void* line_buffer, int row, int plane)
   }
 
   int line_size = this->tile_line_size;
-  int tile_line = row - this->start_row;
+  int tile_line = row - this->tile_start_row;
 
   for (t = 0; t < this->tile_buf_count; t++)
   {
@@ -1456,7 +1467,7 @@ int imFileFormatTIFF::ReadImageData(void* data)
       iTIFFLabFix(this->line_buffer, this->width, this->file_data_type, 0);
 
     if (this->extra_sample_size)
-      iTIFFExtraSamplesFix((imbyte*)this->line_buffer, this->width, this->sample_size, this->extra_sample_size, plane);
+      iTIFFExtraSamplesFix((imbyte*)this->line_buffer, this->width, this->sample_size_no_extra, this->extra_sample_size, plane);
 
     imFileLineBufferRead(this, data, row, plane);
 
