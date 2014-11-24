@@ -30,12 +30,17 @@ SRCTIFF = \
 SRCTIFF  := $(addprefix libtiff/, $(SRCTIFF)) im_format_tiff.cpp
 INCLUDES += libtiff 
 
+LIBPNG := libpng
+ifdef USE_OLD_LIBPNG
+  LIBPNG := libpng12
+endif
+
 SRCPNG = \
     png.c       pngget.c    pngread.c   pngrutil.c  pngwtran.c  \
     pngerror.c  pngmem.c    pngrio.c    pngset.c    pngwio.c    \
     pngpread.c  pngrtran.c  pngtrans.c  pngwrite.c  pngwutil.c
-SRCPNG := $(addprefix libpng/, $(SRCPNG)) im_format_png.cpp
-INCLUDES += libpng
+SRCPNG := $(addprefix $(LIBPNG)/, $(SRCPNG)) im_format_png.cpp
+INCLUDES += $(LIBPNG)
 
 SRCJPEG = \
     jcapimin.c  jcmarker.c  jdapimin.c  jdinput.c   jdtrans.c   \
