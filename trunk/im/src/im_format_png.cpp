@@ -342,7 +342,12 @@ void imFileFormatPNG::iReadAttrib(imAttribTable* attrib_table)
 
   png_charp name;
   int compression_type;
+
+#if (PNG_LIBPNG_VER < 10500)
+  png_charp profile;
+#else
   png_bytep profile;
+#endif
   png_uint_32 proflen;
   if (png_get_iCCP(png_ptr, info_ptr, &name, &compression_type, &profile, &proflen))
     attrib_table->Set("ICCProfile", IM_BYTE, proflen, profile);
@@ -579,7 +584,11 @@ void imFileFormatPNG::iWriteAttrib(imAttribTable* attrib_table)
   attrib_data = attrib_table->Get("ICCProfile", NULL, &proflen);
   if (attrib_data)
   {
+#if (PNG_LIBPNG_VER < 10500)
+    png_charp profile = (png_charp)attrib_data;
+#else
     png_bytep profile = (png_bytep)attrib_data;
+#endif
     png_set_iCCP(png_ptr, info_ptr, "ICC Profile", 0, profile, proflen);
   }
 
