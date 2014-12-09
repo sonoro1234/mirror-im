@@ -2,17 +2,7 @@
 
 require"imlua"
 require"imlua_wmv"
-
-err_msg = {
-  "No error.",
-  "Error while opening the file.",
-  "Error while accessing the file.",
-  "Invalid or unrecognized file format.",
-  "Invalid or unsupported data.",
-  "Invalid or unsupported compression.",
-  "Insuficient memory",
-  "Interrupted by the counter",
-}
+--require"imlua_avi"
 
 -- Margin parameters
 new_filename = arg[1]
@@ -26,18 +16,19 @@ function ProcessImageFile(file_name, ifile)
   local image, err = im.FileImageLoad(file_name);
   if (err and err ~= im.ERR_NONE) then
     ifile:Close()
-    error(err_msg[err+1])
+    error(im.ErrorStr(err))
   end
 
   err = ifile:SaveImage(image)
   if (err and err ~= im.ERR_NONE) then
     ifile:Close()
-    error(err_msg[err+1])
+    error(im.ErrorStr(err))
   end
 
   image:Destroy()
 end
 
+--ifile = im.FileNew(new_filename, "AVI")
 ifile = im.FileNew(new_filename, "WMV")
 
 ifile:SetAttribute("FPS", im.FLOAT, {15}) -- Frames per second
