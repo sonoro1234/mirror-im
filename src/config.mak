@@ -30,6 +30,10 @@ SRCTIFF = \
 SRCTIFF  := $(addprefix libtiff/, $(SRCTIFF)) im_format_tiff.cpp
 INCLUDES += libtiff 
 
+ifdef USE_GTK3
+  USE_OLD_LIBPNG = Yes
+endif
+
 LIBPNG := libpng
 ifdef USE_OLD_LIBPNG
   LIBPNG := libpng12
