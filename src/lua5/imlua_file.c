@@ -120,7 +120,7 @@ static int imluaFileNewRaw (lua_State *L)
 \*****************************************************************************/
 static int imluaFileHandle (lua_State *L)
 {
-  lua_pushlightuserdata(L, imFileHandle(imlua_checkfile(L, 1), luaL_checkint(L, 2)));
+  lua_pushlightuserdata(L, imFileHandle(imlua_checkfile(L, 1), luaL_checkinteger(L, 2)));
   return 1;
 }
 
@@ -130,7 +130,7 @@ static int imluaFileHandle (lua_State *L)
 static int imluaFileLoadImage (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  int index = luaL_optint(L, 2, 0);
+  int index = luaL_optinteger(L, 2, 0);
   int error;
   imImage *image = imFileLoadImage(ifile, index, &error);
   return imlua_pushimageerror(L, image, error);
@@ -142,7 +142,7 @@ static int imluaFileLoadImage (lua_State *L)
 static int imluaFileLoadImageFrame (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  int index = luaL_checkint(L, 2);
+  int index = luaL_checkinteger(L, 2);
   imImage *image = imlua_checkimage(L, 3);
   int error;
 
@@ -158,14 +158,14 @@ static int imluaFileLoadImageFrame (lua_State *L)
 static int imluaFileLoadImageRegion (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  int index = luaL_checkint(L, 2);
-  int bitmap = luaL_checkint(L, 3);
-  int xmin = luaL_checkint(L, 4);
-  int xmax = luaL_checkint(L, 5);
-  int ymin = luaL_checkint(L, 6);
-  int ymax = luaL_checkint(L, 7);
-  int width = luaL_checkint(L, 8);
-  int height = luaL_checkint(L, 9);
+  int index = luaL_checkinteger(L, 2);
+  int bitmap = luaL_checkinteger(L, 3);
+  int xmin = luaL_checkinteger(L, 4);
+  int xmax = luaL_checkinteger(L, 5);
+  int ymin = luaL_checkinteger(L, 6);
+  int ymax = luaL_checkinteger(L, 7);
+  int width = luaL_checkinteger(L, 8);
+  int height = luaL_checkinteger(L, 9);
   int error;
   imImage *image = imFileLoadImageRegion(ifile, index, bitmap, &error, xmin, xmax, ymin, ymax, width, height);
   return imlua_pushimageerror(L, image, error);
@@ -177,7 +177,7 @@ static int imluaFileLoadImageRegion (lua_State *L)
 static int imluaFileLoadBitmap (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  int index = luaL_optint(L, 2, 0);
+  int index = luaL_optinteger(L, 2, 0);
   int error;
   imImage *image = imFileLoadBitmap(ifile, index, &error);
   return imlua_pushimageerror(L, image, error);
@@ -189,7 +189,7 @@ static int imluaFileLoadBitmap (lua_State *L)
 static int imluaFileLoadBitmapFrame (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  int index = luaL_checkint(L, 2);
+  int index = luaL_checkinteger(L, 2);
   imImage *image = imlua_checkimage(L, 3);
   int error;
 
@@ -254,7 +254,7 @@ static int imluaFileSetAttribute (lua_State *L)
 
   imFile *ifile = imlua_checkfile(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int data_type = luaL_checkint(L, 3);
+  int data_type = luaL_checkinteger(L, 3);
 
   if (!lua_isnil(L, 4))
   {
@@ -284,7 +284,7 @@ static int imluaFileSetAttribute (lua_State *L)
           for (i = 0; i < count; i++)
           {
             lua_rawgeti(L, 4, i+1);
-            d[i] = (imbyte) luaL_checkint(L, -1);
+            d[i] = (imbyte) luaL_checkinteger(L, -1);
             lua_pop(L, 1);
           }
         }
@@ -297,7 +297,7 @@ static int imluaFileSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          d[i] = (short) luaL_checkint(L, -1);
+          d[i] = (short) luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -309,7 +309,7 @@ static int imluaFileSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          d[i] = (imushort) luaL_checkint(L, -1);
+          d[i] = (imushort) luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -321,7 +321,7 @@ static int imluaFileSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          d[i] = luaL_checkint(L, -1);
+          d[i] = luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -402,8 +402,8 @@ static int imluaFileSetAttribInteger(lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int data_type = luaL_checkint(L, 3);
-  int value = luaL_checkint(L, 4);
+  int data_type = luaL_checkinteger(L, 3);
+  int value = luaL_checkinteger(L, 4);
   imFileSetAttribInteger(ifile, attrib, data_type, value);
   return 0;
 }
@@ -412,7 +412,7 @@ static int imluaFileSetAttribReal(lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int data_type = luaL_checkint(L, 3);
+  int data_type = luaL_checkinteger(L, 3);
   double value = luaL_checknumber(L, 4);
   imFileSetAttribReal(ifile, attrib, data_type, value);
   return 0;
@@ -560,7 +560,7 @@ static int imluaFileGetAttribInteger(lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int index = luaL_optint(L, 3, 0);
+  int index = luaL_optinteger(L, 3, 0);
   int value = imFileGetAttribInteger(ifile, attrib, index);
   lua_pushinteger(L, value);
   return 1;
@@ -570,7 +570,7 @@ static int imluaFileGetAttribReal(lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int index = luaL_optint(L, 3, 0);
+  int index = luaL_optinteger(L, 3, 0);
   double value = imFileGetAttribReal(ifile, attrib, index);
   lua_pushnumber(L, value);
   return 1;
@@ -645,7 +645,7 @@ static int imluaFileReadImageInfo (lua_State *L)
   int error;
 
   imFile *ifile = imlua_checkfile(L, 1);
-  int index = luaL_optint(L, 2, 0);
+  int index = luaL_optinteger(L, 2, 0);
 
   error = imFileReadImageInfo(ifile, index, &width, &height, &file_color_mode, &file_data_type);
 
@@ -666,10 +666,10 @@ static int imluaFileReadImageInfo (lua_State *L)
 static int imluaFileWriteImageInfo (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  int width = luaL_checkint(L, 2);
-  int height = luaL_checkint(L, 3);
-  int user_color_mode = luaL_checkint(L, 4);
-  int user_data_type = luaL_checkint(L, 5);
+  int width = luaL_checkinteger(L, 2);
+  int height = luaL_checkinteger(L, 3);
+  int user_color_mode = luaL_checkinteger(L, 4);
+  int user_data_type = luaL_checkinteger(L, 5);
 
   imlua_pusherror(L, imFileWriteImageInfo(ifile, width, height, user_color_mode, user_data_type));
   return 1;
@@ -683,7 +683,7 @@ static int imluaFileReadImageData (lua_State *L)
   imFile *ifile = imlua_checkfile(L, 1);
   void* data = lua_touserdata(L, 2);
   int convert2bitmap = lua_toboolean(L, 3);
-  int color_mode_flags = luaL_checkint(L, 4);
+  int color_mode_flags = luaL_checkinteger(L, 4);
   imlua_pusherror(L, imFileReadImageData(ifile, data, convert2bitmap, color_mode_flags));
   return 1;
 }

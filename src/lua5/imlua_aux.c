@@ -103,7 +103,7 @@ int *imlua_toarrayintopt(lua_State *L, int index, int *count, int start)
     for (i = 0; i < n; i++)
     {
       lua_rawgeti(L, index, i+start);
-      value[i] = luaL_checkint(L, -1);
+      value[i] = luaL_checkinteger(L, -1);
       lua_pop(L, 1);
     }
   }
@@ -139,7 +139,7 @@ unsigned long *imlua_toarrayulongopt(lua_State *L, int index, int *count, int st
     for (i = 0; i < n; i++)
     {
       lua_rawgeti(L, index, i+start);
-      value[i] = luaL_checkint(L, -1);
+      value[i] = luaL_checkinteger(L, -1);
       lua_pop(L, 1);
     }
   }

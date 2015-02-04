@@ -28,21 +28,27 @@ im_lzo:
 imlua5:
 	@$(TECMAKE_CMD) MF=imlua5 USE_LUA51=Yes
 	@$(TECMAKE_CMD) MF=imlua5 USE_LUA52=Yes
+	@$(TECMAKE_CMD) MF=imlua5 USE_LUA53=Yes
 imlua_jp2:
 	@$(TECMAKE_CMD) MF=imlua_jp2 USE_LUA51=Yes
 	@$(TECMAKE_CMD) MF=imlua_jp2 USE_LUA52=Yes
+	@$(TECMAKE_CMD) MF=imlua_jp2 USE_LUA53=Yes
 imlua_avi:
 	@$(TECMAKE_CMD) MF=imlua_avi USE_LUA51=Yes
 	@$(TECMAKE_CMD) MF=imlua_avi USE_LUA52=Yes
+	@$(TECMAKE_CMD) MF=imlua_avi USE_LUA53=Yes
 imlua_process5:
 	@$(TECMAKE_CMD) MF=imlua_process5 USE_LUA51=Yes
 	@$(TECMAKE_CMD) MF=imlua_process5 USE_LUA52=Yes
+	@$(TECMAKE_CMD) MF=imlua_process5 USE_LUA53=Yes
 imlua_process_omp5:
 	@$(TECMAKE_CMD) MF=imlua_process5 USE_OPENMP=Yes USE_LUA51=Yes
 	@$(TECMAKE_CMD) MF=imlua_process5 USE_OPENMP=Yes USE_LUA52=Yes
+	@$(TECMAKE_CMD) MF=imlua_process5 USE_OPENMP=Yes USE_LUA53=Yes
 imlua_fftw5:
 	@$(TECMAKE_CMD) MF=imlua_fftw5 USE_LUA51=Yes
 	@$(TECMAKE_CMD) MF=imlua_fftw5 USE_LUA52=Yes
+	@$(TECMAKE_CMD) MF=imlua_fftw5 USE_LUA53=Yes
   
 # WMV and Capture are NOT available in some compilers,
 # so this may result in errors, just ignore them.
@@ -51,11 +57,13 @@ im_wmv:
 imlua_wmv:
 	@$(TECMAKE_CMD) MF=imlua_wmv USE_LUA51=Yes 
 	@$(TECMAKE_CMD) MF=imlua_wmv USE_LUA52=Yes 
+	@$(TECMAKE_CMD) MF=imlua_wmv USE_LUA53=Yes 
 im_capture:
 	@$(TECMAKE_CMD) MF=im_capture
 imlua_capture5:
 	@$(TECMAKE_CMD) MF=imlua_capture5 USE_LUA51=Yes 
 	@$(TECMAKE_CMD) MF=imlua_capture5 USE_LUA52=Yes 
+	@$(TECMAKE_CMD) MF=imlua_capture5 USE_LUA53=Yes 
 
 imlua3:
 	@$(TECMAKE_CMD) MF=imlua3

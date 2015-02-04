@@ -323,7 +323,11 @@ function im.ProcessSplitComponentsNew (src_image)
     table.insert(dst_images, dst_image_i)
   end
   im.ProcessSplitComponents(src_image, dst_images)
-  return unpack(dst_images) --must replace this by table.unpack when 5.1 is not supported
+  if (table.unpack) then 
+    return table.unpack(dst_images)
+  else
+    return unpack(dst_images)
+  end
 end
 
 function im.ProcessMergeComponentsNew (src_image_list)

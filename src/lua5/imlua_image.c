@@ -109,10 +109,10 @@ static imluaImageRow* imlua_checkimagerow (lua_State *L, int param)
 \*****************************************************************************/
 static int imluaImageCreate (lua_State *L)
 {
-  int width = luaL_checkint(L, 1);
-  int height = luaL_checkint(L, 2);
-  int color_space = luaL_checkint(L, 3);
-  int data_type = luaL_checkint(L, 4);
+  int width = luaL_checkinteger(L, 1);
+  int height = luaL_checkinteger(L, 2);
+  int color_space = luaL_checkinteger(L, 3);
+  int data_type = luaL_checkinteger(L, 4);
   imImage *image;
 
   if (!imImageCheckFormat(color_space, data_type))
@@ -156,7 +156,7 @@ static int imluaImageSetPixels(lua_State *L)
     }
     else
     {
-      int value = luaL_checkint(L, -1);
+      int value = luaL_checkinteger(L, -1);
 
       switch (image->data_type)
       {
@@ -262,9 +262,9 @@ static int imluaImageGetPixels(lua_State *L)
 \*****************************************************************************/
 static int imluaImageCreateFromOpenGLData (lua_State *L)
 {
-  int width = luaL_checkint(L, 1);
-  int height = luaL_checkint(L, 2);
-  int glformat = luaL_checkint(L, 3);
+  int width = luaL_checkinteger(L, 1);
+  int height = luaL_checkinteger(L, 2);
+  int glformat = luaL_checkinteger(L, 3);
   void* gldata = lua_touserdata(L, 4);
   imImage *image = imImageCreateFromOpenGLData(width, height, glformat, gldata);
   imlua_pushimage(L, image);
@@ -301,8 +301,8 @@ static int imluaImageSetAlpha (lua_State *L)
 static int imluaImageReshape (lua_State *L)
 {
   imImage* image = imlua_checkimage(L, 1);
-  int width = luaL_checkint(L, 2);
-  int height = luaL_checkint(L, 3);
+  int width = luaL_checkinteger(L, 2);
+  int height = luaL_checkinteger(L, 3);
 
   imImageReshape(image, width, height);
   return 0;
@@ -340,9 +340,9 @@ static int imluaImageCopyData (lua_State *L)
 static int imluaImageCopyPlane(lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
-  int src_plane = luaL_checkint(L, 2);
+  int src_plane = luaL_checkinteger(L, 2);
   imImage* dst_image = imlua_checkimage(L, 3);
-  int dst_plane = luaL_checkint(L, 4);
+  int dst_plane = luaL_checkinteger(L, 4);
   int src_depth, dst_depth;
 
   imlua_matchdatatype(L, src_image, dst_image);
@@ -391,7 +391,7 @@ static int imluaImageSetAttribute (lua_State *L)
 
   imImage* image = imlua_checkimage(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int data_type = luaL_checkint(L, 3);
+  int data_type = luaL_checkinteger(L, 3);
 
   if (!lua_isnil(L, 4))
   {
@@ -421,7 +421,7 @@ static int imluaImageSetAttribute (lua_State *L)
           for (i = 0; i < count; i++)
           {
             lua_rawgeti(L, 4, i+1);
-            data_byte[i] = (imbyte)luaL_checkint(L, -1);
+            data_byte[i] = (imbyte)luaL_checkinteger(L, -1);
             lua_pop(L, 1);
           }
         }
@@ -434,7 +434,7 @@ static int imluaImageSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          data_short[i] = (short)luaL_checkint(L, -1);
+          data_short[i] = (short)luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -446,7 +446,7 @@ static int imluaImageSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          data_ushort[i] = (imushort)luaL_checkint(L, -1);
+          data_ushort[i] = (imushort)luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -458,7 +458,7 @@ static int imluaImageSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          data_int[i] = luaL_checkint(L, -1);
+          data_int[i] = luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -540,8 +540,8 @@ static int imluaImageSetAttribInteger(lua_State *L)
 {
   imImage *iimage = imlua_checkimage(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int data_type = luaL_checkint(L, 3);
-  int value = luaL_checkint(L, 4);
+  int data_type = luaL_checkinteger(L, 3);
+  int value = luaL_checkinteger(L, 4);
   imImageSetAttribInteger(iimage, attrib, data_type, value);
   return 0;
 }
@@ -550,7 +550,7 @@ static int imluaImageSetAttribReal(lua_State *L)
 {
   imImage *iimage = imlua_checkimage(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int data_type = luaL_checkint(L, 3);
+  int data_type = luaL_checkinteger(L, 3);
   double value = luaL_checknumber(L, 4);
   imImageSetAttribReal(iimage, attrib, data_type, value);
   return 0;
@@ -699,7 +699,7 @@ static int imluaImageGetAttribInteger(lua_State *L)
 {
   imImage *iimage = imlua_checkimage(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int index = luaL_optint(L, 3, 0);
+  int index = luaL_optinteger(L, 3, 0);
   int value = imImageGetAttribInteger(iimage, attrib, index);
   lua_pushinteger(L, value);
   return 1;
@@ -709,7 +709,7 @@ static int imluaImageGetAttribReal(lua_State *L)
 {
   imImage *iimage = imlua_checkimage(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  int index = luaL_optint(L, 3, 0);
+  int index = luaL_optinteger(L, 3, 0);
   double value = imImageGetAttribReal(iimage, attrib, index);
   lua_pushnumber(L, value);
   return 1;
@@ -1017,7 +1017,7 @@ static int imluaImageHasAlpha(lua_State *L)
 static int imluaFileImageLoad (lua_State *L)
 {
   const char *filename = luaL_checkstring(L, 1);
-  int index = luaL_optint(L, 2, 0);
+  int index = luaL_optinteger(L, 2, 0);
   int error;
   imImage *image = imFileImageLoad(filename, index, &error);
   return imlua_pushimageerror(L, image, error);
@@ -1029,14 +1029,14 @@ static int imluaFileImageLoad (lua_State *L)
 static int imluaFileImageLoadRegion (lua_State *L)
 {
   const char *filename = luaL_checkstring(L, 1);
-  int index = luaL_checkint(L, 2);
-  int bitmap = luaL_checkint(L, 3);
-  int xmin = luaL_checkint(L, 4);
-  int xmax = luaL_checkint(L, 5);
-  int ymin = luaL_checkint(L, 6);
-  int ymax = luaL_checkint(L, 7);
-  int width = luaL_checkint(L, 8);
-  int height = luaL_checkint(L, 9);
+  int index = luaL_checkinteger(L, 2);
+  int bitmap = luaL_checkinteger(L, 3);
+  int xmin = luaL_checkinteger(L, 4);
+  int xmax = luaL_checkinteger(L, 5);
+  int ymin = luaL_checkinteger(L, 6);
+  int ymax = luaL_checkinteger(L, 7);
+  int width = luaL_checkinteger(L, 8);
+  int height = luaL_checkinteger(L, 9);
   int error;
   imImage *image = imFileImageLoadRegion(filename, index, bitmap, &error, xmin, xmax, ymin, ymax, width, height);
   return imlua_pushimageerror(L, image, error);
@@ -1048,7 +1048,7 @@ static int imluaFileImageLoadRegion (lua_State *L)
 static int imluaFileImageLoadBitmap (lua_State *L)
 {
   const char *filename = luaL_checkstring(L, 1);
-  int index = luaL_optint(L, 2, 0);
+  int index = luaL_optinteger(L, 2, 0);
   int error;
   imImage *image = imFileImageLoadBitmap(filename, index, &error);
   return imlua_pushimageerror(L, image, error);
@@ -1176,7 +1176,7 @@ static int imluaImageRow_index (lua_State *L)
   imImage *image = imagerow->image;
   int channel = imagerow->channel;
   int row = imagerow->row;
-  int column = luaL_checkint(L, 2);
+  int column = luaL_checkinteger(L, 2);
   void* channel_buffer = image->data[channel];
 
   if (column < 0 || column >= image->width)
@@ -1256,7 +1256,7 @@ static int imluaImageRow_newindex (lua_State *L)
   imImage *image = imagerow->image;
   int channel = imagerow->channel;
   int row = imagerow->row;
-  int column = luaL_checkint(L, 2);
+  int column = luaL_checkinteger(L, 2);
   void* channel_buffer = image->data[channel];
 
   if (column < 0 || column >= image->width)
@@ -1268,7 +1268,7 @@ static int imluaImageRow_newindex (lua_State *L)
   {
   case IM_BYTE:
     {
-      int value = luaL_checkint(L, 3);
+      int value = luaL_checkinteger(L, 3);
       imbyte *bdata = (imbyte*) channel_buffer;
       bdata[index] = (imbyte) value;
     }
@@ -1276,7 +1276,7 @@ static int imluaImageRow_newindex (lua_State *L)
 
   case IM_SHORT:
     {
-      int value = luaL_checkint(L, 3);
+      int value = luaL_checkinteger(L, 3);
       short *sdata = (short*) channel_buffer;
       sdata[index] = (short) value;
     }
@@ -1284,7 +1284,7 @@ static int imluaImageRow_newindex (lua_State *L)
 
   case IM_USHORT:
     {
-      int value = luaL_checkint(L, 3);
+      int value = luaL_checkinteger(L, 3);
       imushort *udata = (imushort*) channel_buffer;
       udata[index] = (imushort) value;
     }
@@ -1292,7 +1292,7 @@ static int imluaImageRow_newindex (lua_State *L)
 
   case IM_INT:
     {
-      int value = luaL_checkint(L, 3);
+      int value = luaL_checkinteger(L, 3);
       int *idata = (int*) channel_buffer;
       idata[index] = (int) value;
     }
@@ -1358,7 +1358,7 @@ static int imluaImageRow_newindex (lua_State *L)
 static int imluaImageChannel_index (lua_State *L)
 {
   imluaImageChannel *imagechannel = imlua_checkimagechannel(L, 1);
-  int row = luaL_checkint(L, 2);
+  int row = luaL_checkinteger(L, 2);
 
   if (row < 0 || row >= imagechannel->image->height)
     luaL_argerror(L, 2, "invalid row, out of bounds");
@@ -1377,7 +1377,7 @@ static int imluaImage_index (lua_State *L)
   if (lua_isnumber(L, 2))
   {
     /* handle numeric indexing */
-    int channel = luaL_checkint(L, 2);
+    int channel = luaL_checkinteger(L, 2);
 
     /* create channel */
     int depth = image->has_alpha? image->depth+1: image->depth;
