@@ -66,7 +66,7 @@ static int imluaPaletteCreate(lua_State *L)
 {
   long* color;
 
-  int count = luaL_optint(L, 1, 256);
+  int count = luaL_optinteger(L, 1, 256);
   if (count < 1 || count > 256)
     luaL_argerror(L, 1, "palette count should be a positive integer and less then 256");
 
@@ -97,7 +97,7 @@ static int imluaPaletteFindColor (lua_State *L)
 {
   imluaPalette *pal = imlua_checkpalette(L, 1);
   long color = (long)lua_touserdata(L, 2);
-  unsigned char tol = (unsigned char)luaL_checkint(L, 3);
+  unsigned char tol = (unsigned char)luaL_checkinteger(L, 3);
 
   lua_pushnumber(L, imPaletteFindColor(pal->color, pal->count, color, tol));
   return 1;
@@ -250,8 +250,8 @@ static int imluaPaletteUniformIndex (lua_State *L)
 static int imluaPaletteUniformIndexHalftoned (lua_State *L)
 {
   long color = (long)lua_touserdata(L, 1);
-  int x = luaL_checkint(L, 2);
-  int y = luaL_checkint(L, 3);
+  int x = luaL_checkinteger(L, 2);
+  int y = luaL_checkinteger(L, 3);
 
   lua_pushnumber(L, imPaletteUniformIndexHalftoned(color, x, y));
   return 1;
@@ -296,7 +296,7 @@ static int imluaPalette_gc(lua_State *L)
 static int imluaPalette_index(lua_State *L)
 {
   imluaPalette *pal = imlua_checkpalette(L, 1);
-  int index_i = luaL_checkint(L, 2);
+  int index_i = luaL_checkinteger(L, 2);
 
   if (index_i < 0 || index_i >= pal->count)
     luaL_argerror(L, 2, "index is out of bounds");
@@ -312,7 +312,7 @@ static int imluaPalette_newindex(lua_State *L)
 {
   long color_i;
   imluaPalette *pal = imlua_checkpalette(L, 1);
-  int index_i = luaL_checkint(L, 2);
+  int index_i = luaL_checkinteger(L, 2);
 
   if (index_i < 0 || index_i >= pal->count)
     luaL_argerror(L, 2, "index is out of bounds");

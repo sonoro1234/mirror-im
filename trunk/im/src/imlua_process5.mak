@@ -20,12 +20,17 @@ DEFINES += IM_PROCESS
 INCLUDES = lua5
 LIBS = im_process
 
+ifdef USE_LUA53
+  LUASFX = 53
+  DEFINES += LUA_COMPAT_MODULE
+else
 ifdef USE_LUA52
   LUASFX = 52
   DEFINES += LUA_COMPAT_MODULE
 else
   USE_LUA51 = Yes
   LUASFX = 51
+endif
 endif
 
 ifdef USE_OPENMP

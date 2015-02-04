@@ -62,7 +62,7 @@ static int imluaVideoCaptureDeviceCount (lua_State *L)
 \*****************************************************************************/
 static int imluaVideoCaptureDeviceDesc (lua_State *L)
 {
-  lua_pushstring(L, imVideoCaptureDeviceDesc(luaL_checkint(L, 1)));
+  lua_pushstring(L, imVideoCaptureDeviceDesc(luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -100,7 +100,7 @@ static int imluaVideoCaptureCreate (lua_State *L)
 static int imluaVideoCaptureConnect (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int device = luaL_optint(L, 2, -1);
+  int device = luaL_optinteger(L, 2, -1);
   if (device == -1)
     lua_pushnumber(L, imVideoCaptureConnect(vc, device));
   else
@@ -132,7 +132,7 @@ static int imluaVideoCaptureDialogCount (lua_State *L)
 static int imluaVideoCaptureShowDialog (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int dialog = luaL_checkint(L, 2);
+  int dialog = luaL_checkinteger(L, 2);
   void *parent = lua_touserdata(L, 3); 
 
   lua_pushboolean(L, imVideoCaptureShowDialog(vc, dialog, parent));
@@ -145,7 +145,7 @@ static int imluaVideoCaptureShowDialog (lua_State *L)
 static int imluaVideoCaptureDialogDesc (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int dialog = luaL_checkint(L, 2);
+  int dialog = luaL_checkinteger(L, 2);
 
   lua_pushstring(L, imVideoCaptureDialogDesc(vc, dialog));
   return 1;
@@ -166,7 +166,7 @@ static int imluaVideoCaptureFormatCount (lua_State *L)
 static int imluaVideoCaptureGetFormat (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int format = luaL_checkint(L, 2);
+  int format = luaL_checkinteger(L, 2);
   int width, height;
   char desc[10];
 
@@ -199,8 +199,8 @@ static int imluaVideoCaptureGetImageSize (lua_State *L)
 static int imluaVideoCaptureSetImageSize (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int width = luaL_checkint(L, 2);
-  int height = luaL_checkint(L, 3);
+  int width = luaL_checkinteger(L, 2);
+  int height = luaL_checkinteger(L, 3);
 
   lua_pushboolean(L, imVideoCaptureSetImageSize(vc, width, height));
 
@@ -213,9 +213,9 @@ static int imluaVideoCaptureSetImageSize (lua_State *L)
 static int imluaVideoCaptureSetInOut(lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int input = luaL_checkint(L, 2);
-  int output = luaL_checkint(L, 3);
-  int cross = luaL_checkint(L, 4);
+  int input = luaL_checkinteger(L, 2);
+  int output = luaL_checkinteger(L, 3);
+  int cross = luaL_checkinteger(L, 4);
 
   lua_pushboolean(L, imVideoCaptureSetInOut(vc, input, output, cross));
 
@@ -228,7 +228,7 @@ static int imluaVideoCaptureSetInOut(lua_State *L)
 static int imluaVideoCaptureSetFormat (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int format = luaL_optint(L, 2, -1);
+  int format = luaL_optinteger(L, 2, -1);
   if (format == -1)
     lua_pushnumber(L, imVideoCaptureSetFormat(vc, format));
   else
@@ -304,7 +304,7 @@ static int imluaVideoCaptureFrame (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
   imImage *image = imlua_checkimage(L, 2);
-  int timeout = luaL_checkint(L, 3);
+  int timeout = luaL_checkinteger(L, 3);
 
   if (!(image->color_space == IM_RGB || image->color_space == IM_GRAY))
     luaL_argerror(L, 2, "image must be of RGB or Gray color spaces");
@@ -338,7 +338,7 @@ static int imluaVideoCaptureOneFrame (lua_State *L)
 static int imluaVideoCaptureLive (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
-  int live = luaL_optint(L, 2, -1);
+  int live = luaL_optinteger(L, 2, -1);
   if (live == -1)
     lua_pushnumber(L, imVideoCaptureLive(vc, live));
   else
