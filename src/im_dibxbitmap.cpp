@@ -217,6 +217,7 @@ imImage* imImageLoadFromResource(HMODULE module, LPCTSTR name, int index, int *e
   }
 
   imImage *myimage = imFileLoadImage(ifile, index, error);
+  imFileClose(ifile);
   imBinFileSetCurrentModule(old_mode);
 
   return myimage;
