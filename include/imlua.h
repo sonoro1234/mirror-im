@@ -32,7 +32,11 @@ void imlua_open(void);
  * You must link the application with the "imlua51" library.
  * \ingroup imlua */
 int imlua_open(lua_State *L);
-int luaopen_imlua(lua_State *L);
+
+/** Calls \ref imFormatRemoveAll to release internal memory.
+ * Also available in Lua as "im.Close()".
+* \ingroup imlua */
+int imlua_close(lua_State *L);
 
 #ifdef __IM_IMAGE_H  /* must include im_image.h before this */
 /** Pushes an image as a metatable on the stack.
@@ -49,21 +53,18 @@ imImage* imlua_checkimage(lua_State *L, int param);
  * You must link the application with the "imlua_capture51" library.
  * \ingroup imlua */
 int imlua_open_capture(lua_State *L);
-int luaopen_imlua_capture(lua_State *L);
 
 /** Initializes the Lua binding of the process library.  \n
  * Returns 1 (leaves the "im" table on the top of the stack).
  * You must link the application with the "imlua_process51" library.
  * \ingroup imlua */
 int imlua_open_process(lua_State *L);
-int luaopen_imlua_process(lua_State *L);
 
 /** Initializes the Lua binding of the fourier transform library.  \n
  * Returns 1 (leaves the "im" table on the top of the stack).
  * You must link the application with the "imlua_fftw51" library.
  * \ingroup imlua */
 int imlua_open_fftw(lua_State *L);
-int luaopen_imlua_fftw(lua_State *L);
 
 
 #endif
