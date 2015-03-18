@@ -114,8 +114,8 @@ static int imluaFormatCompressions (lua_State *L)
   int error;
   char *comp[50];
 
-  int color_mode = luaL_optinteger(L, 2, -1);
-  int data_type = luaL_optinteger(L, 3, -1);
+  int color_mode = (int)luaL_optinteger(L, 2, -1);
+  int data_type = (int)luaL_optinteger(L, 3, -1);
 
   error = imFormatCompressions(luaL_checkstring(L, 1), comp, &comp_count, color_mode, data_type);
 
@@ -140,8 +140,8 @@ static int imluaFormatCanWriteImage (lua_State *L)
 {
   const char *format = luaL_checkstring(L, 1);
   const char *compression = luaL_checkstring(L, 2);
-  int color_mode = luaL_checkinteger(L, 3);
-  int data_type = luaL_checkinteger(L, 4);
+  int color_mode = (int)luaL_checkinteger(L, 3);
+  int data_type = (int)luaL_checkinteger(L, 4);
 
   lua_pushboolean(L, imFormatCanWriteImage(format, compression, color_mode, data_type));
   return 1;
@@ -232,7 +232,9 @@ void imlua_regconstants (lua_State *L, const imlua_constant *imconst)
 }
 
 static const luaL_Reg im_lib[] = {
-  {"Version", imluaVersion},
+  { "Close", imlua_close },
+
+  { "Version", imluaVersion },
   {"VersionDate", imluaVersionDate},
   {"VersionNumber", imluaVersionNumber},
 
@@ -244,6 +246,13 @@ static const luaL_Reg im_lib[] = {
 
   {NULL, NULL}
 };
+
+int imlua_close(lua_State *L)
+{
+  (void*)L;
+  imFormatRemoveAll();
+  return 0;
+}
 
 int imlua_open (lua_State *L)
 {

@@ -1,6 +1,7 @@
 EXPORTS
   luaopen_imlua
   imlua_open
+  imlua_close
   imlua_checkimage
   imlua_newarrayulong
   imlua_newarrayint
