@@ -41,11 +41,3 @@ call tecmake %1 "MF=imlua_wmv" "USE_LUA52=Yes" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=imlua_capture5" "USE_LUA52=Yes" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=imlua_wmv" "USE_LUA53=Yes" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=imlua_capture5" "USE_LUA53=Yes" %2 %3 %4 %5 %6 %7 %8
-
-if defined TECGRAF_INTERNAL goto tec_internal
-goto end
-
-:tec_internal
-call tecmake %1 "MF=imlua3" %2 %3 %4 %5 %6 %7 %8
-
-:end
