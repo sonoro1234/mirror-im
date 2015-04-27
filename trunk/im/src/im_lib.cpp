@@ -10,9 +10,9 @@
 #include "im_lib.h"
 
 /* This appears only here to avoid changing the im_lib.h header for bug fixes */
-#define IM_VERSION_FIX ""
-#define IM_VERSION_FIX_NUMBER 0
-/* #define IM_VERSION_FIX_DATE "2013/11/21" */
+#define IM_VERSION_FIX ".1"
+#define IM_VERSION_FIX_NUMBER 1
+#define IM_VERSION_FIX_DATE "2015/04/27"
 
 static const char *iVersion = "TECVERID.str:IM:LIB:" IM_VERSION IM_VERSION_FIX;
 
