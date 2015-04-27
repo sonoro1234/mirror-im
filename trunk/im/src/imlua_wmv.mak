@@ -28,6 +28,7 @@ endif
 LIBNAME := $(LIBNAME)$(LUASFX)
 
 USE_IMLUA = Yes
+NO_LUALINK = Yes
 IM = ..
 
 ifneq ($(findstring gcc, $(TEC_UNAME)), )
