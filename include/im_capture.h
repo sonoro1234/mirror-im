@@ -129,6 +129,13 @@ int IM_DECL imVideoCaptureDialogCount(imVideoCapture* vc);
  * \ingroup capture */
 int IM_DECL imVideoCaptureShowDialog(imVideoCapture* vc, int dialog, void* parent);
 
+/** Returns the description of a configuration dialog.
+ * dialog can be from 0 to \ref imVideoCaptureDialogCount. \n
+ *
+ * \verbatim vc:DialogDesc(dialog: number) -> desc: string [in Lua 5] \endverbatim
+ * \ingroup capture */
+const char* IM_DECL imVideoCaptureDialogDesc(imVideoCapture* vc, int dialog);
+
 /** Allows to control the input and output of devices that have multiple input and outputs.
  * The cross index controls in which stage the input/output will be set. Usually use 1, but some capture boards
  * has a second stage. In Direct X it controls the crossbars.
@@ -136,13 +143,6 @@ int IM_DECL imVideoCaptureShowDialog(imVideoCapture* vc, int dialog, void* paren
  * \verbatim vc:SetInOut(input, output, cross: number) -> error: boolean [in Lua 5] \endverbatim
  * \ingroup capture */
 int IM_DECL imVideoCaptureSetInOut(imVideoCapture* vc, int input, int output, int cross);
-
-/** Returns the description of a configuration dialog.
- * dialog can be from 0 to \ref imVideoCaptureDialogCount. \n
- *
- * \verbatim vc:DialogDesc(dialog: number) -> desc: string [in Lua 5] \endverbatim
- * \ingroup capture */
-const char* IM_DECL imVideoCaptureDialogDesc(imVideoCapture* vc, int dialog);
 
 /** Returns the number of available video formats. \n
  * Returns zero if failed.
@@ -300,6 +300,7 @@ const char** IM_DECL imVideoCaptureGetAttributeList(imVideoCapture* vc, int *num
 }
 
 /** \brief Video Capture Wrapper Class
+ * OLD API. USE NAMESPACE BASED CLASSES.
  * \ingroup capture */
 class imCapture
 {
