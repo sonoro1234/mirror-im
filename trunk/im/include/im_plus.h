@@ -20,7 +20,7 @@
  *
  * See \ref im_plus.h
  */
-namespace im 
+namespace im
 {
   class Image
   {
@@ -79,12 +79,30 @@ namespace im
       return image == 0;
     }
 
-    int Width() const { return image->width; }
-    int Height() const { return image->height; }
-    int ColorSpace() const { return image->color_space; }
-    int DataType() const { return image->data_type; }
-    bool HasAlpha() const { return image->has_alpha != 0; }
-    int Depth() const { return image->depth; }
+    int Width() const 
+    { 
+      return image->width; 
+    }
+    int Height() const 
+    { 
+      return image->height; 
+    }
+    int ColorSpace() const 
+    { 
+      return image->color_space; 
+    }
+    int DataType() const 
+    { 
+      return image->data_type; 
+    }
+    bool HasAlpha() const 
+    { 
+      return image->has_alpha != 0; 
+    }
+    int Depth() const 
+    { 
+      return image->depth; 
+    }
 
     void Copy(Image& dst_image) const
     {
