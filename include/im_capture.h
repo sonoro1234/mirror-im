@@ -300,7 +300,9 @@ const char** IM_DECL imVideoCaptureGetAttributeList(imVideoCapture* vc, int *num
 }
 
 /** \brief Video Capture Wrapper Class
- * OLD API. USE NAMESPACE BASED CLASSES.
+ *
+ * DEPRECATED API. USE NAMESPACE BASED CLASSES.
+ *
  * \ingroup capture */
 class imCapture
 {
