@@ -1,5 +1,5 @@
 /** \file
- * \brief C++ Wrapper for ImageFile Access
+ * \brief Name space for C++ high level API
  *
  * See Copyright Notice in im_lib.h
  */
@@ -13,159 +13,18 @@
 #include "im_capture.h"
 
 
-/** \defgroup namespace im
+/** \brief Name space for C++ high level API
  *
  * \par
- *  Name space for C++ high level API.
+ * Defines wrapper classes for all C structures.
  *
  * See \ref im_plus.h
  */
-namespace im {
-
-  /** \brief Image File Wrapper Class
-   *
-   * \par
-   * Usage is just like the C API. Open and New are replaced by equivalent constructors. \n
-   * Close is replaced by the destructor. Error checking is done by the Error() member. \n
-   * Open and New state are cheked using the Failed() member.
-   *  \ingroup namespace */
-  class ImageFile
-  {
-  protected:
-    imFile* ifile;
-    int error;
-
-    ImageFile() {};
-
-  public:
-
-    ImageFile(const char* file_name)
-    {
-      ifile = imFileOpen(file_name, &error);
-    }
-
-    ImageFile(const char* file_name, const char* format)
-    {
-      ifile = imFileNew(file_name, format, &error);
-    }
-
-    virtual ~ImageFile()
-    {
-      if (ifile) imFileClose(ifile);
-    }
-
-    bool Failed() const
-    {
-      return ifile == 0;
-    }
-
-    int Error() const
-    {
-      return error;
-    }
-
-    void SetAttribute(const char* attrib, int data_type, int count, const void* data)
-    {
-      imFileSetAttribute(ifile, attrib, data_type, count, data);
-    }
-
-    void SetAttribInteger(const char* attrib, int data_type, int value)
-    {
-      imFileSetAttribInteger(ifile, attrib, data_type, value);
-    }
-
-    void SetAttribReal(const char* attrib, int data_type, double value)
-    {
-      imFileSetAttribReal(ifile, attrib, data_type, value);
-    }
-
-    void SetAttribString(const char* attrib, const char* value)
-    {
-      imFileSetAttribString(ifile, attrib, value);
-    }
-
-    const void* GetAttribute(const char* attrib, int &data_type, int &count) const
-    {
-      return imFileGetAttribute(ifile, attrib, &data_type, &count);
-    }
-
-    int GetAttribInteger(const char* attrib, int index) const
-    {
-      return imFileGetAttribInteger(ifile, attrib, index);
-    }
-
-    double GetAttribReal(const char* attrib, int index) const
-    {
-      return imFileGetAttribReal(ifile, attrib, index);
-    }
-
-    const char* GetAttribString(const char* attrib)
-    {
-      return imFileGetAttribString(ifile, attrib);
-    }
-
-    void GetInfo(char* format, char* compression, int &image_count)
-    {
-      imFileGetInfo(ifile, format, compression, &image_count);
-    }
-
-    void ReadImageInfo(int index, int &width, int &height, int &color_mode, int &data_type)
-    {
-      error = imFileReadImageInfo(ifile, index, &width, &height, &color_mode, &data_type);
-    }
-
-    void GetPalette(long* palette, int &palette_count)
-    {
-      imFileGetPalette(ifile, palette, &palette_count);
-    }
-
-    void ReadImageData(void* data, int convert2bitmap, int color_mode_flags)
-    {
-      error = imFileReadImageData(ifile, data, convert2bitmap, color_mode_flags);
-    }
-
-    void SetInfo(const char* compression)
-    {
-      imFileSetInfo(ifile, compression);
-    }
-
-    void SetPalette(long* palette, int palette_count)
-    {
-      imFileSetPalette(ifile, palette, palette_count);
-    }
-
-    void WriteImageInfo(int width, int height, int color_mode, int data_type)
-    {
-      error = imFileWriteImageInfo(ifile, width, height, color_mode, data_type);
-    }
-
-    void WriteImageData(void* data)
-    {
-      error = imFileWriteImageData(ifile, data);
-    }
-  };
-
-
-  /** \brief Image File Raw Wrapper Class
-  *
-  *  \ingroup namespace */
-  class ImageFileRaw : public ImageFile
-  {
-    ImageFileRaw() {};
-
-  public:
-
-    ImageFileRaw(const char* file_name, bool new_file) : ImageFile()
-    {
-      if (new_file) ifile = imFileNewRaw(file_name, &error);
-      else ifile = imFileOpenRaw(file_name, &error);
-    }
-  };
-
-  /** \brief Image Wrapper Class
-   */
+namespace im 
+{
   class Image
   {
+    friend class File;
     friend class Processing;
     friend class VideoCapture;
 
@@ -183,6 +42,24 @@ namespace im {
     Image(const Image& src_image, int width = -1, int height = -1, int color_space = -1, int data_type = -1)
     {
       image = imImageCreateBased(src_image.image, width, height, color_space, data_type);
+    }
+
+    Image(const char* file_name, int index, int &error, bool as_bitmap)
+    {
+      if (as_bitmap)
+        image = imFileImageLoad(file_name, index, &error);
+      else
+        image = imFileImageLoadBitmap(file_name, index, &error);
+    }
+
+    Image(imImage* ref_image)
+    {
+      image = ref_image;
+    }
+
+    int Save(const char* file_name, const char* format)
+    {
+      return imFileImageSave(file_name, format, image);
     }
 
     Image& operator = (const Image& src_image)
@@ -208,21 +85,6 @@ namespace im {
     int DataType() const { return image->data_type; }
     bool HasAlpha() const { return image->has_alpha != 0; }
     int Depth() const { return image->depth; }
-
-#if 0
-    imImage* imFileImageLoad(const char* file_name, int index, int *error);
-    imImage* imFileImageLoadBitmap(const char* file_name, int index, int *error);
-    imImage* imFileImageLoadRegion(const char* file_name, int index, int bitmap, int *error,
-                                   imImage* imFileLoadBitmap(imFile* ifile, int index, int *error);
-    imImage* imFileLoadImage(imFile* ifile, int index, int *error);
-    imImage* imFileLoadImageRegion(imFile* ifile, int index, int bitmap, int *error,
-                                   imImage* imImageClone(const imImage* image);
-
-    int imFileImageSave(const char* file_name, const char* format, const imImage* image);
-    int imFileSaveImage(imFile* ifile, const imImage* image);
-    void imFileLoadBitmapFrame(imFile* ifile, int index, imImage* image, int *error);
-    void imFileLoadImageFrame(imFile* ifile, int index, imImage* image, int *error);
-#endif
 
     void Copy(Image& dst_image) const
     {
@@ -364,8 +226,159 @@ namespace im {
     }
   };
 
-  /** \brief Video Capture Device List Wrapper Class
-  */
+  /********************************************************************/
+
+  class File
+  {
+  protected:
+    imFile* ifile;
+
+    File() {};
+
+  public:
+
+    File(const char* file_name, int &error)
+    {
+      ifile = imFileOpen(file_name, &error);
+    }
+
+    File(const char* file_name, const char* format, int &error)
+    {
+      ifile = imFileNew(file_name, format, &error);
+    }
+
+    File(imFile* ref_ifile)
+    {
+      ifile = ref_ifile;
+    }
+
+    virtual ~File()
+    {
+      if (ifile) imFileClose(ifile);
+    }
+
+    bool Failed() const
+    {
+      return ifile == 0;
+    }
+
+    void SetAttribute(const char* attrib, int data_type, int count, const void* data)
+    {
+      imFileSetAttribute(ifile, attrib, data_type, count, data);
+    }
+
+    void SetAttribInteger(const char* attrib, int data_type, int value)
+    {
+      imFileSetAttribInteger(ifile, attrib, data_type, value);
+    }
+
+    void SetAttribReal(const char* attrib, int data_type, double value)
+    {
+      imFileSetAttribReal(ifile, attrib, data_type, value);
+    }
+
+    void SetAttribString(const char* attrib, const char* value)
+    {
+      imFileSetAttribString(ifile, attrib, value);
+    }
+
+    const void* GetAttribute(const char* attrib, int &data_type, int &count) const
+    {
+      return imFileGetAttribute(ifile, attrib, &data_type, &count);
+    }
+
+    int GetAttribInteger(const char* attrib, int index) const
+    {
+      return imFileGetAttribInteger(ifile, attrib, index);
+    }
+
+    double GetAttribReal(const char* attrib, int index) const
+    {
+      return imFileGetAttribReal(ifile, attrib, index);
+    }
+
+    const char* GetAttribString(const char* attrib)
+    {
+      return imFileGetAttribString(ifile, attrib);
+    }
+
+    void GetInfo(char* format, char* compression, int &image_count)
+    {
+      imFileGetInfo(ifile, format, compression, &image_count);
+    }
+
+    int ReadImageInfo(int index, int &width, int &height, int &color_mode, int &data_type)
+    {
+      return imFileReadImageInfo(ifile, index, &width, &height, &color_mode, &data_type);
+    }
+
+    void GetPalette(long* palette, int &palette_count)
+    {
+      imFileGetPalette(ifile, palette, &palette_count);
+    }
+
+    int ReadImageData(void* data, int convert2bitmap, int color_mode_flags)
+    {
+      return imFileReadImageData(ifile, data, convert2bitmap, color_mode_flags);
+    }
+
+    void SetInfo(const char* compression)
+    {
+      imFileSetInfo(ifile, compression);
+    }
+
+    void SetPalette(long* palette, int palette_count)
+    {
+      imFileSetPalette(ifile, palette, palette_count);
+    }
+
+    int WriteImageInfo(int width, int height, int color_mode, int data_type)
+    {
+      return imFileWriteImageInfo(ifile, width, height, color_mode, data_type);
+    }
+
+    int WriteImageData(void* data)
+    {
+      return imFileWriteImageData(ifile, data);
+    }
+
+    Image* LoadImage(int index, int &error)
+    {
+      imImage* image = imFileLoadImage(ifile, index, &error);
+      return new Image(image);
+    }
+    int SaveImage(const Image& image)
+    {
+      return imFileSaveImage(ifile, image.image);
+    }
+
+    void LoadFrame(int index, Image& image, int &error, bool as_bitmap)
+    {
+      if (as_bitmap)
+        imFileLoadBitmapFrame(ifile, index, image.image, &error);
+      else
+        imFileLoadImageFrame(ifile, index, image.image, &error);
+    }
+  };
+
+  /********************************************************************/
+
+  class FileRaw : public File
+  {
+    FileRaw() {};
+
+  public:
+
+    FileRaw(const char* file_name, int &error, bool new_file) : File()
+    {
+      if (new_file) 
+        ifile = imFileNewRaw(file_name, &error);
+      else 
+        ifile = imFileOpenRaw(file_name, &error);
+    }
+  };
+
+  /********************************************************************/
 
   class VideoCaptureDeviceList
   {
@@ -406,12 +419,22 @@ namespace im {
     }
   };
 
+  /********************************************************************/
+
   class VideoCapture
   {
+  protected:
+    imVideoCapture* vc;
+
   public:
     VideoCapture()
     {
       vc = imVideoCaptureCreate();
+    }
+
+    VideoCapture(imVideoCapture* ref_vc)
+    {
+      vc = ref_vc;
     }
 
     ~VideoCapture()
@@ -543,11 +566,7 @@ namespace im {
     {
       return imVideoCaptureGetAttributeList(vc, &num_attrib);
     }
-
-  protected:
-    imVideoCapture* vc;
   };
-
 }
 
 #endif

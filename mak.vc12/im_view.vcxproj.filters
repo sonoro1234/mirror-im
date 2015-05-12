@@ -10,5 +10,8 @@
     <ClCompile Include="..\test\im_view.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\test\im_view.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
