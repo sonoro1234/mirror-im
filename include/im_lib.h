@@ -98,8 +98,7 @@ int imVersionNumber(void);
  *
  * \section author Author
  * \par
- * Basic Software Group @ Tecgraf/PUC-Rio
- * - Antonio Scuri scuri@tecgraf.puc-rio.br
+ * Antonio Scuri scuri@tecgraf.puc-rio.br
  *
  * \section copyright Copyright Notice
 \verbatim
