@@ -15,6 +15,7 @@
 #include "im_attrib.h"
 #include "im_file.h"
 #include "im_color.h"
+#include "im_palette.h"
 
 
 int imImageCheckFormat(int color_mode, int data_type)
@@ -130,7 +131,7 @@ imImage* imImageCreate(int width, int height, int color_space, int data_type)
   /* palette is available to BINARY, MAP and GRAY */
   if (imColorModeDepth(color_space) == 1)
   {
-    image->palette = (long*)malloc(256*sizeof(long));
+    image->palette = imPaletteNew(256);
 
     if (image->color_space == IM_BINARY)
     {
@@ -255,7 +256,7 @@ void imImageDestroy(imImage* image)
     free(image->data[0]);
 
   if (image->palette)
-    free(image->palette);
+    imPaletteRelease(image->palette);
 
   free(image->data);
 
@@ -550,7 +551,7 @@ void imImageSetPalette(imImage* image, long* palette, int palette_count)
 
   if (image->palette)
   {
-    free(image->palette);
+    imPaletteRelease(image->palette);
     image->palette = palette;
     image->palette_count = palette_count;
   }

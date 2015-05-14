@@ -37,6 +37,17 @@ extern "C" {
  * \ingroup util */
 
 
+/** Allocates memory for the palette data.
+ * This ensures allocation and release in the same module by the correct functions.
+ * \ingroup palette */
+long* imPaletteNew(int count);
+
+/** Releases memory for the palette data.
+* This ensures allocation and release in the same module by the correct functions.
+* \ingroup palette */
+void imPaletteRelease(long* palette);
+
+
 /** Searches for the nearest color on the table and returns the color index if successful. 
  * It looks in all palette entries and finds the minimum euclidian square distance. 
  * If the color matches the given color it returns immediately.

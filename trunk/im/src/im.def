@@ -39,6 +39,8 @@ EXPORTS
   imVersion
   imVersionDate
   imVersionNumber
+  imPaletteNew
+  imPaletteRelease
   imPaletteFindColor
   imPaletteFindNearest
   imPaletteUniformIndex
