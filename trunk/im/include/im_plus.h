@@ -18,6 +18,10 @@
 #include "im_process.h"
 #include "im_counter.h"
 
+namespace cd
+{
+  class Canvas;
+}
 
 /** \brief Name space for C++ high level API
  *
@@ -254,8 +258,9 @@ namespace im
   class Image
   {
     friend class File;
-    friend class Processing;
+    friend class Process;
     friend class VideoCapture;
+    friend class cd::Canvas;
 
   protected:
     imImage* im_image;
