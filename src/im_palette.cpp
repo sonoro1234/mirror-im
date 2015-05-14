@@ -15,6 +15,17 @@
 #include <assert.h>
 #include <math.h>
 
+
+long* imPaletteNew(int count)
+{
+  return (long*)malloc(sizeof(long) * count);
+}
+
+void imPaletteRelease(long* palette)
+{
+  free(palette);
+}
+
 inline int iSqr(int x)
 {
   return x*x;
@@ -96,7 +107,7 @@ int imPaletteFindColor(const long* palette, int palette_count, long color, unsig
 
 long* imPaletteGray(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
 
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -111,7 +122,7 @@ long* imPaletteGray(void)
 
 long* imPaletteRed(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
 
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -126,7 +137,7 @@ long* imPaletteRed(void)
 
 long* imPaletteGreen(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -141,7 +152,7 @@ long* imPaletteGreen(void)
 
 long* imPaletteBlue(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -156,7 +167,7 @@ long* imPaletteBlue(void)
 
 long* imPaletteYellow(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -171,7 +182,7 @@ long* imPaletteYellow(void)
 
 long* imPaletteMagenta(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -186,7 +197,7 @@ long* imPaletteMagenta(void)
 
 long* imPaletteCian(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -201,7 +212,7 @@ long* imPaletteCian(void)
 
 long* imPaletteHues(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   int i;
   float tone, step1 = 255.0f/41.0f, step2 = 255.0f/42.0f;
@@ -276,7 +287,7 @@ long* imPaletteHues(void)
 
 long* imPaletteRainbow(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   int hue;
   unsigned char r, g, b;
@@ -304,7 +315,7 @@ long* imPaletteRainbow(void)
 
 long* imPaletteBlueIce(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   
   for (int lIndex = 0; lIndex < 256; lIndex++)
@@ -319,7 +330,7 @@ long* imPaletteBlueIce(void)
 
 long* imPaletteHotIron(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   int lIndex, lSubIndex;
 
@@ -355,7 +366,7 @@ long* imPaletteHotIron(void)
 
 long* imPaletteBlackBody(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   int lIndex, lSubIndex;
 
@@ -385,7 +396,7 @@ long* imPaletteBlackBody(void)
 
 long* imPaletteHighContrast(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   int lIndex;
 #define NUM_HC 128
@@ -458,7 +469,7 @@ long* imPaletteHighContrast(void)
 
 long* imPaletteLinear(void)
 {
-  long* palette = (long*)malloc(sizeof(long) * 256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
   int lIndex, lHue;
   unsigned char r, g, b;
@@ -495,7 +506,7 @@ static int iSixStepsTable[6] = {0, 51, 102, 153, 204, 255};
 
 long* imPaletteUniform(void)
 {
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   long* ct = palette;
 
   for (int lRedIndex = 0; lRedIndex < 6; lRedIndex++)

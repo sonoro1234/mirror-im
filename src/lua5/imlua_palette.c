@@ -70,7 +70,7 @@ static int imluaPaletteCreate(lua_State *L)
   if (count < 1 || count > 256)
     luaL_argerror(L, 1, "palette count should be a positive integer and less then 256");
 
-  color = (long*)malloc(256*sizeof(long));
+  color = imPaletteNew(256);
   memset(color, 0, 256*sizeof(long));
 
   imlua_pushpalette(L, color, count);
@@ -267,7 +267,7 @@ static int imluaPaletteDestroy (lua_State *L)
   if (!pal->color)
     luaL_argerror(L, 1, "destroyed imPalette");
 
-  free(pal->color);
+  imPaletteRelease(pal->color);
   pal->color = NULL;  /* mark as destroyed */
   pal->count = 0;
 
@@ -282,7 +282,7 @@ static int imluaPalette_gc(lua_State *L)
   imluaPalette *pal = (imluaPalette*)lua_touserdata(L, 1);
   if (pal && pal->color)
   {
-    free(pal->color);
+    imPaletteRelease(pal->color);
     pal->color = NULL;  /* mark as destroyed */
     pal->count = 0;
   }

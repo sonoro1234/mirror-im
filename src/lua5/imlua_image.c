@@ -12,6 +12,7 @@
 #include "im_image.h"
 #include "im_util.h"
 #include "im_convert.h"
+#include "im_palette.h"
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -796,9 +797,9 @@ static int imluaImageGetOpenGLData (lua_State *L)
 static int imluaImageGetPalette (lua_State *L)
 {
   imImage *image = imlua_checkimage(L, 1);
-  long* color = malloc(sizeof(long) * 256);
-  memcpy(color, image->palette, sizeof(long) * 256);
-  imlua_pushpalette(L, color, 256);
+  long* palette = imPaletteNew(256);
+  memcpy(palette, image->palette, sizeof(long) * 256);
+  imlua_pushpalette(L, palette, 256);
   return 1;
 }
 
@@ -809,7 +810,7 @@ static int imluaImageSetPalette (lua_State *L)
 {
   imImage *image = imlua_checkimage(L, 1);
   imluaPalette *pal = imlua_checkpalette(L, 2);
-  long* palette = (long*)malloc(sizeof(long)*256);
+  long* palette = imPaletteNew(256);
   memcpy(palette, pal->color, pal->count*sizeof(long));
   imImageSetPalette(image, palette, pal->count);
   return 0;

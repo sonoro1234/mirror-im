@@ -12,6 +12,7 @@
 #include "im_raw.h"
 #include "im_image.h"
 #include "im_util.h"
+#include "im_palette.h"
 
 #include <lua.h>
 #include <lauxlib.h>
@@ -617,10 +618,10 @@ static int imluaFileGetAttributeList (lua_State *L)
 static int imluaFileGetPalette (lua_State *L)
 {
   imFile *ifile = imlua_checkfile(L, 1);
-  long* color = malloc(sizeof(long) * 256);
+  long* palette = imPaletteNew(256);
   int count;
-  imFileGetPalette(ifile, color, &count);
-  imlua_pushpalette(L, color, count);
+  imFileGetPalette(ifile, palette, &count);
+  imlua_pushpalette(L, palette, count);
   return 1;
 }
 

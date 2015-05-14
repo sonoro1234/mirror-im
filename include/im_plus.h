@@ -7,10 +7,16 @@
 #ifndef __IM_PLUS_H
 #define __IM_PLUS_H
 
+
 #include "im.h"
+#include "im_lib.h"
 #include "im_raw.h"
 #include "im_image.h"
+#include "im_palette.h"
+#include "im_kernel.h"
 #include "im_capture.h"
+#include "im_process.h"
+#include "im_counter.h"
 
 
 /** \brief Name space for C++ high level API
@@ -22,6 +28,229 @@
  */
 namespace im
 {
+  const char* Version()
+  {
+    return imVersion();
+  }
+  const char* VersionDate()
+  {
+    return imVersionDate();
+  }
+  int VersionNumber()
+  {
+    return imVersionNumber();
+  }
+
+  long ColorEncode(unsigned char red, unsigned char green, unsigned char blue)
+  {
+    return (((long)red) << 16) | (((long)green) << 8) | ((long)blue);
+  }
+  unsigned char ColorRed(long color)
+  {
+    return (unsigned char)(color >> 16);
+  }
+  unsigned char ColorGreen(long color)
+  {
+    return (unsigned char)(color >> 8);
+  }
+  unsigned char ColorBlue(long color)
+  {
+    return (unsigned char)color;
+  }
+
+  class Palette
+  {
+    friend class Image;
+
+  protected:
+    long* pal_data;
+    int pal_count;
+
+  public:
+    Palette(int count = 256)
+    {
+      pal_count = count;
+      pal_data = imPaletteNew(pal_count);
+    }
+    Palette(const long* palette, int count = 256)
+    {
+      pal_count = count;
+      pal_data = imPaletteNew(pal_count);
+      for (int i = 0; i < pal_count; i++)
+        pal_data[i] = palette[i];
+    }
+    ~Palette()
+    {
+      Release();
+    }
+
+    long& operator [] (int index)
+    {
+      static long err = -1;
+      if (!pal_data || index < 0 || index >= pal_count)
+        return err;
+      return pal_data[index];
+    }
+
+    void Release()
+    {
+      if (pal_data) 
+        imPaletteRelease(pal_data);
+    }
+
+    int FindNearest(long color) const
+    {
+      return imPaletteFindNearest(pal_data, pal_count, color);
+    }
+    int FindColor(long color, unsigned char tol)
+    {
+      return imPaletteFindColor(pal_data, pal_count, color, tol);
+    }
+
+    /* known palettes */
+    void Gray()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteGray();
+    }
+    void Red()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteRed();
+    }
+    void Green()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteGreen();
+    }
+    void Blue()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteBlue();
+    }
+    void Yellow()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteYellow();
+    }
+    void Magenta()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteMagenta();
+    }
+    void Cian()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteCian();
+    }
+    void Rainbow()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteRainbow();
+    }
+    void Hues()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteHues();
+    }
+    void BlueIce()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteBlueIce();
+    }
+    void HotIron()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteHotIron();
+    }
+    void BlackBody()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteBlackBody();
+    }
+    void HighContrast()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteHighContrast();
+    }
+    void Linear()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteLinear();
+    }
+
+    void Uniform()
+    {
+      Release();
+      pal_count = 256;
+      pal_data = imPaletteUniform();
+    }
+    static int UniformIndex(long color)
+    {
+      return imPaletteUniformIndex(color);
+    }
+    static int UniformIndexHalftoned(long color, int x, int y)
+    {
+      return imPaletteUniformIndexHalftoned(color, x, y);
+    }
+  };
+
+  enum DataType
+  {
+    BYTE,   
+    SHORT,  
+    USHORT, 
+    INT,    
+    FLOAT,  
+    DOUBLE, 
+    CFLOAT, 
+    CDOUBLE 
+  };
+  enum ColorSpace
+  {
+    RGB,    
+    MAP,    
+    GRAY,   
+    BINARY, 
+    CMYK,   
+    YCBCR,  
+    LAB,    
+    LUV,    
+    XYZ     
+  };
+  enum ColorModeConfig
+  {
+    ALPHA = 0x100,  
+    PACKED = 0x200, 
+    TOPDOWN = 0x400 
+  };
+  enum ErrorCodes
+  {
+    ERR_NONE,    
+    ERR_OPEN,    
+    ERR_ACCESS,  
+    ERR_FORMAT,  
+    ERR_DATA,    
+    ERR_COMPRESS,
+    ERR_MEM,     
+    ERR_COUNTER  
+  };
+
+
   class Image
   {
     friend class File;
@@ -29,357 +258,384 @@ namespace im
     friend class VideoCapture;
 
   protected:
-    imImage* image;
+    imImage* im_image;
 
-    Image() {};
+    Image() { im_image = 0; };
 
   public:
     Image(int width, int height, int color_space, int data_type)
     {
-      image = imImageCreate(width, height, color_space, data_type);
+      im_image = imImageCreate(width, height, color_space, data_type);
     }
-
     Image(const Image& src_image, int width = -1, int height = -1, int color_space = -1, int data_type = -1)
     {
-      image = imImageCreateBased(src_image.image, width, height, color_space, data_type);
+      im_image = imImageCreateBased(src_image.im_image, width, height, color_space, data_type);
     }
-
     Image(const char* file_name, int index, int &error, bool as_bitmap)
     {
       if (as_bitmap)
-        image = imFileImageLoad(file_name, index, &error);
+        im_image = imFileImageLoad(file_name, index, &error);
       else
-        image = imFileImageLoadBitmap(file_name, index, &error);
+        im_image = imFileImageLoadBitmap(file_name, index, &error);
     }
-
     Image(imImage* ref_image)
     {
-      image = ref_image;
+      im_image = ref_image;
+    }
+    ~Image()
+    {
+      Release();
     }
 
-    int Save(const char* file_name, const char* format)
-    {
-      return imFileImageSave(file_name, format, image);
-    }
+    /* image io */
+    Image(File& file, int index, int &error);
+
+    /* image capture */
+    Image::Image(VideoCapture& videocapture, bool as_gray);
 
     Image& operator = (const Image& src_image)
     {
-      if (image) imImageDestroy(image);
-      image = imImageDuplicate(src_image.image);
+      Release();
+      im_image = imImageDuplicate(src_image.im_image);
       return *this;
-    }
-
-    virtual ~Image()
-    {
-      if (image) imImageDestroy(image);
     }
 
     bool Failed() const
     {
-      return image == 0;
+      return im_image == 0;
     }
 
+
+    /* image info */
     int Width() const 
     { 
-      return image->width; 
+      return im_image->width; 
     }
     int Height() const 
     { 
-      return image->height; 
+      return im_image->height; 
     }
     int ColorSpace() const 
     { 
-      return image->color_space; 
+      return im_image->color_space; 
     }
     int DataType() const 
     { 
-      return image->data_type; 
+      return im_image->data_type; 
     }
     bool HasAlpha() const 
     { 
-      return image->has_alpha != 0; 
+      return im_image->has_alpha != 0; 
     }
     int Depth() const 
     { 
-      return image->depth; 
+      return im_image->depth; 
+    }
+    bool IsBitmap() const
+    {
+      return imImageIsBitmap(im_image) == 1;
     }
 
+
+    /* image io */
+    int Save(const char* file_name, const char* format)
+    {
+      return imFileImageSave(file_name, format, im_image);
+    }
+
+
+    /* data/metadata copy */
     void Copy(Image& dst_image) const
     {
-      imImageCopy(image, dst_image.image);
+      imImageCopy(im_image, dst_image.im_image);
     }
     void CopyAttributes(Image& dst_image) const
     {
-      imImageCopyAttributes(image, dst_image.image);
+      imImageCopyAttributes(im_image, dst_image.im_image);
     }
     void MergeAttributes(Image& dst_image) const
     {
-      imImageMergeAttributes(image, dst_image.image);
+      imImageMergeAttributes(im_image, dst_image.im_image);
     }
     void CopyData(Image& dst_image) const
     {
-      imImageCopyData(image, dst_image.image);
+      imImageCopyData(im_image, dst_image.im_image);
     }
     void CopyPlane(Image& dst_image, int src_plane, int dst_plane) const
     {
-      imImageCopyPlane(image, src_plane, dst_image.image, dst_plane);
+      imImageCopyPlane(im_image, src_plane, dst_image.im_image, dst_plane);
     }
 
-    bool IsBitmap() const
+
+    /* utilities */
+    void Release()
     {
-      return imImageIsBitmap(image) == 1;
+      if (im_image)
+      {
+        imImageDestroy(im_image);
+        im_image = 0;
+      }
     }
-
     void Clear()
     {
-      imImageClear(image);
+      imImageClear(im_image);
     }
-
     void Reshape(int width, int height)
     {
-      imImageReshape(image, width, height);
+      imImageReshape(im_image, width, height);
+    }
+    void SetPalette(const Palette& palette)
+    {
+      Palette new_palette(palette);
+      imImageSetPalette(im_image, new_palette.pal_data, new_palette.pal_count);
+      new_palette.pal_data = 0;  /* mark as released */
+    }
+    Palette GetPalette()
+    {
+      Palette new_palette(im_image->palette, im_image->palette_count);
+      return new_palette;
     }
 
+
+    /* alpha */
     void AddAlpha()
     {
-      imImageAddAlpha(image);
+      imImageAddAlpha(im_image);
     }
     void SetAlpha(float alpha)
     {
-      imImageSetAlpha(image, alpha);
+      imImageSetAlpha(im_image, alpha);
     }
     void RemoveAlpha()
     {
-      imImageRemoveAlpha(image);
+      imImageRemoveAlpha(im_image);
     }
 
+
+    /* color utilities */
     void MakeBinary()
     {
-      imImageMakeBinary(image);
+      imImageMakeBinary(im_image);
     }
     void MakeGray()
     {
-      imImageMakeGray(image);
+      imImageMakeGray(im_image);
     }
     void SetBinary()
     {
-      imImageSetBinary(image);
+      imImageSetBinary(im_image);
     }
     void SetGray()
     {
-      imImageSetGray(image);
+      imImageSetGray(im_image);
     }
     void SetMap()
     {
-      imImageSetMap(image);
+      imImageSetMap(im_image);
     }
 
-    void SetPalette(long* palette, int palette_count)
-    {
-      imImageSetPalette(image, palette, palette_count);
-    }
 
+    /* attributes or metadata */
     void SetAttribute(const char* attrib, int data_type, int count, const void* data)
     {
-      imImageSetAttribute(image, attrib, data_type, count, data);
+      imImageSetAttribute(im_image, attrib, data_type, count, data);
     }
     void SetAttribInteger(const char* attrib, int data_type, int value)
     {
-      imImageSetAttribInteger(image, attrib, data_type, value);
+      imImageSetAttribInteger(im_image, attrib, data_type, value);
     }
     void SetAttribReal(const char* attrib, int data_type, double value)
     {
-      imImageSetAttribReal(image, attrib, data_type, value);
+      imImageSetAttribReal(im_image, attrib, data_type, value);
     }
     void SetAttribString(const char* attrib, const char* value)
     {
-      imImageSetAttribString(image, attrib, value);
+      imImageSetAttribString(im_image, attrib, value);
     }
 
     const void* GetAttribute(const char* attrib, int *data_type = 0, int *count = 0) const
     {
-      return imImageGetAttribute(image, attrib, data_type, count);
+      return imImageGetAttribute(im_image, attrib, data_type, count);
     }
     int GetAttribInteger(const char* attrib, int index) const
     {
-      return imImageGetAttribInteger(image, attrib, index);
+      return imImageGetAttribInteger(im_image, attrib, index);
     }
     double GetAttribReal(const char* attrib, int index) const
     {
-      return imImageGetAttribReal(image, attrib, index);
+      return imImageGetAttribReal(im_image, attrib, index);
     }
     const char* GetAttribString(const char* attrib) const
     {
-      return imImageGetAttribString(image, attrib);
+      return imImageGetAttribString(im_image, attrib);
     }
 
     void GetAttributeList(char** attrib, int &attrib_count) const
     {
-      imImageGetAttributeList(image, attrib, &attrib_count);
+      imImageGetAttributeList(im_image, attrib, &attrib_count);
     }
 
+
+    /* compare */
     bool operator==(const Image& image2) const
     {
       return Match(image2);
     }
     bool Match(const Image& image2) const
     {
-      return imImageMatch(image, image2.image) == 1;
+      return imImageMatch(im_image, image2.im_image) == 1;
     }
     bool MatchColor(const Image& image2) const
     {
-      return imImageMatchColor(image, image2.image) == 1;
+      return imImageMatchColor(im_image, image2.im_image) == 1;
     }
     bool MatchColorSpace(const Image& image2) const
     {
-      return imImageMatchColorSpace(image, image2.image) == 1;
+      return imImageMatchColorSpace(im_image, image2.im_image) == 1;
     }
     bool MatchDataType(const Image& image2) const
     {
-      return imImageMatchDataType(image, image2.image) == 1;
+      return imImageMatchDataType(im_image, image2.im_image) == 1;
     }
     bool MatchSize(const Image& image2) const
     {
-      return imImageMatchSize(image, image2.image) == 1;
+      return imImageMatchSize(im_image, image2.im_image) == 1;
     }
   };
 
+
   /********************************************************************/
+
+
+  class CounterCallback
+  {
+    void* cc_user_data;
+
+    static int c_callback(int counter, void* user_data, const char* text, int progress)
+    {
+      CounterCallback* cc = (CounterCallback*)user_data;
+      return cc->Callback(counter, cc->cc_user_data, text, progress);
+    }
+
+  public:
+    CounterCallback(void* user_data)
+    {
+      cc_user_data = user_data;
+      imCounterSetCallback(this, c_callback);  //imCounterCallback
+    }
+    virtual ~CounterCallback()
+    {
+    }
+
+    virtual int Callback(int counter, void* user_data, const char* text, int progress) = 0;
+  };
+
+
+  /********************************************************************/
+
 
   class File
   {
-  protected:
-    imFile* ifile;
+    friend class Image;
 
-    File() {};
+  protected:
+    imFile* im_file;
+
+    File() { im_file = 0; };
 
   public:
-
     File(const char* file_name, int &error)
     {
-      ifile = imFileOpen(file_name, &error);
+      im_file = imFileOpen(file_name, &error);
     }
-
     File(const char* file_name, const char* format, int &error)
     {
-      ifile = imFileNew(file_name, format, &error);
+      im_file = imFileNew(file_name, format, &error);
     }
-
-    File(imFile* ref_ifile)
+    File(imFile* ref_file)
     {
-      ifile = ref_ifile;
+      im_file = ref_file;
     }
-
-    virtual ~File()
+    ~File()
     {
-      if (ifile) imFileClose(ifile);
+      if (im_file) imFileClose(im_file);
     }
 
     bool Failed() const
     {
-      return ifile == 0;
+      return im_file == 0;
     }
 
+
+    /* attributes or metadata */
     void SetAttribute(const char* attrib, int data_type, int count, const void* data)
     {
-      imFileSetAttribute(ifile, attrib, data_type, count, data);
+      imFileSetAttribute(im_file, attrib, data_type, count, data);
     }
-
     void SetAttribInteger(const char* attrib, int data_type, int value)
     {
-      imFileSetAttribInteger(ifile, attrib, data_type, value);
+      imFileSetAttribInteger(im_file, attrib, data_type, value);
     }
-
     void SetAttribReal(const char* attrib, int data_type, double value)
     {
-      imFileSetAttribReal(ifile, attrib, data_type, value);
+      imFileSetAttribReal(im_file, attrib, data_type, value);
     }
-
     void SetAttribString(const char* attrib, const char* value)
     {
-      imFileSetAttribString(ifile, attrib, value);
+      imFileSetAttribString(im_file, attrib, value);
     }
-
     const void* GetAttribute(const char* attrib, int &data_type, int &count) const
     {
-      return imFileGetAttribute(ifile, attrib, &data_type, &count);
+      return imFileGetAttribute(im_file, attrib, &data_type, &count);
     }
-
     int GetAttribInteger(const char* attrib, int index) const
     {
-      return imFileGetAttribInteger(ifile, attrib, index);
+      return imFileGetAttribInteger(im_file, attrib, index);
     }
-
     double GetAttribReal(const char* attrib, int index) const
     {
-      return imFileGetAttribReal(ifile, attrib, index);
+      return imFileGetAttribReal(im_file, attrib, index);
     }
-
     const char* GetAttribString(const char* attrib)
     {
-      return imFileGetAttribString(ifile, attrib);
+      return imFileGetAttribString(im_file, attrib);
     }
 
+
+    /* file info */
     void GetInfo(char* format, char* compression, int &image_count)
     {
-      imFileGetInfo(ifile, format, compression, &image_count);
+      imFileGetInfo(im_file, format, compression, &image_count);
     }
-
-    int ReadImageInfo(int index, int &width, int &height, int &color_mode, int &data_type)
-    {
-      return imFileReadImageInfo(ifile, index, &width, &height, &color_mode, &data_type);
-    }
-
-    void GetPalette(long* palette, int &palette_count)
-    {
-      imFileGetPalette(ifile, palette, &palette_count);
-    }
-
-    int ReadImageData(void* data, int convert2bitmap, int color_mode_flags)
-    {
-      return imFileReadImageData(ifile, data, convert2bitmap, color_mode_flags);
-    }
-
     void SetInfo(const char* compression)
     {
-      imFileSetInfo(ifile, compression);
+      imFileSetInfo(im_file, compression);
     }
 
-    void SetPalette(long* palette, int palette_count)
-    {
-      imFileSetPalette(ifile, palette, palette_count);
-    }
 
-    int WriteImageInfo(int width, int height, int color_mode, int data_type)
+    /* image io */
+    int SaveImage(const Image& im_image)
     {
-      return imFileWriteImageInfo(ifile, width, height, color_mode, data_type);
+      return imFileSaveImage(im_file, im_image.im_image);
     }
-
-    int WriteImageData(void* data)
-    {
-      return imFileWriteImageData(ifile, data);
-    }
-
-    Image* LoadImage(int index, int &error)
-    {
-      imImage* image = imFileLoadImage(ifile, index, &error);
-      return new Image(image);
-    }
-    int SaveImage(const Image& image)
-    {
-      return imFileSaveImage(ifile, image.image);
-    }
-
-    void LoadFrame(int index, Image& image, int &error, bool as_bitmap)
+    void LoadFrame(int index, Image& im_image, int &error, bool as_bitmap)
     {
       if (as_bitmap)
-        imFileLoadBitmapFrame(ifile, index, image.image, &error);
+        imFileLoadBitmapFrame(im_file, index, im_image.im_image, &error);
       else
-        imFileLoadImageFrame(ifile, index, image.image, &error);
+        imFileLoadImageFrame(im_file, index, im_image.im_image, &error);
     }
   };
 
+  /* image io */
+  Image::Image(File& file, int index, int &error)
+  {
+    im_image = imFileLoadImage(file.im_file, index, &error);
+  }
+
+
   /********************************************************************/
+
 
   class FileRaw : public File
   {
@@ -390,13 +646,54 @@ namespace im
     FileRaw(const char* file_name, int &error, bool new_file) : File()
     {
       if (new_file) 
-        ifile = imFileNewRaw(file_name, &error);
+        im_file = imFileNewRaw(file_name, &error);
       else 
-        ifile = imFileOpenRaw(file_name, &error);
+        im_file = imFileOpenRaw(file_name, &error);
     }
   };
 
+
   /********************************************************************/
+
+
+  class FormatList
+  {
+  public:
+    FormatList()
+    {
+      imFormatRegisterInternal();
+    }
+    ~FormatList()
+    {
+      imFormatRemoveAll();
+    }
+
+    static void GetList(char** format_list, int &format_count)
+    {
+      imFormatList(format_list, &format_count);
+    }
+
+    static int FormatInfo(const char* format, char* desc, char* ext, int &can_sequence)
+    {
+      return imFormatInfo(format, desc, ext, &can_sequence);
+    }
+    static int FormatInfoExtra(const char* format, char* extra)
+    {
+      return imFormatInfoExtra(format, extra);
+    }
+    static int FormatGetCompressions(const char* format, char** comp, int &comp_count, int color_mode, int data_type)
+    {
+      return imFormatCompressions(format, comp, &comp_count, color_mode, data_type);
+    }
+    static int FormatCanWriteImage(const char* format, const char* compression, int color_mode, int data_type)
+    {
+      return imFormatCanWriteImage(format, compression, color_mode, data_type);
+    }
+  };
+
+
+  /********************************************************************/
+
 
   class VideoCaptureDeviceList
   {
@@ -405,184 +702,288 @@ namespace im
     {
       imVideoCaptureReloadDevices();
     }
-
     ~VideoCaptureDeviceList()
     {
       imVideoCaptureReleaseDevices();
     }
 
-    int Count() const
+    static int Count() 
     {
       return imVideoCaptureDeviceCount();
     }
 
-    const char* DeviceDescription(int device) const
+    static const char* DeviceDescription(int device) 
     {
       return imVideoCaptureDeviceDesc(device);
     }
-
-    const char* DeviceExtendedDescription(int device) const
+    static const char* DeviceExtendedDescription(int device) 
     {
       return imVideoCaptureDeviceExDesc(device);
     }
-
-    const char* DevicePath(int device) const
+    static const char* DevicePath(int device) 
     {
       return imVideoCaptureDevicePath(device);
     }
-
-    const char* DeviceVendorInfo(int device) const
+    static const char* DeviceVendorInfo(int device) 
     {
       return imVideoCaptureDeviceVendorInfo(device);
     }
   };
 
+
   /********************************************************************/
+
 
   class VideoCapture
   {
   protected:
-    imVideoCapture* vc;
+    imVideoCapture* im_vc;
 
   public:
     VideoCapture()
     {
-      vc = imVideoCaptureCreate();
+      im_vc = imVideoCaptureCreate();
     }
-
     VideoCapture(imVideoCapture* ref_vc)
     {
-      vc = ref_vc;
+      im_vc = ref_vc;
     }
-
     ~VideoCapture()
     {
-      if (vc) imVideoCaptureDestroy(vc);
+      if (im_vc) imVideoCaptureDestroy(im_vc);
     }
 
     bool Failed() const
     {
-      return vc == 0;
+      return im_vc == 0;
     }
 
+
+    /* capture connection */
     int Connect(int device)
     {
-      return imVideoCaptureConnect(vc, device);
+      return imVideoCaptureConnect(im_vc, device);
     }
-
     void Disconnect()
     {
-      imVideoCaptureDisconnect(vc);
+      imVideoCaptureDisconnect(im_vc);
     }
-
-    int DialogCount() const
-    {
-      return imVideoCaptureDialogCount(vc);
-    }
-
-    bool ShowDialog(int dialog, void* parent)
-    {
-      return imVideoCaptureShowDialog(vc, dialog, parent) != 0;
-    }
-
-    const char* DialogDescription(int dialog) const
-    {
-      return imVideoCaptureDialogDesc(vc, dialog);
-    }
-
     bool SetInOut(int input, int output, int cross)
     {
-      return imVideoCaptureSetInOut(vc, input, output, cross) != 0;
+      return imVideoCaptureSetInOut(im_vc, input, output, cross) != 0;
     }
-
-    int FormatCount() const
-    {
-      return imVideoCaptureFormatCount(vc);
-    }
-
-    bool GetFormatInfo(int format, int &width, int &height, char* desc) const
-    {
-      return imVideoCaptureGetFormat(vc, format, &width, &height, desc) != 0;
-    }
-
-    int GetFormat() const
-    {
-      return imVideoCaptureSetFormat(vc, -1);
-    }
-
-    bool SetFormat(int format)
-    {
-      return imVideoCaptureSetFormat(vc, format) != 0;
-    }
-
-    void GetImageSize(int &width, int &height) const
-    {
-      imVideoCaptureGetImageSize(vc, &width, &height);
-    }
-
-    bool SetImageSize(int width, int height)
-    {
-      return imVideoCaptureSetImageSize(vc, width, height) != 0;
-    }
-
-    bool CaptureFrame(unsigned char* data, int color_mode, int timeout = -1)
-    {
-      return imVideoCaptureFrame(vc, data, color_mode, timeout) != 0;
-    }
-
-    bool CaptureOneFrame(unsigned char* data, int color_mode)
-    {
-      return imVideoCaptureOneFrame(vc, data, color_mode) != 0;
-    }
-
-    bool CaptureFrame(Image& dst_image, int timeout = -1)
-    {
-      if (dst_image.image->color_space != IM_GRAY && 
-          dst_image.image->color_space != IM_RGB &&
-          dst_image.image->data_type != IM_BYTE)
-        return false;
-
-      return CaptureFrame((unsigned char*)dst_image.image->data[0], dst_image.image->color_space, timeout);
-    }
-
-    bool CaptureOneFrame(Image& dst_image)
-    {
-      if (dst_image.image->color_space != IM_GRAY &&
-          dst_image.image->color_space != IM_RGB &&
-          dst_image.image->data_type != IM_BYTE)
-        return false;
-
-      return CaptureOneFrame((unsigned char*)dst_image.image->data[0], dst_image.image->color_space);
-    }
-
     bool GetLive() const
     {
-      return imVideoCaptureLive(vc, -1) == 1;
+      return imVideoCaptureLive(im_vc, -1) == 1;
     }
-
     bool SetLive(int live)
     {
-      return imVideoCaptureLive(vc, live) != 0;
+      return imVideoCaptureLive(im_vc, live) != 0;
     }
 
+
+    /* configuration dialogs */
+    int DialogCount() const
+    {
+      return imVideoCaptureDialogCount(im_vc);
+    }
+    bool ShowDialog(int dialog, void* parent)
+    {
+      return imVideoCaptureShowDialog(im_vc, dialog, parent) != 0;
+    }
+    const char* DialogDescription(int dialog) const
+    {
+      return imVideoCaptureDialogDesc(im_vc, dialog);
+    }
+
+
+    /* video format */
+    int FormatCount() const
+    {
+      return imVideoCaptureFormatCount(im_vc);
+    }
+    bool GetFormatInfo(int format, int &width, int &height, char* desc) const
+    {
+      return imVideoCaptureGetFormat(im_vc, format, &width, &height, desc) != 0;
+    }
+    int GetFormat() const
+    {
+      return imVideoCaptureSetFormat(im_vc, -1);
+    }
+    bool SetFormat(int format)
+    {
+      return imVideoCaptureSetFormat(im_vc, format) != 0;
+    }
+
+
+    /* image info */
+    void GetImageSize(int &width, int &height) const
+    {
+      imVideoCaptureGetImageSize(im_vc, &width, &height);
+    }
+    bool SetImageSize(int width, int height)
+    {
+      return imVideoCaptureSetImageSize(im_vc, width, height) != 0;
+    }
+
+
+    /* image capture */
+    bool CaptureFrame(Image& dst_image, int timeout = -1)
+    {
+      if (dst_image.im_image->color_space != IM_GRAY && 
+          dst_image.im_image->color_space != IM_RGB &&
+          dst_image.im_image->data_type != IM_BYTE)
+        return false;
+
+      return imVideoCaptureFrame(im_vc, (unsigned char*)dst_image.im_image->data[0], dst_image.im_image->color_space, timeout) != 0;
+    }
+    bool CaptureOneFrame(Image& dst_image)
+    {
+      if (dst_image.im_image->color_space != IM_GRAY &&
+          dst_image.im_image->color_space != IM_RGB &&
+          dst_image.im_image->data_type != IM_BYTE)
+        return false;
+
+      return imVideoCaptureOneFrame(im_vc, (unsigned char*)dst_image.im_image->data[0], dst_image.im_image->color_space) != 0;
+    }
+
+
+    /* attributes */
     bool ResetAttribute(const char* attrib, int fauto)
     {
-      return imVideoCaptureResetAttribute(vc, attrib, fauto) != 0;
+      return imVideoCaptureResetAttribute(im_vc, attrib, fauto) != 0;
     }
-
     bool GetAttribute(const char* attrib, float &percent) const
     {
-      return imVideoCaptureGetAttribute(vc, attrib, &percent) != 0;
+      return imVideoCaptureGetAttribute(im_vc, attrib, &percent) != 0;
     }
-
     bool SetAttribute(const char* attrib, float percent)
     {
-      return imVideoCaptureSetAttribute(vc, attrib, percent) != 0;
+      return imVideoCaptureSetAttribute(im_vc, attrib, percent) != 0;
     }
-
     const char** GetAttributeList(int &num_attrib) const
     {
-      return imVideoCaptureGetAttributeList(vc, &num_attrib);
+      return imVideoCaptureGetAttributeList(im_vc, &num_attrib);
+    }
+  };
+
+  /* image capture */
+  Image::Image(VideoCapture& videocapture, bool as_gray)
+  {
+    int width, height;
+    videocapture.GetImageSize(width, height);
+    im_image = imImageCreate(width, height, as_gray? IM_GRAY: IM_RGB, IM_BYTE);
+  }
+
+  class Kernel : public Image
+  {
+  public:
+    Kernel() : Image() { }
+
+    void Sobel()
+    {
+      Release();
+      im_image = imKernelSobel();
+    }
+    void Prewitt()
+    {
+      Release();
+      im_image = imKernelPrewitt();
+    }
+    void Kirsh()
+    {
+      Release();
+      im_image = imKernelKirsh();
+    }
+    void Laplacian4()
+    {
+      Release();
+      im_image = imKernelLaplacian4();
+    }
+    void Laplacian8()
+    {
+      Release();
+      im_image = imKernelLaplacian8();
+    }
+    void Laplacian5x5()
+    {
+      Release();
+      im_image = imKernelLaplacian5x5();
+    }
+    void Laplacian7x7()
+    {
+      Release();
+      im_image = imKernelLaplacian7x7();
+    }
+    void Gradian3x3()
+    {
+      Release();
+      im_image = imKernelGradian3x3();
+    }
+    void Gradian7x7()
+    {
+      Release();
+      im_image = imKernelGradian7x7();
+    }
+    void Sculpt()
+    {
+      Release();
+      im_image = imKernelSculpt();
+    }
+    void Mean3x3()
+    {
+      Release();
+      im_image = imKernelMean3x3();
+    }
+    void Mean5x5()
+    {
+      Release();
+      im_image = imKernelMean5x5();
+    }
+    void CircularMean5x5()
+    {
+      Release();
+      im_image = imKernelCircularMean5x5();
+    }
+    void Mean7x7()
+    {
+      Release();
+      im_image = imKernelMean7x7();
+    }
+    void CircularMean7x7()
+    {
+      Release();
+      im_image = imKernelCircularMean7x7();
+    }
+    void Gaussian3x3()
+    {
+      Release();
+      im_image = imKernelGaussian3x3();
+    }
+    void Gaussian5x5()
+    {
+      Release();
+      im_image = imKernelGaussian5x5();
+    }
+    void Barlett5x5()
+    {
+      Release();
+      im_image = imKernelBarlett5x5();
+    }
+    void TopHat5x5()
+    {
+      Release();
+      im_image = imKernelTopHat5x5();
+    }
+    void TopHat7x7()
+    {
+      Release();
+      im_image = imKernelTopHat7x7();
+    }
+    void Enhance()
+    {
+      Release();
+      im_image = imKernelEnhance();
     }
   };
 }
