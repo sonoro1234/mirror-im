@@ -57,7 +57,7 @@ void imlua_pushimage(lua_State *L, imImage* image)
 {
   if (!image)
   {
-    luaL_error(L, "image failed to be created, insuficient memory");
+    luaL_error(L, "image failed to be created, insufficient memory");
   }
   else
   {
