@@ -76,16 +76,22 @@ namespace im
       pal_count = count;
       pal_data = imPaletteNew(pal_count);
     }
-    Palette(const long* palette, int count = 256)
+    Palette(long* palette, int count = 256)
     {
       pal_count = count;
+      pal_data = palette;
+    }
+    Palette(const Palette& src_palette)
+    {
+      pal_count = src_palette.pal_count;
       pal_data = imPaletteNew(pal_count);
       for (int i = 0; i < pal_count; i++)
-        pal_data[i] = palette[i];
+        pal_data[i] = src_palette.pal_data[i];
     }
     ~Palette()
     {
-      Release();
+      if (pal_data)
+        imPaletteRelease(pal_data);
     }
 
     long& operator [] (int index)
@@ -96,11 +102,6 @@ namespace im
       return pal_data[index];
     }
 
-    void Release()
-    {
-      if (pal_data) 
-        imPaletteRelease(pal_data);
-    }
 
     int FindNearest(long color) const
     {
@@ -111,97 +112,67 @@ namespace im
       return imPaletteFindColor(pal_data, pal_count, color, tol);
     }
 
-    /* known palettes */
-    void Gray()
+    /* pre-defined palettes */
+    static Palette Gray()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteGray();
+      return Palette(imPaletteGray());
     }
-    void Red()
+    static Palette Red()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteRed();
+      return Palette(imPaletteRed());
     }
-    void Green()
+    static Palette Green()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteGreen();
+      return Palette(imPaletteGreen());
     }
-    void Blue()
+    static Palette Blue()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteBlue();
+      return Palette(imPaletteBlue());
     }
-    void Yellow()
+    static Palette Yellow()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteYellow();
+      return Palette(imPaletteYellow());
     }
-    void Magenta()
+    static Palette Magenta()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteMagenta();
+      return Palette(imPaletteMagenta());
     }
-    void Cian()
+    static Palette Cian()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteCian();
+      return Palette(imPaletteCian());
     }
-    void Rainbow()
+    static Palette Rainbow()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteRainbow();
+      return Palette(imPaletteRainbow());
     }
-    void Hues()
+    static Palette Hues()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteHues();
+      return Palette(imPaletteHues());
     }
-    void BlueIce()
+    static Palette BlueIce()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteBlueIce();
+      return Palette(imPaletteBlueIce());
     }
-    void HotIron()
+    static Palette HotIron()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteHotIron();
+      return Palette(imPaletteHotIron());
     }
-    void BlackBody()
+    static Palette BlackBody()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteBlackBody();
+      return Palette(imPaletteBlackBody());
     }
-    void HighContrast()
+    static Palette HighContrast()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteHighContrast();
+      return Palette(imPaletteHighContrast());
     }
-    void Linear()
+    static Palette Linear()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteLinear();
+      return Palette(imPaletteLinear());
     }
 
-    void Uniform()
+    static Palette Uniform()
     {
-      Release();
-      pal_count = 256;
-      pal_data = imPaletteUniform();
+      return Palette(imPaletteUniform());
     }
     static int UniformIndex(long color)
     {
@@ -215,43 +186,43 @@ namespace im
 
   enum DataType
   {
-    BYTE,   
-    SHORT,  
-    USHORT, 
-    INT,    
-    FLOAT,  
-    DOUBLE, 
-    CFLOAT, 
-    CDOUBLE 
+    BYTE = IM_BYTE,
+    SHORT = IM_SHORT,
+    USHORT = IM_USHORT,
+    INT = IM_INT,
+    FLOAT = IM_FLOAT,
+    DOUBLE = IM_DOUBLE,
+    CFLOAT = IM_CFLOAT,
+    CDOUBLE = IM_CDOUBLE
   };
   enum ColorSpace
   {
-    RGB,    
-    MAP,    
-    GRAY,   
-    BINARY, 
-    CMYK,   
-    YCBCR,  
-    LAB,    
-    LUV,    
-    XYZ     
+    RGB = IM_RGB,
+    MAP = IM_MAP,
+    GRAY = IM_GRAY,
+    BINARY = IM_BINARY,
+    CMYK = IM_CMYK,
+    YCBCR = IM_YCBCR,
+    LAB = IM_LAB,
+    LUV = IM_LUV,
+    XYZ = IM_XYZ
   };
   enum ColorModeConfig
   {
-    ALPHA = 0x100,  
-    PACKED = 0x200, 
-    TOPDOWN = 0x400 
+    ALPHA = IM_ALPHA,
+    PACKED = IM_PACKED,
+    TOPDOWN = IM_TOPDOWN
   };
   enum ErrorCodes
   {
-    ERR_NONE,    
-    ERR_OPEN,    
-    ERR_ACCESS,  
-    ERR_FORMAT,  
-    ERR_DATA,    
-    ERR_COMPRESS,
-    ERR_MEM,     
-    ERR_COUNTER  
+    ERR_NONE = IM_ERR_NONE,
+    ERR_OPEN = IM_ERR_OPEN,
+    ERR_ACCESS = IM_ERR_ACCESS,
+    ERR_FORMAT = IM_ERR_FORMAT,
+    ERR_DATA = IM_ERR_DATA,
+    ERR_COMPRESS = IM_ERR_COMPRESS,
+    ERR_MEM = IM_ERR_MEM,
+    ERR_COUNTER = IM_ERR_COUNTER
   };
 
 
@@ -272,10 +243,10 @@ namespace im
     {
       im_image = imImageCreate(width, height, color_space, data_type);
     }
-    Image(const Image& src_image, int width = -1, int height = -1, int color_space = -1, int data_type = -1)
-    {
-      im_image = imImageCreateBased(src_image.im_image, width, height, color_space, data_type);
-    }
+//    Image(const Image& src_image, int width = -1, int height = -1, int color_space = -1, int data_type = -1)
+//    {
+//      im_image = imImageCreateBased(src_image.im_image, width, height, color_space, data_type);
+//    }
     Image(const char* file_name, int index, int &error, bool as_bitmap)
     {
       if (as_bitmap)
@@ -283,27 +254,20 @@ namespace im
       else
         im_image = imFileImageLoadBitmap(file_name, index, &error);
     }
+    Image(const Image& ref_image)
+    {
+      im_image = ref_image.im_image;
+    }
     Image(imImage* ref_image)
     {
       im_image = ref_image;
     }
     ~Image()
     {
-      Release();
+      if (im_image)
+        imImageDestroy(im_image);
     }
 
-    /* image io */
-    Image(File& file, int index, int &error);
-
-    /* image capture */
-    Image::Image(VideoCapture& videocapture, bool as_gray);
-
-    Image& operator = (const Image& src_image)
-    {
-      Release();
-      im_image = imImageDuplicate(src_image.im_image);
-      return *this;
-    }
 
     bool Failed() const
     {
@@ -349,7 +313,11 @@ namespace im
     }
 
 
-    /* data/metadata copy */
+    /* copy utilities */
+    Image Duplicate()
+    {
+      return Image(imImageDuplicate(im_image));
+    }
     void Copy(Image& dst_image) const
     {
       imImageCopy(im_image, dst_image.im_image);
@@ -373,14 +341,6 @@ namespace im
 
 
     /* utilities */
-    void Release()
-    {
-      if (im_image)
-      {
-        imImageDestroy(im_image);
-        im_image = 0;
-      }
-    }
     void Clear()
     {
       imImageClear(im_image);
@@ -391,13 +351,15 @@ namespace im
     }
     void SetPalette(const Palette& palette)
     {
-      Palette new_palette(palette);
+      Palette new_palette(palette); /* duplicate */
       imImageSetPalette(im_image, new_palette.pal_data, new_palette.pal_count);
       new_palette.pal_data = 0;  /* mark as released */
     }
     Palette GetPalette()
     {
-      Palette new_palette(im_image->palette, im_image->palette_count);
+      Palette ref_palette(im_image->palette, im_image->palette_count);  /* reference */
+      Palette new_palette(ref_palette);  /* duplicate */
+      ref_palette.pal_data = 0;  /* mark as released */
       return new_palette;
     }
 
@@ -543,10 +505,13 @@ namespace im
   {
     friend class Image;
 
+    /* forbidden */
+    File(const File&) { }
+
   protected:
     imFile* im_file;
 
-    File() { im_file = 0; };
+    File() { im_file = 0; }
 
   public:
     File(const char* file_name, int &error)
@@ -563,7 +528,8 @@ namespace im
     }
     ~File()
     {
-      if (im_file) imFileClose(im_file);
+      if (im_file) 
+        imFileClose(im_file);
     }
 
     bool Failed() const
@@ -619,6 +585,10 @@ namespace im
 
 
     /* image io */
+    Image LoadImage(int index, int &error)
+    {
+      return Image(imFileLoadImage(im_file, index, &error));
+    }
     int SaveImage(const Image& im_image)
     {
       return imFileSaveImage(im_file, im_image.im_image);
@@ -632,19 +602,15 @@ namespace im
     }
   };
 
-  /* image io */
-  Image::Image(File& file, int index, int &error)
-  {
-    im_image = imFileLoadImage(file.im_file, index, &error);
-  }
-
 
   /********************************************************************/
 
 
   class FileRaw : public File
   {
-    FileRaw() {};
+    /* forbidden */
+    FileRaw() {}
+    FileRaw(const FileRaw&) {}
 
   public:
 
@@ -663,6 +629,9 @@ namespace im
 
   class FormatList
   {
+    /* forbidden */
+    FormatList(const FormatList&) {}
+
   public:
     FormatList()
     {
@@ -702,6 +671,9 @@ namespace im
 
   class VideoCaptureDeviceList
   {
+    /* forbidden */
+    VideoCaptureDeviceList(const VideoCaptureDeviceList&) {}
+
   public:
     VideoCaptureDeviceList()
     {
@@ -741,6 +713,9 @@ namespace im
 
   class VideoCapture
   {
+    /* forbidden */
+    VideoCapture(const VideoCapture&) {}
+
   protected:
     imVideoCapture* im_vc;
 
@@ -755,7 +730,8 @@ namespace im
     }
     ~VideoCapture()
     {
-      if (im_vc) imVideoCaptureDestroy(im_vc);
+      if (im_vc) 
+        imVideoCaptureDestroy(im_vc);
     }
 
     bool Failed() const
@@ -833,6 +809,12 @@ namespace im
 
 
     /* image capture */
+    Image CaptureImage(bool as_gray)
+    {
+      int width, height;
+      GetImageSize(width, height);
+      return Image(imImageCreate(width, height, as_gray ? IM_GRAY : IM_RGB, IM_BYTE));
+    }
     bool CaptureFrame(Image& dst_image, int timeout = -1)
     {
       if (dst_image.im_image->color_space != IM_GRAY && 
@@ -872,123 +854,97 @@ namespace im
     }
   };
 
-  /* image capture */
-  Image::Image(VideoCapture& videocapture, bool as_gray)
-  {
-    int width, height;
-    videocapture.GetImageSize(width, height);
-    im_image = imImageCreate(width, height, as_gray? IM_GRAY: IM_RGB, IM_BYTE);
-  }
 
-  class Kernel : public Image
+  /********************************************************************/
+
+
+  class Kernel
   {
   public:
-    Kernel() : Image() { }
-
-    void Sobel()
+    /* pre-defined kernels */
+    static Image Sobel()
     {
-      Release();
-      im_image = imKernelSobel();
+      return Image(imKernelSobel());
     }
-    void Prewitt()
+    static Image Prewitt()
     {
-      Release();
-      im_image = imKernelPrewitt();
+      return Image(imKernelPrewitt());
     }
-    void Kirsh()
+    static Image Kirsh()
     {
-      Release();
-      im_image = imKernelKirsh();
+      return Image(imKernelKirsh());
     }
-    void Laplacian4()
+    static Image Laplacian4()
     {
-      Release();
-      im_image = imKernelLaplacian4();
+      return Image(imKernelLaplacian4());
     }
-    void Laplacian8()
+    static Image Laplacian8()
     {
-      Release();
-      im_image = imKernelLaplacian8();
+      return Image(imKernelLaplacian8());
     }
-    void Laplacian5x5()
+    static Image Laplacian5x5()
     {
-      Release();
-      im_image = imKernelLaplacian5x5();
+      return Image(imKernelLaplacian5x5());
     }
-    void Laplacian7x7()
+    static Image Laplacian7x7()
     {
-      Release();
-      im_image = imKernelLaplacian7x7();
+      return Image(imKernelLaplacian7x7());
     }
-    void Gradian3x3()
+    static Image Gradian3x3()
     {
-      Release();
-      im_image = imKernelGradian3x3();
+      return Image(imKernelGradian3x3());
     }
-    void Gradian7x7()
+    static Image Gradian7x7()
     {
-      Release();
-      im_image = imKernelGradian7x7();
+      return Image(imKernelGradian7x7());
     }
-    void Sculpt()
+    static Image Sculpt()
     {
-      Release();
-      im_image = imKernelSculpt();
+      return Image(imKernelSculpt());
     }
-    void Mean3x3()
+    static Image Mean3x3()
     {
-      Release();
-      im_image = imKernelMean3x3();
+      return Image(imKernelMean3x3());
     }
-    void Mean5x5()
+    static Image Mean5x5()
     {
-      Release();
-      im_image = imKernelMean5x5();
+      return Image(imKernelMean5x5());
     }
-    void CircularMean5x5()
+    static Image CircularMean5x5()
     {
-      Release();
-      im_image = imKernelCircularMean5x5();
+      return Image(imKernelCircularMean5x5());
     }
-    void Mean7x7()
+    static Image Mean7x7()
     {
-      Release();
-      im_image = imKernelMean7x7();
+      return Image(imKernelMean7x7());
     }
-    void CircularMean7x7()
+    static Image CircularMean7x7()
     {
-      Release();
-      im_image = imKernelCircularMean7x7();
+      return Image(imKernelCircularMean7x7());
     }
-    void Gaussian3x3()
+    static Image Gaussian3x3()
     {
-      Release();
-      im_image = imKernelGaussian3x3();
+      return Image(imKernelGaussian3x3());
     }
-    void Gaussian5x5()
+    static Image Gaussian5x5()
     {
-      Release();
-      im_image = imKernelGaussian5x5();
+      return Image(imKernelGaussian5x5());
     }
-    void Barlett5x5()
+    static Image Barlett5x5()
     {
-      Release();
-      im_image = imKernelBarlett5x5();
+      return Image(imKernelBarlett5x5());
     }
-    void TopHat5x5()
+    static Image TopHat5x5()
     {
-      Release();
-      im_image = imKernelTopHat5x5();
+      return Image(imKernelTopHat5x5());
     }
-    void TopHat7x7()
+    static Image TopHat7x7()
     {
-      Release();
-      im_image = imKernelTopHat7x7();
+      return Image(imKernelTopHat7x7());
     }
-    void Enhance()
+    static Image Enhance()
     {
-      Release();
-      im_image = imKernelEnhance();
+      return Image(imKernelEnhance());
     }
   };
 }
