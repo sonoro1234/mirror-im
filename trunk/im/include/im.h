@@ -67,7 +67,7 @@ enum imErrorCodes
   IM_ERR_FORMAT,   /**< Invalid or unrecognized file format. */
   IM_ERR_DATA,     /**< Invalid or unsupported data. */
   IM_ERR_COMPRESS, /**< Invalid or unsupported compression. */
-  IM_ERR_MEM,      /**< Insuficient memory */
+  IM_ERR_MEM,      /**< Insufficient memory */
   IM_ERR_COUNTER   /**< Interrupted by the counter */
 };
 
@@ -123,7 +123,7 @@ void* imFileHandle(imFile* ifile, int index);
  * image_count is the number of images in a stack or 
  * the number of frames in a video/animation or the depth of a volume data. \n
  * compression and image_count can be NULL. \n
- * These informations are also available as attributes:
+ * These information are also available as attributes:
  * \verbatim FileFormat (string) \endverbatim
  * \verbatim FileCompression (string) \endverbatim
  * \verbatim FileImageCount IM_INT (1) \endverbatim
@@ -134,7 +134,7 @@ void* imFileHandle(imFile* ifile, int index);
 void imFileGetInfo(imFile* ifile, char* format, char* compression, int *image_count);
 
 /** Changes the write compression method. \n
- * If the compression is not supported will return an error code when writting. \n
+ * If the compression is not supported will return an error code when writing. \n
  * Use NULL to set the default compression. You can use the imFileGetInfo to retrieve the actual compression
  * but only after \ref imFileWriteImageInfo. Only a few formats allow you to change the compression between frames.
  *
@@ -193,8 +193,8 @@ const char* imFileGetAttribString(const imFile* ifile, const char* attrib);
  * \ingroup file */
 void imFileGetAttributeList(imFile* ifile, char** attrib, int *attrib_count);
 
-/** Returns the pallete if any. \n
- * "palette" must be a 256 colors alocated array. \n
+/** Returns the palette if any. \n
+ * "palette" must be a 256 colors allocated array. \n
  * Returns zero in "palette_count" if there is no palette. "palette_count" is >0 and <=256.
  *
  * \verbatim ifile:GetPalette() -> palette: imPalette [in Lua 5] \endverbatim
@@ -236,7 +236,7 @@ int imFileWriteImageInfo(imFile* ifile, int width, int height, int user_color_mo
  * The data can be converted to bitmap when reading.
  * Data type conversion to byte will always scan for min-max then scale to 0-255, 
  * except integer values that min-max are already between 0-255. Complex to real conversions will use the magnitude. \n
- * Color mode flags contains packed, alpha and top-botttom information.
+ * Color mode flags contains packed, alpha and top-bottom information.
  * If flag is 0 means unpacked, no alpha and bottom up. If flag is -1 the file original flags are used. \n
  * Returns an error code.
  * See also \ref imErrorCodes, \ref imDataType, \ref imColorSpace and \ref imColorModeConfig.
@@ -260,7 +260,7 @@ int imFileWriteImageData(imFile* ifile, void* data);
  * but can be called to force the internal formats to be registered before other formats.
  * Notice that additional formats when registered will be registered before the internal formats 
  * if imFormatRegisterInternal is not called yet. \n
- * To control the register order is usefull when two format drivers handle the same format. 
+ * To control the register order is useful when two format drivers handle the same format. 
  * The first registered format will always be used first.
  * \ingroup format */
 void imFormatRegisterInternal(void);
@@ -308,7 +308,7 @@ int imFormatInfoExtra(const char* format, char* extra);
  * \ingroup format */
 int imFormatCompressions(const char* format, char** comp, int *comp_count, int color_mode, int data_type);
 
-/** Checks if the format suport the given image class at the given compression. \n
+/** Checks if the format support the given image class at the given compression. \n
  * Returns an error code.
  * See also \ref format, \ref imErrorCodes, \ref imDataType, \ref imColorSpace and \ref imColorModeConfig.
  *

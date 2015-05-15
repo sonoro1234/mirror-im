@@ -29,13 +29,13 @@ static void PrintError(int error)
     IupMessage("IM", "Error Opening File.");
     break;
   case IM_ERR_MEM:
-    IupMessage("IM", "Insuficient memory.");
+    IupMessage("IM", "Insufficient memory.");
     break;
   case IM_ERR_ACCESS:
     IupMessage("IM", "Error Accessing File.");
     break;
   case IM_ERR_DATA:
-    IupMessage("IM", "Image type not Suported.");
+    IupMessage("IM", "Image type not Supported.");
     break;
   case IM_ERR_FORMAT:
     IupMessage("IM", "Invalid Format.");

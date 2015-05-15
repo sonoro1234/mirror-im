@@ -28,13 +28,13 @@ void PrintError(int error)
     printf("Error Opening File.\n");
     break;
   case IM_ERR_MEM:
-    printf("Insuficient memory.\n");
+    printf("Insufficient memory.\n");
     break;
   case IM_ERR_ACCESS:
     printf("Error Accessing File.\n");
     break;
   case IM_ERR_DATA:
-    printf("Image type not Suported.\n");
+    printf("Image type not Supported.\n");
     break;
   case IM_ERR_FORMAT:
     printf("Invalid Format.\n");

@@ -34,9 +34,9 @@ end
 function im.ErrorStr(err)
 	local msg = {}
 	msg[im.ERR_OPEN] = "Error Opening File."
-	msg[im.ERR_MEM] = "Insuficient memory."
+	msg[im.ERR_MEM] = "Insufficient memory."
 	msg[im.ERR_ACCESS] = "Error Accessing File."
-	msg[im.ERR_DATA] = "Image type not Suported."
+	msg[im.ERR_DATA] = "Image type not Supported."
 	msg[im.ERR_FORMAT] = "Invalid Format."
 	msg[im.ERR_COMPRESS] = "Invalid or unsupported compression."
 	msg[im.ERR_NONE] = "None."
