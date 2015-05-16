@@ -85,9 +85,9 @@ int imFileCheckConversion(imFile* ifile);
  * \ingroup filesdk */
 int imFileLineBufferCount(imFile* ifile);
 
-/** Increments the row and plane counters.
+/** Increments the line and plane counters.
  * \ingroup filesdk */
-void imFileLineBufferInc(imFile* ifile, int *row, int *plane);
+void imFileLineBufferInc(imFile* ifile, int *line, int *plane);
 
 /** Converts from FILE color mode to USER color mode.
  * \ingroup filesdk */

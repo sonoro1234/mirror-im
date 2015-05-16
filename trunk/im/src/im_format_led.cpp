@@ -270,7 +270,7 @@ int imFileFormatLED::ReadImageData(void* data)
 
   imCounterTotal(this->counter, this->height, "Reading LED...");
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     for (int col = 0; col < this->width; col++)
     {
@@ -280,7 +280,7 @@ int imFileFormatLED::ReadImageData(void* data)
       ((imbyte*)this->line_buffer)[col] = (unsigned char)value;
     }
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
@@ -293,9 +293,9 @@ int imFileFormatLED::WriteImageData(void* data)
 {
   imCounterTotal(this->counter, this->height, "Writing LED...");
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     for (int col = 0; col < this->width; col++)
     {

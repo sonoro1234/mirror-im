@@ -681,19 +681,19 @@ int imFileLineBufferCount(imFile* ifile)
   return count;
 }
 
-void imFileLineBufferInc(imFile* ifile, int *row, int *plane)
+void imFileLineBufferInc(imFile* ifile, int *line, int *plane)
 {
   if (!imColorModeIsPacked(ifile->file_color_mode))
   {
-    if (*row == ifile->height-1)
+    if (*line == ifile->height - 1)
     {
-      *row = 0;
+      *line = 0;
       (*plane)++;
       return;
     }
   }
 
-  (*row)++;
+  (*line)++;
 }
 
 int imFileCheckConversion(imFile* ifile)

@@ -168,12 +168,12 @@ imFormatRemoveAll</strong> in <a href="doxygen/group__format.html">File Formats<
 <p>
         Data can also be accessed in Lua in two different ways.</p>
 <p>
-        First, using data indexing with plane, row and column. <strong>
+        First, using data indexing with plane, line and column. <strong>
 		image[plane]</strong> returns an object that represents an image plane.
-		<strong>image[plane][row]</strong> returns an object that represents an 
-		image row of that plane. And finally <strong>image[plane][row][column]</strong> 
+		<strong>image[plane][line]</strong> returns an object that represents an 
+		image line of that plane. And finally <strong>image[plane][line][column]</strong> 
 		returns an object that represents the pixel value of the column in the 
-		row of that plane. All indices use the same start as in C, i.e. all 
+		line of that plane. All indices use the same start as in C, i.e. all 
 		start at 0. Only the pixel value can has its value changed. When 
 		data_type is IM_CFLOAT then value is a table with two numbers.</p>
 <p>

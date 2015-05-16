@@ -914,7 +914,7 @@ int imFileFormatBMP::ReadImageData(void* data)
   /* jump to the begin of image data */
   imBinFileSeekTo(handle, this->offset);
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     /* read and decompress the data */
     if (this->comp_type == BMP_COMPRESS_RLE8)
@@ -933,7 +933,7 @@ int imFileFormatBMP::ReadImageData(void* data)
     if (this->bpp > 8)
       FixRGBOrder();
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
@@ -950,9 +950,9 @@ int imFileFormatBMP::WriteImageData(void* data)
   if (this->comp_type == BMP_COMPRESS_RLE8) // point to the extra buffer
     compressed_buffer = (imbyte*)this->line_buffer + this->line_buffer_size+4;
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     if (this->bpp > 8)
       FixRGBOrder();

@@ -344,7 +344,7 @@ int imFileFormatECW::ReadImageData(void* data)
   for(i = 0; i < nBands; i++)
     ppOutputLine[i] = ppOutputBuffer + i*type_size*view_width;
 
-  for (int row = 0; row < view_height; row++)
+  for (int lin = 0; lin < view_height; lin++)
   {
     NCSEcwReadStatus eError = NCScbmReadViewLineBILEx(this->pNCSFileView, eType, (void**)ppOutputLine);
     if( eError != NCS_SUCCESS)
@@ -356,7 +356,7 @@ int imFileFormatECW::ReadImageData(void* data)
 
     iCopyDataBuffer(ppOutputLine, (imbyte*)this->line_buffer, nBands, view_width, type_size);
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
     {

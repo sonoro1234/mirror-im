@@ -336,7 +336,9 @@ int imAttribTableGetInteger(imAttribTablePrivate* ptable, const char *name, int 
 {
   int data_type, count;
   const void* data = imAttribTableGet(ptable, name, &data_type, &count);
-  if (!data || index < 0 || index >= count) return 0;
+  if (!data || index < 0 || index >= count) 
+    return 0;
+
   switch (data_type)
   {
   case IM_BYTE:
@@ -362,7 +364,9 @@ double imAttribTableGetReal(imAttribTablePrivate* ptable, const char *name, int 
 {
   int data_type, count;
   const void* data = imAttribTableGet(ptable, name, &data_type, &count);
-  if (!data || index < 0 || index >= count) return 0;
+  if (!data || index < 0 || index >= count) 
+    return 0;
+
   switch (data_type)
   {
   case IM_BYTE:
@@ -400,7 +404,8 @@ const char* imAttribTableGetString(imAttribTablePrivate* ptable, const char *nam
 {
   int data_type, count;
   const void* data = imAttribTableGet(ptable, name, &data_type, &count);
-  if (!data || data_type != IM_BYTE || !iFindZero((imbyte*)data, count)) return 0;
+  if (!data || data_type != IM_BYTE || !iFindZero((imbyte*)data, count)) 
+    return 0;
   return (const char*)data;
 }
 

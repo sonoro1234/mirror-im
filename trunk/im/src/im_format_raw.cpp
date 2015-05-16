@@ -283,7 +283,7 @@ int imFileFormatRAW::ReadImageData(void* data)
 
   imCounterTotal(this->counter, count, "Reading RAW...");
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   for (int i = 0; i < count; i++)
   {
     if (ascii)
@@ -334,12 +334,12 @@ int imFileFormatRAW::ReadImageData(void* data)
         iRawFixRGB16();
     }
 
-    imFileLineBufferRead(this, data, row, plane);
+    imFileLineBufferRead(this, data, lin, plane);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
 
     if (this->padding)
       imBinFileSeekOffset(this->handle, this->padding);
@@ -369,10 +369,10 @@ int imFileFormatRAW::WriteImageData(void* data)
 
   imCounterTotal(this->counter, count, "Writing RAW...");
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   for (int i = 0; i < count; i++)
   {
-    imFileLineBufferWrite(this, data, row, plane);
+    imFileLineBufferWrite(this, data, lin, plane);
 
     if (ascii)
     {
@@ -422,7 +422,7 @@ int imFileFormatRAW::WriteImageData(void* data)
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
 
     if (this->padding)
       imBinFileSeekOffset(this->handle, this->padding);

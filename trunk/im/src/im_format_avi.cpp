@@ -596,7 +596,7 @@ int imFileFormatAVI::ReadImageData(void* data)
   }
 
   imbyte* bits = dib->bits;
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     CopyMemory(this->line_buffer, bits, dib->line_size);
     bits += dib->line_size;
@@ -604,7 +604,7 @@ int imFileFormatAVI::ReadImageData(void* data)
     if (dib->bmih->biBitCount > 8)
       FixRGBOrder(dib->bmih->biBitCount);
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
     {
@@ -634,9 +634,9 @@ int imFileFormatAVI::WriteImageData(void* data)
   }
 
   imbyte* bits = dib->bits;
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     if (dib->bmih->biBitCount > 8)
       FixRGBOrder(dib->bmih->biBitCount);

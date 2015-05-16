@@ -1412,30 +1412,30 @@ int imFileFormatGIF::ReadImageData(void* data)
 {
   imCounterTotal(this->counter, this->height, "Reading GIF...");
 
-  int row = 0, error;
+  int lin = 0, error;
   for (int i = 0; i < this->height; i++)
   {
     error = iGIFDecompressLine(&gif_data, handle, (imbyte*)this->line_buffer, this->width);
     if (error != IM_ERR_NONE)
       return IM_ERR_ACCESS;
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
 	  if (gif_data.interlaced)
 	  {
-      row += InterlacedJumps[gif_data.step];
+      lin += InterlacedJumps[gif_data.step];
 
-      if (row > this->height-1)
+      if (lin > this->height-1)
       {
         gif_data.step++;
-        row = InterlacedOffset[gif_data.step];
+        lin = InterlacedOffset[gif_data.step];
       }
 	  }
 	  else
-      row++;
+      lin++;
   }
 
   /* Skip remaining empty blocks of the image data */
@@ -1449,10 +1449,10 @@ int imFileFormatGIF::WriteImageData(void* data)
 {
   imCounterTotal(this->counter, this->height, "Writing GIF...");
 
-  int row = 0, error;
+  int lin = 0, error;
   for (int i = 0; i < this->height; i++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     error = iGIFCompressLine(&gif_data, handle, (imbyte*)this->line_buffer, this->width);
 
@@ -1464,16 +1464,16 @@ int imFileFormatGIF::WriteImageData(void* data)
 
 	  if (gif_data.interlaced)
 	  {
-      row += InterlacedJumps[gif_data.step];
+      lin += InterlacedJumps[gif_data.step];
 
-      if (row > this->height-1)
+      if (lin > this->height-1)
       {
         gif_data.step++;
-        row = InterlacedOffset[gif_data.step];
+        lin = InterlacedOffset[gif_data.step];
       }
 	  }
 	  else
-      row++;
+      lin++;
   }
 
   /* writes the end picture code */

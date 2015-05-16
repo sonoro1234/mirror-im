@@ -56,7 +56,7 @@ typedef struct _imImage
   void** data;        /**< Image data organized as a 2D matrix with several planes.   \n
                            But plane 0 is also a pointer to the full data.            \n
                            The remaining planes are: "data[i] = data[0] + i*plane_size". \n
-                           In Lua, data indexing is possible using: "image[plane][row][column]". \n
+                           In Lua, data indexing is possible using: "image[plane][line][column]". \n
                            Also in Lua, is possible to set all pixels using a table calling "image:SetPixels(table)"
                            and get all pixels using "table = image:GetPixels()" (Since 3.9). */
 

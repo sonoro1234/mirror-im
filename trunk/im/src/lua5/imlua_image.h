@@ -17,11 +17,11 @@ typedef struct _imluaImageChannel {
   int channel;
 } imluaImageChannel;
 
-typedef struct _imluaImageRow {
+typedef struct _imluaImageLine {
   imImage *image;
   int channel;
-  int row;
-} imluaImageRow;
+  int lin;
+} imluaImageLine;
 
 void imlua_open_image(lua_State *L);
 

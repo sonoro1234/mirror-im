@@ -301,7 +301,7 @@ int imFileFormatPNM::ReadImageData(void* data)
   if (this->image_type == '1' || this->image_type == '2' || this->image_type == '3')
     ascii = 1;
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     if (ascii)
     {
@@ -331,7 +331,7 @@ int imFileFormatPNM::ReadImageData(void* data)
         FixBinary();
     }
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
@@ -377,9 +377,9 @@ int imFileFormatPNM::WriteImageData(void* data)
   if (this->image_type == '1' || this->image_type == '2' || this->image_type == '3')
     ascii = 1;
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     if (ascii)
     {
