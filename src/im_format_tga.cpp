@@ -1033,7 +1033,7 @@ int imFileFormatTGA::ReadImageData(void* data)
   if (this->bpp == 16)
     line_size = this->width*2;
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     if (this->image_type > 3)
     {
@@ -1050,7 +1050,7 @@ int imFileFormatTGA::ReadImageData(void* data)
     if (this->bpp > 8)
       FixRGB();
   
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
@@ -1067,9 +1067,9 @@ int imFileFormatTGA::WriteImageData(void* data)
   if (this->image_type > 3)  // point to the extra buffer
     compressed_buffer = (imbyte*)this->line_buffer + this->line_buffer_size;
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     if (this->bpp > 8)
       FixRGB();

@@ -1045,7 +1045,7 @@ int imFileFormatJPEG::ReadImageData(void* data)
 
   imCounterTotal(this->counter, this->dinfo.output_height, "Reading JPEG...");
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   while (this->dinfo.output_scanline < this->dinfo.output_height) 
   {
     if (jpeg_read_scanlines(&this->dinfo, (JSAMPARRAY)&this->line_buffer, 1) == 0)
@@ -1054,7 +1054,7 @@ int imFileFormatJPEG::ReadImageData(void* data)
     if (this->fix_adobe_cmyk)
       iFixAdobeCMYK((unsigned char*)this->line_buffer, this->width);
 
-    imFileLineBufferRead(this, data, row, plane);
+    imFileLineBufferRead(this, data, lin, plane);
 
     if (!imCounterInc(this->counter))
     {
@@ -1062,7 +1062,7 @@ int imFileFormatJPEG::ReadImageData(void* data)
       return IM_ERR_COUNTER;
     }
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
   }
 
   jpeg_finish_decompress(&this->dinfo);
@@ -1077,10 +1077,10 @@ int imFileFormatJPEG::WriteImageData(void* data)
 
   imCounterTotal(this->counter, this->dinfo.output_height, "Writing JPEG...");
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   while (this->cinfo.next_scanline < this->cinfo.image_height) 
   {
-    imFileLineBufferWrite(this, data, row, plane);
+    imFileLineBufferWrite(this, data, lin, plane);
 
     if (jpeg_write_scanlines(&this->cinfo, (JSAMPARRAY)&this->line_buffer, 1) == 0)
       return IM_ERR_ACCESS;
@@ -1091,7 +1091,7 @@ int imFileFormatJPEG::WriteImageData(void* data)
       return IM_ERR_COUNTER;
     }
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
   }
 
   jpeg_finish_compress(&this->cinfo);

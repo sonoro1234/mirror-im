@@ -184,7 +184,7 @@ typedef box * boxptr;
 static hist2d * sl_histogram;	/* pointer to the 3D histogram array */
 static FSERRPTR sl_fserrors;	/* accumulated-errors array */
 static int * sl_error_limiter;	/* table for clamping the applied error */
-static int sl_on_odd_row;	/* flag to remember which row we are on */
+static int sl_on_odd_lin;	/* flag to remember which line we are on */
 static imbyte* sl_colormap[3];	/* selected colormap */
 static int sl_num_colors;	/* number of selected colors */
 
@@ -238,7 +238,7 @@ static int slow_quant(imbyte *red, imbyte *green, imbyte *blue, int w, int h, im
   
   /* Initialize the propagated errors to zero. */
   memset(sl_fserrors, 0, fs_arraysize);
-  sl_on_odd_row = 0;
+  sl_on_odd_lin = 0;
   
   /* Map the image. */
   slow_map_pixels(red, green, blue, w, h, map);
@@ -760,25 +760,25 @@ static void slow_map_pixels (imbyte *red, imbyte *green, imbyte *blue, int width
   histptr cachep;
   int dir;			/* +1 or -1 depending on direction */
   int dir3;			/* 3*dir, for advancing errorptr */
-  int row, col, offset;
+  int lin, col, offset;
   int *error_limit = sl_error_limiter;
   imbyte* colormap0 = sl_colormap[0];
   imbyte* colormap1 = sl_colormap[1];
   imbyte* colormap2 = sl_colormap[2];
   hist2d * histogram = sl_histogram;
   
-  for (row = 0; row < height; row++) 
+  for (lin = 0; lin < height; lin++) 
   {
-    offset = row * width;
+    offset = lin * width;
 
     inRptr = & red[offset];
     inGptr = & green[offset];
     inBptr = & blue[offset];
     outptr = & map[offset];
 
-    if (sl_on_odd_row) 
+    if (sl_on_odd_lin) 
     {
-      /* work right to left in this row */
+      /* work right to left in this line */
       offset = width-1;
 
       inRptr += offset;	/* so point to rightmost pixel */
@@ -790,20 +790,20 @@ static void slow_map_pixels (imbyte *red, imbyte *green, imbyte *blue, int width
       dir = -1;
       dir3 = -3;
       errorptr = sl_fserrors + (width+1)*3; /* => entry after last column */
-      sl_on_odd_row = 0;	/* flip for next time */
+      sl_on_odd_lin = 0;	/* flip for next time */
     } 
     else 
     {
-      /* work left to right in this row */
+      /* work left to right in this line */
       dir = 1;
       dir3 = 3;
       errorptr = sl_fserrors;	/* => entry before first real column */
-      sl_on_odd_row = 1;	/* flip for next time */
+      sl_on_odd_lin = 1;	/* flip for next time */
     }
 
     /* Preset error values: no error propagated to first pixel from left */
     cur0 = cur1 = cur2 = 0;
-    /* and no error propagated to row below yet */
+    /* and no error propagated to line below yet */
     belowerr0 = belowerr1 = belowerr2 = 0;
     bpreverr0 = bpreverr1 = bpreverr2 = 0;
     

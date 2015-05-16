@@ -190,14 +190,14 @@ int imFileFormatPFM::ReadImageData(void* data)
 
   int line_raw_size = imImageLineSize(this->width, this->file_color_mode, this->file_data_type);
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     imBinFileRead(handle, this->line_buffer, line_raw_size, 1);
 
     if (imBinFileError(handle))
       return IM_ERR_ACCESS;     
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
@@ -212,9 +212,9 @@ int imFileFormatPFM::WriteImageData(void* data)
 
   int line_raw_size = imImageLineSize(this->width, this->file_color_mode, this->file_data_type);
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     imBinFileWrite(handle, this->line_buffer, line_raw_size, 1);
 

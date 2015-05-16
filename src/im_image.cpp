@@ -27,12 +27,12 @@ int imImageCheckFormat(int color_mode, int data_type)
   return 1;
 }
 
-int imImagePixelOffset(int is_packed, int width, int height, int depth, int col, int row, int plane)
+int imImagePixelOffset(int is_packed, int width, int height, int depth, int col, int lin, int plane)
 {
   if (is_packed) 
-    return row*width*depth + col*depth + plane;
+    return lin*width*depth + col*depth + plane;
   else           
-    return plane*width*height + row*width + col;
+    return plane*width*height + lin*width + col;
 }
 
 int imImageDataSize(int width, int height, int color_mode, int data_type)

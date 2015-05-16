@@ -455,22 +455,22 @@ void imFileFormatICO::FixRGBOrder()
   }
 }
 
-inline int iICOPixelOffset(int is_top_down, int is_packed, int width, int height, int depth, int col, int row, int plane)
+inline int iICOPixelOffset(int is_top_down, int is_packed, int width, int height, int depth, int col, int lin, int plane)
 {
   if (is_top_down)
-    row = height-1 - row;
+    lin = height-1 - lin;
 
   if (is_packed) 
-    return row*width*depth + col*depth + plane;
+    return lin*width*depth + col*depth + plane;
   else           
-    return plane*width*height + row*width + col;
+    return plane*width*height + lin*width + col;
 }
 
 int imFileFormatICO::ReadImageData(void* data)
 {
   imCounterTotal(this->counter, this->height, "Reading ICO...");
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
     imBinFileRead(handle, this->line_buffer, this->line_raw_size, 1);
     if (imBinFileError(handle))
@@ -479,7 +479,7 @@ int imFileFormatICO::ReadImageData(void* data)
     if (this->bpp > 8)
       FixRGBOrder();
 
-    imFileLineBufferRead(this, data, row, 0);
+    imFileLineBufferRead(this, data, lin, 0);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
@@ -559,9 +559,9 @@ int imFileFormatICO::WriteImageData(void* data)
 
   /* Image Data */
 
-  for (int row = 0; row < this->height; row++)
+  for (int lin = 0; lin < this->height; lin++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     if (this->bpp > 8)
       FixRGBOrder();

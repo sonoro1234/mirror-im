@@ -31,11 +31,11 @@ jas_seqent_t iJP2Bits2Int(jas_seqent_t v, int prec, int sgnd)
 
 /* this is based on jas_image_readcmpt */
 template <class T> 
-int iJP2ReadLine(jas_image_t *image, int row, int cmpno, T *data)
+int iJP2ReadLine(jas_image_t *image, int lin, int cmpno, T *data)
 {
   jas_image_cmpt_t *cmpt = image->cmpts_[cmpno];
 
-  if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * row) * cmpt->cps_, SEEK_SET) < 0) 
+  if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * lin) * cmpt->cps_, SEEK_SET) < 0) 
     return 0;
 
   // this offset will convert from signed to unsigned
@@ -73,11 +73,11 @@ uint_fast32_t iJP2Int2Bits(jas_seqent_t v, int prec, int sgnd)
 
 /* this is based on jas_image_writecmpt */
 template <class T> 
-int iJP2WriteLine(jas_image_t *image, int row, int cmpno, T *data)
+int iJP2WriteLine(jas_image_t *image, int lin, int cmpno, T *data)
 {
   jas_image_cmpt_t *cmpt = image->cmpts_[cmpno];
 
-  if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * row) * cmpt->cps_, SEEK_SET) < 0) 
+  if (jas_stream_seek(cmpt->stream_, (cmpt->width_ * lin) * cmpt->cps_, SEEK_SET) < 0) 
     return 0;
 
   for (int j = 0; j < cmpt->width_; j++) 
@@ -398,7 +398,7 @@ int imFileFormatJP2::ReadImageData(void* data)
   if (imColorModeHasAlpha(this->user_color_mode) && imColorModeHasAlpha(this->file_color_mode))
     alpha_plane = imColorModeDepth(this->file_color_mode) - 1;
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   for (int i = 0; i < count; i++)
   {
     int cmpno;
@@ -412,19 +412,19 @@ int imFileFormatJP2::ReadImageData(void* data)
 
     int ret = 1;
     if (this->file_data_type == IM_BYTE)
-      ret = iJP2ReadLine(image, row, cmpno, (imbyte*)this->line_buffer);
+      ret = iJP2ReadLine(image, lin, cmpno, (imbyte*)this->line_buffer);
     else
-      ret = iJP2ReadLine(image, row, cmpno, (imushort*)this->line_buffer);
+      ret = iJP2ReadLine(image, lin, cmpno, (imushort*)this->line_buffer);
 
     if (!ret)
       return IM_ERR_ACCESS;
 
-    imFileLineBufferRead(this, data, row, plane);
+    imFileLineBufferRead(this, data, lin, plane);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
   }
 
   return IM_ERR_NONE;
@@ -445,16 +445,16 @@ int imFileFormatJP2::WriteImageData(void* data)
   for (int d = 0; d < depth; d++)
     jas_image_setcmpttype(image, d, JAS_IMAGE_CT_COLOR(d));
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   for (int i = 0; i < count; i++)
   {
-    imFileLineBufferWrite(this, data, row, plane);
+    imFileLineBufferWrite(this, data, lin, plane);
 
     int ret = 1;
     if (this->file_data_type == IM_BYTE)
-      ret = iJP2WriteLine(image, row, plane, (imbyte*)this->line_buffer);
+      ret = iJP2WriteLine(image, lin, plane, (imbyte*)this->line_buffer);
     else
-      ret = iJP2WriteLine(image, row, plane, (imushort*)this->line_buffer);
+      ret = iJP2WriteLine(image, lin, plane, (imushort*)this->line_buffer);
 
     if (!ret)
       return IM_ERR_ACCESS;
@@ -462,7 +462,7 @@ int imFileFormatJP2::WriteImageData(void* data)
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
   }
 
   char outopts[512] = "";

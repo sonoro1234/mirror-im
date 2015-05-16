@@ -823,9 +823,9 @@ int imFileFormatPNG::WriteImageInfo()
   return IM_ERR_NONE;
 }
 
-static int iInterlaceRowCheck(int row_step, int pass)
+static int iInterlaceLineCheck(int lin_step, int pass)
 {
-  switch(row_step)
+  switch(lin_step)
   {
   case 0:
     if (pass == 1 || pass == 2 || pass == 4 || pass == 6)
@@ -860,18 +860,18 @@ int imFileFormatPNG::ReadImageData(void* data)
   int count = this->height*this->interlace_steps;
   imCounterTotal(this->counter, count, "Reading PNG...");
 
-  int row = 0;
+  int lin = 0;
   for (int i = 0; i < count; i++)
   {
-    if (this->interlace_steps > 1 && ((row % 8) % 2 == 0)) // only when interlaced and in the 2,4,6 row steps.
-      imFileLineBufferWrite(this, data, row, 0);
+    if (this->interlace_steps > 1 && ((lin % 8) % 2 == 0)) // only when interlaced and in the 2,4,6 lin steps.
+      imFileLineBufferWrite(this, data, lin, 0);
 
     png_read_row(this->png_ptr, (imbyte*)this->line_buffer, NULL);
 
 #if (PNG_LIBPNG_VER < 10500)
-    if (this->interlace_steps == 1 || iInterlaceRowCheck(row % 8, png_ptr->pass + 1))
+    if (this->interlace_steps == 1 || iInterlaceLineCheck(lin % 8, png_ptr->pass + 1))
 #else
-    if (this->interlace_steps == 1 || iInterlaceRowCheck(row % 8, png_get_current_pass_number(png_ptr)+1))
+    if (this->interlace_steps == 1 || iInterlaceLineCheck(lin % 8, png_get_current_pass_number(png_ptr)+1))
 #endif
     {
       if (this->fixbits)
@@ -888,7 +888,7 @@ int imFileFormatPNG::ReadImageData(void* data)
         }
       }
 
-      imFileLineBufferRead(this, data, row, 0);
+      imFileLineBufferRead(this, data, lin, 0);
     }
 
     if (!imCounterInc(this->counter))
@@ -897,9 +897,9 @@ int imFileFormatPNG::ReadImageData(void* data)
       return IM_ERR_COUNTER;
     }
 
-   row++;
-   if (row == this->height)
-     row = 0;
+   lin++;
+   if (lin == this->height)
+     lin = 0;
   }
 
   png_read_end(this->png_ptr, NULL);
@@ -915,10 +915,10 @@ int imFileFormatPNG::WriteImageData(void* data)
   int count = this->height*this->interlace_steps;
   imCounterTotal(this->counter, count, "Writing PNG...");
 
-  int row = 0;
+  int lin = 0;
   for (int i = 0; i < count; i++)
   {
-    imFileLineBufferWrite(this, data, row, 0);
+    imFileLineBufferWrite(this, data, lin, 0);
 
     png_write_row(this->png_ptr, (imbyte*)this->line_buffer);
 
@@ -928,9 +928,9 @@ int imFileFormatPNG::WriteImageData(void* data)
       return IM_ERR_COUNTER;
     }
 
-   row++;
-   if (row == this->height)
-     row = 0;
+   lin++;
+   if (lin == this->height)
+     lin = 0;
   }
 
   png_write_end(this->png_ptr, this->info_ptr);

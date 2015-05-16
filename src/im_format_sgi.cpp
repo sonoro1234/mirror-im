@@ -299,12 +299,12 @@ int imFileFormatSGI::ReadImageInfo(int index)
   switch (dimension)
   {
   case 1:
-    // If this value is 1, the image file consists of only 1 channel and only 1 scanline (row).
+    // If this value is 1, the image file consists of only 1 channel and only 1 line.
     // Only width is valid.
     this->height = 1;
     depth = 1;
   case 2:
-    // If this value is 2, the file consists of a single channel with a number of scanlines. 
+    // If this value is 2, the file consists of a single channel with a number of lines. 
     // Only width and height are valid.
     depth = 1;
     break;
@@ -520,7 +520,7 @@ int imFileFormatSGI::ReadImageData(void* data)
   if (this->comp_type == SGI_RLE)  // point to the extra buffer
     compressed_buffer = (imbyte*)this->line_buffer + this->line_buffer_size;
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   for (int i = 0; i < count; i++)
   {
     if (this->comp_type == SGI_VERBATIM)
@@ -532,9 +532,9 @@ int imFileFormatSGI::ReadImageData(void* data)
     }
     else
     {
-      int row_index = row + plane*this->height;
-      imBinFileSeekTo(handle, this->starttab[row_index]);
-      imBinFileRead(handle, compressed_buffer, this->lengthtab[row_index] / this->bpc, this->bpc);
+      int lin_index = lin + plane*this->height;
+      imBinFileSeekTo(handle, this->starttab[lin_index]);
+      imBinFileRead(handle, compressed_buffer, this->lengthtab[lin_index] / this->bpc, this->bpc);
 
       if (imBinFileError(handle))
         return IM_ERR_ACCESS;     
@@ -545,12 +545,12 @@ int imFileFormatSGI::ReadImageData(void* data)
         iSGIDecodeScanLine((imushort*)this->line_buffer, (imushort*)compressed_buffer, this->width);
     }
 
-    imFileLineBufferRead(this, data, row, plane);
+    imFileLineBufferRead(this, data, lin, plane);
 
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
   }
 
   return IM_ERR_NONE;
@@ -566,10 +566,10 @@ int imFileFormatSGI::WriteImageData(void* data)
   if (this->comp_type == SGI_RLE)  // point to the extra buffer
     compressed_buffer = (imbyte*)this->line_buffer + this->line_buffer_size;
 
-  int row = 0, plane = 0;
+  int lin = 0, plane = 0;
   for (int i = 0; i < count; i++)
   {
-    imFileLineBufferWrite(this, data, row, plane);
+    imFileLineBufferWrite(this, data, lin, plane);
 
     if (this->comp_type == SGI_VERBATIM)
       imBinFileWrite(handle, this->line_buffer, this->line_buffer_size/this->bpc, this->bpc);
@@ -581,9 +581,9 @@ int imFileFormatSGI::WriteImageData(void* data)
       else
         length = iSGIEncodeScanLine((imushort*)compressed_buffer, (imushort*)this->line_buffer, this->width);
 
-      int row_index = row + plane*this->height;
-      this->starttab[row_index] = imBinFileTell(handle);
-      this->lengthtab[row_index] = length*this->bpc;
+      int lin_index = lin + plane*this->height;
+      this->starttab[lin_index] = imBinFileTell(handle);
+      this->lengthtab[lin_index] = length*this->bpc;
 
       imBinFileWrite(handle, compressed_buffer, length, this->bpc);
     }
@@ -594,7 +594,7 @@ int imFileFormatSGI::WriteImageData(void* data)
     if (!imCounterInc(this->counter))
       return IM_ERR_COUNTER;
 
-    imFileLineBufferInc(this, &row, &plane);
+    imFileLineBufferInc(this, &lin, &plane);
   }
 
   if (this->comp_type == SGI_RLE)

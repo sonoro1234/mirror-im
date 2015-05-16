@@ -226,6 +226,85 @@ namespace im
   };
 
 
+  class ImageChannelLine
+  {
+    imImage* image;
+    int lin;
+    void* channel_buffer;
+
+  public:
+    ImageChannelLine(imImage* ref_image, int ref_lin, void* ref_channel_buffer)
+      : image(ref_image), lin(ref_lin), channel_buffer(ref_channel_buffer)
+    {
+    }
+
+    double operator [] (int col)
+    {
+      if (image == 0 || col < 0 || col >= image->width)
+        return 0;
+      else
+      {
+        int index = lin * image->width + col;
+
+        switch (image->data_type)
+        {
+        case IM_BYTE:
+          {
+            unsigned char *bdata = (unsigned char*)channel_buffer;
+            return (double)bdata[index];
+          }
+        case IM_SHORT:
+          {
+            short *sdata = (short*)channel_buffer;
+            return (double)sdata[index];
+          }
+        case IM_USHORT:
+          {
+            unsigned short *udata = (unsigned short*)channel_buffer;
+            return (double)udata[index];
+          }
+        case IM_INT:
+          {
+            int *idata = (int*)channel_buffer;
+            return (double)idata[index];
+          }
+        case IM_FLOAT:
+          {
+            float *fdata = (float*)channel_buffer;
+            return (double)fdata[index];
+          }
+        case IM_DOUBLE:
+          {
+            double *fdata = (double*)channel_buffer;
+            return fdata[index];
+          }
+        }
+
+        return 0;
+      }
+    }
+  };
+
+  class ImageChannel
+  {
+    imImage* image;
+    int plane;
+
+  public:
+    ImageChannel(imImage* ref_image, int ref_plane)
+      : image(ref_image), plane(ref_plane)
+    {
+    }
+
+    ImageChannelLine operator [] (int lin)
+    {
+      if (image == 0 || lin < 0 || lin >= image->height)
+        return ImageChannelLine(0, 0, 0);
+      else
+        return ImageChannelLine(image, lin, image->data[plane]);
+    }
+  };
+
   class Image
   {
     friend class File;
@@ -238,34 +317,59 @@ namespace im
 
     Image() { im_image = 0; };
 
+    void IncRef()
+    {
+      int image_ref = GetAttribInteger("_IMAGE_REF");
+      image_ref++;
+      SetAttribInteger("_IMAGE_REF", IM_INT, image_ref);
+    }
+    bool DecRef()
+    {
+      int image_ref = GetAttribInteger("_IMAGE_REF");
+      if (image_ref > 0)
+      {
+        image_ref--;
+        SetAttribInteger("_IMAGE_REF", IM_INT, image_ref);
+      }
+      return image_ref == 0;
+    }
+
   public:
     Image(int width, int height, int color_space, int data_type)
     {
       im_image = imImageCreate(width, height, color_space, data_type);
+      IncRef();
     }
-//    Image(const Image& src_image, int width = -1, int height = -1, int color_space = -1, int data_type = -1)
-//    {
-//      im_image = imImageCreateBased(src_image.im_image, width, height, color_space, data_type);
-//    }
+    Image(const Image& src_image, int width, int height, int color_space, int data_type)
+    {
+      im_image = imImageCreateBased(src_image.im_image, width, height, color_space, data_type);
+      IncRef();
+    }
     Image(const char* file_name, int index, int &error, bool as_bitmap)
     {
       if (as_bitmap)
         im_image = imFileImageLoad(file_name, index, &error);
       else
         im_image = imFileImageLoadBitmap(file_name, index, &error);
+      IncRef();
     }
     Image(const Image& ref_image)
     {
       im_image = ref_image.im_image;
+      IncRef();
     }
     Image(imImage* ref_image)
     {
       im_image = ref_image;
+      IncRef();
     }
     ~Image()
     {
       if (im_image)
-        imImageDestroy(im_image);
+      {
+        if (DecRef())
+          imImageDestroy(im_image);
+      }
     }
 
 
@@ -274,6 +378,15 @@ namespace im
       return im_image == 0;
     }
 
+    /* image[plane][line][column] */
+    ImageChannel operator [] (int plane)
+    {
+      int depth = im_image->has_alpha? im_image->depth + 1 : im_image->depth;
+      if (plane < 0 || plane >= depth)
+        return ImageChannel(0, 0);
+      else
+        return ImageChannel(im_image, plane);
+    }
 
     /* image info */
     int Width() const 
@@ -312,6 +425,102 @@ namespace im
       return imFileImageSave(file_name, format, im_image);
     }
 
+    void SetValue(int plane, int lin, int col, double value)
+    {
+      int depth = im_image->has_alpha ? im_image->depth + 1 : im_image->depth;
+      if (plane < 0 || plane >= depth)
+        return;
+      if (lin < 0 || lin >= im_image->height)
+        return;
+      if (col < 0 || col >= im_image->width)
+        return;
+
+      int index = lin * im_image->width + col;
+      void* channel_buffer = im_image->data[plane];
+
+      switch (im_image->data_type)
+      {
+      case IM_BYTE:
+      {
+        unsigned char *bdata = (unsigned char*)channel_buffer;
+        bdata[index] = (unsigned char)value;
+      }
+      case IM_SHORT:
+      {
+        short *sdata = (short*)channel_buffer;
+        sdata[index] = (short)value;
+      }
+      case IM_USHORT:
+      {
+        unsigned short *udata = (unsigned short*)channel_buffer;
+        udata[index] = (unsigned short)value;
+      }
+      case IM_INT:
+      {
+        int *idata = (int*)channel_buffer;
+        idata[index] = (int)value;
+      }
+      case IM_FLOAT:
+      {
+        float *fdata = (float*)channel_buffer;
+        fdata[index] = (float)value;
+      }
+      case IM_DOUBLE:
+      {
+        double *fdata = (double*)channel_buffer;
+        fdata[index] = value;
+      }
+      }
+    }
+    double GetValue(int plane, int lin, int col)
+    {
+      int depth = im_image->has_alpha ? im_image->depth + 1 : im_image->depth;
+      if (plane < 0 || plane >= depth)
+        return 0;
+      if (lin < 0 || lin >= im_image->height)
+        return 0;
+      if (col < 0 || col >= im_image->width)
+        return 0;
+
+      int index = lin * im_image->width + col;
+      void* channel_buffer = im_image->data[plane];
+
+      switch (im_image->data_type)
+      {
+        case IM_BYTE:
+        {
+          unsigned char *bdata = (unsigned char*)channel_buffer;
+          return (double)bdata[index];
+        }
+        case IM_SHORT:
+        {
+          short *sdata = (short*)channel_buffer;
+          return (double)sdata[index];
+        }
+        case IM_USHORT:
+        {
+          unsigned short *udata = (unsigned short*)channel_buffer;
+          return (double)udata[index];
+        }
+        case IM_INT:
+        {
+          int *idata = (int*)channel_buffer;
+          return (double)idata[index];
+        }
+        case IM_FLOAT:
+        {
+          float *fdata = (float*)channel_buffer;
+          return (double)fdata[index];
+        }
+        case IM_DOUBLE:
+        {
+          double *fdata = (double*)channel_buffer;
+          return fdata[index];
+        }
+      }
+
+      return 0;
+    }
 
     /* copy utilities */
     Image Duplicate()
@@ -424,11 +633,11 @@ namespace im
     {
       return imImageGetAttribute(im_image, attrib, data_type, count);
     }
-    int GetAttribInteger(const char* attrib, int index) const
+    int GetAttribInteger(const char* attrib, int index = 0) const
     {
       return imImageGetAttribInteger(im_image, attrib, index);
     }
-    double GetAttribReal(const char* attrib, int index) const
+    double GetAttribReal(const char* attrib, int index = 0) const
     {
       return imImageGetAttribReal(im_image, attrib, index);
     }
@@ -488,7 +697,7 @@ namespace im
     CounterCallback(void* user_data)
     {
       cc_user_data = user_data;
-      imCounterSetCallback(this, c_callback);  //imCounterCallback
+      imCounterSetCallback(this, c_callback);
     }
     virtual ~CounterCallback()
     {

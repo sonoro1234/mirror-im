@@ -73,12 +73,12 @@ void imlua_pushimage(lua_State *L, imImage* image)
 \*****************************************************************************/
 static imluaImageChannel *imlua_newimagechannel (lua_State *L, imImage *image, int channel)
 {
-  imluaImageChannel* imagechannel = (imluaImageChannel*) lua_newuserdata(L, sizeof(imluaImageChannel));
-  imagechannel->image = image;
-  imagechannel->channel = channel;
+  imluaImageChannel* image_channel = (imluaImageChannel*) lua_newuserdata(L, sizeof(imluaImageChannel));
+  image_channel->image = image;
+  image_channel->channel = channel;
   luaL_getmetatable(L, "imImageChannel");
   lua_setmetatable(L, -2);
-  return imagechannel;
+  return image_channel;
 }
 
 static imluaImageChannel* imlua_checkimagechannel (lua_State *L, int param)
@@ -87,22 +87,22 @@ static imluaImageChannel* imlua_checkimagechannel (lua_State *L, int param)
 }
 
 /*****************************************************************************\
- image row, for indexing
+ image lin, for indexing
 \*****************************************************************************/
-static imluaImageRow *imlua_newimagerow (lua_State *L, imImage *image, int channel, int row)
+static imluaImageLine* imlua_newimageline (lua_State *L, imImage *image, int channel, int lin)
 {
-  imluaImageRow* imagerow = (imluaImageRow*) lua_newuserdata(L, sizeof(imluaImageRow));
-  imagerow->image = image;
-  imagerow->channel = channel;
-  imagerow->row = row;
-  luaL_getmetatable(L, "imImageChannelRow");
+  imluaImageLine* image_line = (imluaImageLine*) lua_newuserdata(L, sizeof(imluaImageLine));
+  image_line->image = image;
+  image_line->channel = channel;
+  image_line->lin = lin;
+  luaL_getmetatable(L, "imImageChannelLine");
   lua_setmetatable(L, -2);
-  return imagerow;
+  return image_line;
 }
 
-static imluaImageRow* imlua_checkimagerow (lua_State *L, int param)
+static imluaImageLine* imlua_checkimageline (lua_State *L, int param)
 {
-  return (imluaImageRow*) luaL_checkudata(L, param, "imImageChannelRow");
+  return (imluaImageLine*) luaL_checkudata(L, param, "imImageChannelLine");
 }
 
 /*****************************************************************************\
@@ -1138,52 +1138,52 @@ static int imluaImage_tostring (lua_State *L)
 }
 
 /*****************************************************************************\
- imagechannel tostring
+ image_channel tostring
 \*****************************************************************************/
 static int imluaImageChannel_tostring (lua_State *L)
 {
-  imluaImageChannel *imagechannel = imlua_checkimagechannel(L, 1);
+  imluaImageChannel *image_channel = imlua_checkimagechannel(L, 1);
   lua_pushfstring(L, "imImageChannel(%p) [channel=%d]", 
-    imagechannel, 
-    imagechannel->channel
+    image_channel, 
+    image_channel->channel
   );
   return 1;
 }
 
 /*****************************************************************************\
- imagerow tostring
+ image_line tostring
 \*****************************************************************************/
-static int imluaImageRow_tostring (lua_State *L)
+static int imluaImageLine_tostring (lua_State *L)
 {
   char buff[32];
-  imluaImageRow *imagerow = imlua_checkimagerow(L, 1);
+  imluaImageLine *image_line = imlua_checkimageline(L, 1);
 
   sprintf(buff, "%p", lua_touserdata(L, 1));
-  lua_pushfstring(L, "imImageRow(%s) [channel=%d,row=%d]", 
+  lua_pushfstring(L, "imImageLine(%s) [channel=%d,lin=%d]", 
     buff, 
-    imagerow->channel,
-    imagerow->row
+    image_line->channel,
+    image_line->lin
   );
   return 1;
 }
 
 /*****************************************************************************\
- image row indexing
+ image lin indexing
 \*****************************************************************************/
-static int imluaImageRow_index (lua_State *L)
+static int imluaImageLine_index (lua_State *L)
 {
   int index;
-  imluaImageRow *imagerow = imlua_checkimagerow(L, 1);
-  imImage *image = imagerow->image;
-  int channel = imagerow->channel;
-  int row = imagerow->row;
+  imluaImageLine *image_line = imlua_checkimageline(L, 1);
+  imImage *image = image_line->image;
+  int channel = image_line->channel;
+  int lin = image_line->lin;
   int column = luaL_checkinteger(L, 2);
   void* channel_buffer = image->data[channel];
 
   if (column < 0 || column >= image->width)
     luaL_argerror(L, 2, "invalid column, out of bounds");
 
-  index = row * image->width + column;
+  index = lin * image->width + column;
 
   switch (image->data_type)
   {
@@ -1248,22 +1248,22 @@ static int imluaImageRow_index (lua_State *L)
 }
 
 /*****************************************************************************\
- image row new index
+ image lin new index
 \*****************************************************************************/
-static int imluaImageRow_newindex (lua_State *L)
+static int imluaImageLine_newindex (lua_State *L)
 {
   int index;
-  imluaImageRow *imagerow = imlua_checkimagerow(L, 1);
-  imImage *image = imagerow->image;
-  int channel = imagerow->channel;
-  int row = imagerow->row;
+  imluaImageLine *image_line = imlua_checkimageline(L, 1);
+  imImage *image = image_line->image;
+  int channel = image_line->channel;
+  int lin = image_line->lin;
   int column = luaL_checkinteger(L, 2);
   void* channel_buffer = image->data[channel];
 
   if (column < 0 || column >= image->width)
     luaL_argerror(L, 2, "invalid column, out of bounds");
 
-  index = row * image->width + column;
+  index = lin * image->width + column;
 
   switch (image->data_type)
   {
@@ -1358,13 +1358,13 @@ static int imluaImageRow_newindex (lua_State *L)
 \*****************************************************************************/
 static int imluaImageChannel_index (lua_State *L)
 {
-  imluaImageChannel *imagechannel = imlua_checkimagechannel(L, 1);
-  int row = luaL_checkinteger(L, 2);
+  imluaImageChannel *image_channel = imlua_checkimagechannel(L, 1);
+  int lin = luaL_checkinteger(L, 2);
 
-  if (row < 0 || row >= imagechannel->image->height)
-    luaL_argerror(L, 2, "invalid row, out of bounds");
+  if (lin < 0 || lin >= image_channel->image->height)
+    luaL_argerror(L, 2, "invalid lin, out of bounds");
 
-  imlua_newimagerow(L, imagechannel->image, imagechannel->channel, row);
+  imlua_newimageline(L, image_channel->image, image_channel->channel, lin);
   return 1;
 }
 
@@ -1469,7 +1469,7 @@ static const luaL_Reg imimage_metalib[] = {
 
 static void createmeta (lua_State *L) 
 {
-  /* image[plane][row][column] */
+  /* image[plane][lin][column] */
 
   luaL_newmetatable(L, "imImageChannel"); /* create new metatable for imImageChannel handles */
   lua_pushliteral(L, "__index");
@@ -1480,15 +1480,15 @@ static void createmeta (lua_State *L)
   lua_rawset(L, -3);
   lua_pop(L, 1);  /* removes the metatable from the top of the stack */
 
-  luaL_newmetatable(L, "imImageChannelRow"); /* create new metatable for imImageChannelRow handles */
+  luaL_newmetatable(L, "imImageChannelLine"); /* create new metatable for imImageChannelLine handles */
   lua_pushliteral(L, "__index");
-  lua_pushcfunction(L, imluaImageRow_index);
+  lua_pushcfunction(L, imluaImageLine_index);
   lua_rawset(L, -3);
   lua_pushliteral(L, "__newindex");
-  lua_pushcfunction(L, imluaImageRow_newindex);
+  lua_pushcfunction(L, imluaImageLine_newindex);
   lua_rawset(L, -3);
   lua_pushliteral(L, "__tostring");
-  lua_pushcfunction(L, imluaImageRow_tostring);
+  lua_pushcfunction(L, imluaImageLine_tostring);
   lua_rawset(L, -3);
   lua_pop(L, 1);   /* removes the metatable from the top of the stack */
 
