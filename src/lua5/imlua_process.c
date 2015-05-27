@@ -46,10 +46,10 @@ static void imlua_errorcomplex(lua_State *L, int index)
   luaL_argcheck(_L, ((_i)->data_type < IM_FLOAT), _a, "image data type can be integer only")
 
 #define imlua_checkreal(_L, _a, _i) \
-  luaL_argcheck(L, ((_i)->data_type != IM_FLOAT && (_i)->data_type != IM_DOUBLE), _a, "image data type can be real only");
+  luaL_argcheck(L, ((_i)->data_type == IM_FLOAT || (_i)->data_type == IM_DOUBLE), _a, "image data type can be real only");
 
 #define imlua_checkcomplex(_L, _a, _i) \
-  luaL_argcheck(L, ((_i)->data_type != IM_CFLOAT && (_i)->data_type != IM_CDOUBLE), _a, "image data type can be complex only");
+  luaL_argcheck(L, ((_i)->data_type == IM_CFLOAT || (_i)->data_type == IM_CDOUBLE), _a, "image data type can be complex only");
 
 #define imlua_checkreal_dst(_L, _da, _si, _di)                          \
   if ((_si)->data_type == IM_DOUBLE || (_si)->data_type == IM_CDOUBLE)  \
@@ -60,7 +60,7 @@ static void imlua_errorcomplex(lua_State *L, int index)
 #define imlua_checkcomplex_dst(_L, _da, _si, _di)                       \
   if ((_si)->data_type == IM_DOUBLE || (_si)->data_type == IM_CDOUBLE)  \
     imlua_checkdatatype(_L, _da, _di, IM_CDOUBLE);                      \
-    else                                                                \
+  else                                                                  \
     imlua_checkdatatype(_L, _da, _di, IM_CFLOAT)
 
 
@@ -691,7 +691,7 @@ static int imluaProcessReduce (lua_State *L)
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
   int order = imlua_getorder(L, src_image, 3);
-  luaL_argcheck(L, (order != 3), 3, "invalid order, can only be 0 or 1 here");
+  luaL_argcheck(L, (order == 0 || order == 1), 3, "invalid order, can only be 0 or 1");
 
   imlua_matchcolor(L, src_image, dst_image);
 
@@ -723,9 +723,8 @@ static int imluaProcessReduceBy4 (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L,
-    dst_image->width == (src_image->width / 2) &&
-    dst_image->height == (src_image->height / 2), 3, "target image size must be source image width/2, height/2");
+  luaL_argcheck(L, dst_image->width == (src_image->width / 2) &&
+                   dst_image->height == (src_image->height / 2), 3, "target image size must be euqal to source image width/2, height/2");
 
   imProcessReduceBy4(src_image, dst_image);
   return 0;
@@ -744,8 +743,8 @@ static int imluaProcessCrop (lua_State *L)
   imlua_matchcolor(L, src_image, dst_image);
   luaL_argcheck(L, xmin >= 0 && xmin < src_image->width, 3, "xmin must be >= 0 and < width");
   luaL_argcheck(L, ymin >= 0 && ymin < src_image->height, 4, "ymin must be >= 0 and < height");
-  luaL_argcheck(L, dst_image->width <= (src_image->width - xmin), 2, "target image size must be smaller than source image width-xmin");
-  luaL_argcheck(L, dst_image->height <= (src_image->height - ymin), 2, "target image size must be smaller than source image height-ymin");
+  luaL_argcheck(L, dst_image->width <= (src_image->width - xmin), 2, "target image width must be less than or equal to source image width-xmin");
+  luaL_argcheck(L, dst_image->height <= (src_image->height - ymin), 2, "target image height must be less than or equal to source image height-ymin");
 
   imProcessCrop(src_image, dst_image, xmin, ymin);
   return 0;
@@ -781,8 +780,8 @@ static int imluaProcessAddMargins (lua_State *L)
   int ymin = luaL_checkinteger(L, 4);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "target image size must be greatter or equal than source image width+xmin, height+ymin");
-  luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "target image size must be greatter or equal than source image width+xmin, height+ymin");
+  luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "target image width must be greatter or equal than source image width+xmin");
+  luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "target image height must be greatter or equal than source image height+ymin");
 
   imProcessAddMargins(src_image, dst_image, xmin, ymin);
   return 0;
@@ -859,7 +858,7 @@ static int imluaProcessRotate90 (lua_State *L)
   int dir = luaL_checkinteger(L, 3);
 
   imlua_matchcolor(L, src_image, dst_image);
-  luaL_argcheck(L, dst_image->width == src_image->height && dst_image->height == src_image->width, 2, "target width and height must have the source height and width");
+  luaL_argcheck(L, dst_image->width == src_image->height && dst_image->height == src_image->width, 2, "target width and height must be equal to source height and width");
   luaL_argcheck(L, (dir == -1 || dir == 1), 3, "invalid dir, can be -1 or 1 only");
 
   imProcessRotate90(src_image, dst_image, dir);
@@ -921,7 +920,7 @@ static int imluaProcessInterlaceSplit (lua_State *L)
   imlua_matchcolor(L, src_image, dst_image2);
   luaL_argcheck(L, dst_image1->width == src_image->width && dst_image2->width == src_image->width, 2, "target width must be equal to source width");
 
-  if (src_image->height%2)
+  if (src_image->height % 2) /* if odd */
   {
     int dst_height1 = src_image->height/2 + 1;
     luaL_argcheck(L, dst_image1->height == dst_height1, 2, "dst_image1 height must be equal to source height/2+1 if height odd");
@@ -2399,7 +2398,7 @@ static int imluaProcessSplitHSI (lua_State *L)
   imImage *i_image = imlua_checkimage(L, 4);
 
   imlua_checkcolorspace(L, 1, src_image, IM_RGB);
-  luaL_argcheck(L, src_image->data_type == IM_BYTE || src_image->data_type == IM_FLOAT, 1, "data type can be float or byte only");
+  luaL_argcheck(L, src_image->data_type == IM_BYTE || src_image->data_type == IM_FLOAT, 1, "data type can be byte or float only");
   imlua_checktype(L, 2, h_image, IM_GRAY, IM_FLOAT);
   imlua_checktype(L, 3, s_image, IM_GRAY, IM_FLOAT);
   imlua_checktype(L, 4, i_image, IM_GRAY, IM_FLOAT);
@@ -2425,7 +2424,7 @@ static int imluaProcessMergeHSI (lua_State *L)
   imlua_checktype(L, 2, s_image, IM_GRAY, IM_FLOAT);
   imlua_checktype(L, 3, i_image, IM_GRAY, IM_FLOAT);
   imlua_checkcolorspace(L, 4, dst_image, IM_RGB);
-  luaL_argcheck(L, dst_image->data_type == IM_BYTE || dst_image->data_type == IM_FLOAT, 4, "data type can be float or byte only");
+  luaL_argcheck(L, dst_image->data_type == IM_BYTE || dst_image->data_type == IM_FLOAT, 4, "data type can be byte or float only");
   imlua_matchsize(L, dst_image, h_image);
   imlua_matchsize(L, dst_image, s_image);
   imlua_matchsize(L, dst_image, i_image);
