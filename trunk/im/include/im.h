@@ -171,6 +171,7 @@ void imFileSetAttribString(const imFile* ifile, const char* attrib, const char* 
  *
  * \verbatim ifile:GetAttribute(attrib: string, [as_string: boolean]) -> data: table of numbers or string, data_type: number [in Lua 5] \endverbatim
  * If data_type is IM_BYTE, as_string can be used to return a string instead of a table.
+ * \verbatim ifile:GetAttributeRaw(attrib: string) -> data: userdata, data_type, count: number [in Lua 5] \endverbatim
  * \ingroup file */
 const void* imFileGetAttribute(imFile* ifile, const char* attrib, int *data_type, int *count);
 

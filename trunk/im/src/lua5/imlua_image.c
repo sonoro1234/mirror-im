@@ -459,7 +459,7 @@ static int imluaImageSetAttribute (lua_State *L)
         for (i = 0; i < count; i++)
         {
           lua_rawgeti(L, 4, i+1);
-          data_int[i] = luaL_checkinteger(L, -1);
+          data_int[i] = (int)luaL_checkinteger(L, -1);
           lua_pop(L, 1);
         }
       }
@@ -564,6 +564,32 @@ static int imluaImageSetAttribString(lua_State *L)
   const char* value = luaL_checkstring(L, 3);
   imImageSetAttribString(iimage, attrib, value);
   return 0;
+}
+
+
+/*****************************************************************************\
+image:GetAttributeRaw(attrib)
+\*****************************************************************************/
+static int imluaImageGetAttributeRaw(lua_State *L)
+{
+  int data_type;
+  int count;
+  const void *data;
+
+  imImage* image = imlua_checkimage(L, 1);
+  const char *attrib = luaL_checkstring(L, 2);
+
+  data = imImageGetAttribute(image, attrib, &data_type, &count);
+  if (!data)
+  {
+    lua_pushnil(L);
+    return 1;
+  }
+
+  lua_pushlightuserdata(L, (void*)data);
+  lua_pushnumber(L, data_type);
+  lua_pushnumber(L, count);
+  return 3;
 }
 
 
@@ -1430,6 +1456,7 @@ static const luaL_Reg imimage_metalib[] = {
   {"SetAttribInteger", imluaImageSetAttribInteger},
   {"SetAttribReal", imluaImageSetAttribReal},
   {"SetAttribString", imluaImageSetAttribString},
+  {"GetAttributeRaw", imluaImageGetAttributeRaw},
   {"GetAttribute", imluaImageGetAttribute},
   {"GetAttribInteger", imluaImageGetAttribInteger},
   {"GetAttribReal", imluaImageGetAttribReal},
