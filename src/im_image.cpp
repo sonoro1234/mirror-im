@@ -189,7 +189,7 @@ void imImageAddAlpha(imImage* image)
   if (image->has_alpha)
     return;
 
-  unsigned char* new_data = (unsigned char*)realloc(image->data[0], image->size+image->plane_size);
+  unsigned char* new_data = (unsigned char*)realloc(image->data[0], image->size + image->plane_size);  /* image->size is not incremented, just add alpha plane for allocation */
   if (!new_data)
     return;
 
@@ -209,7 +209,7 @@ void imImageRemoveAlpha(imImage* image)
   if (!image->has_alpha)
     return;
 
-  unsigned char* new_data = (unsigned char*)realloc(image->data[0], image->size-image->plane_size);
+  unsigned char* new_data = (unsigned char*)realloc(image->data[0], image->size);  /* image->size is already the size without alpha */
   if (!new_data)
     return;
 
@@ -232,7 +232,8 @@ void imImageReshape(imImage* image, int width, int height)
 
   if (old_size < image->size)
   {
-    void* data0 = realloc(image->data[0], image->has_alpha? image->size+image->plane_size: image->size);
+    int size = image->has_alpha ? image->size + image->plane_size : image->size;
+    void* data0 = realloc(image->data[0], size);
     if (!data0) // if failed restore the previous size
       iImageInit(image, old_width, old_height, image->color_space, image->data_type, image->has_alpha);
     else
