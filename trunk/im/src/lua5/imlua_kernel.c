@@ -176,6 +176,6 @@ static const luaL_Reg imkernel_lib[] = {
 
 void imlua_open_kernel (lua_State *L)
 {
-  /* "im" table is at the top of the stack */
-  luaL_register(L, NULL, imkernel_lib);
+  /* im table is at the top of the stack */
+  imlua_register_funcs(L, imkernel_lib);
 }

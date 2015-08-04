@@ -254,9 +254,41 @@ int imlua_close(lua_State *L)
   return 0;
 }
 
+/* global table */
+static const char* im_globaltable = "im";
+
+void imlua_register_lib(lua_State *L, const luaL_Reg* funcs)
+{
+#if LUA_VERSION_NUM < 502
+  luaL_register(L, im_globaltable, funcs);
+#else
+  lua_getglobal(L, im_globaltable);
+  if (lua_istable(L, -1))
+    luaL_setfuncs(L, funcs, 0);
+  else
+  {
+    if (!lua_isnil(L, -1))
+      luaL_error(L, "name conflict for module \"%s\"", im_globaltable);
+
+    luaL_newlib(L, funcs);
+    lua_pushvalue(L, -1);
+    lua_setglobal(L, im_globaltable);
+  }
+#endif
+}
+
+void imlua_register_funcs(lua_State *L, const luaL_Reg* funcs)
+{
+#if LUA_VERSION_NUM < 502
+  luaL_register(L, NULL, funcs);
+#else
+  luaL_setfuncs(L, funcs, 0);
+#endif
+}
+
 int imlua_open (lua_State *L)
 {
-  luaL_register(L, "im", im_lib);   /* leave "im" table at the top of the stack */
+  imlua_register_lib(L, im_lib);   /* leave im table at the top of the stack */
   imlua_regconstants(L, im_constants);
 
   imlua_open_file(L);

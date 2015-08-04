@@ -1524,15 +1524,15 @@ static void createmeta (lua_State *L)
   lua_pushliteral(L, "__index");    /* dummy code because imluaImage_index will overwrite this behavior */
   lua_pushvalue(L, -2);  /* push metatable */
   lua_rawset(L, -3);  /* metatable.__index = metatable */
-  luaL_register(L, NULL, imimage_metalib);  /* register methods */
+  imlua_register_funcs(L, imimage_metalib);  /* register methods */
   lua_pop(L, 1);  /* removes the metatable from the top of the stack */
 }
 
 void imlua_open_image (lua_State *L)
 {
-  /* "im" table is at the top of the stack */
+  /* im table is at the top of the stack */
   createmeta(L);
-  luaL_register(L, NULL, imimage_lib);
+  imlua_register_funcs(L, imimage_lib);
 
 #ifdef IMLUA_USELOH
 #include "im_image.loh"

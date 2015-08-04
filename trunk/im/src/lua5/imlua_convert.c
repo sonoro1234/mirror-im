@@ -91,8 +91,8 @@ static const luaL_Reg imconvert_lib[] = {
 
 void imlua_open_processconvert (lua_State *L)
 {
-  /* "im" table is at the top of the stack */
-  luaL_register(L, NULL, imconvert_lib);
+  /* im table is at the top of the stack */
+  imlua_register_funcs(L, imconvert_lib);
 
 #ifdef IMLUA_USELOH
 #include "im_processconvert.loh"
@@ -115,8 +115,8 @@ static const luaL_Reg imconvert_lib[] = {
 
 void imlua_open_convert (lua_State *L)
 {
-  /* "im" table is at the top of the stack */
-  luaL_register(L, NULL, imconvert_lib);
+  /* im table is at the top of the stack */
+  imlua_register_funcs(L, imconvert_lib);
 
 #ifdef IMLUA_USELOH
 #include "im_convert.loh"

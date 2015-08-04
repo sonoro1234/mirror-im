@@ -93,6 +93,9 @@ typedef struct _imlua_constant {
 
 void imlua_regconstants(lua_State *L, const imlua_constant *imconst);
 
+void imlua_register_lib(lua_State *L, const luaL_Reg* funcs);
+void imlua_register_funcs(lua_State *L, const luaL_Reg* funcs);
+
 
 /********************************/
 /* private module open          */

@@ -129,7 +129,7 @@ static const luaL_Reg imfftw_lib[] = {
 
 int imlua_open_fftw (lua_State *L)
 {
-  luaL_register(L, "im", imfftw_lib);  /* leave "im" table at the top of the stack */
+  imlua_register_lib(L, imfftw_lib);  /* leave im table at the top of the stack */
 
 #ifdef IMLUA_USELOH
 #include "im_fftw.loh"

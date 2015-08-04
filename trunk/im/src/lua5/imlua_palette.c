@@ -387,13 +387,13 @@ static void createmeta (lua_State *L)
 {
   /* there is no object orientation for imPalette, only array access */
   luaL_newmetatable(L, "imPalette");  /* create new metatable for imPalette handles */
-  luaL_register(L, NULL, impalette_metalib);     /* register methods */
+  imlua_register_funcs(L, impalette_metalib);     /* register methods */
   lua_pop(L, 1);   /* removes the metatable from the top of the stack */
 }
 
 void imlua_open_palette (lua_State *L)
 {
-  /* "im" table is at the top of the stack */
+  /* im table is at the top of the stack */
   createmeta(L);
-  luaL_register(L, NULL, impalette_lib);
+  imlua_register_funcs(L, impalette_lib);
 }

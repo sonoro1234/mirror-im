@@ -430,14 +430,14 @@ static void createmeta (lua_State *L)
   lua_pushliteral(L, "__index");
   lua_pushvalue(L, -2);  /* push metatable */
   lua_rawset(L, -3);  /* metatable.__index = metatable */
-  luaL_register(L, NULL, imcapture_metalib);  /* register methods */
+  imlua_register_funcs(L, imcapture_metalib);  /* register methods */
   lua_pop(L, 1);  /* removes the metatable from the top of the stack */
 }
 
 int imlua_open_capture(lua_State *L)
 {
   createmeta(L);
-  luaL_register(L, "im", imcapture_lib);  /* leave "im" table at the top of the stack */
+  imlua_register_lib(L, imcapture_lib);  /* leave im table at the top of the stack */
   return 1;
 }
 
