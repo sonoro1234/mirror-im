@@ -3754,11 +3754,11 @@ void imlua_open_processconvert(lua_State *L);
 
 int imlua_open_process(lua_State *L)
 {
-  luaL_register(L, "im", improcess_lib);   /* leave "im" table at the top of the stack */
+  imlua_register_lib(L, improcess_lib);   /* leave im table at the top of the stack */
   imlua_regconstants(L, im_process_constants);
 
   luaL_getmetatable(L, "imImage");
-  luaL_register(L, NULL, imimageprocess_lib);
+  imlua_register_funcs(L, imimageprocess_lib);
   lua_pop(L, 1);
 
 #ifdef IMLUA_USELOH

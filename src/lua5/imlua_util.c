@@ -275,6 +275,6 @@ static const luaL_Reg imutil_lib[] = {
 
 void imlua_open_util(lua_State *L)
 {
-  /* "im" table is at the top of the stack */
-  luaL_register(L, NULL, imutil_lib);
+  /* im table is at the top of the stack */
+  imlua_register_funcs(L, imutil_lib);
 }

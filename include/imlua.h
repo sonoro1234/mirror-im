@@ -28,7 +28,7 @@ void imlua_open(void);
 #ifdef LUA_TNONE  /* Lua 5 */
 
 /** Initializes the Lua binding of the main IM library.  \n
- * Returns 1 (leaves the "im" table on the top of the stack).
+ * Returns 1 (leaves the im table on the top of the stack).
  * You must link the application with the "imlua51" library.
  * \ingroup imlua */
 int imlua_open(lua_State *L);
@@ -49,19 +49,19 @@ imImage* imlua_checkimage(lua_State *L, int param);
 #endif
 
 /** Initializes the Lua binding of the capture library.  \n
- * Returns 1 (leaves the "im" table on the top of the stack).
+ * Returns 1 (leaves the im table on the top of the stack).
  * You must link the application with the "imlua_capture51" library.
  * \ingroup imlua */
 int imlua_open_capture(lua_State *L);
 
 /** Initializes the Lua binding of the process library.  \n
- * Returns 1 (leaves the "im" table on the top of the stack).
+ * Returns 1 (leaves the im table on the top of the stack).
  * You must link the application with the "imlua_process51" library.
  * \ingroup imlua */
 int imlua_open_process(lua_State *L);
 
 /** Initializes the Lua binding of the fourier transform library.  \n
- * Returns 1 (leaves the "im" table on the top of the stack).
+ * Returns 1 (leaves the im table on the top of the stack).
  * You must link the application with the "imlua_fftw51" library.
  * \ingroup imlua */
 int imlua_open_fftw(lua_State *L);
