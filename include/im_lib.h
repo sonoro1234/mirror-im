@@ -30,7 +30,7 @@ extern "C" {
  * @{
  */
 #define IM_AUTHOR "Antonio Scuri"
-#define IM_COPYRIGHT "Copyright (C) 1994-2014 Tecgraf, PUC-Rio."
+#define IM_COPYRIGHT "Copyright (C) 1994-2015 Tecgraf/PUC-Rio."
 #define IM_VERSION "3.9"      /* bug fixes are reported only by imVersion functions */
 #define IM_VERSION_NUMBER 309000
 #define IM_VERSION_DATE "2014/09/30"  /* does not include bug fix releases */
@@ -104,7 +104,7 @@ int imVersionNumber(void);
 \verbatim
 
 ****************************************************************************
-Copyright (C) 1994-2015 Tecgraf, PUC-Rio.                                
+Copyright (C) 1994-2015 Tecgraf/PUC-Rio.                                
                                                                          
 Permission is hereby granted, free of charge, to any person obtaining    
 a copy of this software and associated documentation files (the          
