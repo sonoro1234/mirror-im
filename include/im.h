@@ -322,6 +322,4 @@ int imFormatCanWriteImage(const char* format, const char* compression, int color
 }
 #endif
 
-#include "old_im.h"
-
 #endif

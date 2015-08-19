@@ -8,7 +8,7 @@
 #include <memory.h>
 #include <string.h>
 
-#include "old_im.h"
+#include "im_old.h"
 #include "im.h"
 #include "im_util.h"
 #include "im_counter.h"

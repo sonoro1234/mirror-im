@@ -124,13 +124,13 @@
     <ClCompile Include="..\src\im_str.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\old_im.cpp">
+    <ClCompile Include="..\src\im_old.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\old_imcolor.c">
+    <ClCompile Include="..\src\im_oldcolor.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\old_imresize.c">
+    <ClCompile Include="..\src\im_oldresize.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\tiff_binfile.c">
@@ -807,7 +807,7 @@
     <ClInclude Include="..\include\im_util.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\old_im.h">
+    <ClInclude Include="..\include\im_old.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

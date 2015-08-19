@@ -4,7 +4,7 @@
  * See Copyright Notice in im_lib.h
  */
 
-#include "old_im.h"
+#include "im_old.h"
 
 #include <stdlib.h>
 #include <math.h>
