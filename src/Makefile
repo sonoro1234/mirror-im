@@ -5,8 +5,8 @@ else
   TECMAKE_CMD = $(MAKE) --no-print-directory -f ../tecmake.mak
 endif
 
-.PHONY: do_all im_zlib im im_jp2 im_process im_fftw im_lzo imlua3 imlua5 imlua_jp2 imlua_process5 imlua_fftw5 $(WINLIBS)
-do_all: im_zlib im im_jp2 im_process im_process_omp im_fftw im_lzo imlua5 imlua_jp2 imlua_process5 imlua_process_omp5 imlua_fftw5 $(WINLIBS)
+.PHONY: do_all im_zlib im im_jp2 im_process im_fftw im_lzo imlua5 imlua_jp25 imlua_process5 imlua_fftw5 $(WINLIBS)
+do_all: im_zlib im im_jp2 im_process im_process_omp im_fftw im_lzo imlua5 imlua_jp25 imlua_process5 imlua_process_omp5 imlua_fftw5 $(WINLIBS)
 
 im_zlib:
 	@$(TECMAKE_CMD) MF=im_zlib
@@ -24,22 +24,25 @@ im_fftw:
 	@$(TECMAKE_CMD) MF=im_fftw
 im_lzo:
 	@$(TECMAKE_CMD) MF=im_lzo
+  
+# Building for the default (USE_LUA51) 
+# or for the defined at the environment
 
 imlua5:
 	@$(TECMAKE_CMD) MF=imlua5
 #	@$(TECMAKE_CMD) MF=imlua5 USE_LUA51=Yes
 #	@$(TECMAKE_CMD) MF=imlua5 USE_LUA52=Yes
 #	@$(TECMAKE_CMD) MF=imlua5 USE_LUA53=Yes
-imlua_jp2:
-	@$(TECMAKE_CMD) MF=imlua_jp2
-#	@$(TECMAKE_CMD) MF=imlua_jp2 USE_LUA51=Yes
-#	@$(TECMAKE_CMD) MF=imlua_jp2 USE_LUA52=Yes
-#	@$(TECMAKE_CMD) MF=imlua_jp2 USE_LUA53=Yes
-imlua_avi:
-	@$(TECMAKE_CMD) MF=imlua_avi
-#	@$(TECMAKE_CMD) MF=imlua_avi USE_LUA51=Yes
-#	@$(TECMAKE_CMD) MF=imlua_avi USE_LUA52=Yes
-#	@$(TECMAKE_CMD) MF=imlua_avi USE_LUA53=Yes
+imlua_jp25:
+	@$(TECMAKE_CMD) MF=imlua_jp25
+#	@$(TECMAKE_CMD) MF=imlua_jp25 USE_LUA51=Yes
+#	@$(TECMAKE_CMD) MF=imlua_jp25 USE_LUA52=Yes
+#	@$(TECMAKE_CMD) MF=imlua_jp25 USE_LUA53=Yes
+imlua_avi5:
+	@$(TECMAKE_CMD) MF=imlua_avi5
+#	@$(TECMAKE_CMD) MF=imlua_avi5 USE_LUA51=Yes
+#	@$(TECMAKE_CMD) MF=imlua_avi5 USE_LUA52=Yes
+#	@$(TECMAKE_CMD) MF=imlua_avi5 USE_LUA53=Yes
 imlua_process5:
 	@$(TECMAKE_CMD) MF=imlua_process5
 #	@$(TECMAKE_CMD) MF=imlua_process5 USE_LUA51=Yes
@@ -60,11 +63,11 @@ imlua_fftw5:
 # so this may result in errors, just ignore them.
 im_wmv:
 	@$(TECMAKE_CMD) MF=im_wmv
-imlua_wmv:
-	@$(TECMAKE_CMD) MF=imlua_wmv 
-#	@$(TECMAKE_CMD) MF=imlua_wmv USE_LUA51=Yes 
-#	@$(TECMAKE_CMD) MF=imlua_wmv USE_LUA52=Yes 
-#	@$(TECMAKE_CMD) MF=imlua_wmv USE_LUA53=Yes 
+imlua_wmv5:
+	@$(TECMAKE_CMD) MF=imlua_wmv5 
+#	@$(TECMAKE_CMD) MF=imlua_wmv5 USE_LUA51=Yes 
+#	@$(TECMAKE_CMD) MF=imlua_wmv5 USE_LUA52=Yes 
+#	@$(TECMAKE_CMD) MF=imlua_wmv5 USE_LUA53=Yes 
 im_capture:
 	@$(TECMAKE_CMD) MF=im_capture
 imlua_capture5:
@@ -72,6 +75,3 @@ imlua_capture5:
 #	@$(TECMAKE_CMD) MF=imlua_capture5 USE_LUA51=Yes 
 #	@$(TECMAKE_CMD) MF=imlua_capture5 USE_LUA52=Yes 
 #	@$(TECMAKE_CMD) MF=imlua_capture5 USE_LUA53=Yes 
-
-imlua3:
-	@$(TECMAKE_CMD) MF=imlua3
