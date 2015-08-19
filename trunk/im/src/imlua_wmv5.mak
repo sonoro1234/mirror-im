@@ -14,11 +14,9 @@ INCLUDES = lua5
 
 ifdef USE_LUA53
   LUASFX = 53
-  DEFINES += LUA_COMPAT_MODULE
 else
 ifdef USE_LUA52
   LUASFX = 52
-  DEFINES += LUA_COMPAT_MODULE
 else
   USE_LUA51 = Yes
   LUASFX = 51
@@ -27,9 +25,13 @@ endif
 
 LIBNAME := $(LIBNAME)$(LUASFX)
 
-USE_IMLUA = Yes
-NO_LUALINK = Yes
 IM = ..
+USE_IMLUA = Yes
+
+# To not link with the Lua dynamic library in UNIX
+NO_LUALINK = Yes
+# To use a subfolder with the Lua version for binaries
+LUAMOD_DIR = Yes
 
 ifneq ($(findstring gcc, $(TEC_UNAME)), )
   $(error No support for WMFSDK in Cygwin)

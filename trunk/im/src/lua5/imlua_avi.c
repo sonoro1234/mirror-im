@@ -7,10 +7,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "im.h"
+#include "im_image.h"
 #include "im_format_avi.h"
 
 #include <lua.h>
 #include <lauxlib.h>
+
+#include "imlua.h"
+#include "imlua_aux.h"
 
 
 static int imlua_FormatRegisterAVI(lua_State *L)
@@ -29,7 +34,7 @@ static const struct luaL_Reg imlib[] = {
 static int imlua_avi_open (lua_State *L)
 {
   imFormatRegisterAVI();
-  luaL_register(L, "im", imlib);   /* leave "im" table at the top of the stack */
+  imlua_register_lib(L, imlib);   /* leave "im" table at the top of the stack */
   return 1;
 }
 
