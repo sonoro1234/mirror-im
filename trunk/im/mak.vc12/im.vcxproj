@@ -125,9 +125,9 @@
     <ClCompile Include="..\src\im_palette.cpp" />
     <ClCompile Include="..\src\im_rgb2map.cpp" />
     <ClCompile Include="..\src\im_str.cpp" />
-    <ClCompile Include="..\src\old_im.cpp" />
-    <ClCompile Include="..\src\old_imcolor.c" />
-    <ClCompile Include="..\src\old_imresize.c" />
+    <ClCompile Include="..\src\im_old.cpp" />
+    <ClCompile Include="..\src\im_oldcolor.c" />
+    <ClCompile Include="..\src\im_oldresize.c" />
     <ClCompile Include="..\src\tiff_binfile.c" />
     <ClCompile Include="..\src\libtiff\tif_aux.c" />
     <ClCompile Include="..\src\libtiff\tif_close.c" />
@@ -356,7 +356,7 @@
     <ClInclude Include="..\include\im_plus.h" />
     <ClInclude Include="..\include\im_raw.h" />
     <ClInclude Include="..\include\im_util.h" />
-    <ClInclude Include="..\include\old_im.h" />
+    <ClInclude Include="..\include\im_old.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
