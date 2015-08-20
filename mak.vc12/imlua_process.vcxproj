@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -11,20 +11,22 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{CB80E607-6B6C-4ADF-9B6D-27AA925AE493}</ProjectGuid>
+    <ProjectGuid>{CB863607-6B6C-0000-7689-000000001234}</ProjectGuid>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />  <Import Project="lua_version.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
@@ -38,24 +40,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\lib\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\obj\Debug\$(ProjectName)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\lib\Debug\Lua$(LUASFX)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\obj\Debug\$(ProjectName)\Lua$(LUASFX)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>..\lib\x64\</OutDir>
-    <IntDir>..\obj\Debug_x64\$(ProjectName)\</IntDir>
+    <OutDir>..\lib\Debug_64\Lua$(LUASFX)\</OutDir>
+    <IntDir>..\obj\Debug_64\$(ProjectName)\Lua$(LUASFX)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../include;../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;IM_PROCESS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../include;../src;../src/lua5/lh;../../lua$(LUA_SUFFIX)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;IMLUA_USELH;IM_PROCESS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OpenMPSupport>false</OpenMPSupport>
-      <PrecompiledHeaderOutputFile>..\lib/im_process.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -67,21 +68,20 @@
       <Culture>0x0416</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName)$(LUASFX).lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../include;../src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;IM_PROCESS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>../include;../src;../src/lua5/lh;../../lua$(LUA_SUFFIX)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;IMLUA_USELH;IM_PROCESS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ExceptionHandling>
       </ExceptionHandling>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <OpenMPSupport>false</OpenMPSupport>
-      <PrecompiledHeaderOutputFile>..\lib/im_process.pch</PrecompiledHeaderOutputFile>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <WarningLevel>Level4</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -93,51 +93,19 @@
       <Culture>0x0416</Culture>
     </ResourceCompile>
     <Lib>
-      <OutputFile>$(OutDir)$(ProjectName).lib</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName)$(LUASFX).lib</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\process\im_analyze.cpp" />
-    <ClCompile Include="..\src\process\im_arithmetic_bin.cpp" />
-    <ClCompile Include="..\src\process\im_arithmetic_un.cpp" />
-    <ClCompile Include="..\src\process\im_canny.cpp" />
-    <ClCompile Include="..\src\process\im_color.cpp" />
-    <ClCompile Include="..\src\im_convertbitmap.cpp" />
-    <ClCompile Include="..\src\im_convertcolor.cpp" />
-    <ClCompile Include="..\src\im_converttype.cpp" />
-    <ClCompile Include="..\src\process\im_convolve.cpp" />
-    <ClCompile Include="..\src\process\im_convolve_rank.cpp" />
-    <ClCompile Include="..\src\process\im_distance.cpp" />
-    <ClCompile Include="..\src\process\im_effects.cpp" />
-    <ClCompile Include="..\src\process\im_geometric.cpp" />
-    <ClCompile Include="..\src\process\im_histogram.cpp" />
-    <ClCompile Include="..\src\process\im_houghline.cpp" />
-    <ClCompile Include="..\src\process\im_kernel.cpp" />
-    <ClCompile Include="..\src\process\im_logic.cpp" />
-    <ClCompile Include="..\src\process\im_morphology_bin.cpp" />
-    <ClCompile Include="..\src\process\im_morphology_gray.cpp" />
-    <ClCompile Include="..\src\process\im_point.cpp" />
-    <ClCompile Include="..\src\process\im_process_counter.cpp" />
-    <ClCompile Include="..\src\process\im_quantize.cpp" />
-    <ClCompile Include="..\src\process\im_remotesens.cpp" />
-    <ClCompile Include="..\src\process\im_render.cpp" />
-    <ClCompile Include="..\src\process\im_resize.cpp" />
-    <ClCompile Include="..\src\process\im_statistics.cpp" />
-    <ClCompile Include="..\src\process\im_threshold.cpp" />
-    <ClCompile Include="..\src\process\im_tonegamut.cpp" />
+    <None Include="..\src\lua5\im_process.lua" />
+    <None Include="..\src\lua5\im_processconvert.lua" />
+    <None Include="..\src\lua5\imlua_process.def" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\im_process.def" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\im_kernel.h" />
-    <ClInclude Include="..\include\im_process.h" />
-    <ClInclude Include="..\include\im_process_ana.h" />
-    <ClInclude Include="..\src\process\im_process_counter.h" />
-    <ClInclude Include="..\include\im_process_glo.h" />
-    <ClInclude Include="..\include\im_process_loc.h" />
-    <ClInclude Include="..\include\im_process_pnt.h" />
+    <ClCompile Include="..\src\lua5\imlua_convert.c" />
+    <ClCompile Include="..\src\lua5\imlua_kernel.c" />
+    <ClCompile Include="..\src\lua5\imlua_process.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
