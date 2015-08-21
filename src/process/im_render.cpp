@@ -567,7 +567,7 @@ struct xyStackArray
   int max_count, count;
 };
 
-xyStackArray* xyStackArrayCreate()
+static inline xyStackArray* xyStackArrayCreate()
 {
   xyStackArray* stack = new xyStackArray;
 
@@ -578,18 +578,18 @@ xyStackArray* xyStackArrayCreate()
   return stack;
 }
 
-void xyStackArrayDestroy(xyStackArray* stack)
+static inline void xyStackArrayDestroy(xyStackArray* stack)
 {
   free(stack->xy_data);
   delete stack;
 }
 
-int xyStackArrayHasData(xyStackArray* stack)
+static inline int xyStackArrayHasData(xyStackArray* stack)
 {
   return stack->count;
 }
 
-static void xyStackArrayPush(xyStackArray* stack, int x, int y)
+static inline void xyStackArrayPush(xyStackArray* stack, int x, int y)
 {
   if (stack->count + 2 > stack->max_count)
   {
@@ -602,7 +602,7 @@ static void xyStackArrayPush(xyStackArray* stack, int x, int y)
   stack->count += 2;
 }
 
-static void xyStackArrayPop(xyStackArray* stack, int &x, int &y)
+static inline void xyStackArrayPop(xyStackArray* stack, int &x, int &y)
 {
   stack->count -= 2;
   x = stack->xy_data[stack->count + 0];
@@ -707,7 +707,7 @@ static void DoRenderFloodFillRGB(T** data, int width, int height, int start_x, i
   xyStackArrayDestroy(stack);
 }
 
-void imProcessRenderFloodFill(const imImage* image, int start_x, int start_y, float* replace_color, float tolerance)
+void imProcessRenderFloodFill(imImage* image, int start_x, int start_y, float* replace_color, float tolerance)
 {
   switch (image->data_type)
   {
