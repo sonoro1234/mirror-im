@@ -141,6 +141,7 @@ EXPORTS
   imProcessSliceThreshold
   imProcessRenderGrid
   imProcessRenderChessboard
+  imProcessRenderFloodFill
   imProcessInsert
   imProcessCrop
   imProcessRegionalMaximum

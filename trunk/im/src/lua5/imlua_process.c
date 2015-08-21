@@ -3026,6 +3026,32 @@ static int imluaProcessRenderChessboard (lua_State *L)
   return 1;
 }
 
+static int imluaProcessRenderFloodFill(lua_State *L)
+{
+  imImage *image = imlua_checkimage(L, 1);
+  int start_x = luaL_checkinteger(L, 2);
+  int start_y = luaL_checkinteger(L, 3);
+  double tolerance = luaL_checknumber(L, 5);
+  int count;
+  float*color;
+
+  imlua_checknotcomplex(L, 1, image);
+  imlua_checkcolorspace(L, 1, image, IM_RGB);
+
+  /* minimize leak when error, checking array after other checks */
+  color = imlua_toarrayfloat(L, 4, &count, 1);
+  if (count != 3)
+  {
+    free(color);
+    luaL_argerror(L, 4, "the color must have 3 components");
+    return 0;
+  }
+
+  imProcessRenderFloodFill(image, start_x, start_y, color, (float)tolerance);
+
+  free(color);
+  return 0;
+}
 
 
 /*****************************************************************************\
@@ -3653,6 +3679,7 @@ static const luaL_Reg improcess_lib[] = {
   {"ProcessRenderCosine", imluaProcessRenderCosine},
   {"ProcessRenderGrid", imluaProcessRenderGrid},
   {"ProcessRenderChessboard", imluaProcessRenderChessboard},
+  {"ProcessRenderFloodFill", imluaProcessRenderFloodFill },
 
   {"ProcessToneGamut", imluaProcessToneGamut},
   {"ProcessUnNormalize", imluaProcessUnNormalize},

@@ -619,6 +619,14 @@ int imProcessRenderGrid(imImage* image, int x_space, int y_space);
  * \ingroup render */
 int imProcessRenderChessboard(imImage* image, int x_space, int y_space);
 
+/** Render a color flood fill. \n
+ * Image must the IM_RGB color space. replace_color must have 3 components.
+ *
+ * \verbatim im.ProcessRenderFloodFill(image: imImage, start_x, start_y: number, replace_color: table of 3 numbers, tolerance: number)  [in Lua 5] \endverbatim
+ * \ingroup render */
+void imProcessRenderFloodFill(const imImage* image, int start_x, int start_y, float* replace_color, float tolerance);
+
+
 
 
 /** \defgroup tonegamut Tone Gamut Operations
