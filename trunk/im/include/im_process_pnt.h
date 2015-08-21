@@ -624,7 +624,7 @@ int imProcessRenderChessboard(imImage* image, int x_space, int y_space);
  *
  * \verbatim im.ProcessRenderFloodFill(image: imImage, start_x, start_y: number, replace_color: table of 3 numbers, tolerance: number)  [in Lua 5] \endverbatim
  * \ingroup render */
-void imProcessRenderFloodFill(const imImage* image, int start_x, int start_y, float* replace_color, float tolerance);
+void imProcessRenderFloodFill(imImage* image, int start_x, int start_y, float* replace_color, float tolerance);
 
 
 
