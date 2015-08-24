@@ -53,13 +53,13 @@ enum imGammaFactor
 enum imCastMode
 {
   IM_CAST_MINMAX, /**< scan for min and max values.  */
-  IM_CAST_FIXED,  /**< use predefied min-max values. */
+  IM_CAST_FIXED,  /**< use predefined min-max values. */
   IM_CAST_DIRECT, /**< direct type cast the value.   */
   IM_CAST_USER    /**< user attributes called "UserMin" and "UserMax", both float values. */
 };
 
 /** Changes the image data type, using a complex2real conversion, 
- * a gamma factor, and an abssolute mode (modulus). \n
+ * a gamma factor, and an absolute mode (modulus). \n
  * When demoting the data type the function will scan source for min/max values or use fixed values (cast_mode)
  * to scale the result according to the target range. \n
  * Except complex to real that will use only the complex2real conversion. \n
@@ -67,10 +67,10 @@ enum imCastMode
  * Returns IM_ERR_NONE, IM_ERR_DATA or IM_ERR_COUNTER, see also \ref imErrorCodes. \n
  * See also \ref imDataType, \ref datatypeutl, \ref imComplex2Real, \ref imGammaFactor and \ref imCastMode.
  *
- * \verbatim im.ConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
- * \verbatim im.ConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
+ * \verbatim im.ConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
+ * \verbatim im.ConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
  * \ingroup convert */
-int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int abssolute, int cast_mode);
+int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
 
 /** Converts one color space to another. \n
  * Images must be of the same size and data type. If color mode is the same nothing is done. \n
@@ -93,10 +93,10 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image);
  * See also \ref imImageIsBitmap, \ref imComplex2Real, \ref imGammaFactor and \ref imCastMode. \n
  * The function im.ConvertToBitmapNew uses the default conversion result from \ref imColorModeToBitmap if color_space is nil.
  *
- * \verbatim im.ConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
- * \verbatim im.ConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
+ * \verbatim im.ConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convert */
-int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int abssolute, int cast_mode);
+int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
 
 /** Returns an OpenGL compatible data buffer. Also returns the correspondant pixel format. \n
  * The memory allocated is stored in the attribute "GLDATA" with BYTE type. And it will exists while the image exists. \n

@@ -21,9 +21,9 @@
 
 
 #ifdef IM_PROCESS
-int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int abssolute, int cast_mode)
+int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
 #else
-int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int abssolute, int cast_mode)
+int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
 #endif
 {
   assert(src_image);
@@ -55,9 +55,9 @@ int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real
     {
       // data type conversion, but NO color mode conversion
 #ifdef IM_PROCESS
-      ret = imProcessConvertDataType(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode);
+      ret = imProcessConvertDataType(src_image, dst_image, cpx2real, gamma, absolute, cast_mode);
 #else
-      ret = imConvertDataType(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode);
+      ret = imConvertDataType(src_image, dst_image, cpx2real, gamma, absolute, cast_mode);
 #endif
     }
     else
@@ -78,9 +78,9 @@ int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real
         {
           // second just convert data type
 #ifdef IM_PROCESS
-          ret = imProcessConvertDataType(temp_image, dst_image, cpx2real, gamma, abssolute, cast_mode);
+          ret = imProcessConvertDataType(temp_image, dst_image, cpx2real, gamma, absolute, cast_mode);
 #else
-          ret = imConvertDataType(temp_image, dst_image, cpx2real, gamma, abssolute, cast_mode);
+          ret = imConvertDataType(temp_image, dst_image, cpx2real, gamma, absolute, cast_mode);
 #endif
         }
         imImageDestroy(temp_image);

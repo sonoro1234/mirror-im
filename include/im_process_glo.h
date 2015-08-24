@@ -181,7 +181,7 @@ void imProcessSwapQuadrants(imImage* image, int center2origin);
  * See \ref im_util.h
  * \ingroup process */
 
-/** Sets the minimum number of interations to split into threads. \n
+/** Sets the minimum number of iterations to split into threads. \n
  * Default value is 250000, or an image with 500x500. \n
  * Returns the previous value.
  *

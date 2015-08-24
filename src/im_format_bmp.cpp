@@ -110,7 +110,7 @@ static int iBMPDecodeScanLine(imBinFile* handle, unsigned char* DecodedBuffer, i
       while (runCount-- && Index < Width)
         DecodedBuffer[Index++] = runValue;
     }
-    else  /* Abssolute Mode or Escape Code */
+    else  /* Absolute Mode or Escape Code */
     {
       switch(runValue)
       {
@@ -122,7 +122,7 @@ static int iBMPDecodeScanLine(imBinFile* handle, unsigned char* DecodedBuffer, i
         imBinFileRead(handle, &runCount, 1, 1);
         imBinFileRead(handle, &runCount, 1, 1);  
         break;
-      default:            /* Abssolute Mode */
+      default:            /* Absolute Mode */
         remain = runValue % 2;
         runValue = (unsigned char)(Index + runValue < (Width + 1)? runValue: (Width - 1) - Index);
         imBinFileRead(handle, DecodedBuffer + Index, runValue, 1);

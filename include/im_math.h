@@ -359,9 +359,9 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
 /** Calculates minimum and maximum values.
  * \ingroup math */
 template <class T> 
-inline void imMinMax(const T *map, int count, T& min, T& max, int abssolute = 0)
+inline void imMinMax(const T *map, int count, T& min, T& max, int absolute = 0)
 {
-  if (abssolute)
+  if (absolute)
     min = imAbs(map[0]);
   else
     min = map[0];
@@ -370,7 +370,7 @@ inline void imMinMax(const T *map, int count, T& min, T& max, int abssolute = 0)
   for (int i = 1; i < count; i++)
   {
     T value;
-    if (abssolute)
+    if (absolute)
       value = imAbs(map[i]);
     else
       value = map[i];
@@ -386,7 +386,7 @@ inline void imMinMax(const T *map, int count, T& min, T& max, int abssolute = 0)
  * with addtional considerations for data type conversion and normalized operations.
  * \ingroup math */
 template <class T> 
-inline void imMinMaxType(const T *map, int count, T& min, T& max, int abssolute = 0)
+inline void imMinMaxType(const T *map, int count, T& min, T& max, int absolute = 0)
 {
   int size_of = sizeof(imbyte);
   if (sizeof(T) == size_of)
@@ -397,7 +397,7 @@ inline void imMinMaxType(const T *map, int count, T& min, T& max, int abssolute 
   }
   else
   {
-    imMinMax(map, count, min, max, abssolute);
+    imMinMax(map, count, min, max, absolute);
 
     /* if equal define a minimum interval */
     if (min == max)
