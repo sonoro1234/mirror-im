@@ -21,7 +21,7 @@
 
 
 /*****************************************************************************\
- im.ConvertDataType(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode)
+ im.ConvertDataType(src_image, dst_image, cpx2real, gamma, absolute, cast_mode)
 \*****************************************************************************/
 static int imluaConvertDataType (lua_State *L)
 {
@@ -29,14 +29,14 @@ static int imluaConvertDataType (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
   int cpx2real = luaL_checkinteger(L, 3);
   float gamma = (float)luaL_checknumber(L, 4);
-  int abssolute = lua_toboolean(L, 5);
+  int absolute = lua_toboolean(L, 5);
   int cast_mode = luaL_checkinteger(L, 6);
 
   imlua_matchcolorspace(L, src_image, dst_image);
 #ifdef IM_PROCESS
-  imlua_pusherror(L, imProcessConvertDataType(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode));
+  imlua_pusherror(L, imProcessConvertDataType(src_image, dst_image, cpx2real, gamma, absolute, cast_mode));
 #else
-  imlua_pusherror(L, imConvertDataType(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode));
+  imlua_pusherror(L, imConvertDataType(src_image, dst_image, cpx2real, gamma, absolute, cast_mode));
 #endif
   return 1;
 }
@@ -59,7 +59,7 @@ static int imluaConvertColorSpace (lua_State *L)
 }
 
 /*****************************************************************************\
- im.ConvertToBitmap(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode)
+ im.ConvertToBitmap(src_image, dst_image, cpx2real, gamma, absolute, cast_mode)
 \*****************************************************************************/
 static int imluaConvertToBitmap (lua_State *L)
 {
@@ -67,16 +67,16 @@ static int imluaConvertToBitmap (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
   int cpx2real = luaL_checkinteger(L, 3);
   float gamma = (float)luaL_checknumber(L, 4);
-  int abssolute = lua_toboolean(L, 5);
+  int absolute = lua_toboolean(L, 5);
   int cast_mode = luaL_checkinteger(L, 6);
 
   imlua_matchsize(L, src_image, dst_image);
   imlua_matchcheck(L, imImageIsBitmap(dst_image), "image must be a bitmap");
 
 #ifdef IM_PROCESS
-  imlua_pusherror(L, imProcessConvertToBitmap(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode));
+  imlua_pusherror(L, imProcessConvertToBitmap(src_image, dst_image, cpx2real, gamma, absolute, cast_mode));
 #else
-  imlua_pusherror(L, imConvertToBitmap(src_image, dst_image, cpx2real, gamma, abssolute, cast_mode));
+  imlua_pusherror(L, imConvertToBitmap(src_image, dst_image, cpx2real, gamma, absolute, cast_mode));
 #endif
   return 1;
 }

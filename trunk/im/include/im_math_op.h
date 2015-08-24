@@ -140,7 +140,7 @@ inline T1 pow_op(const T1& v1, const T2& v2)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-/// Generic Abssolute
+/// Generic Absolute
 template <class T>
 inline T abs_op(const T& v)
 {

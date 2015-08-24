@@ -233,8 +233,8 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int *holes_count, 
 
 /** Measure the total perimeter of all regions (external and internal). \n
  * Source image is IM_GRAY/IM_USHORT type (the result of imAnalyzeFindRegions). \n
- * It uses a half-pixel inter distance for 8 neighboors in a perimeter of a 4 connected region. \n
- * This function can also be used to measure line lenght. \n
+ * It uses a half-pixel inter distance for 8 neighbors in a perimeter of a 4 connected region. \n
+ * This function can also be used to measure line length. \n
  * perim has size the number of regions.
  *
  * \verbatim im.AnalyzeMeasurePerimeter(image: imImage) -> perim: table of numbers [in Lua 5] \endverbatim
@@ -242,7 +242,7 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int *holes_count, 
 void imAnalyzeMeasurePerimeter(const imImage* image, float* perim, int region_count);
 
 /** Isolates the perimeter line of gray integer images. Background is defined as being black (0). \n
- * It just checks if at least one of the 4 connected neighboors is non zero. Image borders are extended with zeros.
+ * It just checks if at least one of the 4 connected neighbors is non zero. Image borders are extended with zeros.
  *
  * \verbatim im.ProcessPerimeterLine(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessPerimeterLineNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim

@@ -19,7 +19,7 @@ extern "C" {
  * \ingroup process */
 
 
-/** Custom unary point funtion. \n
+/** Custom unary point function. \n
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value: number, params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the params table is unpacked.
@@ -127,7 +127,7 @@ int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage
  * \ingroup arithm */
 enum imUnaryOp {
   IM_UN_EQL,     /**< equal             = a              */
-  IM_UN_ABS,     /**< abssolute         = |a|            */
+  IM_UN_ABS,     /**< absolute         = |a|            */
   IM_UN_LESS,    /**< less              = -a             */
   IM_UN_INV,     /**< invert (#)        = 1/a            */
   IM_UN_SQR,     /**< square            = a*a            */
@@ -928,10 +928,10 @@ void imProcessAbnormalHyperionCorrection(const imImage* src_image, imImage* dst_
 /** Same as  \ref imConvertDataType.
  * But returns zero if the counter aborted.
  *
- * \verbatim im.ProcessConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
- * \verbatim im.ProcessConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
+ * \verbatim im.ProcessConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
+ * \verbatim im.ProcessConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
  * \ingroup procconvert */
-int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int abssolute, int cast_mode);
+int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
 
 /** Same as  \ref imConvertColorSpace.
  * But returns zero if the counter aborted.
@@ -944,10 +944,10 @@ int imProcessConvertColorSpace(const imImage* src_image, imImage* dst_image);
 /** Same as  \ref imConvertToBitmap.
  * But returns zero if the counter aborted.
  *
- * \verbatim im.ProcessConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
- * \verbatim im.ProcessConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, abssolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
+ * \verbatim im.ProcessConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup procconvert */
-int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int abssolute, int cast_mode);
+int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
 
 
 /** \defgroup imageenhance Image Enhance Utilities in Lua
