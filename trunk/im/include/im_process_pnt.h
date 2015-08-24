@@ -41,11 +41,11 @@ typedef int (*imUnaryPointOpFunc)(float src_value, float *dst_value, float* para
  * \ingroup point */
 int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name);
 
-/** Custom unary point color funtion. \n
+/** Custom unary point color function. \n
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value_plane0: number, src_value_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the params table is unpacked.
- * Also each color plane is passed as a separe value, instead of inside an array.
+ * Also each color plane is passed as a separate value, instead of inside an array.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
 typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y);
@@ -64,14 +64,14 @@ typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value,
  * \ingroup point */
 int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name);
 
-/** Custom multiple point funtion. \n
+/** Custom multiple point function. \n
  * Source values are copies, so they can be changed inside the function without affecting the original image. \n
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value1: number, src_value2: number, ... , params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
-typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_count);
+typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_image_count);
 
 /** Apply an multiple point operation using a custom function.
  * One pixel from each source affects the same pixel on target. \n
@@ -86,17 +86,17 @@ typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float
  * In Lua, the params table is passed to the function by using the Lua stack, 
  * so its table can contain any type of objects, but they all must be unnamed.
  * \ingroup point */
-int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name);
+int imProcessMultiPointOp(const imImage** src_image_list, int src_image_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name);
 
-/** Custom multiple point color funtion. \n
+/** Custom multiple point color function. \n
  * Source values are copies, so they can be changed inside the function without affecting the original image. \n
  * Data will be set only if the returned value is non zero.
  * \verbatim func(src_value1_plane0: number, src_value1_plane1: number, ..., src_value2_plane0: number, src_value2_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
- * Also each color plane is passed as a separe value, instead of inside an array.
+ * Also each color plane is passed as a separate value, instead of inside an array.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
-typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float* params, void* userdata, int x, int y, int src_count, int src_depth, int dst_depth);
+typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float* params, void* userdata, int x, int y, int src_image_count, int src_depth, int dst_depth);
 
 /** Apply an multiple point color operation using a custom function.
  * One pixel from each source affects the same pixel on target. \n
@@ -111,7 +111,7 @@ typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float*
  * In Lua, the params table is passed to the function by using the Lua stack, 
  * so its table can contain any type of objects, but they all must be unnamed.
  * \ingroup point */
-int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name);
+int imProcessMultiPointColorOp(const imImage** src_image_list, int src_image_count, imImage* dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name);
 
 
 
@@ -194,7 +194,7 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
  * \li any integer -> any integer or real
  * \li real -> real
  * \li complex -> complex
- * The constant value is type casted to an apropriate type before the operation. \n
+ * The constant value is type casted to an appropriate type before the operation. \n
  * If source is complex, target complex must be the same data type (imcfloat-imcfloat or imcdouble-imcdouble only). \n
  * If target is byte, then the result is cropped to 0-255.
  *
@@ -216,7 +216,7 @@ void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, i
  * Can be done in-place, images must match. \n
  * alpha_image must have the same data type except for complex images that must be real, 
  * and color_space must be IM_GRAY.
- * Maximum alpha values are baed in \ref imColorMax. Minimum is always 0.
+ * Maximum alpha values are based in \ref imColorMax. Minimum is always 0.
  * \verbatim im.ProcessBlend(src_image1: imImage, src_image2: imImage, alpha_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessBlendNew(image1: imImage, image2: imImage, alpha_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup arithm */
@@ -330,8 +330,8 @@ void imProcessQuantizeGrayUniform(const imImage* src_image, imImage* dst_image, 
  * The histogram is used an each level is summed while the result is less than the obtained amount from 0 (for the lowest level) and from the last level (for the highest).
  * If it is zero, then only empty counts of the histogram will be considered. \n
  * Images must be (IM_BYTE, IM_SHORT or IM_USHORT)/(IM_RGB or IM_GRAY). Can be done in-place. \n
- * To expand the gammut without using the histogram, by just specifing the lowest and highest levels
- * use the \ref IM_GAMUT_EXPAND tone gammut operation (\ref imProcessToneGamut).
+ * To expand the gamut without using the histogram, by just specifying the lowest and highest levels
+ * use the \ref IM_GAMUT_EXPAND tone gamut operation (\ref imProcessToneGamut).
  *
  * \verbatim im.ProcessExpandHistogram(src_image: imImage, dst_image: imImage, percent: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessExpandHistogramNew(src_image: imImage, percent: number) -> new_image: imImage [in Lua 5] \endverbatim

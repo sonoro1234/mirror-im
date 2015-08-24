@@ -22,7 +22,7 @@ extern "C" {
  * "S" is the normal distance from the diagonal of the RGB cube. It ranges from 0 to 1. \n
  * "H" is the angle starting from the red vector, given in degrees.
  * \par
- * This is not a new color space, this is exactly the same gammut as RGB. \n
+ * This is not a new color space, this is exactly the same gamut as RGB. \n
  * \par
  * See \ref im_colorhsi.h
  * \ingroup color */
