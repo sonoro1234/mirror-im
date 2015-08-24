@@ -274,7 +274,10 @@ namespace im
   {
     friend class File;
     friend class Process;
+    friend class Analyze;
+    friend class Calc;
     friend class VideoCapture;
+
     friend class cd::Canvas;
     friend class cd::CanvasImageRGB;
 
@@ -1153,179 +1156,697 @@ namespace im
     }
 
 #if 0
-    Image *New(src_image, ...)
+    Image *New(src_image, ...);
 
-    int imGaussianStdDev2KernelSize(float stddev);
-    float imGaussianKernelSize2StdDev(int kernel_size);
-    void imProcessCalcRotateSize(int width, int height, int *new_width, int *new_height, double cos0, double sin0);
-    int imProcessOpenMPSetMinCount(int min_count);
-    int imProcessOpenMPSetNumThreads(int count);
+    return imGaussianStdDev2KernelSize(stddev);
+    return imGaussianKernelSize2StdDev(kernel_size);
+    imProcessCalcRotateSize(width, height, *new_width, *new_height, cos0, sin0);
+    return imProcessOpenMPSetMinCount(min_count);
+    return imProcessOpenMPSetNumThreads(count);
 
-    int imProcessHoughLines(const imImage* src_image, imImage* dst_image);
-    int imProcessHoughLinesDraw(const imImage* src_image, const imImage* hough, const imImage* hough_points, imImage* dst_image);
-    void imProcessCrossCorrelation(const imImage* src_image1, const imImage* src_image2, imImage* dst_image);
-    void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image);
-    void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image);
-    void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
-    void imProcessFFT(const imImage* src_image, imImage* dst_image);
-    void imProcessIFFT(const imImage* src_image, imImage* dst_image);
-    int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name);
-    int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name);
-    int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name);
-    int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name);
-    void imProcessUnArithmeticOp(const imImage* src_image, imImage* dst_image, int op);
-    void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int op);
-    void imProcessArithmeticConstOp(const imImage* src_image, float src_const, imImage* dst_image, int op);
-    void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, float alpha);
-    void imProcessBlend(const imImage* src_image1, const imImage* src_image2, const imImage* alpha_image, imImage* dst_image);
-    void imProcessCompose(const imImage* src_image1, const imImage* src_image2, imImage* dst_image);
-    void imProcessSplitComplex(const imImage* src_image, imImage* dst_image1, imImage* dst_image2, int polar);
-    void imProcessMergeComplex(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int polar);
-    void imProcessMultipleMean(const imImage** src_image_list, int src_image_count, imImage* dst_image);
-    void imProcessMultipleStdDev(const imImage** src_image_list, int src_image_count, const imImage *mean_image, imImage* dst_image);
-    int imProcessMultipleMedian(const imImage** src_image_list, int src_image_count, imImage* dst_image);
-    int imProcessAutoCovariance(const imImage* src_image, const imImage* mean_image, imImage* dst_image);
-    void imProcessMultiplyConj(const imImage* src_image1, const imImage* src_image2, imImage* dst_image);
-    void imProcessQuantizeRGBUniform(const imImage* src_image, imImage* dst_image, int do_dither);
-    void imProcessQuantizeGrayUniform(const imImage* src_image, imImage* dst_image, int grays);
-    void imProcessExpandHistogram(const imImage* src_image, imImage* dst_image, float percent);
-    void imProcessEqualizeHistogram(const imImage* src_image, imImage* dst_image);
-    void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* chroma_image);
-    void imProcessSplitHSI(const imImage* src_image, imImage* h_image, imImage* s_image, imImage* i_image);
-    void imProcessMergeHSI(const imImage* h_image, const imImage* s_image, const imImage* i_image, imImage* dst_image);
-    void imProcessSplitComponents(const imImage* src_image, imImage** dst_image_list);
-    void imProcessMergeComponents(const imImage** src_image_list, imImage* dst_image);
-    void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image);
-    void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* src_color, float* dst_color);
-    void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, float* src_color, float dst_alpha);
-    void imProcessBitwiseOp(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, int op);
-    void imProcessBitwiseNot(const imImage* src_image, imImage* dst_image);
-    void imProcessBitMask(const imImage* src_image, imImage* dst_image, unsigned char mask, int op);
-    void imProcessBitPlane(const imImage* src_image, imImage* dst_image, int plane, int do_reset);
-    int imProcessRenderAddSpeckleNoise(const imImage* src_image, imImage* dst_image, float percent);
-    int imProcessRenderAddGaussianNoise(const imImage* src_image, imImage* dst_image, float mean, float stddev);
-    int imProcessRenderAddUniformNoise(const imImage* src_image, imImage* dst_image, float mean, float stddev);
-    void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, float* params);
-    void imProcessUnNormalize(const imImage* src_image, imImage* dst_image);
-    void imProcessDirectConv(const imImage* src_image, imImage* dst_image);
-    void imProcessNegative(const imImage* src_image, imImage* dst_image);
-    float imProcessCalcAutoGamma(const imImage* image);
-    void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shift, float s_shift, float i_shift);
-    void imProcessThreshold(const imImage* src_image, imImage* dst_image, float level, int value);
-    void imProcessThresholdByDiff(const imImage* src_image1, const imImage* src_image2, imImage* dst_image);
-    void imProcessHysteresisThreshold(const imImage* src_image, imImage* dst_image, int low_thres, int high_thres);
-    void imProcessHysteresisThresEstimate(const imImage* image, int *low_level, int *high_level);
-    int imProcessUniformErrThreshold(const imImage* src_image, imImage* dst_image);
-    void imProcessDifusionErrThreshold(const imImage* src_image, imImage* dst_image, int level);
-    int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, float percent);
-    int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image);
-    float imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image);
-    void imProcessLocalMaxThresEstimate(const imImage* image, int *level);
-    void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, float start_level, float end_level);
-    void imProcessPixelate(const imImage* src_image, imImage* dst_image, int box_size);
-    void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level);
-    void imProcessNormDiffRatio(const imImage* image1, const imImage* image2, imImage* dst_image);
-    void imProcessAbnormalHyperionCorrection(const imImage* src_image, imImage* dst_image, int threshold_consecutive, int threshold_percent, imImage* image_abnormal);
-    int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
-    int imProcessConvertColorSpace(const imImage* src_image, imImage* dst_image);
-    int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
-    int imProcessReduce(const imImage* src_image, imImage* dst_image, int order);
-    int imProcessResize(const imImage* src_image, imImage* dst_image, int order);
-    void imProcessReduceBy4(const imImage* src_image, imImage* dst_image);
-    void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
-    void imProcessInsert(const imImage* src_image, const imImage* region_image, imImage* dst_image, int xmin, int ymin);
-    void imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
-    int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, double sin0, int order);
-    int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0, double sin0, int x, int y, int to_origin, int order);
-    void imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir_clockwise);
-    void imProcessRotate180(const imImage* src_image, imImage* dst_image);
-    void imProcessMirror(const imImage* src_image, imImage* dst_image);
-    void imProcessFlip(const imImage* src_image, imImage* dst_image);
-    int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int order);
-    int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k1, int order);
-    void imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2);
-    int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, const imImage* kernel, int ismax);
-    int imProcessGrayMorphErode(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGrayMorphDilate(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGrayMorphOpen(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGrayMorphClose(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGrayMorphTopHat(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGrayMorphWell(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGrayMorphGradient(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessBinMorphConvolve(const imImage* src_image, imImage* dst_image, const imImage* kernel, int hit_white, int iter);
-    int imProcessBinMorphErode(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
-    int imProcessBinMorphDilate(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
-    int imProcessBinMorphOpen(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
-    int imProcessBinMorphClose(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
-    int imProcessBinMorphOutline(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
-    void imProcessBinMorphThin(const imImage* src_image, imImage* dst_image);
-    int imProcessMedianConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessRangeConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessRankClosestConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessRankMaxConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessRankMinConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessRangeContrastThreshold(const imImage* src_image, imImage* dst_image, int kernel_size, int min_range);
-    int imProcessLocalMaxThreshold(const imImage* src_image, imImage* dst_image, int kernel_size, int min_level);
-    int imProcessConvolve(const imImage* src_image, imImage* dst_image, const imImage* kernel);
-    int imProcessConvolveSep(const imImage* src_image, imImage* dst_image, const imImage* kernel);
-    int imProcessConvolveDual(const imImage* src_image, imImage* dst_image, const imImage *kernel1, const imImage *kernel2);
-    int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imImage* kernel, int count);
-    int imProcessCompassConvolve(const imImage* src_image, imImage* dst_image, imImage* kernel);
-    int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev1, float stddev2);
-    int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev);
-    int imProcessMeanConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev);
-    int imProcessBarlettConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
-    int imProcessSobelConvolve(const imImage* src_image, imImage* dst_image);
-    int imProcessPrewittConvolve(const imImage* src_image, imImage* dst_image);
-    int imProcessSplineEdgeConvolve(const imImage* src_image, imImage* dst_image);
-    void imProcessZeroCrossing(const imImage* src_image, imImage* dst_image);
-    void imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev);
-    int imProcessUnsharp(const imImage* src_image, imImage* dst_image, float stddev, float amount, float threshold);
-    int imProcessSharp(const imImage* src_image, imImage* dst_image, float amount, float threshold);
-    int imProcessSharpKernel(const imImage* src_image, const imImage* kernel, imImage* dst_image, float amount, float threshold);
-    void imProcessPerimeterLine(const imImage* src_image, imImage* dst_image);
-    void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int connect, int start_size, int end_size, int inside);
-    void imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect);
-    void imProcessRotateKernel(imImage* kernel);
-    void imProcessFFTraw(imImage* image, int inverse, int center, int normalize);
-    void imProcessSwapQuadrants(imImage* image, int center2origin);
+    return imProcessHoughLines(src_image.im_image, dst_image.im_image);
+    return imProcessHoughLinesDraw(src_image.im_image, hough, hough_points, dst_image.im_image);
+    imProcessCrossCorrelation(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+    imProcessAutoCorrelation(src_image.im_image, dst_image.im_image);
+    imProcessDistanceTransform(src_image.im_image, dst_image.im_image);
+    imProcessRegionalMaximum(src_image.im_image, dst_image.im_image);
+    imProcessFFT(src_image.im_image, dst_image.im_image);
+    imProcessIFFT(src_image.im_image, dst_image.im_image);
+    return imProcessUnaryPointOp(src_image.im_image, dst_image.im_image, imUnaryPointOpFunc func, params, userdata, op_name);
+    return imProcessUnaryPointColorOp(src_image.im_image, dst_image.im_image, imUnaryPointColorOpFunc func, params, userdata, op_name);
+    return imProcessMultiPointOp(src_image.im_image, src_count, dst_image.im_image, imMultiPointOpFunc func, params, userdata, op_name);
+    return imProcessMultiPointColorOp(src_image.im_image, src_count, dst_image.im_image, imMultiPointColorOpFunc func, params, userdata, op_name);
+    imProcessUnArithmeticOp(src_image.im_image, dst_image.im_image, op);
+    imProcessArithmeticOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
+    imProcessArithmeticConstOp(src_image.im_image, src_const, dst_image.im_image, op);
+    imProcessBlendConst(src_image1.im_image, src_image2.im_image, dst_image.im_image, alpha);
+    imProcessBlend(src_image1.im_image, src_image2.im_image, alpha_image, dst_image.im_image);
+    imProcessCompose(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+    imProcessSplitComplex(src_image.im_image, dst_image1.im_image, dst_image2.im_image, polar);
+    imProcessMergeComplex(src_image1.im_image, src_image2.im_image, dst_image.im_image, polar);
+    imProcessMultipleMean(src_image_list, src_image_count, dst_image.im_image);
+    imProcessMultipleStdDev(src_image_list, src_image_count, mean_image, dst_image.im_image);
+    return imProcessMultipleMedian(src_image_list, src_image_count, dst_image.im_image);
+    return imProcessAutoCovariance(src_image.im_image, mean_image, dst_image.im_image);
+    imProcessMultiplyConj(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+    imProcessQuantizeRGBUniform(src_image.im_image, dst_image.im_image, do_dither);
+    imProcessQuantizeGrayUniform(src_image.im_image, dst_image.im_image, grays);
+    imProcessExpandHistogram(src_image.im_image, dst_image.im_image, percent);
+    imProcessEqualizeHistogram(src_image.im_image, dst_image.im_image);
+    imProcessSplitYChroma(src_image.im_image, y_image, chroma_image);
+    imProcessSplitHSI(src_image.im_image, h_image, s_image, i_image);
+    imProcessMergeHSI(h_image, s_image, i_image, dst_image.im_image);
+    imProcessSplitComponents(src_image.im_image, dst_image_list);
+    imProcessMergeComponents(src_image_list, dst_image.im_image);
+    imProcessNormalizeComponents(src_image.im_image, dst_image.im_image);
+    imProcessReplaceColor(src_image.im_image, dst_image.im_image, src_color, dst_color);
+    imProcessSetAlphaColor(src_image.im_image, dst_image.im_image, src_color, dst_alpha);
+    imProcessBitwiseOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
+    imProcessBitwiseNot(src_image.im_image, dst_image.im_image);
+    imProcessBitMask(src_image.im_image, dst_image.im_image, mask, op);
+    imProcessBitPlane(src_image.im_image, dst_image.im_image, plane, do_reset);
+    return imProcessRenderAddSpeckleNoise(src_image.im_image, dst_image.im_image, percent);
+    return imProcessRenderAddGaussianNoise(src_image.im_image, dst_image.im_image, mean, stddev);
+    return imProcessRenderAddUniformNoise(src_image.im_image, dst_image.im_image, mean, stddev);
+    imProcessToneGamut(src_image.im_image, dst_image.im_image, op, params);
+    imProcessUnNormalize(src_image.im_image, dst_image.im_image);
+    imProcessDirectConv(src_image.im_image, dst_image.im_image);
+    imProcessNegative(src_image.im_image, dst_image.im_image);
+    return imProcessCalcAutoGamma(image.im_image);
+    imProcessShiftHSI(src_image.im_image, dst_image.im_image, h_shift, s_shift, i_shift);
+    imProcessThreshold(src_image.im_image, dst_image.im_image, level, value);
+    imProcessThresholdByDiff(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+    imProcessHysteresisThreshold(src_image.im_image, dst_image.im_image, low_thres, high_thres);
+    imProcessHysteresisThresEstimate(image.im_image, *low_level, *high_level);
+    return imProcessUniformErrThreshold(src_image.im_image, dst_image.im_image);
+    imProcessDifusionErrThreshold(src_image.im_image, dst_image.im_image, level);
+    return imProcessPercentThreshold(src_image.im_image, dst_image.im_image, percent);
+    return imProcessOtsuThreshold(src_image.im_image, dst_image.im_image);
+    return imProcessMinMaxThreshold(src_image.im_image, dst_image.im_image);
+    imProcessLocalMaxThresEstimate(image.im_image, *level);
+    imProcessSliceThreshold(src_image.im_image, dst_image.im_image, start_level, end_level);
+    imProcessPixelate(src_image.im_image, dst_image.im_image, box_size);
+    imProcessPosterize(src_image.im_image, dst_image.im_image, level);
+    imProcessNormDiffRatio(image1.im_image, image2.im_image, dst_image.im_image);
+    imProcessAbnormalHyperionCorrection(src_image.im_image, dst_image.im_image, threshold_consecutive, threshold_percent, image_abnormal);
+    return imProcessConvertDataType(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
+    return imProcessConvertColorSpace(src_image.im_image, dst_image.im_image);
+    return imProcessConvertToBitmap(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
+    return imProcessReduce(src_image.im_image, dst_image.im_image, order);
+    return imProcessResize(src_image.im_image, dst_image.im_image, order);
+    imProcessReduceBy4(src_image.im_image, dst_image.im_image);
+    imProcessCrop(src_image.im_image, dst_image.im_image, xmin, ymin);
+    imProcessInsert(src_image.im_image, region_image, dst_image.im_image, xmin, ymin);
+    imProcessAddMargins(src_image.im_image, dst_image.im_image, xmin, ymin);
+    return imProcessRotate(src_image.im_image, dst_image.im_image, cos0, sin0, order);
+    return imProcessRotateRef(src_image.im_image, dst_image.im_image, cos0, sin0, x, y, to_origin, order);
+    imProcessRotate90(src_image.im_image, dst_image.im_image, dir_clockwise);
+    imProcessRotate180(src_image.im_image, dst_image.im_image);
+    imProcessMirror(src_image.im_image, dst_image.im_image);
+    imProcessFlip(src_image.im_image, dst_image.im_image);
+    return imProcessRadial(src_image.im_image, dst_image.im_image, k1, order);
+    return imProcessSwirl(src_image.im_image, dst_image.im_image, k1, order);
+    imProcessInterlaceSplit(src_image.im_image, dst_image1.im_image, dst_image2.im_image);
+    return imProcessGrayMorphConvolve(src_image.im_image, dst_image.im_image, kernel, ismax);
+    return imProcessGrayMorphErode(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGrayMorphDilate(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGrayMorphOpen(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGrayMorphClose(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGrayMorphTopHat(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGrayMorphWell(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGrayMorphGradient(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessBinMorphConvolve(src_image.im_image, dst_image.im_image, kernel, hit_white, iter);
+    return imProcessBinMorphErode(src_image.im_image, dst_image.im_image, kernel_size, iter);
+    return imProcessBinMorphDilate(src_image.im_image, dst_image.im_image, kernel_size, iter);
+    return imProcessBinMorphOpen(src_image.im_image, dst_image.im_image, kernel_size, iter);
+    return imProcessBinMorphClose(src_image.im_image, dst_image.im_image, kernel_size, iter);
+    return imProcessBinMorphOutline(src_image.im_image, dst_image.im_image, kernel_size, iter);
+    imProcessBinMorphThin(src_image.im_image, dst_image.im_image);
+    return imProcessMedianConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessRangeConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessRankClosestConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessRankMaxConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessRankMinConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessRangeContrastThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_range);
+    return imProcessLocalMaxThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_level);
+    return imProcessConvolve(src_image.im_image, dst_image.im_image, kernel);
+    return imProcessConvolveSep(src_image.im_image, dst_image.im_image, kernel);
+    return imProcessConvolveDual(src_image.im_image, dst_image.im_image, kernel1, kernel2);
+    return imProcessConvolveRep(src_image.im_image, dst_image.im_image, kernel, count);
+    return imProcessCompassConvolve(src_image.im_image, dst_image.im_image, kernel);
+    return imProcessDiffOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev1, stddev2);
+    return imProcessLapOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
+    return imProcessMeanConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
+    return imProcessBarlettConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+    return imProcessSobelConvolve(src_image.im_image, dst_image.im_image);
+    return imProcessPrewittConvolve(src_image.im_image, dst_image.im_image);
+    return imProcessSplineEdgeConvolve(src_image.im_image, dst_image.im_image);
+    imProcessZeroCrossing(src_image.im_image, dst_image.im_image);
+    imProcessCanny(src_image.im_image, dst_image.im_image, stddev);
+    return imProcessUnsharp(src_image.im_image, dst_image.im_image, stddev, amount, threshold);
+    return imProcessSharp(src_image.im_image, dst_image.im_image, amount, threshold);
+    return imProcessSharpKernel(src_image.im_image, kernel, dst_image.im_image, amount, threshold);
+    imProcessPerimeterLine(src_image.im_image, dst_image.im_image);
+    imProcessRemoveByArea(src_image.im_image, dst_image.im_image, connect, start_size, end_size, inside);
+    imProcessFillHoles(src_image.im_image, dst_image.im_image, connect);
+    imProcessRotateKernel(kernel);
+    imProcessFFTraw(image.im_image, inverse, center, normalize);
+    imProcessSwapQuadrants(image.im_image, center2origin);
 
-    int imProcessRenderOp(imImage* image, imRenderFunc render_func, const char* render_name, float* params, int plus);
-    int imProcessRenderCondOp(imImage* image, imRenderCondFunc render_cond_func, const char* render_name, float* params);
-    int imProcessRenderRandomNoise(imImage* image);
-    int imProcessRenderConstant(imImage* image, float* value);
-    int imProcessRenderWheel(imImage* image, int internal_radius, int external_radius);
-    int imProcessRenderCone(imImage* image, int radius);
-    int imProcessRenderTent(imImage* image, int tent_width, int tent_height);
-    int imProcessRenderRamp(imImage* image, int start, int end, int vert_dir);
-    int imProcessRenderBox(imImage* image, int box_width, int box_height);
-    int imProcessRenderSinc(imImage* image, float x_period, float y_period);
-    int imProcessRenderGaussian(imImage* image, float stddev);
-    int imProcessRenderLapOfGaussian(imImage* image, float stddev);
-    int imProcessRenderCosine(imImage* image, float x_period, float y_period);
-    int imProcessRenderGrid(imImage* image, int x_space, int y_space);
-    int imProcessRenderChessboard(imImage* image, int x_space, int y_space);
-    void imProcessRenderFloodFill(imImage* image, int start_x, int start_y, float* replace_color, float tolerance);
 
-    float imCalcRMSError(const imImage* image1, const imImage* image2);
-    float imCalcSNR(const imImage* src_image, const imImage* noise_image);
-    unsigned long imCalcCountColors(const imImage* image);
-    void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulative);
-    void imCalcHistogram(const imImage* image, unsigned long* histo, int plane, int cumulative);
-    void imCalcImageStatistics(const imImage* image, imStats* stats);
-    void imCalcHistogramStatistics(const imImage* image, imStats* stats);
-    void imCalcHistoImageStatistics(const imImage* image, int* median, int* mode);
-    void imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max);
-
-    int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int connect, int touch_border);
-    void imAnalyzeMeasureArea(const imImage* image, int* area, int region_count);
-    void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea);
-    void imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_count, float* cx, float* cy);
-    void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const float* cx, const float* cy,
-                                       void imAnalyzeMeasureHoles(const imImage* image, int connect, int *holes_count, int* area, float* perim);
-    void imAnalyzeMeasurePerimeter(const imImage* image, float* perim, int region_count);
 #endif
+
+#if 0
+    Image New(src_image, ...);
+
+    static int GaussianStdDev2KernelSize(float stddev)
+    {
+    }
+    static float GaussianKernelSize2StdDev(int kernel_size)
+    {
+    }
+    static void CalcRotateSize(int width, int height, int &new_width, int &new_height, double cos0, double sin0)
+    {
+    }
+    static void OpenMPSetMinCount(int min_count)
+    {
+    }
+    static void OpenMPSetNumThreads(int count)
+    {
+    }
+
+    static void HoughLines(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void HoughLinesDraw(const Image& src_image, const Image& hough, const Image& hough_points, Image& dst_image)
+    {
+    }
+    static void CrossCorrelation(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    {
+    }
+    static void AutoCorrelation(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void DistanceTransform(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void RegionalMaximum(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void FFT(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void IFFT(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+    }
+    static void UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+    }
+    static void MultiPointOp(const Image& *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+    }
+    static void MultiPointColorOp(const Image& *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+    }
+    static void UnArithmeticOp(const Image& src_image, Image& dst_image, int op)
+    {
+    }
+    static void ArithmeticOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
+    {
+    }
+    static void ArithmeticConstOp(const Image& src_image, float src_const, Image& dst_image, int op)
+    {
+    }
+    static void BlendConst(const Image& src_image1, const Image& src_image2, Image& dst_image, float alpha)
+    {
+    }
+    static void Blend(const Image& src_image1, const Image& src_image2, const Image& alpha_image, Image& dst_image)
+    {
+    }
+    static void Compose(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    {
+    }
+    static void SplitComplex(const Image& src_image, Image& dst_image1, Image& dst_image2, int polar)
+    {
+    }
+    static void MergeComplex(const Image& src_image1, const Image& src_image2, Image& dst_image, int polar)
+    {
+    }
+    static void MultipleMean(const Image& *src_image_list, int src_image_count, Image& dst_image)
+    {
+    }
+    static void MultipleStdDev(const Image& *src_image_list, int src_image_count, const Image& mean_image, Image& dst_image)
+    {
+    }
+    static void MultipleMedian(const Image& *src_image_list, int src_image_count, Image& dst_image)
+    {
+    }
+    static void AutoCovariance(const Image& src_image, const Image& mean_image, Image& dst_image)
+    {
+    }
+    static void MultiplyConj(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    {
+    }
+    static void QuantizeRGBUniform(const Image& src_image, Image& dst_image, int do_dither)
+    {
+    }
+    static void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays)
+    {
+    }
+    static void ExpandHistogram(const Image& src_image, Image& dst_image, float percent)
+    {
+    }
+    static void EqualizeHistogram(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void SplitYChroma(const Image& src_image, Image& y_image, Image& chroma_image)
+    {
+    }
+    static void SplitHSI(const Image& src_image, Image& h_image, Image& s_image, Image& i_image)
+    {
+    }
+    static void MergeHSI(const Image& h_image, const Image& s_image, const Image& i_image, Image& dst_image)
+    {
+    }
+    static void SplitComponents(const Image& src_image, Image& *dst_image_list)
+    {
+    }
+    static void MergeComponents(const Image& *src_image_list, Image& dst_image)
+    {
+    }
+    static void NormalizeComponents(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void ReplaceColor(const Image& src_image, Image& dst_image, float* src_color, float* dst_color)
+    {
+    }
+    static void SetAlphaColor(const Image& src_image, Image& dst_image, float* src_color, float dst_alpha)
+    {
+    }
+    static void BitwiseOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
+    {
+    }
+    static void BitwiseNot(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void BitMask(const Image& src_image, Image& dst_image, unsigned char mask, int op)
+    {
+    }
+    static void BitPlane(const Image& src_image, Image& dst_image, int plane, int do_reset)
+    {
+    }
+    static void RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, float percent)
+    {
+    }
+    static void RenderAddGaussianNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
+    {
+    }
+    static void RenderAddUniformNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
+    {
+    }
+    static void ToneGamut(const Image& src_image, Image& dst_image, int op, float* params)
+    {
+    }
+    static void UnNormalize(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void DirectConv(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void Negative(const Image& src_image, Image& dst_image)
+    {
+    }
+    static float CalcAutoGamma(const Image& image)
+    {
+    }
+    static void ShiftHSI(const Image& src_image, Image& dst_image, float h_shift, float s_shift, float i_shift)
+    {
+    }
+    static void Threshold(const Image& src_image, Image& dst_image, float level, int value)
+    {
+    }
+    static void ThresholdByDiff(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    {
+    }
+    static void HysteresisThreshold(const Image& src_image, Image& dst_image, int low_thres, int high_thres)
+    {
+    }
+    static void HysteresisThresEstimate(const Image& image, int &low_level, int &high_level)
+    {
+    }
+    static void UniformErrThreshold(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void DifusionErrThreshold(const Image& src_image, Image& dst_image, int level)
+    {
+    }
+    static void PercentThreshold(const Image& src_image, Image& dst_image, float percent)
+    {
+    }
+    static void OtsuThreshold(const Image& src_image, Image& dst_image)
+    {
+    }
+    static float MinMaxThreshold(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void LocalMaxThresEstimate(const Image& image, int &level)
+    {
+    }
+    static void SliceThreshold(const Image& src_image, Image& dst_image, float start_level, float end_level)
+    {
+    }
+    static void Pixelate(const Image& src_image, Image& dst_image, int box_size)
+    {
+    }
+    static void Posterize(const Image& src_image, Image& dst_image, int level)
+    {
+    }
+    static void NormDiffRatio(const Image& image1, const Image& image2, Image& dst_image)
+    {
+    }
+    static void AbnormalHyperionCorrection(const Image& src_image, Image& dst_image, int threshold_consecutive, int threshold_percent, Image& image_abnormal)
+    {
+    }
+    static void ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+    {
+    }
+    static void ConvertColorSpace(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+    {
+    }
+    static void Reduce(const Image& src_image, Image& dst_image, int order)
+    {
+    }
+    static void Resize(const Image& src_image, Image& dst_image, int order)
+    {
+    }
+    static void ReduceBy4(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void Crop(const Image& src_image, Image& dst_image, int xmin, int ymin)
+    {
+    }
+    static void Insert(const Image& src_image, const Image& region_image, Image& dst_image, int xmin, int ymin)
+    {
+    }
+    static void AddMargins(const Image& src_image, Image& dst_image, int xmin, int ymin)
+    {
+    }
+    static void Rotate(const Image& src_image, Image& dst_image, double cos0, double sin0, int order)
+    {
+    }
+    static void RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order)
+    {
+    }
+    static void Rotate90(const Image& src_image, Image& dst_image, int dir_clockwise)
+    {
+    }
+    static void Rotate180(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void Mirror(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void Flip(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void Radial(const Image& src_image, Image& dst_image, float k1, int order)
+    {
+    }
+    static void Swirl(const Image& src_image, Image& dst_image, float k1, int order)
+    {
+    }
+    static void InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2)
+    {
+    }
+    static void GrayMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int ismax)
+    {
+    }
+    static void GrayMorphErode(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GrayMorphDilate(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GrayMorphOpen(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GrayMorphClose(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GrayMorphTopHat(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GrayMorphWell(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GrayMorphGradient(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void BinMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int hit_white, int iter)
+    {
+    }
+    static void BinMorphErode(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    {
+    }
+    static void BinMorphDilate(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    {
+    }
+    static void BinMorphOpen(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    {
+    }
+    static void BinMorphClose(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    {
+    }
+    static void BinMorphOutline(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    {
+    }
+    static void BinMorphThin(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void MedianConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void RangeConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void RankClosestConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void RankMaxConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void RankMinConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void RangeContrastThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_range)
+    {
+    }
+    static void LocalMaxThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_level)
+    {
+    }
+    static void Convolve(const Image& src_image, Image& dst_image, const Image& kernel)
+    {
+    }
+    static void ConvolveSep(const Image& src_image, Image& dst_image, const Image& kernel)
+    {
+    }
+    static void ConvolveDual(const Image& src_image, Image& dst_image, const Image& kernel1, const Image& kernel2)
+    {
+    }
+    static void ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int count)
+    {
+    }
+    static void CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel)
+    {
+    }
+    static void DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev1, float stddev2)
+    {
+    }
+    static void LapOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
+    {
+    }
+    static void MeanConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void GaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
+    {
+    }
+    static void BarlettConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    {
+    }
+    static void SobelConvolve(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void PrewittConvolve(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void SplineEdgeConvolve(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void ZeroCrossing(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void Canny(const Image& src_image, Image& dst_image, float stddev)
+    {
+    }
+    static void Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold)
+    {
+    }
+    static void Sharp(const Image& src_image, Image& dst_image, float amount, float threshold)
+    {
+    }
+    static void SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold)
+    {
+    }
+    static void PerimeterLine(const Image& src_image, Image& dst_image)
+    {
+    }
+    static void RemoveByArea(const Image& src_image, Image& dst_image, int connect, int start_size, int end_size, int inside)
+    {
+    }
+    static void FillHoles(const Image& src_image, Image& dst_image, int connect)
+    {
+    }
+    static void RotateKernel(Image& kernel)
+    {
+    }
+    static void FFTraw(Image& image, int inverse, int center, int normalize)
+    {
+    }
+    static void SwapQuadrants(Image& image, int center2origin)
+    {
+    }
+#endif
+
+    static int RenderOp(Image& image, imRenderFunc render_func, const char* render_name, float* params, int plus)
+    {
+      return imProcessRenderOp(image.im_image, render_func, render_name, params, plus);
+    }
+    static int RenderCondOp(Image& image, imRenderCondFunc render_cond_func, const char* render_name, float* params)
+    {
+      return imProcessRenderCondOp(image.im_image, render_cond_func, render_name, params);
+    }
+    static int RenderRandomNoise(Image& image)
+    {
+      return imProcessRenderRandomNoise(image.im_image);
+    }
+    static int RenderConstant(Image& image, float* value)
+    {
+      return imProcessRenderConstant(image.im_image, value);
+    }
+    static int RenderWheel(Image& image, int internal_radius, int external_radius)
+    {
+      return imProcessRenderWheel(image.im_image, internal_radius, external_radius);
+    }
+    static int RenderCone(Image& image, int radius)
+    {
+      return imProcessRenderCone(image.im_image, radius);
+    }
+    static int RenderTent(Image& image, int tent_width, int tent_height)
+    {
+      return imProcessRenderTent(image.im_image, tent_width, tent_height);
+    }
+    static int RenderRamp(Image& image, int start, int end, int vert_dir)
+    {
+      return imProcessRenderRamp(image.im_image, start, end, vert_dir);
+    }
+    static int RenderBox(Image& image, int box_width, int box_height)
+    {
+      return imProcessRenderBox(image.im_image, box_width, box_height);
+    }
+    static int RenderSinc(Image& image, float x_period, float y_period)
+    {
+      return imProcessRenderSinc(image.im_image, x_period, y_period);
+    }
+    static int RenderGaussian(Image& image, float stddev)
+    {
+      return imProcessRenderGaussian(image.im_image, stddev);
+    }
+    static int RenderLapOfGaussian(Image& image, float stddev)
+    {
+      return imProcessRenderLapOfGaussian(image.im_image, stddev);
+    }
+    static int RenderCosine(Image& image, float x_period, float y_period)
+    {
+      return imProcessRenderCosine(image.im_image, x_period, y_period);
+    }
+    static int RenderGrid(Image& image, int x_space, int y_space)
+    {
+      return imProcessRenderGrid(image.im_image, x_space, y_space);
+    }
+    static int RenderChessboard(Image& image, int x_space, int y_space)
+    {
+      return imProcessRenderChessboard(image.im_image, x_space, y_space);
+    }
+    static int RenderFloodFill(Image& image, int start_x, int start_y, float* replace_color, float tolerance)
+    {
+      imProcessRenderFloodFill(image.im_image, start_x, start_y, replace_color, tolerance);
+    }
+  };
+
+  class Calc
+  {
+  public:
+
+    static float RMSError(const Image& image1, const Image& image2)
+    {
+      return imCalcRMSError(image1.im_image, image2.im_image);
+    }
+    static float SNR(const Image& src_image, const Image& noise_image)
+    {
+      return imCalcSNR(src_image.im_image, noise_image.im_image);
+    }
+    static unsigned long CountColors(const Image& image)
+    {
+      return imCalcCountColors(image.im_image);
+    }
+    static void GrayHistogram(const Image& image, unsigned long* histo, int cumulative)
+    {
+      imCalcGrayHistogram(image.im_image, histo, cumulative);
+    }
+    static void Histogram(const Image& image, unsigned long* histo, int plane, int cumulative)
+    {
+      imCalcHistogram(image.im_image, histo, plane, cumulative);
+    }
+    static void ImageStatistics(const Image& image, imStats* stats)
+    {
+      imCalcImageStatistics(image.im_image, stats);
+    }
+    static void HistogramStatistics(const Image& image, imStats* stats)
+    {
+      imCalcHistogramStatistics(image.im_image, stats);
+    }
+    static void HistoImageStatistics(const Image& image, int* median, int* mode)
+    {
+      imCalcHistoImageStatistics(image.im_image, median, mode);
+    }
+    static void PercentMinMax(const Image& image, float percent, int ignore_zero, int &min, int &max)
+    {
+      imCalcPercentMinMax(image.im_image, percent, ignore_zero, &min, &max);
+    }
+  };
+
+  class Analyze
+    {
+    public:
+
+    static int FindRegions(const Image& src_image, Image& dst_image, int connect, int touch_border)
+    {
+      return imAnalyzeFindRegions(src_image.im_image, dst_image.im_image, connect, touch_border);
+    }
+
+    static void MeasureArea(const Image& image, int* area, int region_count)
+    {
+      imAnalyzeMeasureArea(image.im_image, area, region_count);
+    }
+    static void MeasurePerimArea(const Image& image, float* perimarea)
+    {
+      imAnalyzeMeasurePerimArea(image.im_image, perimarea);
+    }
+    static void MeasureCentroid(const Image& image, const int* area, int region_count, float* cx, float* cy)
+    {
+      imAnalyzeMeasureCentroid(image.im_image, area, region_count, cx, cy);
+    }
+    static void MeasurePrincipalAxis(const Image& image, const int* area, const float* cx, const float* cy, const int region_count, float* major_slope, float* major_length, float* minor_slope, float* minor_length)
+    {
+      imAnalyzeMeasurePrincipalAxis(image.im_image, area, cx, cy, region_count, major_slope, major_length, minor_slope, minor_length);
+    }
+    static void MeasureHoles(const Image& image, int connect, int* holes_count, int* area, float* perim)
+    {
+      imAnalyzeMeasureHoles(image.im_image, connect, holes_count, area, perim);
+    }
+    static void MeasurePerimeter(const Image& image, float* perim, int region_count)
+    {
+      imAnalyzeMeasurePerimeter(image.im_image, perim, region_count);
+    }
+
   };
 
 }

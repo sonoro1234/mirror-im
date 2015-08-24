@@ -13,7 +13,7 @@
  *
  * \par
  * Functions to convert from one color space to another, 
- * and color gammut utilities.
+ * and color gamut utilities.
  * \par
  * See \ref im_color.h
  *
@@ -24,17 +24,17 @@
  * weighted by the spectral sensitivity of human vision.
  * \par
  * L* is lightness, a nonlinear luminance
- * that aproximates the perception of brightness. 
+ * that approximates the perception of brightness. 
  * It is nearly perceptual uniform.
  * It has a range of 0 to 100.
  * \par
- * Y' is luma, a nonlinear luminance that aproximates lightness.
+ * Y' is luma, a nonlinear luminance that approximates lightness.
  * \par
  * Brightness is a visual sensation according to which an area
- * apears to exhibit more or less light. 
+ * appears to exhibit more or less light. 
  * It is a subjective quantity and can not be measured.
  * \par
- * One unit of euclidian distante in CIE L*u*v* or CIE L*a*b* corresponds
+ * One unit of Euclidian distance in CIE L*u*v* or CIE L*a*b* corresponds
  * roughly to a just-noticeable difference (JND) of color.
  * \par
 \verbatim
@@ -44,7 +44,7 @@
  (the same can be calculated for Lab)
 \endverbatim
  * \par
- * IEC 61966-2.1 Default RGB colour space - sRGB
+ * IEC 61966-2.1 Default RGB color space - sRGB
  * \li ITU-R Recommendation BT.709 (D65 white point).
  * \li D65 White Point (X,Y,Z) = (0.9505 1.0000 1.0890)
  * \par
