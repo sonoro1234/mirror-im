@@ -1150,560 +1150,572 @@ namespace im
   {
   public:
 
+    static int GaussianStdDev2KernelSize(float stddev)
+    {
+      return imGaussianStdDev2KernelSize(stddev);
+    }
+    static float GaussianKernelSize2StdDev(int kernel_size)
+    {
+      return imGaussianKernelSize2StdDev(kernel_size);
+    }
+    static void CalcRotateSize(int width, int height, int &new_width, int &new_height, double cos0, double sin0)
+    {
+      imProcessCalcRotateSize(width, height, &new_width, &new_height, cos0, sin0);
+    }
+    static int OpenMPSetMinCount(int min_count)
+    {
+      return imProcessOpenMPSetMinCount(min_count);
+    }
+    static int OpenMPSetNumThreads(int count)
+    {
+      return imProcessOpenMPSetNumThreads(count);
+    }
+
+    static int HoughLines(const Image& src_image, Image& dst_image)
+    {
+      return imProcessHoughLines(src_image.im_image, dst_image.im_image);
+    }
+    static int HoughLinesDraw(const Image& src_image, const Image& hough, const Image& hough_points, Image& dst_image)
+    {
+      return imProcessHoughLinesDraw(src_image.im_image, hough.im_image, hough_points.im_image, dst_image.im_image);
+    }
+    static void CrossCorrelation(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    {
+      imProcessCrossCorrelation(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+    }
+    static void AutoCorrelation(const Image& src_image, Image& dst_image)
+    {
+      imProcessAutoCorrelation(src_image.im_image, dst_image.im_image);
+    }
+    static void DistanceTransform(const Image& src_image, Image& dst_image)
+    {
+      imProcessDistanceTransform(src_image.im_image, dst_image.im_image);
+    }
+    static void RegionalMaximum(const Image& src_image, Image& dst_image)
+    {
+      imProcessRegionalMaximum(src_image.im_image, dst_image.im_image);
+    }
+    static void FFT(const Image& src_image, Image& dst_image)
+    {
+      imProcessFFT(src_image.im_image, dst_image.im_image);
+    }
+    static void IFFT(const Image& src_image, Image& dst_image)
+    {
+      imProcessIFFT(src_image.im_image, dst_image.im_image);
+    }
+    static int UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+      return imProcessUnaryPointOp(src_image.im_image, dst_image.im_image, func, params, userdata, op_name);
+    }
+    static int UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+      return imProcessUnaryPointColorOp(src_image.im_image, dst_image.im_image, func, params, userdata, op_name);
+    }
+    static int MultiPointOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+      imImage** c_src_image_list = new imImage*[src_image_count];
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
+      int ret = imProcessMultiPointOp((const imImage**)c_src_image_list, src_image_count, dst_image.im_image, func, params, userdata, op_name);
+      delete[] c_src_image_list;
+      return ret;
+    }
+    static int MultiPointColorOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+    {
+      imImage** c_src_image_list = new imImage*[src_image_count];
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
+      int ret = imProcessMultiPointColorOp((const imImage**)c_src_image_list, src_image_count, dst_image.im_image, func, params, userdata, op_name);
+      delete[] c_src_image_list;
+      return ret;
+    }
     static void UnArithmeticOp(const Image& src_image, Image& dst_image, int op)
     {
       imProcessUnArithmeticOp(src_image.im_image, dst_image.im_image, op);
     }
-
-#if 0
-    Image *New(src_image, ...);
-
-    return imGaussianStdDev2KernelSize(stddev);
-    return imGaussianKernelSize2StdDev(kernel_size);
-    imProcessCalcRotateSize(width, height, *new_width, *new_height, cos0, sin0);
-    return imProcessOpenMPSetMinCount(min_count);
-    return imProcessOpenMPSetNumThreads(count);
-
-    return imProcessHoughLines(src_image.im_image, dst_image.im_image);
-    return imProcessHoughLinesDraw(src_image.im_image, hough, hough_points, dst_image.im_image);
-    imProcessCrossCorrelation(src_image1.im_image, src_image2.im_image, dst_image.im_image);
-    imProcessAutoCorrelation(src_image.im_image, dst_image.im_image);
-    imProcessDistanceTransform(src_image.im_image, dst_image.im_image);
-    imProcessRegionalMaximum(src_image.im_image, dst_image.im_image);
-    imProcessFFT(src_image.im_image, dst_image.im_image);
-    imProcessIFFT(src_image.im_image, dst_image.im_image);
-    return imProcessUnaryPointOp(src_image.im_image, dst_image.im_image, imUnaryPointOpFunc func, params, userdata, op_name);
-    return imProcessUnaryPointColorOp(src_image.im_image, dst_image.im_image, imUnaryPointColorOpFunc func, params, userdata, op_name);
-    return imProcessMultiPointOp(src_image.im_image, src_count, dst_image.im_image, imMultiPointOpFunc func, params, userdata, op_name);
-    return imProcessMultiPointColorOp(src_image.im_image, src_count, dst_image.im_image, imMultiPointColorOpFunc func, params, userdata, op_name);
-    imProcessUnArithmeticOp(src_image.im_image, dst_image.im_image, op);
-    imProcessArithmeticOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
-    imProcessArithmeticConstOp(src_image.im_image, src_const, dst_image.im_image, op);
-    imProcessBlendConst(src_image1.im_image, src_image2.im_image, dst_image.im_image, alpha);
-    imProcessBlend(src_image1.im_image, src_image2.im_image, alpha_image, dst_image.im_image);
-    imProcessCompose(src_image1.im_image, src_image2.im_image, dst_image.im_image);
-    imProcessSplitComplex(src_image.im_image, dst_image1.im_image, dst_image2.im_image, polar);
-    imProcessMergeComplex(src_image1.im_image, src_image2.im_image, dst_image.im_image, polar);
-    imProcessMultipleMean(src_image_list, src_image_count, dst_image.im_image);
-    imProcessMultipleStdDev(src_image_list, src_image_count, mean_image, dst_image.im_image);
-    return imProcessMultipleMedian(src_image_list, src_image_count, dst_image.im_image);
-    return imProcessAutoCovariance(src_image.im_image, mean_image, dst_image.im_image);
-    imProcessMultiplyConj(src_image1.im_image, src_image2.im_image, dst_image.im_image);
-    imProcessQuantizeRGBUniform(src_image.im_image, dst_image.im_image, do_dither);
-    imProcessQuantizeGrayUniform(src_image.im_image, dst_image.im_image, grays);
-    imProcessExpandHistogram(src_image.im_image, dst_image.im_image, percent);
-    imProcessEqualizeHistogram(src_image.im_image, dst_image.im_image);
-    imProcessSplitYChroma(src_image.im_image, y_image, chroma_image);
-    imProcessSplitHSI(src_image.im_image, h_image, s_image, i_image);
-    imProcessMergeHSI(h_image, s_image, i_image, dst_image.im_image);
-    imProcessSplitComponents(src_image.im_image, dst_image_list);
-    imProcessMergeComponents(src_image_list, dst_image.im_image);
-    imProcessNormalizeComponents(src_image.im_image, dst_image.im_image);
-    imProcessReplaceColor(src_image.im_image, dst_image.im_image, src_color, dst_color);
-    imProcessSetAlphaColor(src_image.im_image, dst_image.im_image, src_color, dst_alpha);
-    imProcessBitwiseOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
-    imProcessBitwiseNot(src_image.im_image, dst_image.im_image);
-    imProcessBitMask(src_image.im_image, dst_image.im_image, mask, op);
-    imProcessBitPlane(src_image.im_image, dst_image.im_image, plane, do_reset);
-    return imProcessRenderAddSpeckleNoise(src_image.im_image, dst_image.im_image, percent);
-    return imProcessRenderAddGaussianNoise(src_image.im_image, dst_image.im_image, mean, stddev);
-    return imProcessRenderAddUniformNoise(src_image.im_image, dst_image.im_image, mean, stddev);
-    imProcessToneGamut(src_image.im_image, dst_image.im_image, op, params);
-    imProcessUnNormalize(src_image.im_image, dst_image.im_image);
-    imProcessDirectConv(src_image.im_image, dst_image.im_image);
-    imProcessNegative(src_image.im_image, dst_image.im_image);
-    return imProcessCalcAutoGamma(image.im_image);
-    imProcessShiftHSI(src_image.im_image, dst_image.im_image, h_shift, s_shift, i_shift);
-    imProcessThreshold(src_image.im_image, dst_image.im_image, level, value);
-    imProcessThresholdByDiff(src_image1.im_image, src_image2.im_image, dst_image.im_image);
-    imProcessHysteresisThreshold(src_image.im_image, dst_image.im_image, low_thres, high_thres);
-    imProcessHysteresisThresEstimate(image.im_image, *low_level, *high_level);
-    return imProcessUniformErrThreshold(src_image.im_image, dst_image.im_image);
-    imProcessDifusionErrThreshold(src_image.im_image, dst_image.im_image, level);
-    return imProcessPercentThreshold(src_image.im_image, dst_image.im_image, percent);
-    return imProcessOtsuThreshold(src_image.im_image, dst_image.im_image);
-    return imProcessMinMaxThreshold(src_image.im_image, dst_image.im_image);
-    imProcessLocalMaxThresEstimate(image.im_image, *level);
-    imProcessSliceThreshold(src_image.im_image, dst_image.im_image, start_level, end_level);
-    imProcessPixelate(src_image.im_image, dst_image.im_image, box_size);
-    imProcessPosterize(src_image.im_image, dst_image.im_image, level);
-    imProcessNormDiffRatio(image1.im_image, image2.im_image, dst_image.im_image);
-    imProcessAbnormalHyperionCorrection(src_image.im_image, dst_image.im_image, threshold_consecutive, threshold_percent, image_abnormal);
-    return imProcessConvertDataType(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
-    return imProcessConvertColorSpace(src_image.im_image, dst_image.im_image);
-    return imProcessConvertToBitmap(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
-    return imProcessReduce(src_image.im_image, dst_image.im_image, order);
-    return imProcessResize(src_image.im_image, dst_image.im_image, order);
-    imProcessReduceBy4(src_image.im_image, dst_image.im_image);
-    imProcessCrop(src_image.im_image, dst_image.im_image, xmin, ymin);
-    imProcessInsert(src_image.im_image, region_image, dst_image.im_image, xmin, ymin);
-    imProcessAddMargins(src_image.im_image, dst_image.im_image, xmin, ymin);
-    return imProcessRotate(src_image.im_image, dst_image.im_image, cos0, sin0, order);
-    return imProcessRotateRef(src_image.im_image, dst_image.im_image, cos0, sin0, x, y, to_origin, order);
-    imProcessRotate90(src_image.im_image, dst_image.im_image, dir_clockwise);
-    imProcessRotate180(src_image.im_image, dst_image.im_image);
-    imProcessMirror(src_image.im_image, dst_image.im_image);
-    imProcessFlip(src_image.im_image, dst_image.im_image);
-    return imProcessRadial(src_image.im_image, dst_image.im_image, k1, order);
-    return imProcessSwirl(src_image.im_image, dst_image.im_image, k1, order);
-    imProcessInterlaceSplit(src_image.im_image, dst_image1.im_image, dst_image2.im_image);
-    return imProcessGrayMorphConvolve(src_image.im_image, dst_image.im_image, kernel, ismax);
-    return imProcessGrayMorphErode(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGrayMorphDilate(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGrayMorphOpen(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGrayMorphClose(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGrayMorphTopHat(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGrayMorphWell(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGrayMorphGradient(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessBinMorphConvolve(src_image.im_image, dst_image.im_image, kernel, hit_white, iter);
-    return imProcessBinMorphErode(src_image.im_image, dst_image.im_image, kernel_size, iter);
-    return imProcessBinMorphDilate(src_image.im_image, dst_image.im_image, kernel_size, iter);
-    return imProcessBinMorphOpen(src_image.im_image, dst_image.im_image, kernel_size, iter);
-    return imProcessBinMorphClose(src_image.im_image, dst_image.im_image, kernel_size, iter);
-    return imProcessBinMorphOutline(src_image.im_image, dst_image.im_image, kernel_size, iter);
-    imProcessBinMorphThin(src_image.im_image, dst_image.im_image);
-    return imProcessMedianConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessRangeConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessRankClosestConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessRankMaxConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessRankMinConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessRangeContrastThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_range);
-    return imProcessLocalMaxThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_level);
-    return imProcessConvolve(src_image.im_image, dst_image.im_image, kernel);
-    return imProcessConvolveSep(src_image.im_image, dst_image.im_image, kernel);
-    return imProcessConvolveDual(src_image.im_image, dst_image.im_image, kernel1, kernel2);
-    return imProcessConvolveRep(src_image.im_image, dst_image.im_image, kernel, count);
-    return imProcessCompassConvolve(src_image.im_image, dst_image.im_image, kernel);
-    return imProcessDiffOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev1, stddev2);
-    return imProcessLapOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
-    return imProcessMeanConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
-    return imProcessBarlettConvolve(src_image.im_image, dst_image.im_image, kernel_size);
-    return imProcessSobelConvolve(src_image.im_image, dst_image.im_image);
-    return imProcessPrewittConvolve(src_image.im_image, dst_image.im_image);
-    return imProcessSplineEdgeConvolve(src_image.im_image, dst_image.im_image);
-    imProcessZeroCrossing(src_image.im_image, dst_image.im_image);
-    imProcessCanny(src_image.im_image, dst_image.im_image, stddev);
-    return imProcessUnsharp(src_image.im_image, dst_image.im_image, stddev, amount, threshold);
-    return imProcessSharp(src_image.im_image, dst_image.im_image, amount, threshold);
-    return imProcessSharpKernel(src_image.im_image, kernel, dst_image.im_image, amount, threshold);
-    imProcessPerimeterLine(src_image.im_image, dst_image.im_image);
-    imProcessRemoveByArea(src_image.im_image, dst_image.im_image, connect, start_size, end_size, inside);
-    imProcessFillHoles(src_image.im_image, dst_image.im_image, connect);
-    imProcessRotateKernel(kernel);
-    imProcessFFTraw(image.im_image, inverse, center, normalize);
-    imProcessSwapQuadrants(image.im_image, center2origin);
-
-
-#endif
-
-#if 0
-    Image New(src_image, ...);
-
-    static int GaussianStdDev2KernelSize(float stddev)
-    {
-    }
-    static float GaussianKernelSize2StdDev(int kernel_size)
-    {
-    }
-    static void CalcRotateSize(int width, int height, int &new_width, int &new_height, double cos0, double sin0)
-    {
-    }
-    static void OpenMPSetMinCount(int min_count)
-    {
-    }
-    static void OpenMPSetNumThreads(int count)
-    {
-    }
-
-    static void HoughLines(const Image& src_image, Image& dst_image)
-    {
-    }
-    static void HoughLinesDraw(const Image& src_image, const Image& hough, const Image& hough_points, Image& dst_image)
-    {
-    }
-    static void CrossCorrelation(const Image& src_image1, const Image& src_image2, Image& dst_image)
-    {
-    }
-    static void AutoCorrelation(const Image& src_image, Image& dst_image)
-    {
-    }
-    static void DistanceTransform(const Image& src_image, Image& dst_image)
-    {
-    }
-    static void RegionalMaximum(const Image& src_image, Image& dst_image)
-    {
-    }
-    static void FFT(const Image& src_image, Image& dst_image)
-    {
-    }
-    static void IFFT(const Image& src_image, Image& dst_image)
-    {
-    }
-    static void UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name)
-    {
-    }
-    static void UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
-    {
-    }
-    static void MultiPointOp(const Image& *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
-    {
-    }
-    static void MultiPointColorOp(const Image& *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
-    {
-    }
-    static void UnArithmeticOp(const Image& src_image, Image& dst_image, int op)
-    {
-    }
     static void ArithmeticOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
     {
+      imProcessArithmeticOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
     }
     static void ArithmeticConstOp(const Image& src_image, float src_const, Image& dst_image, int op)
     {
+      imProcessArithmeticConstOp(src_image.im_image, src_const, dst_image.im_image, op);
     }
     static void BlendConst(const Image& src_image1, const Image& src_image2, Image& dst_image, float alpha)
     {
+      imProcessBlendConst(src_image1.im_image, src_image2.im_image, dst_image.im_image, alpha);
     }
     static void Blend(const Image& src_image1, const Image& src_image2, const Image& alpha_image, Image& dst_image)
     {
+      imProcessBlend(src_image1.im_image, src_image2.im_image, alpha_image.im_image, dst_image.im_image);
     }
     static void Compose(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
+      imProcessCompose(src_image1.im_image, src_image2.im_image, dst_image.im_image);
     }
     static void SplitComplex(const Image& src_image, Image& dst_image1, Image& dst_image2, int polar)
     {
+      imProcessSplitComplex(src_image.im_image, dst_image1.im_image, dst_image2.im_image, polar);
     }
     static void MergeComplex(const Image& src_image1, const Image& src_image2, Image& dst_image, int polar)
     {
+      imProcessMergeComplex(src_image1.im_image, src_image2.im_image, dst_image.im_image, polar);
     }
-    static void MultipleMean(const Image& *src_image_list, int src_image_count, Image& dst_image)
+    static void MultipleMean(const Image *src_image_list, int src_image_count, Image& dst_image)
     {
+      imImage** c_src_image_list = new imImage*[src_image_count];
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
+      imProcessMultipleMean((const imImage**)c_src_image_list, src_image_count, dst_image.im_image);
+      delete[] c_src_image_list;
     }
-    static void MultipleStdDev(const Image& *src_image_list, int src_image_count, const Image& mean_image, Image& dst_image)
+    static void MultipleStdDev(const Image *src_image_list, int src_image_count, const Image& mean_image, Image& dst_image)
     {
+      imImage** c_src_image_list = new imImage*[src_image_count];
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
+      imProcessMultipleStdDev((const imImage**)c_src_image_list, src_image_count, mean_image.im_image, dst_image.im_image);
+      delete[] c_src_image_list;
     }
-    static void MultipleMedian(const Image& *src_image_list, int src_image_count, Image& dst_image)
+    static int MultipleMedian(const Image *src_image_list, int src_image_count, Image& dst_image)
     {
+      imImage** c_src_image_list = new imImage*[src_image_count];
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
+      return imProcessMultipleMedian((const imImage**)c_src_image_list, src_image_count, dst_image.im_image);
+      delete[] c_src_image_list;
     }
-    static void AutoCovariance(const Image& src_image, const Image& mean_image, Image& dst_image)
+    static int AutoCovariance(const Image& src_image, const Image& mean_image, Image& dst_image)
     {
+      return imProcessAutoCovariance(src_image.im_image, mean_image.im_image, dst_image.im_image);
     }
     static void MultiplyConj(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
+      imProcessMultiplyConj(src_image1.im_image, src_image2.im_image, dst_image.im_image);
     }
     static void QuantizeRGBUniform(const Image& src_image, Image& dst_image, int do_dither)
     {
+      imProcessQuantizeRGBUniform(src_image.im_image, dst_image.im_image, do_dither);
     }
     static void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays)
     {
+      imProcessQuantizeGrayUniform(src_image.im_image, dst_image.im_image, grays);
     }
     static void ExpandHistogram(const Image& src_image, Image& dst_image, float percent)
     {
+      imProcessExpandHistogram(src_image.im_image, dst_image.im_image, percent);
     }
     static void EqualizeHistogram(const Image& src_image, Image& dst_image)
     {
+      imProcessEqualizeHistogram(src_image.im_image, dst_image.im_image);
     }
     static void SplitYChroma(const Image& src_image, Image& y_image, Image& chroma_image)
     {
+      imProcessSplitYChroma(src_image.im_image, y_image.im_image, chroma_image.im_image);
     }
     static void SplitHSI(const Image& src_image, Image& h_image, Image& s_image, Image& i_image)
     {
+      imProcessSplitHSI(src_image.im_image, h_image.im_image, s_image.im_image, i_image.im_image);
     }
     static void MergeHSI(const Image& h_image, const Image& s_image, const Image& i_image, Image& dst_image)
     {
+      imProcessMergeHSI(h_image.im_image, s_image.im_image, i_image.im_image, dst_image.im_image);
     }
-    static void SplitComponents(const Image& src_image, Image& *dst_image_list)
+    static void SplitComponents(const Image& src_image, Image *dst_image_list)
     {
+      imImage* c_dst_image_list[4];
+      c_dst_image_list[0] = dst_image_list[0].im_image;
+      c_dst_image_list[1] = dst_image_list[1].im_image;
+      c_dst_image_list[2] = dst_image_list[2].im_image;
+      if (src_image.Depth() == 4 || src_image.HasAlpha())
+        c_dst_image_list[3] = dst_image_list[3].im_image;
+      imProcessSplitComponents(src_image.im_image, c_dst_image_list);
     }
-    static void MergeComponents(const Image& *src_image_list, Image& dst_image)
+    static void MergeComponents(const Image *src_image_list, Image& dst_image)
     {
+      imImage* c_src_image_list[4];
+      c_src_image_list[0] = src_image_list[0].im_image;
+      c_src_image_list[1] = src_image_list[1].im_image;
+      c_src_image_list[2] = src_image_list[2].im_image;
+      if (dst_image.Depth() == 4 || dst_image.HasAlpha())
+        c_src_image_list[3] = src_image_list[3].im_image;
+      imProcessMergeComponents((const imImage**)c_src_image_list, dst_image.im_image);
     }
     static void NormalizeComponents(const Image& src_image, Image& dst_image)
     {
+      imProcessNormalizeComponents(src_image.im_image, dst_image.im_image);
     }
     static void ReplaceColor(const Image& src_image, Image& dst_image, float* src_color, float* dst_color)
     {
+      imProcessReplaceColor(src_image.im_image, dst_image.im_image, src_color, dst_color);
     }
     static void SetAlphaColor(const Image& src_image, Image& dst_image, float* src_color, float dst_alpha)
     {
+      imProcessSetAlphaColor(src_image.im_image, dst_image.im_image, src_color, dst_alpha);
     }
     static void BitwiseOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
     {
+      imProcessBitwiseOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
     }
     static void BitwiseNot(const Image& src_image, Image& dst_image)
     {
+      imProcessBitwiseNot(src_image.im_image, dst_image.im_image);
     }
     static void BitMask(const Image& src_image, Image& dst_image, unsigned char mask, int op)
     {
+      imProcessBitMask(src_image.im_image, dst_image.im_image, mask, op);
     }
     static void BitPlane(const Image& src_image, Image& dst_image, int plane, int do_reset)
     {
+      imProcessBitPlane(src_image.im_image, dst_image.im_image, plane, do_reset);
     }
-    static void RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, float percent)
+    static int RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, float percent)
     {
+      return imProcessRenderAddSpeckleNoise(src_image.im_image, dst_image.im_image, percent);
     }
-    static void RenderAddGaussianNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
+    static int RenderAddGaussianNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
     {
+      return imProcessRenderAddGaussianNoise(src_image.im_image, dst_image.im_image, mean, stddev);
     }
-    static void RenderAddUniformNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
+    static int RenderAddUniformNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
     {
+      return imProcessRenderAddUniformNoise(src_image.im_image, dst_image.im_image, mean, stddev);
     }
     static void ToneGamut(const Image& src_image, Image& dst_image, int op, float* params)
     {
+      imProcessToneGamut(src_image.im_image, dst_image.im_image, op, params);
     }
     static void UnNormalize(const Image& src_image, Image& dst_image)
     {
+      imProcessUnNormalize(src_image.im_image, dst_image.im_image);
     }
     static void DirectConv(const Image& src_image, Image& dst_image)
     {
+      imProcessDirectConv(src_image.im_image, dst_image.im_image);
     }
     static void Negative(const Image& src_image, Image& dst_image)
     {
+      imProcessNegative(src_image.im_image, dst_image.im_image);
     }
     static float CalcAutoGamma(const Image& image)
     {
+      return imProcessCalcAutoGamma(image.im_image);
     }
     static void ShiftHSI(const Image& src_image, Image& dst_image, float h_shift, float s_shift, float i_shift)
     {
+      imProcessShiftHSI(src_image.im_image, dst_image.im_image, h_shift, s_shift, i_shift);
     }
     static void Threshold(const Image& src_image, Image& dst_image, float level, int value)
     {
+      imProcessThreshold(src_image.im_image, dst_image.im_image, level, value);
     }
     static void ThresholdByDiff(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
+      imProcessThresholdByDiff(src_image1.im_image, src_image2.im_image, dst_image.im_image);
     }
     static void HysteresisThreshold(const Image& src_image, Image& dst_image, int low_thres, int high_thres)
     {
+      imProcessHysteresisThreshold(src_image.im_image, dst_image.im_image, low_thres, high_thres);
     }
     static void HysteresisThresEstimate(const Image& image, int &low_level, int &high_level)
     {
+      imProcessHysteresisThresEstimate(image.im_image, &low_level, &high_level);
     }
-    static void UniformErrThreshold(const Image& src_image, Image& dst_image)
+    static int UniformErrThreshold(const Image& src_image, Image& dst_image)
     {
+      return imProcessUniformErrThreshold(src_image.im_image, dst_image.im_image);
     }
     static void DifusionErrThreshold(const Image& src_image, Image& dst_image, int level)
     {
+      imProcessDifusionErrThreshold(src_image.im_image, dst_image.im_image, level);
     }
-    static void PercentThreshold(const Image& src_image, Image& dst_image, float percent)
+    static int PercentThreshold(const Image& src_image, Image& dst_image, float percent)
     {
+      return imProcessPercentThreshold(src_image.im_image, dst_image.im_image, percent);
     }
-    static void OtsuThreshold(const Image& src_image, Image& dst_image)
+    static int OtsuThreshold(const Image& src_image, Image& dst_image)
     {
+      return imProcessOtsuThreshold(src_image.im_image, dst_image.im_image);
     }
     static float MinMaxThreshold(const Image& src_image, Image& dst_image)
     {
+      return imProcessMinMaxThreshold(src_image.im_image, dst_image.im_image);
     }
     static void LocalMaxThresEstimate(const Image& image, int &level)
     {
+      imProcessLocalMaxThresEstimate(image.im_image, &level);
     }
     static void SliceThreshold(const Image& src_image, Image& dst_image, float start_level, float end_level)
     {
+      imProcessSliceThreshold(src_image.im_image, dst_image.im_image, start_level, end_level);
     }
     static void Pixelate(const Image& src_image, Image& dst_image, int box_size)
     {
+      imProcessPixelate(src_image.im_image, dst_image.im_image, box_size);
     }
     static void Posterize(const Image& src_image, Image& dst_image, int level)
     {
+      imProcessPosterize(src_image.im_image, dst_image.im_image, level);
     }
     static void NormDiffRatio(const Image& image1, const Image& image2, Image& dst_image)
     {
+      imProcessNormDiffRatio(image1.im_image, image2.im_image, dst_image.im_image);
     }
     static void AbnormalHyperionCorrection(const Image& src_image, Image& dst_image, int threshold_consecutive, int threshold_percent, Image& image_abnormal)
     {
+      imProcessAbnormalHyperionCorrection(src_image.im_image, dst_image.im_image, threshold_consecutive, threshold_percent, image_abnormal.im_image);
     }
-    static void ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+    static int ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
     {
+      return imProcessConvertDataType(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
     }
-    static void ConvertColorSpace(const Image& src_image, Image& dst_image)
+    static int ConvertColorSpace(const Image& src_image, Image& dst_image)
     {
+      return imProcessConvertColorSpace(src_image.im_image, dst_image.im_image);
     }
-    static void ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+    static int ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
     {
+      return imProcessConvertToBitmap(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
     }
-    static void Reduce(const Image& src_image, Image& dst_image, int order)
+    static int Reduce(const Image& src_image, Image& dst_image, int order)
     {
+      return imProcessReduce(src_image.im_image, dst_image.im_image, order);
     }
-    static void Resize(const Image& src_image, Image& dst_image, int order)
+    static int Resize(const Image& src_image, Image& dst_image, int order)
     {
+      return imProcessResize(src_image.im_image, dst_image.im_image, order);
     }
     static void ReduceBy4(const Image& src_image, Image& dst_image)
     {
+      imProcessReduceBy4(src_image.im_image, dst_image.im_image);
     }
     static void Crop(const Image& src_image, Image& dst_image, int xmin, int ymin)
     {
+      imProcessCrop(src_image.im_image, dst_image.im_image, xmin, ymin);
     }
     static void Insert(const Image& src_image, const Image& region_image, Image& dst_image, int xmin, int ymin)
     {
+      imProcessInsert(src_image.im_image, region_image.im_image, dst_image.im_image, xmin, ymin);
     }
     static void AddMargins(const Image& src_image, Image& dst_image, int xmin, int ymin)
     {
+      imProcessAddMargins(src_image.im_image, dst_image.im_image, xmin, ymin);
     }
-    static void Rotate(const Image& src_image, Image& dst_image, double cos0, double sin0, int order)
+    static int Rotate(const Image& src_image, Image& dst_image, double cos0, double sin0, int order)
     {
+      return imProcessRotate(src_image.im_image, dst_image.im_image, cos0, sin0, order);
     }
-    static void RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order)
+    static int RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order)
     {
+      return imProcessRotateRef(src_image.im_image, dst_image.im_image, cos0, sin0, x, y, to_origin, order);
     }
     static void Rotate90(const Image& src_image, Image& dst_image, int dir_clockwise)
     {
+      imProcessRotate90(src_image.im_image, dst_image.im_image, dir_clockwise);
     }
     static void Rotate180(const Image& src_image, Image& dst_image)
     {
+      imProcessRotate180(src_image.im_image, dst_image.im_image);
     }
     static void Mirror(const Image& src_image, Image& dst_image)
     {
+      imProcessMirror(src_image.im_image, dst_image.im_image);
     }
     static void Flip(const Image& src_image, Image& dst_image)
     {
+      imProcessFlip(src_image.im_image, dst_image.im_image);
     }
-    static void Radial(const Image& src_image, Image& dst_image, float k1, int order)
+    static int Radial(const Image& src_image, Image& dst_image, float k1, int order)
     {
+      return imProcessRadial(src_image.im_image, dst_image.im_image, k1, order);
     }
-    static void Swirl(const Image& src_image, Image& dst_image, float k1, int order)
+    static int Swirl(const Image& src_image, Image& dst_image, float k1, int order)
     {
+      return imProcessSwirl(src_image.im_image, dst_image.im_image, k1, order);
     }
     static void InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2)
     {
+      imProcessInterlaceSplit(src_image.im_image, dst_image1.im_image, dst_image2.im_image);
     }
-    static void GrayMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int ismax)
+    static int GrayMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int ismax)
     {
+      return imProcessGrayMorphConvolve(src_image.im_image, dst_image.im_image, kernel.im_image, ismax);
     }
-    static void GrayMorphErode(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphErode(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphErode(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GrayMorphDilate(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphDilate(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphDilate(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GrayMorphOpen(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphOpen(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphOpen(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GrayMorphClose(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphClose(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphClose(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GrayMorphTopHat(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphTopHat(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphTopHat(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GrayMorphWell(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphWell(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphWell(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GrayMorphGradient(const Image& src_image, Image& dst_image, int kernel_size)
+    static int GrayMorphGradient(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessGrayMorphGradient(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void BinMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int hit_white, int iter)
+    static int BinMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int hit_white, int iter)
     {
+      return imProcessBinMorphConvolve(src_image.im_image, dst_image.im_image, kernel.im_image, hit_white, iter);
     }
-    static void BinMorphErode(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    static int BinMorphErode(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
+      return imProcessBinMorphErode(src_image.im_image, dst_image.im_image, kernel_size, iter);
     }
-    static void BinMorphDilate(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    static int BinMorphDilate(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
+      return imProcessBinMorphDilate(src_image.im_image, dst_image.im_image, kernel_size, iter);
     }
-    static void BinMorphOpen(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    static int BinMorphOpen(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
+      return imProcessBinMorphOpen(src_image.im_image, dst_image.im_image, kernel_size, iter);
     }
-    static void BinMorphClose(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    static int BinMorphClose(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
+      return imProcessBinMorphClose(src_image.im_image, dst_image.im_image, kernel_size, iter);
     }
-    static void BinMorphOutline(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    static int BinMorphOutline(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
+      return imProcessBinMorphOutline(src_image.im_image, dst_image.im_image, kernel_size, iter);
     }
     static void BinMorphThin(const Image& src_image, Image& dst_image)
     {
+      imProcessBinMorphThin(src_image.im_image, dst_image.im_image);
     }
-    static void MedianConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int MedianConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessMedianConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void RangeConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int RangeConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessRangeConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void RankClosestConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int RankClosestConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessRankClosestConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void RankMaxConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int RankMaxConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessRankMaxConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void RankMinConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int RankMinConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessRankMinConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void RangeContrastThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_range)
+    static int RangeContrastThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_range)
     {
+      return imProcessRangeContrastThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_range);
     }
-    static void LocalMaxThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_level)
+    static int LocalMaxThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_level)
     {
+      return imProcessLocalMaxThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_level);
     }
-    static void Convolve(const Image& src_image, Image& dst_image, const Image& kernel)
+    static int Convolve(const Image& src_image, Image& dst_image, const Image& kernel)
     {
+      return imProcessConvolve(src_image.im_image, dst_image.im_image, kernel.im_image);
     }
-    static void ConvolveSep(const Image& src_image, Image& dst_image, const Image& kernel)
+    static int ConvolveSep(const Image& src_image, Image& dst_image, const Image& kernel)
     {
+      return imProcessConvolveSep(src_image.im_image, dst_image.im_image, kernel.im_image);
     }
-    static void ConvolveDual(const Image& src_image, Image& dst_image, const Image& kernel1, const Image& kernel2)
+    static int ConvolveDual(const Image& src_image, Image& dst_image, const Image& kernel1, const Image& kernel2)
     {
+      return imProcessConvolveDual(src_image.im_image, dst_image.im_image, kernel1.im_image, kernel2.im_image);
     }
-    static void ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int count)
+    static int ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int count)
     {
+      return imProcessConvolveRep(src_image.im_image, dst_image.im_image, kernel.im_image, count);
     }
-    static void CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel)
+    static int CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel)
     {
+      return imProcessCompassConvolve(src_image.im_image, dst_image.im_image, kernel.im_image);
     }
-    static void DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev1, float stddev2)
+    static int DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev1, float stddev2)
     {
+      return imProcessDiffOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev1, stddev2);
     }
-    static void LapOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
+    static int LapOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
     {
+      return imProcessLapOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
     }
-    static void MeanConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int MeanConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessMeanConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void GaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
+    static int GaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
     {
+      return imProcessGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
     }
-    static void BarlettConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    static int BarlettConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
+      return imProcessBarlettConvolve(src_image.im_image, dst_image.im_image, kernel_size);
     }
-    static void SobelConvolve(const Image& src_image, Image& dst_image)
+    static int SobelConvolve(const Image& src_image, Image& dst_image)
     {
+      return imProcessSobelConvolve(src_image.im_image, dst_image.im_image);
     }
-    static void PrewittConvolve(const Image& src_image, Image& dst_image)
+    static int PrewittConvolve(const Image& src_image, Image& dst_image)
     {
+      return imProcessPrewittConvolve(src_image.im_image, dst_image.im_image);
     }
-    static void SplineEdgeConvolve(const Image& src_image, Image& dst_image)
+    static int SplineEdgeConvolve(const Image& src_image, Image& dst_image)
     {
+      return imProcessSplineEdgeConvolve(src_image.im_image, dst_image.im_image);
     }
     static void ZeroCrossing(const Image& src_image, Image& dst_image)
     {
+      imProcessZeroCrossing(src_image.im_image, dst_image.im_image);
     }
     static void Canny(const Image& src_image, Image& dst_image, float stddev)
     {
+      imProcessCanny(src_image.im_image, dst_image.im_image, stddev);
     }
-    static void Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold)
+    static int Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold)
     {
+      return imProcessUnsharp(src_image.im_image, dst_image.im_image, stddev, amount, threshold);
     }
-    static void Sharp(const Image& src_image, Image& dst_image, float amount, float threshold)
+    static int Sharp(const Image& src_image, Image& dst_image, float amount, float threshold)
     {
+      return imProcessSharp(src_image.im_image, dst_image.im_image, amount, threshold);
     }
-    static void SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold)
+    static int SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold)
     {
+      return imProcessSharpKernel(src_image.im_image, kernel.im_image, dst_image.im_image, amount, threshold);
     }
     static void PerimeterLine(const Image& src_image, Image& dst_image)
     {
+      imProcessPerimeterLine(src_image.im_image, dst_image.im_image);
     }
     static void RemoveByArea(const Image& src_image, Image& dst_image, int connect, int start_size, int end_size, int inside)
     {
+      imProcessRemoveByArea(src_image.im_image, dst_image.im_image, connect, start_size, end_size, inside);
     }
     static void FillHoles(const Image& src_image, Image& dst_image, int connect)
     {
+      imProcessFillHoles(src_image.im_image, dst_image.im_image, connect);
     }
     static void RotateKernel(Image& kernel)
     {
+      imProcessRotateKernel(kernel.im_image);
     }
     static void FFTraw(Image& image, int inverse, int center, int normalize)
     {
+      imProcessFFTraw(image.im_image, inverse, center, normalize);
     }
     static void SwapQuadrants(Image& image, int center2origin)
     {
+      imProcessSwapQuadrants(image.im_image, center2origin);
     }
-#endif
 
     static int RenderOp(Image& image, imRenderFunc render_func, const char* render_name, float* params, int plus)
     {
@@ -1771,6 +1783,38 @@ namespace im
     }
   };
 
+  class Histogram
+  {
+    friend class Calc;
+
+    /* forbidden */
+    Histogram() { }
+
+    unsigned long* histo;
+    int count;
+  public:
+
+    Histogram(int image_data_type)
+    {
+      count = imHistogramCount(image_data_type);
+      histo = new unsigned long[count];
+    }
+    ~Histogram()
+    {
+      delete[] histo;
+    }
+
+    Histogram(const Histogram& histogram)
+    {
+      count = histogram.count;
+      histo = new unsigned long[count];
+      for (int i = 0; i < count; i++) histo[i] = histogram.histo[i];
+    }
+
+    unsigned long operator [](int index) { return histo[index]; }
+  };
+
+
   class Calc
   {
   public:
@@ -1787,21 +1831,21 @@ namespace im
     {
       return imCalcCountColors(image.im_image);
     }
-    static void GrayHistogram(const Image& image, unsigned long* histo, int cumulative)
+    static void GrayHistogram(const Image& image, Histogram& histogram, int cumulative)
     {
-      imCalcGrayHistogram(image.im_image, histo, cumulative);
+      imCalcGrayHistogram(image.im_image, histogram.histo, cumulative);
     }
-    static void Histogram(const Image& image, unsigned long* histo, int plane, int cumulative)
+    static void Histogram(const Image& image, Histogram& histogram, int plane, int cumulative)
     {
-      imCalcHistogram(image.im_image, histo, plane, cumulative);
+      imCalcHistogram(image.im_image, histogram.histo, plane, cumulative);
     }
-    static void ImageStatistics(const Image& image, imStats* stats)
+    static void ImageStatistics(const Image& image, imStats& stats)
     {
-      imCalcImageStatistics(image.im_image, stats);
+      imCalcImageStatistics(image.im_image, &stats);
     }
-    static void HistogramStatistics(const Image& image, imStats* stats)
+    static void HistogramStatistics(const Image& image, imStats& stats)
     {
-      imCalcHistogramStatistics(image.im_image, stats);
+      imCalcHistogramStatistics(image.im_image, &stats);
     }
     static void HistoImageStatistics(const Image& image, int* median, int* mode)
     {
