@@ -18,6 +18,7 @@
 #include "im_process.h"
 #include "im_counter.h"
 #include "im_convert.h"
+#include "im_attrib_flat.h"
 
 
 namespace cd
@@ -46,23 +47,6 @@ namespace im
   int VersionNumber()
   {
     return imVersionNumber();
-  }
-
-  long ColorEncode(unsigned char red, unsigned char green, unsigned char blue)
-  {
-    return (((long)red) << 16) | (((long)green) << 8) | ((long)blue);
-  }
-  unsigned char ColorRed(long color)
-  {
-    return (unsigned char)(color >> 16);
-  }
-  unsigned char ColorGreen(long color)
-  {
-    return (unsigned char)(color >> 8);
-  }
-  unsigned char ColorBlue(long color)
-  {
-    return (unsigned char)color;
   }
 
 
@@ -114,6 +98,23 @@ namespace im
     int FindColor(long color, unsigned char tol)
     {
       return imPaletteFindColor(pal_data, pal_count, color, tol);
+    }
+
+    static long ColorEncode(unsigned char red, unsigned char green, unsigned char blue)
+    {
+      return (((long)red) << 16) | (((long)green) << 8) | ((long)blue);
+    }
+    static unsigned char ColorRed(long color)
+    {
+      return (unsigned char)(color >> 16);
+    }
+    static unsigned char ColorGreen(long color)
+    {
+      return (unsigned char)(color >> 8);
+    }
+    static unsigned char ColorBlue(long color)
+    {
+      return (unsigned char)color;
     }
 
     /* pre-defined palettes */
@@ -188,6 +189,133 @@ namespace im
     }
   };
 
+  class AttribTable
+  {
+    imAttribTablePrivate* ptable;
+
+    /* forbidden */
+    AttribTable() {}
+
+  public:
+
+    AttribTable(int hash_size)
+    {
+      ptable = imAttribTableCreate(hash_size);
+    }
+    AttribTable(const AttribTable& attrib_table)
+    {
+      imAttribTableCopyFrom(ptable, attrib_table.ptable);
+    }
+    ~AttribTable()
+    {
+      imAttribTableDestroy(ptable);
+    }
+
+    int Count() const
+    {
+      return imAttribTableCount(ptable);
+    }
+    void RemoveAll()
+    {
+      imAttribTableRemoveAll(ptable);
+    }
+
+    void MergeFrom(const AttribTable& attrib_table)
+    {
+      imAttribTableMergeFrom(ptable, attrib_table.ptable);
+    }
+
+    void Set(const char* name, int data_type, int count, const void* data)
+    {
+      imAttribTableSet(ptable, name, data_type, count, data);
+    }
+    void SetInteger(const char* name, int data_type, int value)
+    {
+      imAttribTableSetInteger(ptable, name, data_type, value);
+    }
+    void SetReal(const char* name, int data_type, double value)
+    {
+      imAttribTableSetReal(ptable, name, data_type, value);
+    }
+    void SetString(const char* name, const char* value)
+    {
+      imAttribTableSetString(ptable, name, value);
+    }
+    void Reset(const char *name)
+    {
+      imAttribTableUnSet(ptable, name);
+    }
+
+    const void* Get(const char *name, int *data_type = 0, int *count = 0) const
+    {
+      return imAttribTableGet(ptable, name, data_type, count);
+    }
+    int GetInteger(const char *name, int index = 0) const
+    {
+      return imAttribTableGetInteger(ptable, name, index);
+    }
+    double GetReal(const char *name, int index = 0) const
+    {
+      return imAttribTableGetReal(ptable, name, index);
+    }
+    const char* GetString(const char *name) const
+    {
+      return imAttribTableGetString(ptable, name);
+    }
+
+    void ForEach(void* user_data, imAttribTableCallback attrib_func) const
+    {
+      imAttribTableForEach(ptable, user_data, attrib_func);
+    }
+  };
+
+
+  class AttribArray
+  {
+    imAttribTablePrivate* ptable;
+
+    /* forbidden */
+    AttribArray() {}
+
+  public:
+
+    AttribArray(int count)
+    {
+      ptable = imAttribArrayCreate(count);
+    }
+    AttribArray(const AttribArray& attrib_array)
+    {
+      ptable = imAttribArrayCreate(imAttribTableCount(attrib_array.ptable));
+      imAttribArrayCopyFrom(ptable, attrib_array.ptable);
+    }
+    ~AttribArray()
+    {
+      imAttribTableDestroy(ptable);
+    }
+
+    int Count() const
+    {
+      return imAttribTableCount(ptable);
+    }
+    void RemoveAll()
+    {
+      imAttribTableRemoveAll(ptable);
+    }
+
+    void Set(int index, const char* name, int data_type, int count, const void* data)
+    {
+      imAttribArraySet(ptable, index, name, data_type, count, data);
+    }
+    const void* Get(int index, char *name = 0, int *data_type = 0, int *count = 0) const
+    {
+      return imAttribArrayGet(ptable, index, name, data_type, count);
+    }
+
+    void ForEach(void* user_data, imAttribTableCallback attrib_func) const
+    {
+      imAttribTableForEach(ptable, user_data, attrib_func);
+    }
+  };
 
   class ImageChannelLine
   {
@@ -1166,9 +1294,9 @@ namespace im
     {
       return imProcessOpenMPSetMinCount(min_count);
     }
-    static int OpenMPSetNumThreads(int count)
+    static int OpenMPSetNumThreads(int thread_count)
     {
-      return imProcessOpenMPSetNumThreads(count);
+      return imProcessOpenMPSetNumThreads(thread_count);
     }
 
     static int HoughLines(const Image& src_image, Image& dst_image)
@@ -1632,9 +1760,9 @@ namespace im
     {
       return imProcessConvolveDual(src_image.im_image, dst_image.im_image, kernel1.im_image, kernel2.im_image);
     }
-    static int ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int count)
+    static int ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int rep_count)
     {
-      return imProcessConvolveRep(src_image.im_image, dst_image.im_image, kernel.im_image, count);
+      return imProcessConvolveRep(src_image.im_image, dst_image.im_image, kernel.im_image, rep_count);
     }
     static int CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel)
     {
@@ -1811,7 +1939,13 @@ namespace im
       for (int i = 0; i < count; i++) histo[i] = histogram.histo[i];
     }
 
-    unsigned long operator [](int index) { return histo[index]; }
+    unsigned long& operator [](int index) 
+    { 
+      static unsigned long err = (unsigned long)-1;
+      if (!histo || index < 0 || index >= count)
+        return err;
+      return histo[index]; 
+    }
   };
 
 

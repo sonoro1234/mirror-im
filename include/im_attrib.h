@@ -16,7 +16,7 @@
  * Names are usually strings with less that 30 chars.
  * \par
  * Attributes are stored in a hash table for fast access. \n
- * We use the hash function described in "The Pratice of Programming" of Kernighan & Pike.
+ * We use the hash function described in "The Practice of Programming" of Kernighan & Pike.
  * \ingroup util */
 class imAttribTable
 {
