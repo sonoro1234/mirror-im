@@ -247,7 +247,7 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
   // now all pixels are marked, 
   // but some marks are aliases to others
 
-  // ajust the alias table to be a remap table
+  // adjust the alias table to be a remap table
   // and return the real region count
   alias_update(alias_table, region_count);
 
@@ -376,7 +376,7 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
   // now all pixels are marked, 
   // but some marks are aliases to others
 
-  // ajust the alias table to be a remap table
+  // adjust the alias table to be a remap table
   // and return the real region count
   alias_update(alias_table, region_count);
 
@@ -632,7 +632,7 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
   //    -----
   //    3 | 4
 
-  // line coeficients for lines that belongs to axis 1 and 2
+  // line coefficients for lines that belongs to axis 1 and 2
   float* A1 = (float*)malloc(region_count*sizeof(float));
   float* A2 = (float*)malloc(region_count*sizeof(float));
   float* C1 = (float*)malloc(region_count*sizeof(float));
@@ -720,7 +720,7 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
         float d1, d2;
         if (slope2[index] == 90)
         {
-          d2 = y - data_cy[index];   // I ckecked this many times, looks odd but it is correct.
+          d2 = y - data_cy[index];   // I checked this many times, looks odd but it is correct.
           d1 = x - data_cx[index];
         }
         else
@@ -804,12 +804,16 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
   free(D2a); 
 }
 
-void imAnalyzeMeasureHoles(const imImage* image, int connect, int* count_data, int* area_data, float* perim_data)
+void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int* count_data, int* area_data, float* perim_data)
 {
   int i;
   imImage *inv_image = imImageCreate(image->width, image->height, IM_BINARY, IM_BYTE);
   imbyte* inv_data = (imbyte*)inv_image->data[0];
   imushort* img_data = (imushort*)image->data[0];
+
+  memset(count_data, 0, region_count*sizeof(int));
+  memset(area_data, 0, region_count*sizeof(int));
+  memset(perim_data, 0, region_count*sizeof(float));
 
   // finds the holes in the inverted image
 #ifdef _OPENMP
@@ -836,7 +840,7 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int* count_data, i
     return;
   }
 
-  // measure the holes area
+  // measure each holes area
   int* holes_area = (int*)malloc(holes_count*sizeof(int));
   imAnalyzeMeasureArea(holes_image, holes_area, holes_count);
 
@@ -867,7 +871,7 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int* count_data, i
         // it is the first time we encounter a pixel of this hole.
         // then it is a pixel from the hole border.
         // now find which region this hole is inside.
-        // a 4 connected neighbour is necessarilly a valid region or 0.
+        // a 4 connected neighbor is necessarily a valid region or 0.
 
         int region_index = 0;
         if (img_data[offset_up + x]) region_index = img_data[offset_up + x];
@@ -935,7 +939,7 @@ void imProcessPerimeterLine(const imImage* src_image, imImage* dst_image)
 }
 
 /* Perimeter Templates idea based in
-   Parker, Pratical Computer Vision Using C
+   Parker, Practical Computer Vision Using C
 
 For 1.414 (sqrt(2)/2 + sqrt(2)/2) [1]:
      1 0 0   0 0 1   1 0 0   0 0 1   0 0 0   1 0 1
@@ -1059,7 +1063,7 @@ void imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regi
       {
         int T = 0;
 
-        // check the 8 neighboors if they belong to the perimeter
+        // check the 8 neighbors if they belong to the perimeter
         if (IsPerimeterPoint(map+offset+width, width, height, x-1, y+1))
           T |= 0x01;
         if (IsPerimeterPoint(map+offset+width, width, height, x, y+1))
@@ -1214,7 +1218,7 @@ static void iInitPerimAreaTemplate(imbyte *templ, float *v)
   v[6] = 0.125f;
 }
 
-void imAnalyzeMeasurePerimArea(const imImage* image, float* area_data)
+void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int region_count)
 {
   static imbyte templ[256];
   static float vt[7];
@@ -1226,6 +1230,8 @@ void imAnalyzeMeasurePerimArea(const imImage* image, float* area_data)
   }
 
   imushort* map = (imushort*)image->data[0];
+
+  memset(perimarea_data, 0, region_count*sizeof(float));
 
   int width = image->width;
   int height = image->height;
@@ -1261,7 +1267,7 @@ void imAnalyzeMeasurePerimArea(const imImage* image, float* area_data)
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
-          area_data[index] += inc;
+          perimarea_data[index] += inc;
         }
       }
     }

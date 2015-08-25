@@ -327,8 +327,10 @@ static int iGetMax(imImage* image)
 
 static int imlua_checkregioncount(lua_State *L, int narg, imImage* image)
 {
-  if (lua_isnoneornil(L, narg)) return iGetMax(image);
-  else return (int)luaL_checknumber(L, narg);
+  if (lua_isnoneornil(L, narg)) 
+    return iGetMax(image);
+  else 
+    return (int)luaL_checknumber(L, narg);
 }
 
 
@@ -370,7 +372,7 @@ static int imluaAnalyzeMeasurePerimArea (lua_State *L)
   count = imlua_checkregioncount(L, 2, image);
   perimarea = (float*) malloc(sizeof(float) * count);
 
-  imAnalyzeMeasurePerimArea(image, perimarea);
+  imAnalyzeMeasurePerimArea(image, perimarea, count);
 
   imlua_newarrayfloat (L, perimarea, count, 0);
   free(perimarea);
@@ -478,7 +480,7 @@ static int imluaAnalyzeMeasureHoles (lua_State *L)
   area = (int*) malloc (sizeof(int) * count);
   perim = (float*) malloc (sizeof(float) * count);
 
-  imAnalyzeMeasureHoles(image, connect, &holes_count, area, perim);
+  imAnalyzeMeasureHoles(image, connect, count, &holes_count, area, perim);
 
   lua_pushnumber(L, holes_count);
   imlua_newarrayint(L, area, holes_count, 0);
