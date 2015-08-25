@@ -62,7 +62,7 @@ static char* utlStrDup(const char* str)
 
 imAttribNode::imAttribNode(const char* name, int _data_type, int _count, const void* _data, imAttribNode* _next)
 {
-  if (_data_type == 0 && _count == -1)  /* BYTE meaning a string */
+  if (_data_type == 0 && _count == -1 && _data)  /* BYTE meaning a string */
     _count = (int)strlen((char*)_data)+1;
 
   this->name = utlStrDup(name);
@@ -72,8 +72,10 @@ imAttribNode::imAttribNode(const char* name, int _data_type, int _count, const v
 
   int size = _count * imDataTypeSize(_data_type);
   this->data = malloc(size);
-  if (_data) memcpy(this->data, _data, size);
-  else memset(this->data, 0, size);
+  if (_data) 
+    memcpy(this->data, _data, size);
+  else 
+    memset(this->data, 0, size);
 }
 
 imAttribNode::~imAttribNode()

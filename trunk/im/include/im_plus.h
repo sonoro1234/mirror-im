@@ -36,15 +36,15 @@ namespace cd
  */
 namespace im
 {
-  const char* Version()
+  inline const char* Version()
   {
     return imVersion();
   }
-  const char* VersionDate()
+  inline const char* VersionDate()
   {
     return imVersionDate();
   }
-  int VersionNumber()
+  inline int VersionNumber()
   {
     return imVersionNumber();
   }
@@ -206,7 +206,7 @@ namespace im
     {
       imAttribTableCopyFrom(ptable, attrib_table.ptable);
     }
-    ~AttribTable()
+    virtual ~AttribTable()
     {
       imAttribTableDestroy(ptable);
     }
@@ -269,53 +269,6 @@ namespace im
     }
   };
 
-
-  class AttribArray
-  {
-    imAttribTablePrivate* ptable;
-
-    /* forbidden */
-    AttribArray() {}
-
-  public:
-
-    AttribArray(int count)
-    {
-      ptable = imAttribArrayCreate(count);
-    }
-    AttribArray(const AttribArray& attrib_array)
-    {
-      ptable = imAttribArrayCreate(imAttribTableCount(attrib_array.ptable));
-      imAttribArrayCopyFrom(ptable, attrib_array.ptable);
-    }
-    ~AttribArray()
-    {
-      imAttribTableDestroy(ptable);
-    }
-
-    int Count() const
-    {
-      return imAttribTableCount(ptable);
-    }
-    void RemoveAll()
-    {
-      imAttribTableRemoveAll(ptable);
-    }
-
-    void Set(int index, const char* name, int data_type, int count, const void* data)
-    {
-      imAttribArraySet(ptable, index, name, data_type, count, data);
-    }
-    const void* Get(int index, char *name = 0, int *data_type = 0, int *count = 0) const
-    {
-      return imAttribArrayGet(ptable, index, name, data_type, count);
-    }
-
-    void ForEach(void* user_data, imAttribTableCallback attrib_func) const
-    {
-      imAttribTableForEach(ptable, user_data, attrib_func);
-    }
-  };
 
   class ImageChannelLine
   {
@@ -1920,6 +1873,7 @@ namespace im
 
     unsigned long* histo;
     int count;
+
   public:
 
     Histogram(int image_data_type)
@@ -1991,38 +1945,103 @@ namespace im
     }
   };
 
+  class MeasureTable : protected AttribTable
+  {
+    int region_count;
+
+  public:
+    MeasureTable(int _region_count)
+      :region_count(_region_count), AttribTable(0)
+    {
+    }
+    ~MeasureTable() {}
+
+    int RegionCount() const { return region_count; }
+
+    const void* AddMeasure(const char* name, int data_type)
+    {
+      const void* data = Get(name);
+      if (!data)
+      {
+        Set(name, data_type, region_count, (const void*)0);
+        data = Get(name);
+      }
+      return data;
+    }
+    const void* GetMeasure(const char* name, int *data_type = (int*)0) const
+    {
+      return Get(name, data_type);
+    }
+
+    int* AddMeasureInt(const char* name)
+    {
+      return (int*)AddMeasure(name, IM_INT);
+    }
+    float* AddMeasureFloat(const char* name)
+    {
+      return (float*)AddMeasure(name, IM_FLOAT);
+    }
+    int* GetMeasureInt(const char* name) const
+    {
+      int data_type;
+      const void* data = Get(name, &data_type);
+      if (!data || data_type != IM_INT)
+        return (int*)0;
+      else
+        return (int*)data;
+    }
+    float* GetMeasureFloat(const char* name) const
+    {
+      int data_type;
+      const void* data = Get(name, &data_type);
+      if (!data || data_type != IM_FLOAT)
+        return (float*)0;
+      else
+        return (float*)data;
+    }
+
+  };
+
   class Analyze
-    {
-    public:
+  {
+  public:
 
-    static int FindRegions(const Image& src_image, Image& dst_image, int connect, int touch_border)
+    static int FindRegions(const Image& image, Image& region_image, int connect, int touch_border)
     {
-      return imAnalyzeFindRegions(src_image.im_image, dst_image.im_image, connect, touch_border);
+      return imAnalyzeFindRegions(image.im_image, region_image.im_image, connect, touch_border);
     }
 
-    static void MeasureArea(const Image& image, int* area, int region_count)
+    static void MeasureArea(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasureArea(image.im_image, area, region_count);
+      imAnalyzeMeasureArea(region_image.im_image, measure_table.AddMeasureInt("Area"), measure_table.RegionCount());
     }
-    static void MeasurePerimArea(const Image& image, float* perimarea)
+    static void MeasurePerimArea(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasurePerimArea(image.im_image, perimarea);
+      imAnalyzeMeasurePerimArea(region_image.im_image, measure_table.AddMeasureFloat("PerimeterArea"), measure_table.RegionCount());
     }
-    static void MeasureCentroid(const Image& image, const int* area, int region_count, float* cx, float* cy)
+    static void MeasureCentroid(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasureCentroid(image.im_image, area, region_count, cx, cy);
+      imAnalyzeMeasureCentroid(region_image.im_image, measure_table.GetMeasureInt("Area"), measure_table.RegionCount(), 
+                                                      measure_table.AddMeasureFloat("CentroidX"), measure_table.AddMeasureFloat("CentroidY"));
     }
-    static void MeasurePrincipalAxis(const Image& image, const int* area, const float* cx, const float* cy, const int region_count, float* major_slope, float* major_length, float* minor_slope, float* minor_length)
+    static void MeasurePrincipalAxis(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasurePrincipalAxis(image.im_image, area, cx, cy, region_count, major_slope, major_length, minor_slope, minor_length);
+      imAnalyzeMeasurePrincipalAxis(region_image.im_image, measure_table.GetMeasureInt("Area"), 
+                                                           measure_table.GetMeasureFloat("CentroidX"), measure_table.GetMeasureFloat("CentroidY"), 
+                                                           measure_table.RegionCount(), 
+                                                           measure_table.AddMeasureFloat("MajorSlope"), measure_table.AddMeasureFloat("MajorLength"), 
+                                                           measure_table.AddMeasureFloat("MinorSlope"), measure_table.AddMeasureFloat("MinorLength"));
     }
-    static void MeasureHoles(const Image& image, int connect, int* holes_count, int* area, float* perim)
+    static void MeasureHoles(const Image& region_image, int connect, MeasureTable& measure_table)
     {
-      imAnalyzeMeasureHoles(image.im_image, connect, holes_count, area, perim);
+      imAnalyzeMeasureHoles(region_image.im_image, connect, measure_table.RegionCount(), 
+                                                            measure_table.AddMeasureInt("HolesCount"),
+                                                            measure_table.AddMeasureInt("HolesArea"), 
+                                                            measure_table.AddMeasureFloat("HolesPerimeter"));
     }
-    static void MeasurePerimeter(const Image& image, float* perim, int region_count)
+    static void MeasurePerimeter(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasurePerimeter(image.im_image, perim, region_count);
+      imAnalyzeMeasurePerimeter(region_image.im_image, measure_table.AddMeasureFloat("Perimeter"), measure_table.RegionCount());
     }
 
   };

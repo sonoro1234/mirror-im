@@ -13,7 +13,7 @@
 #include "im_util.h"
 #include "im_attrib.h"
 #include "im_counter.h"
-#include "im_plus.h"  // make shure that this file is compiled
+#include "im_plus.h"  // make sure that this file is compiled
 
 
 void imFileClear(imFile* ifile)

@@ -195,7 +195,7 @@ void imAnalyzeMeasureArea(const imImage* image, int* area, int region_count);
  * \verbatim im.AnalyzeMeasurePerimArea(image: imImage, [region_count: number]) -> perimarea: table of numbers [in Lua 5] \endverbatim
  * The returned table is zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea);
+void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea, int region_count);
 
 /** Calculate the centroid position of all regions. Holes are not included. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
@@ -221,15 +221,15 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const 
                                    const int region_count, float* major_slope, float* major_length, 
                                                            float* minor_slope, float* minor_length);
 
-/** Measure the number and area of holes of all regions. \n
+/** Measure the number of holes of all regions. Optionally computes the holes area and holes perimeter of all regions. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
- * area and perim has size the number of regions, if some is NULL it will be not calculated.
+ * count, area and perim has size the number of regions, if some is NULL it will be not calculated.
  * Not using OpenMP when enabled.
  *
- * \verbatim im.AnalyzeMeasureHoles(image: imImage, connect: number, [region_count: number]) -> holes_count: number, area: table of numbers, perim: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeMeasureHoles(image: imImage, connect: number, [region_count: number]) -> holes_count: number, holes_area: table of numbers, holes_perim: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasureHoles(const imImage* image, int connect, int *holes_count, int* area, float* perim);
+void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int *holes_count, int* holes_area, float* holes_perim);
 
 /** Measure the total perimeter of all regions (external and internal). \n
  * Source image is IM_GRAY/IM_USHORT type (the result of imAnalyzeFindRegions). \n
