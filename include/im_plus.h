@@ -24,7 +24,7 @@
 namespace cd
 {
   class Canvas;
-  class CanvasImageRGB;
+  class CanvasImImage;
 }
 
 /** \brief Name space for C++ high level API
@@ -360,7 +360,7 @@ namespace im
     friend class VideoCapture;
 
     friend class cd::Canvas;
-    friend class cd::CanvasImageRGB;
+    friend class cd::CanvasImImage;
 
   protected:
     imImage* im_image;
