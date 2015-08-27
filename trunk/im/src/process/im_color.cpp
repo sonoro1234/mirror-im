@@ -175,15 +175,6 @@ void imProcessMergeComponents(const imImage** src_image, imImage* dst_image)
 template <class ST, class DT>
 static void DoNormalizeComp(ST** src_data, DT** dst_data, int count, int depth)
 {
-  ST* src_pdata[IM_MAXDEPTH];
-  DT* dst_pdata[IM_MAXDEPTH];
-
-  for(int dt = 0; dt < depth; dt++)
-  {
-    dst_pdata[dt] = dst_data[dt];
-    src_pdata[dt] = src_data[dt];
-  }
-
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -193,14 +184,14 @@ static void DoNormalizeComp(ST** src_data, DT** dst_data, int count, int depth)
 
     DT sum = 0;
     for(d = 0; d < depth; d++)
-      sum += (DT)*(src_pdata[d]);
+      sum += (DT)(src_data[d][i]);
 
     for(d = 0; d < depth; d++)
     {
       if (sum == 0)
-        dst_pdata[d][i] = 0;
+        dst_data[d][i] = 0;
       else
-        dst_pdata[d][i] = (DT)*(src_pdata[d]) / sum;
+        dst_data[d][i] = (DT)(src_data[d][i]) / sum;
     }
   }
 }
