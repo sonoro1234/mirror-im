@@ -81,14 +81,14 @@ int imImageCheckFormat(int color_mode, int data_type);
  * See \ref im_util.h
  * \ingroup util */
 
-/** Encode RGB components in a long for palete usage. \n
+/** Encode RGB components in a long for palette usage. \n
  * "long" definition is compatible with the CD library definition.
  *
  * \verbatim im.ColorEncode(red: number, green: number, blue: number) -> color: lightuserdata [in Lua 5] \endverbatim
  * \ingroup colorutl */
 long imColorEncode(unsigned char red, unsigned char green, unsigned char blue);
 
-/** Decode RGB components from a long for palete usage. \n
+/** Decode RGB components from a long for palette usage. \n
  * "long" definition is compatible with the CD library definition.
  *
  * \verbatim im.ColorDecode(color: lightuserdata) -> red: number, green: number, blue: number [in Lua 5] \endverbatim

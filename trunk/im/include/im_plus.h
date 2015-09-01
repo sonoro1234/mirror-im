@@ -21,11 +21,6 @@
 #include "im_attrib_flat.h"
 
 
-namespace cd
-{
-  class Canvas;
-  class CanvasImImage;
-}
 
 /** \brief Name space for C++ high level API
  *
@@ -52,52 +47,51 @@ namespace im
 
   class Palette
   {
-    friend class Image;
-
   protected:
-    long* pal_data;
-    int pal_count;
+    long* pal;
+    int count;
 
   public:
-    Palette(int count = 256)
+    Palette(int pal_count = 256)
     {
-      pal_count = count;
-      pal_data = imPaletteNew(pal_count);
+      count = pal_count;
+      pal = imPaletteNew(count);
     }
-    Palette(long* palette, int count = 256)
+    Palette(long* palette, int pal_count = 256)
     {
-      pal_count = count;
-      pal_data = palette;
+      count = pal_count;
+      pal = palette;
     }
     Palette(const Palette& src_palette)
     {
-      pal_count = src_palette.pal_count;
-      pal_data = imPaletteNew(pal_count);
-      for (int i = 0; i < pal_count; i++)
-        pal_data[i] = src_palette.pal_data[i];
+      count = src_palette.count;
+      pal = imPaletteDuplicate(src_palette.pal, src_palette.count);
     }
     ~Palette()
     {
-      if (pal_data)
-        imPaletteRelease(pal_data);
+      if (pal)
+        imPaletteRelease(pal);
     }
+
+    long* GetData() const { return pal; }
+    int Count() const { return count; }
 
     long& operator [] (int index)
     {
       static long err = -1;
-      if (!pal_data || index < 0 || index >= pal_count)
+      if (!pal || index < 0 || index >= count)
         return err;
-      return pal_data[index];
+      return pal[index];
     }
 
 
     int FindNearest(long color) const
     {
-      return imPaletteFindNearest(pal_data, pal_count, color);
+      return imPaletteFindNearest(pal, count, color);
     }
     int FindColor(long color, unsigned char tol)
     {
-      return imPaletteFindColor(pal_data, pal_count, color, tol);
+      return imPaletteFindColor(pal, count, color, tol);
     }
 
     static long ColorEncode(unsigned char red, unsigned char green, unsigned char blue)
@@ -208,7 +202,8 @@ namespace im
     }
     virtual ~AttribTable()
     {
-      imAttribTableDestroy(ptable);
+      if (ptable)
+        imAttribTableDestroy(ptable);
     }
 
     int Count() const
@@ -353,18 +348,10 @@ namespace im
 
   class Image
   {
-    friend class File;
-    friend class Process;
-    friend class Analyze;
-    friend class Calc;
-    friend class VideoCapture;
-
-    friend class cd::Canvas;
-    friend class cd::CanvasImImage;
-
   protected:
     imImage* im_image;
 
+    /* forbidden */
     Image() { im_image = 0; };
 
     void IncRef()
@@ -421,6 +408,8 @@ namespace im
           imImageDestroy(im_image);
       }
     }
+
+    imImage* GetHandle() const { return im_image; }
 
 
     bool Failed() const
@@ -613,16 +602,11 @@ namespace im
     /* palette */
     void SetPalette(const Palette& palette)
     {
-      Palette new_palette(palette); /* duplicate */
-      imImageSetPalette(im_image, new_palette.pal_data, new_palette.pal_count);
-      new_palette.pal_data = 0;  /* mark as released */
+      imImageSetPalette(im_image, imPaletteDuplicate(palette.GetData(), palette.Count()), palette.Count());
     }
     Palette GetPalette()
     {
-      Palette ref_palette(im_image->palette, im_image->palette_count);  /* reference */
-      Palette new_palette(ref_palette);  /* duplicate */
-      ref_palette.pal_data = 0;  /* mark as released */
-      return new_palette;
+      return Palette(imPaletteDuplicate(im_image->palette, im_image->palette_count), im_image->palette_count);
     }
 
 
@@ -869,14 +853,14 @@ namespace im
     }
     int SaveImage(const Image& im_image)
     {
-      return imFileSaveImage(im_file, im_image.im_image);
+      return imFileSaveImage(im_file, im_image.GetHandle());
     }
     void LoadFrame(int index, Image& im_image, int &error, bool as_bitmap)
     {
       if (as_bitmap)
-        imFileLoadBitmapFrame(im_file, index, im_image.im_image, &error);
+        imFileLoadBitmapFrame(im_file, index, im_image.GetHandle(), &error);
       else
-        imFileLoadImageFrame(im_file, index, im_image.im_image, &error);
+        imFileLoadImageFrame(im_file, index, im_image.GetHandle(), &error);
     }
   };
 
@@ -905,85 +889,77 @@ namespace im
   /********************************************************************/
 
 
-  class FormatList
+  namespace Format
   {
-    /* forbidden */
-    FormatList(const FormatList&) {}
-
-  public:
-    FormatList()
+    inline void RegisterInternal()
     {
       imFormatRegisterInternal();
     }
-    ~FormatList()
+    inline void RemoveAll()
     {
       imFormatRemoveAll();
     }
 
-    static void GetList(char** format_list, int &format_count)
+    inline void List(char** format_list, int &format_count)
     {
       imFormatList(format_list, &format_count);
     }
 
-    static int FormatInfo(const char* format, char* desc, char* ext, int &can_sequence)
+    inline int Info(const char* format, char* desc, char* ext, int &can_sequence)
     {
       return imFormatInfo(format, desc, ext, &can_sequence);
     }
-    static int FormatInfoExtra(const char* format, char* extra)
+    inline int InfoExtra(const char* format, char* extra)
     {
       return imFormatInfoExtra(format, extra);
     }
-    static int FormatGetCompressions(const char* format, char** comp, int &comp_count, int color_mode, int data_type)
+    inline int Compressions(const char* format, char** comp, int &comp_count, int color_mode, int data_type)
     {
       return imFormatCompressions(format, comp, &comp_count, color_mode, data_type);
     }
-    static int FormatCanWriteImage(const char* format, const char* compression, int color_mode, int data_type)
+    inline int CanWriteImage(const char* format, const char* compression, int color_mode, int data_type)
     {
       return imFormatCanWriteImage(format, compression, color_mode, data_type);
     }
-  };
+  }
 
 
   /********************************************************************/
 
 
-  class VideoCaptureDeviceList
+  namespace VideoCaptureDevice
   {
-    /* forbidden */
-    VideoCaptureDeviceList(const VideoCaptureDeviceList&) {}
-
-  public:
-    VideoCaptureDeviceList()
+    void ReloadList()
     {
       imVideoCaptureReloadDevices();
     }
-    ~VideoCaptureDeviceList()
+    void ReleaseList()
     {
       imVideoCaptureReleaseDevices();
     }
 
-    static int Count() 
+    inline int Count() 
     {
       return imVideoCaptureDeviceCount();
     }
 
-    static const char* DeviceDescription(int device) 
+    inline const char* DeviceDescription(int device) 
     {
       return imVideoCaptureDeviceDesc(device);
     }
-    static const char* DeviceExtendedDescription(int device) 
+    inline const char* DeviceExtendedDescription(int device) 
     {
       return imVideoCaptureDeviceExDesc(device);
     }
-    static const char* DevicePath(int device) 
+    inline const char* DevicePath(int device) 
     {
       return imVideoCaptureDevicePath(device);
     }
-    static const char* DeviceVendorInfo(int device) 
+    inline const char* DeviceVendorInfo(int device) 
     {
       return imVideoCaptureDeviceVendorInfo(device);
     }
-  };
+  }
 
 
   /********************************************************************/
@@ -991,11 +967,10 @@ namespace im
 
   class VideoCapture
   {
+    imVideoCapture* im_vc;
+
     /* forbidden */
     VideoCapture(const VideoCapture&) {}
-
-  protected:
-    imVideoCapture* im_vc;
 
   public:
     VideoCapture()
@@ -1095,21 +1070,25 @@ namespace im
     }
     bool CaptureFrame(Image& dst_image, int timeout = -1)
     {
-      if (dst_image.im_image->color_space != IM_GRAY && 
-          dst_image.im_image->color_space != IM_RGB &&
-          dst_image.im_image->data_type != IM_BYTE)
+      imImage* image = dst_image.GetHandle();
+
+      if (image->color_space != IM_GRAY && 
+          image->color_space != IM_RGB &&
+          image->data_type != IM_BYTE)
         return false;
 
-      return imVideoCaptureFrame(im_vc, (unsigned char*)dst_image.im_image->data[0], dst_image.im_image->color_space, timeout) != 0;
+      return imVideoCaptureFrame(im_vc, (unsigned char*)image->data[0], image->color_space, timeout) != 0;
     }
     bool CaptureOneFrame(Image& dst_image)
     {
-      if (dst_image.im_image->color_space != IM_GRAY &&
-          dst_image.im_image->color_space != IM_RGB &&
-          dst_image.im_image->data_type != IM_BYTE)
+      imImage* image = dst_image.GetHandle();
+
+      if (image->color_space != IM_GRAY &&
+          image->color_space != IM_RGB &&
+          image->data_type != IM_BYTE)
         return false;
 
-      return imVideoCaptureOneFrame(im_vc, (unsigned char*)dst_image.im_image->data[0], dst_image.im_image->color_space) != 0;
+      return imVideoCaptureOneFrame(im_vc, (unsigned char*)image->data[0], image->color_space) != 0;
     }
 
 
@@ -1136,741 +1115,737 @@ namespace im
   /********************************************************************/
 
 
-  class Kernel
+  namespace Kernel
   {
-  public:
     /* pre-defined kernels */
-    static Image Sobel()
+    inline Image Sobel()
     {
       return Image(imKernelSobel());
     }
-    static Image Prewitt()
+    inline Image Prewitt()
     {
       return Image(imKernelPrewitt());
     }
-    static Image Kirsh()
+    inline Image Kirsh()
     {
       return Image(imKernelKirsh());
     }
-    static Image Laplacian4()
+    inline Image Laplacian4()
     {
       return Image(imKernelLaplacian4());
     }
-    static Image Laplacian8()
+    inline Image Laplacian8()
     {
       return Image(imKernelLaplacian8());
     }
-    static Image Laplacian5x5()
+    inline Image Laplacian5x5()
     {
       return Image(imKernelLaplacian5x5());
     }
-    static Image Laplacian7x7()
+    inline Image Laplacian7x7()
     {
       return Image(imKernelLaplacian7x7());
     }
-    static Image Gradian3x3()
+    inline Image Gradian3x3()
     {
       return Image(imKernelGradian3x3());
     }
-    static Image Gradian7x7()
+    inline Image Gradian7x7()
     {
       return Image(imKernelGradian7x7());
     }
-    static Image Sculpt()
+    inline Image Sculpt()
     {
       return Image(imKernelSculpt());
     }
-    static Image Mean3x3()
+    inline Image Mean3x3()
     {
       return Image(imKernelMean3x3());
     }
-    static Image Mean5x5()
+    inline Image Mean5x5()
     {
       return Image(imKernelMean5x5());
     }
-    static Image CircularMean5x5()
+    inline Image CircularMean5x5()
     {
       return Image(imKernelCircularMean5x5());
     }
-    static Image Mean7x7()
+    inline Image Mean7x7()
     {
       return Image(imKernelMean7x7());
     }
-    static Image CircularMean7x7()
+    inline Image CircularMean7x7()
     {
       return Image(imKernelCircularMean7x7());
     }
-    static Image Gaussian3x3()
+    inline Image Gaussian3x3()
     {
       return Image(imKernelGaussian3x3());
     }
-    static Image Gaussian5x5()
+    inline Image Gaussian5x5()
     {
       return Image(imKernelGaussian5x5());
     }
-    static Image Barlett5x5()
+    inline Image Barlett5x5()
     {
       return Image(imKernelBarlett5x5());
     }
-    static Image TopHat5x5()
+    inline Image TopHat5x5()
     {
       return Image(imKernelTopHat5x5());
     }
-    static Image TopHat7x7()
+    inline Image TopHat7x7()
     {
       return Image(imKernelTopHat7x7());
     }
-    static Image Enhance()
+    inline Image Enhance()
     {
       return Image(imKernelEnhance());
     }
-  };
+  }
 
 
-  class Process
+  namespace Process
   {
-  public:
-
-    static int GaussianStdDev2KernelSize(float stddev)
+    inline int GaussianStdDev2KernelSize(float stddev)
     {
       return imGaussianStdDev2KernelSize(stddev);
     }
-    static float GaussianKernelSize2StdDev(int kernel_size)
+    inline float GaussianKernelSize2StdDev(int kernel_size)
     {
       return imGaussianKernelSize2StdDev(kernel_size);
     }
-    static void CalcRotateSize(int width, int height, int &new_width, int &new_height, double cos0, double sin0)
+    inline void CalcRotateSize(int width, int height, int &new_width, int &new_height, double cos0, double sin0)
     {
       imProcessCalcRotateSize(width, height, &new_width, &new_height, cos0, sin0);
     }
-    static int OpenMPSetMinCount(int min_count)
+    inline int OpenMPSetMinCount(int min_count)
     {
       return imProcessOpenMPSetMinCount(min_count);
     }
-    static int OpenMPSetNumThreads(int thread_count)
+    inline int OpenMPSetNumThreads(int thread_count)
     {
       return imProcessOpenMPSetNumThreads(thread_count);
     }
 
-    static int HoughLines(const Image& src_image, Image& dst_image)
+    inline int HoughLines(const Image& src_image, Image& dst_image)
     {
-      return imProcessHoughLines(src_image.im_image, dst_image.im_image);
+      return imProcessHoughLines(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int HoughLinesDraw(const Image& src_image, const Image& hough, const Image& hough_points, Image& dst_image)
+    inline int HoughLinesDraw(const Image& src_image, const Image& hough, const Image& hough_points, Image& dst_image)
     {
-      return imProcessHoughLinesDraw(src_image.im_image, hough.im_image, hough_points.im_image, dst_image.im_image);
+      return imProcessHoughLinesDraw(src_image.GetHandle(), hough.GetHandle(), hough_points.GetHandle(), dst_image.GetHandle());
     }
-    static void CrossCorrelation(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    inline void CrossCorrelation(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
-      imProcessCrossCorrelation(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+      imProcessCrossCorrelation(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle());
     }
-    static void AutoCorrelation(const Image& src_image, Image& dst_image)
+    inline void AutoCorrelation(const Image& src_image, Image& dst_image)
     {
-      imProcessAutoCorrelation(src_image.im_image, dst_image.im_image);
+      imProcessAutoCorrelation(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void DistanceTransform(const Image& src_image, Image& dst_image)
+    inline void DistanceTransform(const Image& src_image, Image& dst_image)
     {
-      imProcessDistanceTransform(src_image.im_image, dst_image.im_image);
+      imProcessDistanceTransform(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void RegionalMaximum(const Image& src_image, Image& dst_image)
+    inline void RegionalMaximum(const Image& src_image, Image& dst_image)
     {
-      imProcessRegionalMaximum(src_image.im_image, dst_image.im_image);
+      imProcessRegionalMaximum(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void FFT(const Image& src_image, Image& dst_image)
+    inline void FFT(const Image& src_image, Image& dst_image)
     {
-      imProcessFFT(src_image.im_image, dst_image.im_image);
+      imProcessFFT(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void IFFT(const Image& src_image, Image& dst_image)
+    inline void IFFT(const Image& src_image, Image& dst_image)
     {
-      imProcessIFFT(src_image.im_image, dst_image.im_image);
+      imProcessIFFT(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name)
+    inline int UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name)
     {
-      return imProcessUnaryPointOp(src_image.im_image, dst_image.im_image, func, params, userdata, op_name);
+      return imProcessUnaryPointOp(src_image.GetHandle(), dst_image.GetHandle(), func, params, userdata, op_name);
     }
-    static int UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+    inline int UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
     {
-      return imProcessUnaryPointColorOp(src_image.im_image, dst_image.im_image, func, params, userdata, op_name);
+      return imProcessUnaryPointColorOp(src_image.GetHandle(), dst_image.GetHandle(), func, params, userdata, op_name);
     }
-    static int MultiPointOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
+    inline int MultiPointOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
     {
       imImage** c_src_image_list = new imImage*[src_image_count];
-      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
-      int ret = imProcessMultiPointOp((const imImage**)c_src_image_list, src_image_count, dst_image.im_image, func, params, userdata, op_name);
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
+      int ret = imProcessMultiPointOp((const imImage**)c_src_image_list, src_image_count, dst_image.GetHandle(), func, params, userdata, op_name);
       delete[] c_src_image_list;
       return ret;
     }
-    static int MultiPointColorOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+    inline int MultiPointColorOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
     {
       imImage** c_src_image_list = new imImage*[src_image_count];
-      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
-      int ret = imProcessMultiPointColorOp((const imImage**)c_src_image_list, src_image_count, dst_image.im_image, func, params, userdata, op_name);
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
+      int ret = imProcessMultiPointColorOp((const imImage**)c_src_image_list, src_image_count, dst_image.GetHandle(), func, params, userdata, op_name);
       delete[] c_src_image_list;
       return ret;
     }
-    static void UnArithmeticOp(const Image& src_image, Image& dst_image, int op)
+    inline void UnArithmeticOp(const Image& src_image, Image& dst_image, int op)
     {
-      imProcessUnArithmeticOp(src_image.im_image, dst_image.im_image, op);
+      imProcessUnArithmeticOp(src_image.GetHandle(), dst_image.GetHandle(), op);
     }
-    static void ArithmeticOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
+    inline void ArithmeticOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
     {
-      imProcessArithmeticOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
+      imProcessArithmeticOp(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), op);
     }
-    static void ArithmeticConstOp(const Image& src_image, float src_const, Image& dst_image, int op)
+    inline void ArithmeticConstOp(const Image& src_image, float src_const, Image& dst_image, int op)
     {
-      imProcessArithmeticConstOp(src_image.im_image, src_const, dst_image.im_image, op);
+      imProcessArithmeticConstOp(src_image.GetHandle(), src_const, dst_image.GetHandle(), op);
     }
-    static void BlendConst(const Image& src_image1, const Image& src_image2, Image& dst_image, float alpha)
+    inline void BlendConst(const Image& src_image1, const Image& src_image2, Image& dst_image, float alpha)
     {
-      imProcessBlendConst(src_image1.im_image, src_image2.im_image, dst_image.im_image, alpha);
+      imProcessBlendConst(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), alpha);
     }
-    static void Blend(const Image& src_image1, const Image& src_image2, const Image& alpha_image, Image& dst_image)
+    inline void Blend(const Image& src_image1, const Image& src_image2, const Image& alpha_image, Image& dst_image)
     {
-      imProcessBlend(src_image1.im_image, src_image2.im_image, alpha_image.im_image, dst_image.im_image);
+      imProcessBlend(src_image1.GetHandle(), src_image2.GetHandle(), alpha_image.GetHandle(), dst_image.GetHandle());
     }
-    static void Compose(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    inline void Compose(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
-      imProcessCompose(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+      imProcessCompose(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle());
     }
-    static void SplitComplex(const Image& src_image, Image& dst_image1, Image& dst_image2, int polar)
+    inline void SplitComplex(const Image& src_image, Image& dst_image1, Image& dst_image2, int polar)
     {
-      imProcessSplitComplex(src_image.im_image, dst_image1.im_image, dst_image2.im_image, polar);
+      imProcessSplitComplex(src_image.GetHandle(), dst_image1.GetHandle(), dst_image2.GetHandle(), polar);
     }
-    static void MergeComplex(const Image& src_image1, const Image& src_image2, Image& dst_image, int polar)
+    inline void MergeComplex(const Image& src_image1, const Image& src_image2, Image& dst_image, int polar)
     {
-      imProcessMergeComplex(src_image1.im_image, src_image2.im_image, dst_image.im_image, polar);
+      imProcessMergeComplex(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), polar);
     }
-    static void MultipleMean(const Image *src_image_list, int src_image_count, Image& dst_image)
-    {
-      imImage** c_src_image_list = new imImage*[src_image_count];
-      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
-      imProcessMultipleMean((const imImage**)c_src_image_list, src_image_count, dst_image.im_image);
-      delete[] c_src_image_list;
-    }
-    static void MultipleStdDev(const Image *src_image_list, int src_image_count, const Image& mean_image, Image& dst_image)
+    inline void MultipleMean(const Image *src_image_list, int src_image_count, Image& dst_image)
     {
       imImage** c_src_image_list = new imImage*[src_image_count];
-      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
-      imProcessMultipleStdDev((const imImage**)c_src_image_list, src_image_count, mean_image.im_image, dst_image.im_image);
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
+      imProcessMultipleMean((const imImage**)c_src_image_list, src_image_count, dst_image.GetHandle());
       delete[] c_src_image_list;
     }
-    static int MultipleMedian(const Image *src_image_list, int src_image_count, Image& dst_image)
+    inline void MultipleStdDev(const Image *src_image_list, int src_image_count, const Image& mean_image, Image& dst_image)
     {
       imImage** c_src_image_list = new imImage*[src_image_count];
-      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].im_image;
-      return imProcessMultipleMedian((const imImage**)c_src_image_list, src_image_count, dst_image.im_image);
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
+      imProcessMultipleStdDev((const imImage**)c_src_image_list, src_image_count, mean_image.GetHandle(), dst_image.GetHandle());
       delete[] c_src_image_list;
     }
-    static int AutoCovariance(const Image& src_image, const Image& mean_image, Image& dst_image)
+    inline int MultipleMedian(const Image *src_image_list, int src_image_count, Image& dst_image)
     {
-      return imProcessAutoCovariance(src_image.im_image, mean_image.im_image, dst_image.im_image);
+      imImage** c_src_image_list = new imImage*[src_image_count];
+      for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
+      return imProcessMultipleMedian((const imImage**)c_src_image_list, src_image_count, dst_image.GetHandle());
+      delete[] c_src_image_list;
     }
-    static void MultiplyConj(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    inline int AutoCovariance(const Image& src_image, const Image& mean_image, Image& dst_image)
     {
-      imProcessMultiplyConj(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+      return imProcessAutoCovariance(src_image.GetHandle(), mean_image.GetHandle(), dst_image.GetHandle());
     }
-    static void QuantizeRGBUniform(const Image& src_image, Image& dst_image, int do_dither)
+    inline void MultiplyConj(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
-      imProcessQuantizeRGBUniform(src_image.im_image, dst_image.im_image, do_dither);
+      imProcessMultiplyConj(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle());
     }
-    static void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays)
+    inline void QuantizeRGBUniform(const Image& src_image, Image& dst_image, int do_dither)
     {
-      imProcessQuantizeGrayUniform(src_image.im_image, dst_image.im_image, grays);
+      imProcessQuantizeRGBUniform(src_image.GetHandle(), dst_image.GetHandle(), do_dither);
     }
-    static void ExpandHistogram(const Image& src_image, Image& dst_image, float percent)
+    inline void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays)
     {
-      imProcessExpandHistogram(src_image.im_image, dst_image.im_image, percent);
+      imProcessQuantizeGrayUniform(src_image.GetHandle(), dst_image.GetHandle(), grays);
     }
-    static void EqualizeHistogram(const Image& src_image, Image& dst_image)
+    inline void ExpandHistogram(const Image& src_image, Image& dst_image, float percent)
     {
-      imProcessEqualizeHistogram(src_image.im_image, dst_image.im_image);
+      imProcessExpandHistogram(src_image.GetHandle(), dst_image.GetHandle(), percent);
     }
-    static void SplitYChroma(const Image& src_image, Image& y_image, Image& chroma_image)
+    inline void EqualizeHistogram(const Image& src_image, Image& dst_image)
     {
-      imProcessSplitYChroma(src_image.im_image, y_image.im_image, chroma_image.im_image);
+      imProcessEqualizeHistogram(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void SplitHSI(const Image& src_image, Image& h_image, Image& s_image, Image& i_image)
+    inline void SplitYChroma(const Image& src_image, Image& y_image, Image& chroma_image)
     {
-      imProcessSplitHSI(src_image.im_image, h_image.im_image, s_image.im_image, i_image.im_image);
+      imProcessSplitYChroma(src_image.GetHandle(), y_image.GetHandle(), chroma_image.GetHandle());
     }
-    static void MergeHSI(const Image& h_image, const Image& s_image, const Image& i_image, Image& dst_image)
+    inline void SplitHSI(const Image& src_image, Image& h_image, Image& s_image, Image& i_image)
     {
-      imProcessMergeHSI(h_image.im_image, s_image.im_image, i_image.im_image, dst_image.im_image);
+      imProcessSplitHSI(src_image.GetHandle(), h_image.GetHandle(), s_image.GetHandle(), i_image.GetHandle());
     }
-    static void SplitComponents(const Image& src_image, Image *dst_image_list)
+    inline void MergeHSI(const Image& h_image, const Image& s_image, const Image& i_image, Image& dst_image)
+    {
+      imProcessMergeHSI(h_image.GetHandle(), s_image.GetHandle(), i_image.GetHandle(), dst_image.GetHandle());
+    }
+    inline void SplitComponents(const Image& src_image, Image *dst_image_list)
     {
       imImage* c_dst_image_list[4];
-      c_dst_image_list[0] = dst_image_list[0].im_image;
-      c_dst_image_list[1] = dst_image_list[1].im_image;
-      c_dst_image_list[2] = dst_image_list[2].im_image;
+      c_dst_image_list[0] = dst_image_list[0].GetHandle();
+      c_dst_image_list[1] = dst_image_list[1].GetHandle();
+      c_dst_image_list[2] = dst_image_list[2].GetHandle();
       if (src_image.Depth() == 4 || src_image.HasAlpha())
-        c_dst_image_list[3] = dst_image_list[3].im_image;
-      imProcessSplitComponents(src_image.im_image, c_dst_image_list);
+        c_dst_image_list[3] = dst_image_list[3].GetHandle();
+      imProcessSplitComponents(src_image.GetHandle(), c_dst_image_list);
     }
-    static void MergeComponents(const Image *src_image_list, Image& dst_image)
+    inline void MergeComponents(const Image *src_image_list, Image& dst_image)
     {
       imImage* c_src_image_list[4];
-      c_src_image_list[0] = src_image_list[0].im_image;
-      c_src_image_list[1] = src_image_list[1].im_image;
-      c_src_image_list[2] = src_image_list[2].im_image;
+      c_src_image_list[0] = src_image_list[0].GetHandle();
+      c_src_image_list[1] = src_image_list[1].GetHandle();
+      c_src_image_list[2] = src_image_list[2].GetHandle();
       if (dst_image.Depth() == 4 || dst_image.HasAlpha())
-        c_src_image_list[3] = src_image_list[3].im_image;
-      imProcessMergeComponents((const imImage**)c_src_image_list, dst_image.im_image);
+        c_src_image_list[3] = src_image_list[3].GetHandle();
+      imProcessMergeComponents((const imImage**)c_src_image_list, dst_image.GetHandle());
     }
-    static void NormalizeComponents(const Image& src_image, Image& dst_image)
+    inline void NormalizeComponents(const Image& src_image, Image& dst_image)
     {
-      imProcessNormalizeComponents(src_image.im_image, dst_image.im_image);
+      imProcessNormalizeComponents(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void ReplaceColor(const Image& src_image, Image& dst_image, float* src_color, float* dst_color)
+    inline void ReplaceColor(const Image& src_image, Image& dst_image, float* src_color, float* dst_color)
     {
-      imProcessReplaceColor(src_image.im_image, dst_image.im_image, src_color, dst_color);
+      imProcessReplaceColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, dst_color);
     }
-    static void SetAlphaColor(const Image& src_image, Image& dst_image, float* src_color, float dst_alpha)
+    inline void SetAlphaColor(const Image& src_image, Image& dst_image, float* src_color, float dst_alpha)
     {
-      imProcessSetAlphaColor(src_image.im_image, dst_image.im_image, src_color, dst_alpha);
+      imProcessSetAlphaColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, dst_alpha);
     }
-    static void BitwiseOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
+    inline void BitwiseOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op)
     {
-      imProcessBitwiseOp(src_image1.im_image, src_image2.im_image, dst_image.im_image, op);
+      imProcessBitwiseOp(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), op);
     }
-    static void BitwiseNot(const Image& src_image, Image& dst_image)
+    inline void BitwiseNot(const Image& src_image, Image& dst_image)
     {
-      imProcessBitwiseNot(src_image.im_image, dst_image.im_image);
+      imProcessBitwiseNot(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void BitMask(const Image& src_image, Image& dst_image, unsigned char mask, int op)
+    inline void BitMask(const Image& src_image, Image& dst_image, unsigned char mask, int op)
     {
-      imProcessBitMask(src_image.im_image, dst_image.im_image, mask, op);
+      imProcessBitMask(src_image.GetHandle(), dst_image.GetHandle(), mask, op);
     }
-    static void BitPlane(const Image& src_image, Image& dst_image, int plane, int do_reset)
+    inline void BitPlane(const Image& src_image, Image& dst_image, int plane, int do_reset)
     {
-      imProcessBitPlane(src_image.im_image, dst_image.im_image, plane, do_reset);
+      imProcessBitPlane(src_image.GetHandle(), dst_image.GetHandle(), plane, do_reset);
     }
-    static int RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, float percent)
+    inline int RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, float percent)
     {
-      return imProcessRenderAddSpeckleNoise(src_image.im_image, dst_image.im_image, percent);
+      return imProcessRenderAddSpeckleNoise(src_image.GetHandle(), dst_image.GetHandle(), percent);
     }
-    static int RenderAddGaussianNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
+    inline int RenderAddGaussianNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
     {
-      return imProcessRenderAddGaussianNoise(src_image.im_image, dst_image.im_image, mean, stddev);
+      return imProcessRenderAddGaussianNoise(src_image.GetHandle(), dst_image.GetHandle(), mean, stddev);
     }
-    static int RenderAddUniformNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
+    inline int RenderAddUniformNoise(const Image& src_image, Image& dst_image, float mean, float stddev)
     {
-      return imProcessRenderAddUniformNoise(src_image.im_image, dst_image.im_image, mean, stddev);
+      return imProcessRenderAddUniformNoise(src_image.GetHandle(), dst_image.GetHandle(), mean, stddev);
     }
-    static void ToneGamut(const Image& src_image, Image& dst_image, int op, float* params)
+    inline void ToneGamut(const Image& src_image, Image& dst_image, int op, float* params)
     {
-      imProcessToneGamut(src_image.im_image, dst_image.im_image, op, params);
+      imProcessToneGamut(src_image.GetHandle(), dst_image.GetHandle(), op, params);
     }
-    static void UnNormalize(const Image& src_image, Image& dst_image)
+    inline void UnNormalize(const Image& src_image, Image& dst_image)
     {
-      imProcessUnNormalize(src_image.im_image, dst_image.im_image);
+      imProcessUnNormalize(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void DirectConv(const Image& src_image, Image& dst_image)
+    inline void DirectConv(const Image& src_image, Image& dst_image)
     {
-      imProcessDirectConv(src_image.im_image, dst_image.im_image);
+      imProcessDirectConv(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void Negative(const Image& src_image, Image& dst_image)
+    inline void Negative(const Image& src_image, Image& dst_image)
     {
-      imProcessNegative(src_image.im_image, dst_image.im_image);
+      imProcessNegative(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static float CalcAutoGamma(const Image& image)
+    inline float CalcAutoGamma(const Image& image)
     {
-      return imProcessCalcAutoGamma(image.im_image);
+      return imProcessCalcAutoGamma(image.GetHandle());
     }
-    static void ShiftHSI(const Image& src_image, Image& dst_image, float h_shift, float s_shift, float i_shift)
+    inline void ShiftHSI(const Image& src_image, Image& dst_image, float h_shift, float s_shift, float i_shift)
     {
-      imProcessShiftHSI(src_image.im_image, dst_image.im_image, h_shift, s_shift, i_shift);
+      imProcessShiftHSI(src_image.GetHandle(), dst_image.GetHandle(), h_shift, s_shift, i_shift);
     }
-    static void Threshold(const Image& src_image, Image& dst_image, float level, int value)
+    inline void Threshold(const Image& src_image, Image& dst_image, float level, int value)
     {
-      imProcessThreshold(src_image.im_image, dst_image.im_image, level, value);
+      imProcessThreshold(src_image.GetHandle(), dst_image.GetHandle(), level, value);
     }
-    static void ThresholdByDiff(const Image& src_image1, const Image& src_image2, Image& dst_image)
+    inline void ThresholdByDiff(const Image& src_image1, const Image& src_image2, Image& dst_image)
     {
-      imProcessThresholdByDiff(src_image1.im_image, src_image2.im_image, dst_image.im_image);
+      imProcessThresholdByDiff(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle());
     }
-    static void HysteresisThreshold(const Image& src_image, Image& dst_image, int low_thres, int high_thres)
+    inline void HysteresisThreshold(const Image& src_image, Image& dst_image, int low_thres, int high_thres)
     {
-      imProcessHysteresisThreshold(src_image.im_image, dst_image.im_image, low_thres, high_thres);
+      imProcessHysteresisThreshold(src_image.GetHandle(), dst_image.GetHandle(), low_thres, high_thres);
     }
-    static void HysteresisThresEstimate(const Image& image, int &low_level, int &high_level)
+    inline void HysteresisThresEstimate(const Image& image, int &low_level, int &high_level)
     {
-      imProcessHysteresisThresEstimate(image.im_image, &low_level, &high_level);
+      imProcessHysteresisThresEstimate(image.GetHandle(), &low_level, &high_level);
     }
-    static int UniformErrThreshold(const Image& src_image, Image& dst_image)
+    inline int UniformErrThreshold(const Image& src_image, Image& dst_image)
     {
-      return imProcessUniformErrThreshold(src_image.im_image, dst_image.im_image);
+      return imProcessUniformErrThreshold(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void DifusionErrThreshold(const Image& src_image, Image& dst_image, int level)
+    inline void DifusionErrThreshold(const Image& src_image, Image& dst_image, int level)
     {
-      imProcessDifusionErrThreshold(src_image.im_image, dst_image.im_image, level);
+      imProcessDifusionErrThreshold(src_image.GetHandle(), dst_image.GetHandle(), level);
     }
-    static int PercentThreshold(const Image& src_image, Image& dst_image, float percent)
+    inline int PercentThreshold(const Image& src_image, Image& dst_image, float percent)
     {
-      return imProcessPercentThreshold(src_image.im_image, dst_image.im_image, percent);
+      return imProcessPercentThreshold(src_image.GetHandle(), dst_image.GetHandle(), percent);
     }
-    static int OtsuThreshold(const Image& src_image, Image& dst_image)
+    inline int OtsuThreshold(const Image& src_image, Image& dst_image)
     {
-      return imProcessOtsuThreshold(src_image.im_image, dst_image.im_image);
+      return imProcessOtsuThreshold(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static float MinMaxThreshold(const Image& src_image, Image& dst_image)
+    inline float MinMaxThreshold(const Image& src_image, Image& dst_image)
     {
-      return imProcessMinMaxThreshold(src_image.im_image, dst_image.im_image);
+      return imProcessMinMaxThreshold(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void LocalMaxThresEstimate(const Image& image, int &level)
+    inline void LocalMaxThresEstimate(const Image& image, int &level)
     {
-      imProcessLocalMaxThresEstimate(image.im_image, &level);
+      imProcessLocalMaxThresEstimate(image.GetHandle(), &level);
     }
-    static void SliceThreshold(const Image& src_image, Image& dst_image, float start_level, float end_level)
+    inline void SliceThreshold(const Image& src_image, Image& dst_image, float start_level, float end_level)
     {
-      imProcessSliceThreshold(src_image.im_image, dst_image.im_image, start_level, end_level);
+      imProcessSliceThreshold(src_image.GetHandle(), dst_image.GetHandle(), start_level, end_level);
     }
-    static void Pixelate(const Image& src_image, Image& dst_image, int box_size)
+    inline void Pixelate(const Image& src_image, Image& dst_image, int box_size)
     {
-      imProcessPixelate(src_image.im_image, dst_image.im_image, box_size);
+      imProcessPixelate(src_image.GetHandle(), dst_image.GetHandle(), box_size);
     }
-    static void Posterize(const Image& src_image, Image& dst_image, int level)
+    inline void Posterize(const Image& src_image, Image& dst_image, int level)
     {
-      imProcessPosterize(src_image.im_image, dst_image.im_image, level);
+      imProcessPosterize(src_image.GetHandle(), dst_image.GetHandle(), level);
     }
-    static void NormDiffRatio(const Image& image1, const Image& image2, Image& dst_image)
+    inline void NormDiffRatio(const Image& image1, const Image& image2, Image& dst_image)
     {
-      imProcessNormDiffRatio(image1.im_image, image2.im_image, dst_image.im_image);
+      imProcessNormDiffRatio(image1.GetHandle(), image2.GetHandle(), dst_image.GetHandle());
     }
-    static void AbnormalHyperionCorrection(const Image& src_image, Image& dst_image, int threshold_consecutive, int threshold_percent, Image& image_abnormal)
+    inline void AbnormalHyperionCorrection(const Image& src_image, Image& dst_image, int threshold_consecutive, int threshold_percent, Image& image_abnormal)
     {
-      imProcessAbnormalHyperionCorrection(src_image.im_image, dst_image.im_image, threshold_consecutive, threshold_percent, image_abnormal.im_image);
+      imProcessAbnormalHyperionCorrection(src_image.GetHandle(), dst_image.GetHandle(), threshold_consecutive, threshold_percent, image_abnormal.GetHandle());
     }
-    static int ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+    inline int ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
     {
-      return imProcessConvertDataType(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
+      return imProcessConvertDataType(src_image.GetHandle(), dst_image.GetHandle(), cpx2real, gamma, absolute, cast_mode);
     }
-    static int ConvertColorSpace(const Image& src_image, Image& dst_image)
+    inline int ConvertColorSpace(const Image& src_image, Image& dst_image)
     {
-      return imProcessConvertColorSpace(src_image.im_image, dst_image.im_image);
+      return imProcessConvertColorSpace(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+    inline int ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
     {
-      return imProcessConvertToBitmap(src_image.im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode);
+      return imProcessConvertToBitmap(src_image.GetHandle(), dst_image.GetHandle(), cpx2real, gamma, absolute, cast_mode);
     }
-    static int Reduce(const Image& src_image, Image& dst_image, int order)
+    inline int Reduce(const Image& src_image, Image& dst_image, int order)
     {
-      return imProcessReduce(src_image.im_image, dst_image.im_image, order);
+      return imProcessReduce(src_image.GetHandle(), dst_image.GetHandle(), order);
     }
-    static int Resize(const Image& src_image, Image& dst_image, int order)
+    inline int Resize(const Image& src_image, Image& dst_image, int order)
     {
-      return imProcessResize(src_image.im_image, dst_image.im_image, order);
+      return imProcessResize(src_image.GetHandle(), dst_image.GetHandle(), order);
     }
-    static void ReduceBy4(const Image& src_image, Image& dst_image)
+    inline void ReduceBy4(const Image& src_image, Image& dst_image)
     {
-      imProcessReduceBy4(src_image.im_image, dst_image.im_image);
+      imProcessReduceBy4(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void Crop(const Image& src_image, Image& dst_image, int xmin, int ymin)
+    inline void Crop(const Image& src_image, Image& dst_image, int xmin, int ymin)
     {
-      imProcessCrop(src_image.im_image, dst_image.im_image, xmin, ymin);
+      imProcessCrop(src_image.GetHandle(), dst_image.GetHandle(), xmin, ymin);
     }
-    static void Insert(const Image& src_image, const Image& region_image, Image& dst_image, int xmin, int ymin)
+    inline void Insert(const Image& src_image, const Image& region_image, Image& dst_image, int xmin, int ymin)
     {
-      imProcessInsert(src_image.im_image, region_image.im_image, dst_image.im_image, xmin, ymin);
+      imProcessInsert(src_image.GetHandle(), region_image.GetHandle(), dst_image.GetHandle(), xmin, ymin);
     }
-    static void AddMargins(const Image& src_image, Image& dst_image, int xmin, int ymin)
+    inline void AddMargins(const Image& src_image, Image& dst_image, int xmin, int ymin)
     {
-      imProcessAddMargins(src_image.im_image, dst_image.im_image, xmin, ymin);
+      imProcessAddMargins(src_image.GetHandle(), dst_image.GetHandle(), xmin, ymin);
     }
-    static int Rotate(const Image& src_image, Image& dst_image, double cos0, double sin0, int order)
+    inline int Rotate(const Image& src_image, Image& dst_image, double cos0, double sin0, int order)
     {
-      return imProcessRotate(src_image.im_image, dst_image.im_image, cos0, sin0, order);
+      return imProcessRotate(src_image.GetHandle(), dst_image.GetHandle(), cos0, sin0, order);
     }
-    static int RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order)
+    inline int RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order)
     {
-      return imProcessRotateRef(src_image.im_image, dst_image.im_image, cos0, sin0, x, y, to_origin, order);
+      return imProcessRotateRef(src_image.GetHandle(), dst_image.GetHandle(), cos0, sin0, x, y, to_origin, order);
     }
-    static void Rotate90(const Image& src_image, Image& dst_image, int dir_clockwise)
+    inline void Rotate90(const Image& src_image, Image& dst_image, int dir_clockwise)
     {
-      imProcessRotate90(src_image.im_image, dst_image.im_image, dir_clockwise);
+      imProcessRotate90(src_image.GetHandle(), dst_image.GetHandle(), dir_clockwise);
     }
-    static void Rotate180(const Image& src_image, Image& dst_image)
+    inline void Rotate180(const Image& src_image, Image& dst_image)
     {
-      imProcessRotate180(src_image.im_image, dst_image.im_image);
+      imProcessRotate180(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void Mirror(const Image& src_image, Image& dst_image)
+    inline void Mirror(const Image& src_image, Image& dst_image)
     {
-      imProcessMirror(src_image.im_image, dst_image.im_image);
+      imProcessMirror(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void Flip(const Image& src_image, Image& dst_image)
+    inline void Flip(const Image& src_image, Image& dst_image)
     {
-      imProcessFlip(src_image.im_image, dst_image.im_image);
+      imProcessFlip(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int Radial(const Image& src_image, Image& dst_image, float k1, int order)
+    inline int Radial(const Image& src_image, Image& dst_image, float k1, int order)
     {
-      return imProcessRadial(src_image.im_image, dst_image.im_image, k1, order);
+      return imProcessRadial(src_image.GetHandle(), dst_image.GetHandle(), k1, order);
     }
-    static int Swirl(const Image& src_image, Image& dst_image, float k1, int order)
+    inline int Swirl(const Image& src_image, Image& dst_image, float k1, int order)
     {
-      return imProcessSwirl(src_image.im_image, dst_image.im_image, k1, order);
+      return imProcessSwirl(src_image.GetHandle(), dst_image.GetHandle(), k1, order);
     }
-    static void InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2)
+    inline void InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2)
     {
-      imProcessInterlaceSplit(src_image.im_image, dst_image1.im_image, dst_image2.im_image);
+      imProcessInterlaceSplit(src_image.GetHandle(), dst_image1.GetHandle(), dst_image2.GetHandle());
     }
-    static int GrayMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int ismax)
+    inline int GrayMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int ismax)
     {
-      return imProcessGrayMorphConvolve(src_image.im_image, dst_image.im_image, kernel.im_image, ismax);
+      return imProcessGrayMorphConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle(), ismax);
     }
-    static int GrayMorphErode(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphErode(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphErode(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphErode(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GrayMorphDilate(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphDilate(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphDilate(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphDilate(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GrayMorphOpen(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphOpen(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphOpen(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphOpen(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GrayMorphClose(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphClose(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphClose(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphClose(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GrayMorphTopHat(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphTopHat(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphTopHat(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphTopHat(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GrayMorphWell(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphWell(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphWell(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphWell(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GrayMorphGradient(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int GrayMorphGradient(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessGrayMorphGradient(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessGrayMorphGradient(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int BinMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int hit_white, int iter)
+    inline int BinMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int hit_white, int iter)
     {
-      return imProcessBinMorphConvolve(src_image.im_image, dst_image.im_image, kernel.im_image, hit_white, iter);
+      return imProcessBinMorphConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle(), hit_white, iter);
     }
-    static int BinMorphErode(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    inline int BinMorphErode(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
-      return imProcessBinMorphErode(src_image.im_image, dst_image.im_image, kernel_size, iter);
+      return imProcessBinMorphErode(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter);
     }
-    static int BinMorphDilate(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    inline int BinMorphDilate(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
-      return imProcessBinMorphDilate(src_image.im_image, dst_image.im_image, kernel_size, iter);
+      return imProcessBinMorphDilate(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter);
     }
-    static int BinMorphOpen(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    inline int BinMorphOpen(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
-      return imProcessBinMorphOpen(src_image.im_image, dst_image.im_image, kernel_size, iter);
+      return imProcessBinMorphOpen(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter);
     }
-    static int BinMorphClose(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    inline int BinMorphClose(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
-      return imProcessBinMorphClose(src_image.im_image, dst_image.im_image, kernel_size, iter);
+      return imProcessBinMorphClose(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter);
     }
-    static int BinMorphOutline(const Image& src_image, Image& dst_image, int kernel_size, int iter)
+    inline int BinMorphOutline(const Image& src_image, Image& dst_image, int kernel_size, int iter)
     {
-      return imProcessBinMorphOutline(src_image.im_image, dst_image.im_image, kernel_size, iter);
+      return imProcessBinMorphOutline(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter);
     }
-    static void BinMorphThin(const Image& src_image, Image& dst_image)
+    inline void BinMorphThin(const Image& src_image, Image& dst_image)
     {
-      imProcessBinMorphThin(src_image.im_image, dst_image.im_image);
+      imProcessBinMorphThin(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int MedianConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int MedianConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessMedianConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessMedianConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int RangeConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int RangeConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessRangeConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessRangeConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int RankClosestConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int RankClosestConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessRankClosestConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessRankClosestConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int RankMaxConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int RankMaxConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessRankMaxConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessRankMaxConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int RankMinConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int RankMinConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessRankMinConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessRankMinConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int RangeContrastThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_range)
+    inline int RangeContrastThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_range)
     {
-      return imProcessRangeContrastThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_range);
+      return imProcessRangeContrastThreshold(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, min_range);
     }
-    static int LocalMaxThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_level)
+    inline int LocalMaxThreshold(const Image& src_image, Image& dst_image, int kernel_size, int min_level)
     {
-      return imProcessLocalMaxThreshold(src_image.im_image, dst_image.im_image, kernel_size, min_level);
+      return imProcessLocalMaxThreshold(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, min_level);
     }
-    static int Convolve(const Image& src_image, Image& dst_image, const Image& kernel)
+    inline int Convolve(const Image& src_image, Image& dst_image, const Image& kernel)
     {
-      return imProcessConvolve(src_image.im_image, dst_image.im_image, kernel.im_image);
+      return imProcessConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle());
     }
-    static int ConvolveSep(const Image& src_image, Image& dst_image, const Image& kernel)
+    inline int ConvolveSep(const Image& src_image, Image& dst_image, const Image& kernel)
     {
-      return imProcessConvolveSep(src_image.im_image, dst_image.im_image, kernel.im_image);
+      return imProcessConvolveSep(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle());
     }
-    static int ConvolveDual(const Image& src_image, Image& dst_image, const Image& kernel1, const Image& kernel2)
+    inline int ConvolveDual(const Image& src_image, Image& dst_image, const Image& kernel1, const Image& kernel2)
     {
-      return imProcessConvolveDual(src_image.im_image, dst_image.im_image, kernel1.im_image, kernel2.im_image);
+      return imProcessConvolveDual(src_image.GetHandle(), dst_image.GetHandle(), kernel1.GetHandle(), kernel2.GetHandle());
     }
-    static int ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int rep_count)
+    inline int ConvolveRep(const Image& src_image, Image& dst_image, const Image& kernel, int rep_count)
     {
-      return imProcessConvolveRep(src_image.im_image, dst_image.im_image, kernel.im_image, rep_count);
+      return imProcessConvolveRep(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle(), rep_count);
     }
-    static int CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel)
+    inline int CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel)
     {
-      return imProcessCompassConvolve(src_image.im_image, dst_image.im_image, kernel.im_image);
+      return imProcessCompassConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle());
     }
-    static int DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev1, float stddev2)
+    inline int DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev1, float stddev2)
     {
-      return imProcessDiffOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev1, stddev2);
+      return imProcessDiffOfGaussianConvolve(src_image.GetHandle(), dst_image.GetHandle(), stddev1, stddev2);
     }
-    static int LapOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
+    inline int LapOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
     {
-      return imProcessLapOfGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
+      return imProcessLapOfGaussianConvolve(src_image.GetHandle(), dst_image.GetHandle(), stddev);
     }
-    static int MeanConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int MeanConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessMeanConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessMeanConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int GaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
+    inline int GaussianConvolve(const Image& src_image, Image& dst_image, float stddev)
     {
-      return imProcessGaussianConvolve(src_image.im_image, dst_image.im_image, stddev);
+      return imProcessGaussianConvolve(src_image.GetHandle(), dst_image.GetHandle(), stddev);
     }
-    static int BarlettConvolve(const Image& src_image, Image& dst_image, int kernel_size)
+    inline int BarlettConvolve(const Image& src_image, Image& dst_image, int kernel_size)
     {
-      return imProcessBarlettConvolve(src_image.im_image, dst_image.im_image, kernel_size);
+      return imProcessBarlettConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size);
     }
-    static int SobelConvolve(const Image& src_image, Image& dst_image)
+    inline int SobelConvolve(const Image& src_image, Image& dst_image)
     {
-      return imProcessSobelConvolve(src_image.im_image, dst_image.im_image);
+      return imProcessSobelConvolve(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int PrewittConvolve(const Image& src_image, Image& dst_image)
+    inline int PrewittConvolve(const Image& src_image, Image& dst_image)
     {
-      return imProcessPrewittConvolve(src_image.im_image, dst_image.im_image);
+      return imProcessPrewittConvolve(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static int SplineEdgeConvolve(const Image& src_image, Image& dst_image)
+    inline int SplineEdgeConvolve(const Image& src_image, Image& dst_image)
     {
-      return imProcessSplineEdgeConvolve(src_image.im_image, dst_image.im_image);
+      return imProcessSplineEdgeConvolve(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void ZeroCrossing(const Image& src_image, Image& dst_image)
+    inline void ZeroCrossing(const Image& src_image, Image& dst_image)
     {
-      imProcessZeroCrossing(src_image.im_image, dst_image.im_image);
+      imProcessZeroCrossing(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void Canny(const Image& src_image, Image& dst_image, float stddev)
+    inline void Canny(const Image& src_image, Image& dst_image, float stddev)
     {
-      imProcessCanny(src_image.im_image, dst_image.im_image, stddev);
+      imProcessCanny(src_image.GetHandle(), dst_image.GetHandle(), stddev);
     }
-    static int Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold)
+    inline int Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold)
     {
-      return imProcessUnsharp(src_image.im_image, dst_image.im_image, stddev, amount, threshold);
+      return imProcessUnsharp(src_image.GetHandle(), dst_image.GetHandle(), stddev, amount, threshold);
     }
-    static int Sharp(const Image& src_image, Image& dst_image, float amount, float threshold)
+    inline int Sharp(const Image& src_image, Image& dst_image, float amount, float threshold)
     {
-      return imProcessSharp(src_image.im_image, dst_image.im_image, amount, threshold);
+      return imProcessSharp(src_image.GetHandle(), dst_image.GetHandle(), amount, threshold);
     }
-    static int SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold)
+    inline int SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold)
     {
-      return imProcessSharpKernel(src_image.im_image, kernel.im_image, dst_image.im_image, amount, threshold);
+      return imProcessSharpKernel(src_image.GetHandle(), kernel.GetHandle(), dst_image.GetHandle(), amount, threshold);
     }
-    static void PerimeterLine(const Image& src_image, Image& dst_image)
+    inline void PerimeterLine(const Image& src_image, Image& dst_image)
     {
-      imProcessPerimeterLine(src_image.im_image, dst_image.im_image);
+      imProcessPerimeterLine(src_image.GetHandle(), dst_image.GetHandle());
     }
-    static void RemoveByArea(const Image& src_image, Image& dst_image, int connect, int start_size, int end_size, int inside)
+    inline void RemoveByArea(const Image& src_image, Image& dst_image, int connect, int start_size, int end_size, int inside)
     {
-      imProcessRemoveByArea(src_image.im_image, dst_image.im_image, connect, start_size, end_size, inside);
+      imProcessRemoveByArea(src_image.GetHandle(), dst_image.GetHandle(), connect, start_size, end_size, inside);
     }
-    static void FillHoles(const Image& src_image, Image& dst_image, int connect)
+    inline void FillHoles(const Image& src_image, Image& dst_image, int connect)
     {
-      imProcessFillHoles(src_image.im_image, dst_image.im_image, connect);
+      imProcessFillHoles(src_image.GetHandle(), dst_image.GetHandle(), connect);
     }
-    static void RotateKernel(Image& kernel)
+    inline void RotateKernel(Image& kernel)
     {
-      imProcessRotateKernel(kernel.im_image);
+      imProcessRotateKernel(kernel.GetHandle());
     }
-    static void FFTraw(Image& image, int inverse, int center, int normalize)
+    inline void FFTraw(Image& image, int inverse, int center, int normalize)
     {
-      imProcessFFTraw(image.im_image, inverse, center, normalize);
+      imProcessFFTraw(image.GetHandle(), inverse, center, normalize);
     }
-    static void SwapQuadrants(Image& image, int center2origin)
+    inline void SwapQuadrants(Image& image, int center2origin)
     {
-      imProcessSwapQuadrants(image.im_image, center2origin);
+      imProcessSwapQuadrants(image.GetHandle(), center2origin);
     }
 
-    static int RenderOp(Image& image, imRenderFunc render_func, const char* render_name, float* params, int plus)
+    inline int RenderOp(Image& image, imRenderFunc render_func, const char* render_name, float* params, int plus)
     {
-      return imProcessRenderOp(image.im_image, render_func, render_name, params, plus);
+      return imProcessRenderOp(image.GetHandle(), render_func, render_name, params, plus);
     }
-    static int RenderCondOp(Image& image, imRenderCondFunc render_cond_func, const char* render_name, float* params)
+    inline int RenderCondOp(Image& image, imRenderCondFunc render_cond_func, const char* render_name, float* params)
     {
-      return imProcessRenderCondOp(image.im_image, render_cond_func, render_name, params);
+      return imProcessRenderCondOp(image.GetHandle(), render_cond_func, render_name, params);
     }
-    static int RenderRandomNoise(Image& image)
+    inline int RenderRandomNoise(Image& image)
     {
-      return imProcessRenderRandomNoise(image.im_image);
+      return imProcessRenderRandomNoise(image.GetHandle());
     }
-    static int RenderConstant(Image& image, float* value)
+    inline int RenderConstant(Image& image, float* value)
     {
-      return imProcessRenderConstant(image.im_image, value);
+      return imProcessRenderConstant(image.GetHandle(), value);
     }
-    static int RenderWheel(Image& image, int internal_radius, int external_radius)
+    inline int RenderWheel(Image& image, int internal_radius, int external_radius)
     {
-      return imProcessRenderWheel(image.im_image, internal_radius, external_radius);
+      return imProcessRenderWheel(image.GetHandle(), internal_radius, external_radius);
     }
-    static int RenderCone(Image& image, int radius)
+    inline int RenderCone(Image& image, int radius)
     {
-      return imProcessRenderCone(image.im_image, radius);
+      return imProcessRenderCone(image.GetHandle(), radius);
     }
-    static int RenderTent(Image& image, int tent_width, int tent_height)
+    inline int RenderTent(Image& image, int tent_width, int tent_height)
     {
-      return imProcessRenderTent(image.im_image, tent_width, tent_height);
+      return imProcessRenderTent(image.GetHandle(), tent_width, tent_height);
     }
-    static int RenderRamp(Image& image, int start, int end, int vert_dir)
+    inline int RenderRamp(Image& image, int start, int end, int vert_dir)
     {
-      return imProcessRenderRamp(image.im_image, start, end, vert_dir);
+      return imProcessRenderRamp(image.GetHandle(), start, end, vert_dir);
     }
-    static int RenderBox(Image& image, int box_width, int box_height)
+    inline int RenderBox(Image& image, int box_width, int box_height)
     {
-      return imProcessRenderBox(image.im_image, box_width, box_height);
+      return imProcessRenderBox(image.GetHandle(), box_width, box_height);
     }
-    static int RenderSinc(Image& image, float x_period, float y_period)
+    inline int RenderSinc(Image& image, float x_period, float y_period)
     {
-      return imProcessRenderSinc(image.im_image, x_period, y_period);
+      return imProcessRenderSinc(image.GetHandle(), x_period, y_period);
     }
-    static int RenderGaussian(Image& image, float stddev)
+    inline int RenderGaussian(Image& image, float stddev)
     {
-      return imProcessRenderGaussian(image.im_image, stddev);
+      return imProcessRenderGaussian(image.GetHandle(), stddev);
     }
-    static int RenderLapOfGaussian(Image& image, float stddev)
+    inline int RenderLapOfGaussian(Image& image, float stddev)
     {
-      return imProcessRenderLapOfGaussian(image.im_image, stddev);
+      return imProcessRenderLapOfGaussian(image.GetHandle(), stddev);
     }
-    static int RenderCosine(Image& image, float x_period, float y_period)
+    inline int RenderCosine(Image& image, float x_period, float y_period)
     {
-      return imProcessRenderCosine(image.im_image, x_period, y_period);
+      return imProcessRenderCosine(image.GetHandle(), x_period, y_period);
     }
-    static int RenderGrid(Image& image, int x_space, int y_space)
+    inline int RenderGrid(Image& image, int x_space, int y_space)
     {
-      return imProcessRenderGrid(image.im_image, x_space, y_space);
+      return imProcessRenderGrid(image.GetHandle(), x_space, y_space);
     }
-    static int RenderChessboard(Image& image, int x_space, int y_space)
+    inline int RenderChessboard(Image& image, int x_space, int y_space)
     {
-      return imProcessRenderChessboard(image.im_image, x_space, y_space);
+      return imProcessRenderChessboard(image.GetHandle(), x_space, y_space);
     }
-    static int RenderFloodFill(Image& image, int start_x, int start_y, float* replace_color, float tolerance)
+    inline int RenderFloodFill(Image& image, int start_x, int start_y, float* replace_color, float tolerance)
     {
-      imProcessRenderFloodFill(image.im_image, start_x, start_y, replace_color, tolerance);
+      imProcessRenderFloodFill(image.GetHandle(), start_x, start_y, replace_color, tolerance);
     }
-  };
+  }
 
   class Histogram
   {
-    friend class Calc;
-
     /* forbidden */
     Histogram() { }
 
+  protected:
     unsigned long* histo;
     int count;
 
@@ -1883,14 +1858,19 @@ namespace im
     }
     ~Histogram()
     {
-      delete[] histo;
+      if (histo)
+        delete[] histo;
     }
+
+    unsigned long* GetData() const { return histo; }
+    int Count() const { return count; }
 
     Histogram(const Histogram& histogram)
     {
       count = histogram.count;
       histo = new unsigned long[count];
-      for (int i = 0; i < count; i++) histo[i] = histogram.histo[i];
+      for (int i = 0; i < count; i++) 
+        histo[i] = histogram.histo[i];
     }
 
     unsigned long& operator [](int index) 
@@ -1903,47 +1883,45 @@ namespace im
   };
 
 
-  class Calc
+  namespace Calc
   {
-  public:
-
-    static float RMSError(const Image& image1, const Image& image2)
+    inline float RMSError(const Image& image1, const Image& image2)
     {
-      return imCalcRMSError(image1.im_image, image2.im_image);
+      return imCalcRMSError(image1.GetHandle(), image2.GetHandle());
     }
-    static float SNR(const Image& src_image, const Image& noise_image)
+    inline float SNR(const Image& src_image, const Image& noise_image)
     {
-      return imCalcSNR(src_image.im_image, noise_image.im_image);
+      return imCalcSNR(src_image.GetHandle(), noise_image.GetHandle());
     }
-    static unsigned long CountColors(const Image& image)
+    inline unsigned long CountColors(const Image& image)
     {
-      return imCalcCountColors(image.im_image);
+      return imCalcCountColors(image.GetHandle());
     }
-    static void GrayHistogram(const Image& image, Histogram& histogram, int cumulative)
+    inline void GrayHistogram(const Image& image, im::Histogram& histogram, int cumulative)
     {
-      imCalcGrayHistogram(image.im_image, histogram.histo, cumulative);
+      imCalcGrayHistogram(image.GetHandle(), histogram.GetData(), cumulative);
     }
-    static void Histogram(const Image& image, Histogram& histogram, int plane, int cumulative)
+    inline void Histogram(const Image& image, im::Histogram& histogram, int plane, int cumulative)
     {
-      imCalcHistogram(image.im_image, histogram.histo, plane, cumulative);
+      imCalcHistogram(image.GetHandle(), histogram.GetData(), plane, cumulative);
     }
-    static void ImageStatistics(const Image& image, imStats& stats)
+    inline void ImageStatistics(const Image& image, imStats& stats)
     {
-      imCalcImageStatistics(image.im_image, &stats);
+      imCalcImageStatistics(image.GetHandle(), &stats);
     }
-    static void HistogramStatistics(const Image& image, imStats& stats)
+    inline void HistogramStatistics(const Image& image, imStats& stats)
     {
-      imCalcHistogramStatistics(image.im_image, &stats);
+      imCalcHistogramStatistics(image.GetHandle(), &stats);
     }
-    static void HistoImageStatistics(const Image& image, int* median, int* mode)
+    inline void HistoImageStatistics(const Image& image, int* median, int* mode)
     {
-      imCalcHistoImageStatistics(image.im_image, median, mode);
+      imCalcHistoImageStatistics(image.GetHandle(), median, mode);
     }
-    static void PercentMinMax(const Image& image, float percent, int ignore_zero, int &min, int &max)
+    inline void PercentMinMax(const Image& image, float percent, int ignore_zero, int &min, int &max)
     {
-      imCalcPercentMinMax(image.im_image, percent, ignore_zero, &min, &max);
+      imCalcPercentMinMax(image.GetHandle(), percent, ignore_zero, &min, &max);
     }
-  };
+  }
 
   class MeasureTable : protected AttribTable
   {
@@ -1999,52 +1977,49 @@ namespace im
       else
         return (float*)data;
     }
-
   };
 
-  class Analyze
+  namespace Analyze
   {
-  public:
-
-    static int FindRegions(const Image& image, Image& region_image, int connect, int touch_border)
+    inline int FindRegions(const Image& image, Image& region_image, int connect, int touch_border)
     {
-      return imAnalyzeFindRegions(image.im_image, region_image.im_image, connect, touch_border);
+      return imAnalyzeFindRegions(image.GetHandle(), region_image.GetHandle(), connect, touch_border);
     }
 
-    static void MeasureArea(const Image& region_image, MeasureTable& measure_table)
+    inline void MeasureArea(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasureArea(region_image.im_image, measure_table.AddMeasureInt("Area"), measure_table.RegionCount());
+      imAnalyzeMeasureArea(region_image.GetHandle(), measure_table.AddMeasureInt("Area"), measure_table.RegionCount());
     }
-    static void MeasurePerimArea(const Image& region_image, MeasureTable& measure_table)
+    inline void MeasurePerimArea(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasurePerimArea(region_image.im_image, measure_table.AddMeasureFloat("PerimeterArea"), measure_table.RegionCount());
+      imAnalyzeMeasurePerimArea(region_image.GetHandle(), measure_table.AddMeasureFloat("PerimeterArea"), measure_table.RegionCount());
     }
-    static void MeasureCentroid(const Image& region_image, MeasureTable& measure_table)
+    inline void MeasureCentroid(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasureCentroid(region_image.im_image, measure_table.GetMeasureInt("Area"), measure_table.RegionCount(), 
+      imAnalyzeMeasureCentroid(region_image.GetHandle(), measure_table.GetMeasureInt("Area"), measure_table.RegionCount(), 
                                                       measure_table.AddMeasureFloat("CentroidX"), measure_table.AddMeasureFloat("CentroidY"));
     }
-    static void MeasurePrincipalAxis(const Image& region_image, MeasureTable& measure_table)
+    inline void MeasurePrincipalAxis(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasurePrincipalAxis(region_image.im_image, measure_table.GetMeasureInt("Area"), 
+      imAnalyzeMeasurePrincipalAxis(region_image.GetHandle(), measure_table.GetMeasureInt("Area"), 
                                                            measure_table.GetMeasureFloat("CentroidX"), measure_table.GetMeasureFloat("CentroidY"), 
                                                            measure_table.RegionCount(), 
                                                            measure_table.AddMeasureFloat("MajorSlope"), measure_table.AddMeasureFloat("MajorLength"), 
                                                            measure_table.AddMeasureFloat("MinorSlope"), measure_table.AddMeasureFloat("MinorLength"));
     }
-    static void MeasureHoles(const Image& region_image, int connect, MeasureTable& measure_table)
+    inline void MeasureHoles(const Image& region_image, int connect, MeasureTable& measure_table)
     {
-      imAnalyzeMeasureHoles(region_image.im_image, connect, measure_table.RegionCount(), 
+      imAnalyzeMeasureHoles(region_image.GetHandle(), connect, measure_table.RegionCount(), 
                                                             measure_table.AddMeasureInt("HolesCount"),
                                                             measure_table.AddMeasureInt("HolesArea"), 
                                                             measure_table.AddMeasureFloat("HolesPerimeter"));
     }
-    static void MeasurePerimeter(const Image& region_image, MeasureTable& measure_table)
+    inline void MeasurePerimeter(const Image& region_image, MeasureTable& measure_table)
     {
-      imAnalyzeMeasurePerimeter(region_image.im_image, measure_table.AddMeasureFloat("Perimeter"), measure_table.RegionCount());
+      imAnalyzeMeasurePerimeter(region_image.GetHandle(), measure_table.AddMeasureFloat("Perimeter"), measure_table.RegionCount());
     }
 
-  };
+  }
 
 }
 
