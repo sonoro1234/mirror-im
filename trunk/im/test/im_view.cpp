@@ -10,12 +10,7 @@
   Click on image to open another file.
 */
 
-#include <iup.h>
-#include <cd.h>
-#include <cdiup.h>
-
-#include <im_plus.h>
-//#include <cd_plus.h>
+#include <iup_plus.h>
 
 #include <stdio.h>
 #include <string.h>
