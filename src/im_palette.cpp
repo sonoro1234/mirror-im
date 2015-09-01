@@ -26,6 +26,16 @@ void imPaletteRelease(long* palette)
   free(palette);
 }
 
+long* imPaletteDuplicate(const long* palette, int count)
+{
+  long* new_palette = imPaletteNew(count);
+
+  for (int i = 0; i < count; i++)
+    new_palette[i] = palette[i];
+
+  return new_palette;
+}
+
 inline int iSqr(int x)
 {
   return x*x;

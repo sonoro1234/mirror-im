@@ -43,9 +43,13 @@ extern "C" {
 long* imPaletteNew(int count);
 
 /** Releases memory for the palette data.
-* This ensures allocation and release in the same module by the correct functions.
-* \ingroup palette */
+ * This ensures allocation and release in the same module by the correct functions.
+ * \ingroup palette */
 void imPaletteRelease(long* palette);
+
+/** Duplicate a palette data using imPaletteNew.
+ * \ingroup palette */
+long* imPaletteDuplicate(const long* palette, int count);
 
 
 /** Searches for the nearest color on the table and returns the color index if successful. 

@@ -553,6 +553,7 @@ void imImageSetPalette(imImage* image, long* palette, int palette_count)
   if (image->palette)
   {
     imPaletteRelease(image->palette);
+
     image->palette = palette;
     image->palette_count = palette_count;
   }
