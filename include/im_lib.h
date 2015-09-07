@@ -29,13 +29,13 @@ extern "C" {
  * See \ref im_lib.h
  * @{
  */
-#define IM_AUTHOR "Antonio Scuri"
+#define IM_NAME "IM - An Imaging Toolkit"
+#define IM_DESCRIPTION "Toolkit for Image Representation, Storage, Capture and Processing"
 #define IM_COPYRIGHT "Copyright (C) 1994-2015 Tecgraf/PUC-Rio"
+#define IM_AUTHOR "Antonio Scuri"
 #define IM_VERSION "3.9"      /* bug fixes are reported only by imVersion functions */
 #define IM_VERSION_NUMBER 309000
 #define IM_VERSION_DATE "2014/09/30"  /* does not include bug fix releases */
-#define IM_DESCRIPTION "Image Representation, Storage, Capture and Processing"
-#define IM_NAME "IM - An Imaging Toolkit"
 /** @} */
 
 

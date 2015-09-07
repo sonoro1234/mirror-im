@@ -929,11 +929,11 @@ namespace im
 
   namespace VideoCaptureDevice
   {
-    void ReloadList()
+    inline void ReloadList()
     {
       imVideoCaptureReloadDevices();
     }
-    void ReleaseList()
+    inline void ReleaseList()
     {
       imVideoCaptureReleaseDevices();
     }
