@@ -53,8 +53,9 @@
 #ifdef HAVE_SEARCH_H
 # include <search.h>
 #else
+/* IMLIB 
 extern void *lfind(const void *, const void *, size_t *, size_t,
-		   int (*)(const void *, const void *));
+		   int (*)(const void *, const void *)); */
 #endif
 
 #include "tiffio.h"

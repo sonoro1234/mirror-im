@@ -33,7 +33,7 @@
 #define CF(format,target,v,maxlen)                              \
 {                                                               \
         if (format != target) {                                 \
-                snprintf (v, maxlen,	                        \
+                exif_snprintf (v, maxlen,	                        \
                         _("Invalid format '%s', "               \
                         "expected '%s'."),                      \
                         exif_format_get_name (format),          \
@@ -45,7 +45,7 @@
 #define CF2(format,target1,target2,v,maxlen)                    \
 {                                                               \
         if ((format != target1) && (format != target2)) {       \
-                snprintf (v, maxlen,	                        \
+                exif_snprintf (v, maxlen,	                        \
                         _("Invalid format '%s', "               \
                         "expected '%s' or '%s'."),              \
                         exif_format_get_name (format),          \
@@ -58,7 +58,7 @@
 #define CC(number,target,v,maxlen)                                      \
 {                                                                       \
         if (number != target) {                                         \
-                snprintf (v, maxlen,                                    \
+                exif_snprintf (v, maxlen,                                    \
                         _("Invalid number of components (%i, "          \
                         "expected %i)."), (int) number, (int) target);  \
                 break;                                                  \
@@ -68,7 +68,7 @@
 #define CC2(number,t1,t2,v,maxlen)                                      \
 {                                                                       \
 	if ((number < t1) || (number > t2)) {                           \
-		snprintf (v, maxlen,                                    \
+		exif_snprintf (v, maxlen,                                    \
 			_("Invalid number of components (%i, "          \
 			"expected %i or %i)."), (int) number,		\
 			(int) t1, (int) t2);  				\
@@ -297,7 +297,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		if ((vl & 0xF0F0F0F0) == 0x30303030) {
 			memcpy (v, entry->data, MIN (maxlen, 4));
 		} else {
-			snprintf (v, maxlen, "%04lx", (long unsigned int) vl);
+			exif_snprintf (v, maxlen, "%04lx", (long unsigned int) vl);
 		}
 		break;
 	case MNOTE_NIKON_TAG_ISO:
@@ -305,14 +305,14 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
                 CC (entry->components, 2, v, maxlen);
                 /*vs = exif_get_short (entry->data, entry->order);*/
                 vs = exif_get_short (entry->data + 2, entry->order);
-                snprintf (v, maxlen, "ISO %hd", vs);
+                exif_snprintf (v, maxlen, "ISO %hd", vs);
                 break;
 	case MNOTE_NIKON_TAG_ISO2:
                 CF (entry->format, EXIF_FORMAT_SHORT, v, maxlen);
                 CC (entry->components, 2, v, maxlen);
                 /*vs = exif_get_short (entry->data, entry->order);*/
                 vs = exif_get_short (entry->data + 2, entry->order);
-                snprintf (v, maxlen, "ISO2 %hd", vs);
+                exif_snprintf (v, maxlen, "ISO2 %hd", vs);
                 break;
 	case MNOTE_NIKON_TAG_QUALITY:
 	case MNOTE_NIKON_TAG_COLORMODE:
@@ -336,7 +336,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		CF (entry->format, EXIF_FORMAT_LONG, v, maxlen);
 		CC (entry->components, 1, v, maxlen);
 		vl =  exif_get_long (entry->data, entry->order);
-		snprintf (v, maxlen, "%lu",  (long unsigned int) vl );
+		exif_snprintf (v, maxlen, "%lu",  (long unsigned int) vl );
 		break;
 	case MNOTE_NIKON_TAG_LENS_FSTOPS:
 	case MNOTE_NIKON_TAG_EXPOSUREDIFF: {
@@ -345,7 +345,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		CC (entry->components, 4, v, maxlen);
 		vl =  exif_get_long (entry->data, entry->order);
 		a = (vl>>24)&0xff; b = (vl>>16)&0xff; c = (vl>>8)&0xff; d = (vl)&0xff;
-		snprintf (v, maxlen, "%.1f",  c?(float)a*((float)b/(float)c):0 );
+		exif_snprintf (v, maxlen, "%.1f",  c?(float)a*((float)b/(float)c):0 );
 		break;
 	}
 	case MNOTE_NIKON_TAG_FLASHEXPCOMPENSATION:
@@ -353,7 +353,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		CF (entry->format, EXIF_FORMAT_UNDEFINED, v, maxlen);
 		CC (entry->components, 4, v, maxlen);
 		vl =  exif_get_long (entry->data, entry->order);
-		snprintf (v, maxlen, "%.1f",  ((long unsigned int) vl>>24)/6.0 );
+		exif_snprintf (v, maxlen, "%.1f",  ((long unsigned int) vl>>24)/6.0 );
 		break;
 	case MNOTE_NIKON_TAG_SATURATION:
 	case MNOTE_NIKON_TAG_WHITEBALANCEFINE:
@@ -363,7 +363,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		CF (entry->format, EXIF_FORMAT_SSHORT, v, maxlen);
 		CC (entry->components, 1, v, maxlen);
 		vs = exif_get_short (entry->data, entry->order);
-		snprintf (v, maxlen, "%hd", vs);
+		exif_snprintf (v, maxlen, "%hd", vs);
 		break;
 	case MNOTE_NIKON_TAG_WHITEBALANCERB:
 		CF (entry->format, EXIF_FORMAT_RATIONAL, v, maxlen);
@@ -372,7 +372,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		r = (double)vr.numerator / vr.denominator;
 		vr = exif_get_rational (entry->data+8, entry->order);
 		b = (double)vr.numerator / vr.denominator;
-		snprintf (v, maxlen, _("Red Correction %f, blue Correction %f"), r,b);
+		exif_snprintf (v, maxlen, _("Red Correction %f, blue Correction %f"), r,b);
 		break;
 	case MNOTE_NIKON_TAG_MANUALFOCUSDISTANCE:
 		CF (entry->format, EXIF_FORMAT_RATIONAL, v, maxlen);
@@ -380,7 +380,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		vr = exif_get_rational (entry->data, entry->order);
 		if (vr.numerator) {
 			r = (double)vr.numerator / vr.denominator;
-			snprintf (v, maxlen, _("%2.2f meters"), r);
+			exif_snprintf (v, maxlen, _("%2.2f meters"), r);
 		} else {
 			strncpy (v, _("No manual focus selection"), maxlen);
 		}
@@ -392,7 +392,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		vr2 = exif_get_rational (entry->data+8, entry->order);
 		r = (double)vr.numerator / vr.denominator;
 		b = (double)vr2.numerator / vr2.denominator;
-		snprintf (v, maxlen, "%2.2f x %2.2f um", r, b);
+		exif_snprintf (v, maxlen, "%2.2f x %2.2f um", r, b);
 		break;
 	case MNOTE_NIKON_TAG_BRACKETING:
 		CF2 (entry->format, EXIF_FORMAT_BYTE, EXIF_FORMAT_SHORT, v, maxlen);
@@ -402,7 +402,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		} else {
 			vs = entry->data[0];
 		}
-		snprintf (v, maxlen, "%hd", vs);
+		exif_snprintf (v, maxlen, "%hd", vs);
 		break;
 	case MNOTE_NIKON_TAG_AFFOCUSPOSITION:
 		CF (entry->format, EXIF_FORMAT_UNDEFINED, v, maxlen);
@@ -430,7 +430,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		for (i = 0; (items[i].tag && items[i].tag != entry->tag); i++)
 			;
 		if (!items[i].tag) {
-		  	snprintf (v, maxlen, _("Internal error (unknown value %hi)"), vs);
+		  	exif_snprintf (v, maxlen, _("Internal error (unknown value %hi)"), vs);
 		  	break;
 		}
 		CF (entry->format, items[i].fmt, v, maxlen);
@@ -438,7 +438,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		for (j = 0; items[i].elem[j].string &&
 			    (items[i].elem[j].index < vs); j++);
 		if (items[i].elem[j].index != vs) {
-			snprintf (v, maxlen, _("Unknown value %hi"), vs);
+			exif_snprintf (v, maxlen, _("Unknown value %hi"), vs);
 			break;
 		}
 		strncpy (v, _(items[i].elem[j].string), maxlen);
@@ -451,7 +451,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 				strncpy (v, _("None"), maxlen);
 			} else {
 				r = (double)vr.numerator / vr.denominator;
-				snprintf (v, maxlen, "%2.2f", r);
+				exif_snprintf (v, maxlen, "%2.2f", r);
 			}
 			break;
 		}
@@ -500,7 +500,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		for (i = 0; (items[i].tag && items[i].tag != entry->tag); i++)
 			;
 		if (!items[i].tag) {
-		  	snprintf (v, maxlen, _("Internal error (unknown value %hi)"), vs);
+		  	exif_snprintf (v, maxlen, _("Internal error (unknown value %hi)"), vs);
 		  	break;
 		}
 		CF (entry->format, items[i].fmt, v, maxlen);
@@ -508,7 +508,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		for (j = 0; items[i].elem[j].string &&
 			    (items[i].elem[j].index < vs); j++);
 		if (items[i].elem[j].index != vs) {
-			snprintf (v, maxlen, _("Unknown value %hi"), vs);
+			exif_snprintf (v, maxlen, _("Unknown value %hi"), vs);
 			break;
 		}
 		strncpy (v, _(items[i].elem[j].string), maxlen);
@@ -572,7 +572,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 			c = (double)vr.numerator / vr.denominator;
 			vr = exif_get_rational (entry->data+24, entry->order);
 			d = (double)vr.numerator / vr.denominator;
-			snprintf (v, maxlen, "%ld-%ldmm 1:%3.1f - %3.1f",a,b,c,d);
+			exif_snprintf (v, maxlen, "%ld-%ldmm 1:%3.1f - %3.1f",a,b,c,d);
 		}
 		break;
 
@@ -595,10 +595,10 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 			strncpy (v, _("Panorama"), maxlen);
 			break;
 		default:
-			snprintf (v, maxlen, "%li", (long int) vl);
+			exif_snprintf (v, maxlen, "%li", (long int) vl);
 		}
 		vl = exif_get_long (entry->data + 4, entry->order);
-		snprintf (buf, sizeof (buf), "/%li/", (long int) vl);
+		exif_snprintf (buf, sizeof (buf), "/%li/", (long int) vl);
 		strncat (v, buf, maxlen - strlen (v));
 		vl = exif_get_long (entry->data + 8, entry->order);
 		switch (vl) {
@@ -615,7 +615,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 			strncat (v, _("Top to bottom"), maxlen - strlen (v));
 			break;
 		default:
-			snprintf (buf, sizeof (buf), "%li",
+			exif_snprintf (buf, sizeof (buf), "%li",
 				  (long int) vl);
 			strncat (v, buf, maxlen - strlen (v));
 		}
@@ -684,7 +684,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		}
 		else {
 			unsigned long tmp = vr.numerator / vr.denominator;
-			snprintf (v, maxlen, "%li mm", tmp);
+			exif_snprintf (v, maxlen, "%li mm", tmp);
 		}
 		break;
 	case MNOTE_OLYMPUS_TAG_WBALANCE:
@@ -723,7 +723,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 					break;
 				}
 				if (colorTemp) {
-					snprintf (v, maxlen, _("Manual: %liK"), colorTemp);
+					exif_snprintf (v, maxlen, _("Manual: %liK"), colorTemp);
 				}
 				else {
 					strncpy (v, _("Manual: unknown"), maxlen);
@@ -744,7 +744,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		CF (entry->format, EXIF_FORMAT_SHORT, v, maxlen);
 		CC (entry->components, 2, v, maxlen);
 		vs = exif_get_short (entry->data, entry->order);
-		snprintf (v, maxlen, "%hu ", vs);
+		exif_snprintf (v, maxlen, "%hu ", vs);
 		vs = exif_get_short (entry->data + 2, entry->order);
 		sprintf (buf, "%hu", vs);
 		strncat (v, buf, maxlen - strlen (v));
@@ -777,12 +777,12 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 		case EXIF_FORMAT_SHORT:
 			CC (entry->components, 1, v, maxlen);
 			vs = exif_get_short (entry->data, entry->order);
-			snprintf (v, maxlen, "%hu", vs);
+			exif_snprintf (v, maxlen, "%hu", vs);
 			break;
 		case EXIF_FORMAT_LONG:
 			CC (entry->components, 1, v, maxlen);
 			vl = exif_get_long (entry->data, entry->order);
-			snprintf (v, maxlen, "%li", (long int) vl);
+			exif_snprintf (v, maxlen, "%li", (long int) vl);
 			break;
 		case EXIF_FORMAT_RATIONAL:
 			CC (entry->components, 1, v, maxlen);
@@ -791,7 +791,7 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 				strncpy (v, _("Infinite"), maxlen);
 			} else {
 				r = (double)vr.numerator / vr.denominator;
-				snprintf (v, maxlen, "%2.3f", r);
+				exif_snprintf (v, maxlen, "%2.3f", r);
 			}
 			break;
 		case EXIF_FORMAT_SRATIONAL:
@@ -801,12 +801,12 @@ mnote_olympus_entry_get_value (MnoteOlympusEntry *entry, char *v, unsigned int m
 				strncpy (v, _("Infinite"), maxlen);
 			} else {
 				r = (double)vsr.numerator / vsr.denominator;
-				snprintf (v, maxlen, "%2.3f", r);
+				exif_snprintf (v, maxlen, "%2.3f", r);
 			}
 			break;
 		case EXIF_FORMAT_UNDEFINED:
 		default:
-			snprintf (v, maxlen, _("%i bytes unknown data: "),
+			exif_snprintf (v, maxlen, _("%i bytes unknown data: "),
 				  entry->size);
 			for (i = 0; i < (int)entry->size; i++) {
 				sprintf (buf, "%02x", entry->data[i]);

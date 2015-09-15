@@ -7,6 +7,7 @@
 #define GETTEXT_PACKAGE "libexif-9"
 
 #ifdef WIN32
-#define snprintf _snprintf
+#define exif_snprintf _snprintf
+#else
+#define exif_snprintf snprintf
 #endif
-

@@ -35,7 +35,7 @@
 #define CF(format,target,v,maxlen)                              \
 {                                                               \
 	if (format != target) {                                 \
-		snprintf (v, maxlen,	                        \
+		exif_snprintf (v, maxlen,	                        \
 			_("Invalid format '%s', "               \
 			"expected '%s'."),                      \
 			exif_format_get_name (format),          \
@@ -47,7 +47,7 @@
 #define CC(number,target,v,maxlen)                                      \
 {                                                                       \
 	if (number != target) {                                         \
-		snprintf (v, maxlen,                                    \
+		exif_snprintf (v, maxlen,                                    \
 			_("Invalid number of components (%i, "          \
 			"expected %i)."), (int) number, (int) target);  \
 		break;                                                  \
@@ -57,7 +57,7 @@
 #define CC2(number,t1,t2,v,maxlen)                                      \
 {                                                                       \
 	if ((number != t1) && (number != t2)) {                         \
-		snprintf (v, maxlen,                                    \
+		exif_snprintf (v, maxlen,                                    \
 			_("Invalid number of components (%i, "          \
 			"expected %i or %i)."), (int) number,		\
 			(int) t1, (int) t2);  				\
@@ -346,7 +346,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 			/* search the tag */
 			for (i = 0; (items[i].tag && items[i].tag != entry->tag); i++);
 			if (!items[i].tag) {
-				snprintf (val, maxlen,
+				exif_snprintf (val, maxlen,
 					  _("Internal error (unknown value %i)"), vs);
 			  	break;
 			}
@@ -355,7 +355,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 			for (j = 0; items[i].elem[j].string &&
 			    (items[i].elem[j].index < vs); j++);
 			if (items[i].elem[j].index != vs) {
-				snprintf (val, maxlen,
+				exif_snprintf (val, maxlen,
 					  _("Internal error (unknown value %i)"), vs);
 				break;
 			}
@@ -370,7 +370,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 			/* search the tag */
 			for (i = 0; (items2[i].tag && items2[i].tag != entry->tag); i++);
 			if (!items2[i].tag) {
-				snprintf (val, maxlen,
+				exif_snprintf (val, maxlen,
 					  _("Internal error (unknown value %i %i)"), vs, vs2);
 			  	break;
 			}
@@ -379,7 +379,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 			for (j = 0; items2[i].elem[j].string && ((items2[i].elem[j].index2 < vs2)
 				|| ((items2[i].elem[j].index2 == vs2) && (items2[i].elem[j].index1 < vs))); j++);
 			if ((items2[i].elem[j].index1 != vs) || (items2[i].elem[j].index2 != vs2)) {
-				snprintf (val, maxlen,
+				exif_snprintf (val, maxlen,
 					  _("Internal error (unknown value %i %i)"), vs, vs2);
 				break;
 			}
@@ -391,12 +391,12 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 		CF (entry->format, EXIF_FORMAT_LONG, val, maxlen);
 		CC (entry->components, 1, val, maxlen);
 		vl = exif_get_long (entry->data, entry->order);
-		snprintf (val, maxlen, "%li", (long int) vl);
+		exif_snprintf (val, maxlen, "%li", (long int) vl);
 		break;
 	case MNOTE_PENTAX_TAG_PRINTIM:
 		CF (entry->format, EXIF_FORMAT_UNDEFINED, val, maxlen);
 		CC (entry->components, 124, val, maxlen);
-		snprintf (val, maxlen, _("%i bytes unknown data"),
+		exif_snprintf (val, maxlen, _("%i bytes unknown data"),
 			entry->size);
 		break;
 	case MNOTE_PENTAX_TAG_TZ_CITY:
@@ -410,12 +410,12 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 		CC (entry->components, 4, val, maxlen);
 		/* Note: format is UNDEFINED, not SHORT -> order is fixed: MOTOROLA */
 		vs = exif_get_short (entry->data, EXIF_BYTE_ORDER_MOTOROLA);
-		snprintf (val, maxlen, "%i:%02i:%02i", vs, entry->data[2], entry->data[3]);
+		exif_snprintf (val, maxlen, "%i:%02i:%02i", vs, entry->data[2], entry->data[3]);
 		break;
 	case MNOTE_PENTAX2_TAG_TIME:
 		CF (entry->format, EXIF_FORMAT_UNDEFINED, val, maxlen);
 		CC2 (entry->components, 3, 4, val, maxlen);
-		snprintf (val, maxlen, "%02i:%02i:%02i", entry->data[0], entry->data[1], entry->data[2]);
+		exif_snprintf (val, maxlen, "%02i:%02i:%02i", entry->data[0], entry->data[1], entry->data[2]);
 		break;
 	default:
 		switch (entry->format) {
@@ -428,7 +428,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 		  	size_t k, len = strlen(val);
 		  	for(k=0; k<entry->components; k++) {
 				vs = exif_get_short (data, entry->order);
-				snprintf (val+len, maxlen-len, "%i ", vs);
+				exif_snprintf (val+len, maxlen-len, "%i ", vs);
 				len = strlen(val);
 				data += 2;
 			}
@@ -440,7 +440,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 		  	size_t k, len = strlen(val);
 		  	for(k=0; k<entry->components; k++) {
 				vl = exif_get_long (data, entry->order);
-				snprintf (val+len, maxlen-len, "%li", (long int) vl);
+				exif_snprintf (val+len, maxlen-len, "%li", (long int) vl);
 				len = strlen(val);
 				data += 4;
 			}
@@ -448,7 +448,7 @@ mnote_pentax_entry_get_value (MnotePentaxEntry *entry,
 		  break;
 		case EXIF_FORMAT_UNDEFINED:
 		default:
-		  snprintf (val, maxlen, _("%i bytes unknown data"),
+		  exif_snprintf (val, maxlen, _("%i bytes unknown data"),
 			  entry->size);
 		  break;
 		}
