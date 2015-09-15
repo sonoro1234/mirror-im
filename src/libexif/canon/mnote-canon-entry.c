@@ -36,7 +36,7 @@
 #define CF(format,target,v,maxlen)                              \
 {                                                               \
         if (format != target) {                                 \
-                snprintf (v, maxlen,                            \
+                exif_snprintf (v, maxlen,                            \
                         _("Invalid format '%s', "               \
                         "expected '%s'."),                      \
                         exif_format_get_name (format),          \
@@ -48,7 +48,7 @@
 #define CC(number,target,v,maxlen)                                      \
 {                                                                       \
         if (number != target) {                                         \
-                snprintf (v, maxlen,                                    \
+                exif_snprintf (v, maxlen,                                    \
                         _("Invalid number of components (%i, "          \
                         "expected %i)."), (int) number, (int) target);  \
                 break;                                                  \
@@ -57,7 +57,7 @@
 #define CC2(number,t1,t2,v,maxlen)                                      \
 {                                                                       \
 	if ((number != t1) && (number != t2)) {                         \
-		snprintf (v, maxlen,                                    \
+		exif_snprintf (v, maxlen,                                    \
 			_("Invalid number of components (%i, "          \
 			"expected %i or %i)."), (int) number,		\
 			(int) t1, (int) t2);  				\
@@ -453,7 +453,7 @@ canon_search_table_value (const struct canon_entry_table_t table[],
 		strncpy (val, _(table[j].name), maxlen);
 	} else {
 		/* No matching subtag and/or value found. */
-		snprintf (val, maxlen, "0x%04x", vs);
+		exif_snprintf (val, maxlen, "0x%04x", vs);
 	}
 }
 
@@ -493,7 +493,7 @@ canon_search_table_bitfield (const struct canon_entry_table_t table[],
 		}
 	} else {
 		/* No matching subtag found. */
-		snprintf (val, maxlen, "0x%04x", vs);
+		exif_snprintf (val, maxlen, "0x%04x", vs);
 	}
 }
 
@@ -574,12 +574,12 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 				strncpy(val, _("Off"), maxlen);
 				break;
 			}
-			snprintf (val, maxlen, _("%i (ms)"), vs * 100);
+			exif_snprintf (val, maxlen, _("%i (ms)"), vs * 100);
 			break;
 		case 15:
 			if (((vs & 0xC000) == 0x4000) && (vs != 0x7FFF)) {
 				/* Canon S3 IS - directly specified value */
-				snprintf (val, maxlen, "%i", vs & ~0x4000);
+				exif_snprintf (val, maxlen, "%i", vs & ~0x4000);
 			} else {
 				/* Standard Canon - index into lookup table */
 				canon_search_table_value (entries_settings_1, t, vs, val, maxlen);
@@ -588,21 +588,21 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 		case 22:
 		case 23:
 		case 24:
-			snprintf (val, maxlen, "%u", vs);
+			exif_snprintf (val, maxlen, "%u", vs);
 			break;
 		case 25:
 		case 26:
-			snprintf (val, maxlen, "%.2f", apex_value_to_aperture (vs / 32.0));
+			exif_snprintf (val, maxlen, "%.2f", apex_value_to_aperture (vs / 32.0));
 			break;
 		case 28:
 			canon_search_table_bitfield(entries_settings_1, t, vs, val, maxlen);
 			break;
 		case 34:
-			snprintf (val, maxlen, "%.2f", vs / 10.0);
+			exif_snprintf (val, maxlen, "%.2f", vs / 10.0);
 			break;
 		case 35:
 		case 36:
-			snprintf (val, maxlen, "%u", vs);
+			exif_snprintf (val, maxlen, "%u", vs);
 			break;
 		default:
 			canon_search_table_value (entries_settings_1, t, vs, val, maxlen);
@@ -614,11 +614,11 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 		vs = exif_get_short (data + t * 2, entry->order);
 		switch (t) {
 		case 1:
-			snprintf (val, maxlen, "%u", vs);
+			exif_snprintf (val, maxlen, "%u", vs);
 			break;
 		case 2:
 		case 3:
-			snprintf (val, maxlen, _("%.2f mm"), vs * 25.4 / 1000);
+			exif_snprintf (val, maxlen, _("%.2f mm"), vs * 25.4 / 1000);
 			break;
 		default:
 			canon_search_table_value (entries_focal_length, t, vs, val, maxlen);
@@ -633,45 +633,45 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 		vs = exif_get_short (data + 2 + t * 2, entry->order);
 		switch (t) {
 		case 0:
-			snprintf (val, maxlen, "%.3f", pow (2, (ExifSShort)vs / 32.0));
+			exif_snprintf (val, maxlen, "%.3f", pow (2, (ExifSShort)vs / 32.0));
 			break;
 		case 1:
-			snprintf (val, maxlen, "%.0f", apex_value_to_iso_speed ((ExifSShort)vs / 32.0));
+			exif_snprintf (val, maxlen, "%.0f", apex_value_to_iso_speed ((ExifSShort)vs / 32.0));
 			break;
 		case 2:
 		case 5:
 		case 14:
 		case 16:
-			snprintf (val, maxlen, _("%.2f EV"), (ExifSShort)vs / 32.0);
+			exif_snprintf (val, maxlen, _("%.2f EV"), (ExifSShort)vs / 32.0);
 			break;
 		case 3:
 		case 20:
-			snprintf (val, maxlen, "%.2f", apex_value_to_aperture (vs / 32.0));
+			exif_snprintf (val, maxlen, "%.2f", apex_value_to_aperture (vs / 32.0));
 			break;
 		case 4:
 		case 21:
 			d = apex_value_to_shutter_speed ((ExifSShort)vs / 32.0);
 			if (d < 1)
-				snprintf (val, maxlen, _("1/%i"),(int)(1.0 / d));
+				exif_snprintf (val, maxlen, _("1/%i"),(int)(1.0 / d));
 			else
-				snprintf (val, maxlen, "%i", (int) d);
+				exif_snprintf (val, maxlen, "%i", (int) d);
 			break;
 		case 8:
-			snprintf (val, maxlen, "%u", vs);
+			exif_snprintf (val, maxlen, "%u", vs);
 			break;
 		case 12:
-			snprintf (val, maxlen, "%.2f", vs / 32.0);
+			exif_snprintf (val, maxlen, "%.2f", vs / 32.0);
 			break;
 		case 18:
 		case 19:
-			snprintf (val, maxlen, _("%u mm"), vs);
+			exif_snprintf (val, maxlen, _("%u mm"), vs);
 			break;
 		case 28:
 			if ((ExifSShort)vs <= 0) {
 				strncpy(val, _("Off"), maxlen);
 				break;
 			}
-			snprintf (val, maxlen, _("%i (ms)"), vs * 100);
+			exif_snprintf (val, maxlen, _("%i (ms)"), vs * 100);
 			break;
 		default:
 			canon_search_table_value (entries_settings_2, t, vs, val, maxlen);
@@ -702,7 +702,7 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 		CF (entry->format, EXIF_FORMAT_LONG, val, maxlen);
 		CC (entry->components, 1, val, maxlen);
 		vl = exif_get_long (data, entry->order);
-		snprintf (val, maxlen, "%03lu-%04lu",
+		exif_snprintf (val, maxlen, "%03lu-%04lu",
 				(unsigned long) vl/10000,
 				(unsigned long) vl%10000);
 		break;
@@ -711,7 +711,7 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 		CF (entry->format, EXIF_FORMAT_LONG, val, maxlen);
 		CC (entry->components, 1, val, maxlen);
 		vl = exif_get_long (data, entry->order);
-		snprintf (val, maxlen, "%04X-%05d", (int)vl>>16,(int)vl&0xffff);
+		exif_snprintf (val, maxlen, "%04X-%05d", (int)vl>>16,(int)vl&0xffff);
 		break;
 
 	case MNOTE_CANON_TAG_CUSTOM_FUNCS:
@@ -720,7 +720,7 @@ mnote_canon_entry_get_value (const MnoteCanonEntry *entry, unsigned int t, char 
 		if (t >= n) return NULL;
 		CC (entry->components, n, val, maxlen);
 		vs = exif_get_short (data + 2 + t * 2, entry->order);
-		snprintf (buf, sizeof (buf), "%u", vs);
+		exif_snprintf (buf, sizeof (buf), "%u", vs);
 		strncat (val, buf, maxlen - strlen (val));
 		break;
 

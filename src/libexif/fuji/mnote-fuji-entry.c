@@ -31,7 +31,7 @@
 #define CF(format,target,v,maxlen)                              \
 {                                                               \
         if (format != target) {                                 \
-                snprintf (v, maxlen,	                        \
+                exif_snprintf (v, maxlen,	                        \
                         _("Invalid format '%s', "               \
                         "expected '%s'."),                      \
                         exif_format_get_name (format),          \
@@ -43,7 +43,7 @@
 #define CC(number,target,v,maxlen)                                      \
 {                                                                       \
         if (number != target) {                                         \
-                snprintf (v, maxlen,                                    \
+                exif_snprintf (v, maxlen,                                    \
                         _("Invalid number of components (%i, "          \
                         "expected %i)."), (int) number, (int) target);  \
                 break;                                                  \
@@ -232,7 +232,7 @@ mnote_fuji_entry_get_value (MnoteFujiEntry *entry,
 		/* search the tag */
 		for (i = 0; (items[i].tag && items[i].tag != entry->tag); i++);
 		if (!items[i].tag) {
-			snprintf (val, maxlen,
+			exif_snprintf (val, maxlen,
 				  _("Internal error (unknown value %i)"), vs);
 		  	break;
 		}
@@ -241,7 +241,7 @@ mnote_fuji_entry_get_value (MnoteFujiEntry *entry,
 		for (j = 0; items[i].elem[j].string &&
 		    (items[i].elem[j].index < vs); j++);
 		if (items[i].elem[j].index != vs) {
-			snprintf (val, maxlen,
+			exif_snprintf (val, maxlen,
 				  _("Internal error (unknown value %i)"), vs);
 			break;
 		}
@@ -252,7 +252,7 @@ mnote_fuji_entry_get_value (MnoteFujiEntry *entry,
 		CC (entry->components, 2, val, maxlen);
 		vs = exif_get_short (entry->data, entry->order);
 		vs2 = exif_get_short (entry->data+2, entry->order);
-		snprintf (val, maxlen, "%i, %i", vs, vs2);
+		exif_snprintf (val, maxlen, "%i, %i", vs, vs2);
 		break;
 	  case MNOTE_FUJI_TAG_MIN_FOCAL_LENGTH:
 	  case MNOTE_FUJI_TAG_MAX_FOCAL_LENGTH:
@@ -260,7 +260,7 @@ mnote_fuji_entry_get_value (MnoteFujiEntry *entry,
 		CC (entry->components, 1, val, maxlen);
 		vr = exif_get_rational (entry->data, entry->order);
 		if (!vr.denominator) break;
-		snprintf (val, maxlen, _("%2.2f mm"), (double) vr.numerator /
+		exif_snprintf (val, maxlen, _("%2.2f mm"), (double) vr.numerator /
 			  vr.denominator);
 		break;
 
@@ -271,31 +271,31 @@ mnote_fuji_entry_get_value (MnoteFujiEntry *entry,
 		  break;
 		case EXIF_FORMAT_SHORT:
 		  vs = exif_get_short (entry->data, entry->order);
-		  snprintf (val, maxlen, "%i", vs);
+		  exif_snprintf (val, maxlen, "%i", vs);
 		  break;
 		case EXIF_FORMAT_LONG:
 		  vl = exif_get_long (entry->data, entry->order);
-		  snprintf (val, maxlen, "%lu", (long unsigned) vl);
+		  exif_snprintf (val, maxlen, "%lu", (long unsigned) vl);
 		  break;
 		case EXIF_FORMAT_SLONG:
 		  vsl = exif_get_slong (entry->data, entry->order);
-		  snprintf (val, maxlen, "%li", (long int) vsl);
+		  exif_snprintf (val, maxlen, "%li", (long int) vsl);
 		  break;
 		case EXIF_FORMAT_RATIONAL:
 		  vr = exif_get_rational (entry->data, entry->order);
 		  if (!vr.denominator) break;
-		  snprintf (val, maxlen, "%2.4f", (double) vr.numerator /
+		  exif_snprintf (val, maxlen, "%2.4f", (double) vr.numerator /
 						    vr.denominator);
 		  break;
 		case EXIF_FORMAT_SRATIONAL:
 		  vsr = exif_get_srational (entry->data, entry->order);
 		  if (!vsr.denominator) break;
-		  snprintf (val, maxlen, "%2.4f", (double) vsr.numerator /
+		  exif_snprintf (val, maxlen, "%2.4f", (double) vsr.numerator /
 			  vsr.denominator);
 		  break;
 		case EXIF_FORMAT_UNDEFINED:
 		default:
-		  snprintf (val, maxlen, _("%i bytes unknown data"),
+		  exif_snprintf (val, maxlen, _("%i bytes unknown data"),
  			  entry->size);
 		  break;
 		}
