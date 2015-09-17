@@ -11,27 +11,27 @@ tecmake $1 MF=im_lzo $2 $3 $4 $5 $6 $7 $8
 # Building for the default (USE_LUA51) 
 # or for the defined at the environment
 
-#tecmake $1 MF=imlua5 $2 $3 $4 $5 $6 $7 $8
-#tecmake $1 MF=imlua_process5 $2 $3 $4 $5 $6 $7 $8
-#tecmake $1 MF=imlua_process5 USE_OPENMP=Yes $2 $3 $4 $5 $6 $7 $8
-#tecmake $1 MF=imlua_jp25 $2 $3 $4 $5 $6 $7 $8
-#tecmake $1 MF=imlua_fftw5 $2 $3 $4 $5 $6 $7 $8
+tecmake $1 MF=imlua5 $2 $3 $4 $5 $6 $7 $8
+tecmake $1 MF=imlua_process5 $2 $3 $4 $5 $6 $7 $8
+tecmake $1 MF=imlua_process5 USE_OPENMP=Yes $2 $3 $4 $5 $6 $7 $8
+tecmake $1 MF=imlua_jp25 $2 $3 $4 $5 $6 $7 $8
+tecmake $1 MF=imlua_fftw5 $2 $3 $4 $5 $6 $7 $8
 
-tecmake $1 MF=imlua5 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_process5 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_process5 USE_OPENMP=Yes USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_jp25 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_fftw5 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua5 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_process5 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_process5 USE_OPENMP=Yes USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_jp25 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_fftw5 USE_LUA51=Yes $2 $3 $4 $5 $6 $7 $8
 
-tecmake $1 MF=imlua5 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_process5 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_process5 USE_OPENMP=Yes USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_jp25 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_fftw5 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua5 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_process5 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_process5 USE_OPENMP=Yes USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_jp25 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_fftw5 USE_LUA52=Yes $2 $3 $4 $5 $6 $7 $8
 
-tecmake $1 MF=imlua5 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_process5 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_process5 USE_OPENMP=Yes USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_jp25 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
-tecmake $1 MF=imlua_fftw5 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua5 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_process5 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_process5 USE_OPENMP=Yes USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_jp25 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
+#tecmake $1 MF=imlua_fftw5 USE_LUA53=Yes $2 $3 $4 $5 $6 $7 $8
 
