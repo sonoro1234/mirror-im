@@ -335,7 +335,6 @@ wb_usr.tree =
             { link= "doxygen/classimComplex.html", name= {en= "imComplex" } },
             { link= "doxygen/classimFileFormatBase.html", name= {en= "imFileFormatBase" } },
             { link= "doxygen/classimFormat.html", name= {en= "imFormat" } },
-            { link= "doxygen/classimImageFile.html", name= {en= "imImageFile" } },
           }
         },  
         { 
@@ -376,7 +375,7 @@ wb_usr.tree =
             { link= "doxygen/im__raw_8h.html", name= {en= "im_raw.h" } },
             { link= "doxygen/im__util_8h.html", name= {en= "im_util.h" } },
             { link= "doxygen/imlua_8h.html", name= {en= "imlua.h" } },
-            { link= "doxygen/old__im_8h.html", name= {en= "old_im.h" } }
+            { link= "doxygen/im__old_8h.html", name= {en= "im_old.h" } }
           }
         },
         { 
