@@ -1,6 +1,6 @@
 ifeq ($(OS), Windows_NT)
   TECMAKE_CMD = $(MAKE) --no-print-directory -f ../tecmakewin.mak TEC_UNAME=$(TEC_UNAME)
-  WINLIBS = im_avi im_wmv imlua_avi imlua_wmv im_capture imlua_capture5
+  WINLIBS = im_avi im_wmv imlua_avi5 imlua_wmv5 im_capture imlua_capture5
 else
   TECMAKE_CMD = $(MAKE) --no-print-directory -f ../tecmake.mak
 endif
