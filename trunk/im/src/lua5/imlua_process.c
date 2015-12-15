@@ -1932,7 +1932,7 @@ static int imluaMultiColorOpFunc(float* src_value, float *dst_value, float* para
 
 static int imluaProcessMultiPointColorOp(lua_State *L)
 {
-  int src_count, src_depth, dst_depth;
+  int src_count;
   imImage **src_image_list;
   imImage *dst_image = imlua_checkimage(L, 2);
   const char *op_name = luaL_optstring(L, 6, NULL);
@@ -1962,9 +1962,6 @@ static int imluaProcessMultiPointColorOp(lua_State *L)
     imlua_errormatchsize(L);  
     return 0;
   }
-
-  src_depth = src_image_list[0]->has_alpha? src_image_list[0]->depth+1: src_image_list[0]->depth;
-  dst_depth = dst_image->has_alpha? dst_image->depth+1: dst_image->depth;
 
   lua_pushboolean(L, imProcessMultiPointColorOp((const imImage**)src_image_list, src_count, dst_image, imluaMultiColorOpFunc, NULL, L, op_name));
 
