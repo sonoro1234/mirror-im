@@ -249,7 +249,7 @@ static const luaL_Reg im_lib[] = {
 
 int imlua_close(lua_State *L)
 {
-  (void*)L;
+  (void)L;
   imFormatRemoveAll();
   return 0;
 }
