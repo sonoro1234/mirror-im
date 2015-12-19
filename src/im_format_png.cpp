@@ -336,7 +336,12 @@ void imFileFormatPNG::iReadAttrib(imAttribTable* attrib_table)
   png_timep time;
   if (png_get_tIME(png_ptr, info_ptr, &time))
   {
+#if PNG_LIBPNG_VER > 10600
+    char stime[29];
+    png_convert_to_rfc1123_buffer(stime, time);
+#else
     const char* stime = png_convert_to_rfc1123(png_ptr, time);
+#endif
     attrib_table->Set("DateTimeModified", IM_BYTE, -1, stime);
   }
 
