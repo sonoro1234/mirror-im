@@ -119,7 +119,7 @@ int main(int argc, char* argv[])
       long palette[256];
       int palette_count;
       imFileGetPalette(ifile, palette, &palette_count);
-      imFileSetPalette(ifile, palette, palette_count);
+      imFileSetPalette(ofile, palette, palette_count);
     }
 
     error = imFileWriteImageInfo(ofile, width, height, color_mode, data_type);
@@ -138,12 +138,12 @@ int main(int argc, char* argv[])
   imFileClose(ifile);  
   imFileClose(ofile);  
 
-  return 1;
+  return 0;
 
 man_error:
   PrintError(error);
   if (data) free(data);
   if (ifile) imFileClose(ifile);
   if (ofile) imFileClose(ofile);
-  return 0;
+  return 1;
 }

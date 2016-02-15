@@ -1,6 +1,6 @@
 /* IM 3 sample that copies an image from one file to another. 
    It is good to test the file formats read and write.
-   If the destiny does not supports the input image it aborts and returns an error.
+   If the target does not supports the input image it aborts and returns an error.
 
   Needs "im.lib".
 
@@ -11,8 +11,10 @@
 
 #include <im.h>
 #include <im_util.h>
+#ifdef WIN32
 #include <im_format_avi.h>
 #include <im_format_wmv.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,13 +28,13 @@ void PrintError(int error)
     printf("Error Opening File.\n");
     break;
   case IM_ERR_MEM:
-    printf("Insuficient memory.\n");
+    printf("Insufficient memory.\n");
     break;
   case IM_ERR_ACCESS:
     printf("Error Accessing File.\n");
     break;
   case IM_ERR_DATA:
-    printf("Image type not Suported.\n");
+    printf("Image type not Supported.\n");
     break;
   case IM_ERR_FORMAT:
     printf("Invalid Format.\n");
@@ -53,8 +55,10 @@ int main(int argc, char* argv[])
     return 0;
   }
 
-//  imFormatRegisterAVI();
-//  imFormatRegisterWMV();
+#ifdef WIN32
+  imFormatRegisterAVI();
+  imFormatRegisterWMV();
+#endif
 
   void* data = NULL;
   imFile* ifile = NULL;
@@ -115,7 +119,7 @@ int main(int argc, char* argv[])
       long palette[256];
       int palette_count;
       imFileGetPalette(ifile, palette, &palette_count);
-      imFileSetPalette(ifile, palette, palette_count);
+      imFileSetPalette(ofile, palette, palette_count);
     }
 
     error = imFileWriteImageInfo(ofile, width, height, color_mode, data_type);
@@ -134,12 +138,12 @@ int main(int argc, char* argv[])
   imFileClose(ifile);  
   imFileClose(ofile);  
 
-  return 1;
+  return 0;
 
 man_error:
   PrintError(error);
   if (data) free(data);
   if (ifile) imFileClose(ifile);
   if (ofile) imFileClose(ofile);
-  return 0;
+  return 1;
 }
