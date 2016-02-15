@@ -26,13 +26,13 @@ void PrintError(int error)
     printf("Error Opening File.\n");
     break;
   case IM_ERR_MEM:
-    printf("Insuficient memory.\n");
+    printf("Insufficient memory.\n");
     break;
   case IM_ERR_ACCESS:
     printf("Error Accessing File.\n");
     break;
   case IM_ERR_DATA:
-    printf("Image type not Suported.\n");
+    printf("Image type not Supported.\n");
     break;
   case IM_ERR_FORMAT:
     printf("Invalid Format.\n");
@@ -64,6 +64,9 @@ char* AttribData2Str(const void* data, int data_type)
   case IM_BYTE:
     sprintf(data_str, "%3d", (int)(*((imbyte*)data)));
     break;
+  case IM_SHORT:
+    sprintf(data_str, "%5d", (int)(*((short*)data)));
+    break;
   case IM_USHORT:
     sprintf(data_str, "%5d", (int)(*((imushort*)data)));
     break;
@@ -77,8 +80,17 @@ char* AttribData2Str(const void* data, int data_type)
     {
       float *c = (float*)data;
       sprintf(data_str, "%5.2g, %5.2f", (double)*c, (double)*(c+1));
+      break;
     }
+  case IM_DOUBLE:
+    sprintf(data_str, "%5.2f", (*((double*)data)));
     break;
+  case IM_CDOUBLE:
+    {
+      double *c = (double*)data;
+      sprintf(data_str, "%5.2g, %5.2f", *c, *(c + 1));
+      break;
+    }
   }
 
   return data_str;
@@ -201,11 +213,10 @@ int main(int argc, char* argv[])
   if (argc < 2)
   {
     printf("Invalid number of arguments.\n");
-    return 0;
+    return 1;
   }
 
   PrintImageInfo(argv[1]);
 
-  return 1;
+  return 0;
 }
-
