@@ -619,6 +619,11 @@ int imFileFormatPNG::ReadImageInfo(int index)
 {
   (void)index;
 
+  /* to avoid warning in profile checks */
+#ifdef PNG_SET_OPTION_SUPPORTED
+  png_set_option(png_ptr, PNG_SKIP_sRGB_CHECK_PROFILE, 1);
+#endif
+
   /* Allocate/initialize the memory for image information.  REQUIRED. */
   info_ptr = png_create_info_struct(png_ptr);
   if (info_ptr == NULL)
