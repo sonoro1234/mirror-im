@@ -2,9 +2,9 @@ PROJNAME = im
 LIBNAME = im
 OPT = YES
 
-INCLUDES = . ../include zlib
+INCLUDES = . ../include 
 LDIR = ../lib/$(TEC_UNAME)
-LINK_ZLIB = Yes
+USE_ZLIB = Yes
 
 # WORDS_BIGENDIAN used by libTIFF
 ifeq ($(TEC_SYSARCH), ppc)
