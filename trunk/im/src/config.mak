@@ -30,21 +30,18 @@ SRCTIFF = \
 SRCTIFF  := $(addprefix libtiff/, $(SRCTIFF)) im_format_tiff.cpp
 INCLUDES += libtiff 
 
-ifdef USE_GTK3
-  USE_OLD_LIBPNG = Yes
+ifneq ($(findstring Win, $(TEC_SYSNAME)), )
+  SRCPNG = \
+      png.c       pngget.c    pngread.c   pngrutil.c  pngwtran.c  \
+      pngerror.c  pngmem.c    pngrio.c    pngset.c    pngwio.c    \
+      pngpread.c  pngrtran.c  pngtrans.c  pngwrite.c  pngwutil.c
+  SRCPNG := $(addprefix libpng/, $(SRCPNG)) im_format_png.cpp
+  INCLUDES += libpng
+else
+  # In Linux, use the installed files in the system libpng-dev
+  # If using GTK, then must use the same libpng they use
+  INCLUDES += /usr/include/libpng
 endif
-
-LIBPNG := libpng
-ifdef USE_OLD_LIBPNG
-  LIBPNG := libpng12
-endif
-
-SRCPNG = \
-    png.c       pngget.c    pngread.c   pngrutil.c  pngwtran.c  \
-    pngerror.c  pngmem.c    pngrio.c    pngset.c    pngwio.c    \
-    pngpread.c  pngrtran.c  pngtrans.c  pngwrite.c  pngwutil.c
-SRCPNG := $(addprefix $(LIBPNG)/, $(SRCPNG)) im_format_png.cpp
-INCLUDES += $(LIBPNG)
 
 SRCJPEG = \
     jcapimin.c  jcmarker.c  jdapimin.c  jdinput.c   jdtrans.c   \
@@ -84,10 +81,11 @@ SRC = \
     im_convertbitmap.cpp  im_format_led.cpp   im_counter.cpp       im_str.cpp           \
     im_convertcolor.cpp   im_fileraw.cpp      im_format_krn.cpp    im_compress.cpp      \
     im_file.cpp           im_old.cpp          im_format_pfm.cpp                         \
-    $(SRCJPEG) $(SRCPNG) $(SRCTIFF) $(SRCLZF)
+    $(SRCJPEG) $(SRCTIFF) $(SRCLZF)
     
 ifneq ($(findstring Win, $(TEC_SYSNAME)), )
   SRC += im_sysfile_win32.cpp im_dib.cpp im_dibxbitmap.cpp
+  SRC += $(SRCPNG)
   
   ifneq ($(findstring dll, $(TEC_UNAME)), )
     SRC += im.rc
