@@ -26,7 +26,8 @@ SRCTIFF = \
     tif_dir.c       tif_fax3sm.c     tif_packbits.c  tif_tile.c     \
     tif_dirinfo.c   tif_flush.c      tif_pixarlog.c  tif_zip.c      \
     tif_dirread.c   tif_getimage.c   tif_predict.c   tif_version.c  \
-    tif_write.c     tif_warning.c    tif_ojpeg.c
+    tif_write.c     tif_warning.c    tif_ojpeg.c     tif_lzma.c     \
+    tif_jbig.c
 SRCTIFF  := $(addprefix libtiff/, $(SRCTIFF)) im_format_tiff.cpp
 INCLUDES += libtiff 
 
