@@ -51,7 +51,7 @@
 /* Define to 1 if you have the <GL/gl.h> header file. */
 #undef HAVE_GL_GL_H
 
-/* Define as 0 or 1 according to the floating point format suported by the
+/* Define as 0 or 1 according to the floating point format supported by the
    machine */
 #define HAVE_IEEEFP     /* IMLIB */
 
@@ -405,3 +405,5 @@
 
 /* To avoid the inclusion of <windows.h> */
 #define AVOID_WIN32_FILEIO 1     /* IMLIB */
+
+#define HAVE_SNPRINTF 1     /* IMLIB */
