@@ -42,6 +42,7 @@ else
   # In Linux, use the installed files in the system libpng-dev
   # If using GTK, then must use the same libpng they use
   INCLUDES += /usr/include/libpng
+  SRCPNG := im_format_png.cpp
 endif
 
 SRCJPEG = \
@@ -82,11 +83,10 @@ SRC = \
     im_convertbitmap.cpp  im_format_led.cpp   im_counter.cpp       im_str.cpp           \
     im_convertcolor.cpp   im_fileraw.cpp      im_format_krn.cpp    im_compress.cpp      \
     im_file.cpp           im_old.cpp          im_format_pfm.cpp                         \
-    $(SRCJPEG) $(SRCTIFF) $(SRCLZF)
+    $(SRCJPEG) $(SRCTIFF) $(SRCPNG) $(SRCLZF)
     
 ifneq ($(findstring Win, $(TEC_SYSNAME)), )
   SRC += im_sysfile_win32.cpp im_dib.cpp im_dibxbitmap.cpp
-  SRC += $(SRCPNG)
   
   ifneq ($(findstring dll, $(TEC_UNAME)), )
     SRC += im.rc
