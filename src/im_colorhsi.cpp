@@ -79,7 +79,7 @@ static float iColorHSI_Smax(float h, double cosH, double sinH, float i)
     return 0.0f;
 
   /* Making r=0, g=0, b=0, r=1, g=1 or b=1 in the parametric equations and 
-     writting s in function of H and I. */
+     writing s in function of H and I. */
 
   hr = (float)(cosH / 1.5);
   hg = (float)((-cosH + sinH*sqrt3)/ 3.0);
