@@ -162,6 +162,7 @@ EXPORTS
   imDibCreateSection
   imDibFromHBitmap
   imDibFromImage
+  imDibSectionFromImage
   imDibLoadFile
   imDibPasteClipboard
   imDibLineGetPixelFunc

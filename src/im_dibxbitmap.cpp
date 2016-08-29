@@ -148,7 +148,13 @@ imImage* imDibToImage(const imDib* dib)
   }
   else
   {
-    imDibDecodeToRGBA(dib, (imbyte*)image->data[0], (imbyte*)image->data[1], (imbyte*)image->data[2], NULL);
+    if (dib->bmih->biBitCount == 32)
+    {
+      imImageAddAlpha(image);
+      imDibDecodeToRGBA(dib, (imbyte*)image->data[0], (imbyte*)image->data[1], (imbyte*)image->data[2], (imbyte*)image->data[3]);
+    }
+    else
+      imDibDecodeToRGBA(dib, (imbyte*)image->data[0], (imbyte*)image->data[1], (imbyte*)image->data[2], NULL);
   }
 
   return image;
@@ -166,7 +172,12 @@ imDib* imDibFromImage(const imImage* image)
   if (image->color_space != IM_RGB)
     bpp = 8;
   else
-    bpp = 24;
+  {
+    if (image->has_alpha)
+      bpp = 32;
+    else
+      bpp = 24;
+  }
 
   imDib* dib = imDibCreate(image->width, image->height, bpp);     
   if (!dib) return NULL;
@@ -174,7 +185,47 @@ imDib* imDibFromImage(const imImage* image)
   if (image->color_space != IM_RGB)
     imDibEncodeFromMap(dib, (const imbyte*)image->data[0], image->palette, image->palette_count);
   else
-    imDibEncodeFromRGBA(dib, (const imbyte*)image->data[0], (const imbyte*)image->data[1], (const imbyte*)image->data[2], NULL);
+  {
+    if (image->has_alpha)
+      imDibEncodeFromRGBA(dib, (const imbyte*)image->data[0], (const imbyte*)image->data[1], (const imbyte*)image->data[2], (const imbyte*)image->data[3]);
+    else
+      imDibEncodeFromRGBA(dib, (const imbyte*)image->data[0], (const imbyte*)image->data[1], (const imbyte*)image->data[2], NULL);
+  }
+
+  return dib;
+}
+
+imDib* imDibSectionFromImage(HDC hDC, HBITMAP *bitmap, const imImage* image)
+{
+  assert(image);
+  assert(imImageIsBitmap(image));
+
+  if (!imImageIsBitmap(image))
+    return NULL;
+
+  int bpp;
+  if (image->color_space != IM_RGB)
+    bpp = 8;
+  else
+  {
+    if (image->has_alpha)
+      bpp = 32;
+    else
+      bpp = 24;
+  }
+
+  imDib* dib = imDibCreateSection(hDC, bitmap, image->width, image->height, bpp);
+  if (!dib) return NULL;
+
+  if (image->color_space != IM_RGB)
+    imDibEncodeFromMap(dib, (const imbyte*)image->data[0], image->palette, image->palette_count);
+  else
+  {
+    if (image->has_alpha)
+      imDibEncodeFromRGBA(dib, (const imbyte*)image->data[0], (const imbyte*)image->data[1], (const imbyte*)image->data[2], (const imbyte*)image->data[3]);
+    else
+      imDibEncodeFromRGBA(dib, (const imbyte*)image->data[0], (const imbyte*)image->data[1], (const imbyte*)image->data[2], NULL);
+  }
 
   return dib;
 }

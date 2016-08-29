@@ -233,9 +233,9 @@ static int iLineSize(int width, int bpp)
 
 static void iInitHeadersReference(imDib* dib)
 {
-  dib->bmi = (BITMAPINFO*)dib->dib;
-  dib->bmih = (BITMAPINFOHEADER*)dib->dib;
-  dib->bmic = (RGBQUAD*)(dib->dib + sizeof(BITMAPINFOHEADER));
+  dib->bmi = (BITMAPINFO*)dib->buffer;
+  dib->bmih = (BITMAPINFOHEADER*)dib->buffer;
+  dib->bmic = (RGBQUAD*)(dib->buffer + sizeof(BITMAPINFOHEADER));
 }
 
 static void iInitSizes(imDib* dib, int width, int height, int bpp)
@@ -271,7 +271,7 @@ static void iInitInfoHeader(BITMAPINFOHEADER* bmih, int width, int height, int b
 static void iInitBits(imDib* dib, BYTE* bits)
 {
   if (bits == NULL)
-    dib->bits = dib->dib + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * dib->palette_count;
+    dib->bits = dib->buffer + sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * dib->palette_count;
   else
     dib->bits = bits;
 }
@@ -335,12 +335,12 @@ static int iCheckHeader(BITMAPINFOHEADER *bmih)
   Creation
 *****************/
 
-static void AllocDib(imDib* dib) 
+static void AllocHandle(imDib* dib) 
 {
-  dib->dib = NULL;
+  dib->buffer = NULL;
   dib->handle = GlobalAlloc(GMEM_MOVEABLE, dib->size); 
   if (!dib->handle) return;
-  dib->dib = (BYTE*)GlobalLock(dib->handle); 
+  dib->buffer = (BYTE*)GlobalLock(dib->handle); 
 }
 
 imDib* imDibCreate(int width, int height, int bpp)
@@ -354,6 +354,7 @@ imDib* imDibCreate(int width, int height, int bpp)
   assert(bpp);
 
   dib = (imDib*)malloc(sizeof(imDib));
+  memset(dib, 0, sizeof(imDib));
 
   if (bpp > 8)
   {
@@ -367,8 +368,8 @@ imDib* imDibCreate(int width, int height, int bpp)
   
   iInitSizes(dib, width, height, bpp);
                          
-  AllocDib(dib);
-  if (dib->dib == NULL)
+  AllocHandle(dib);
+  if (dib->buffer == NULL)
   {
     free(dib);
     return NULL;
@@ -380,7 +381,6 @@ imDib* imDibCreate(int width, int height, int bpp)
 
   iInitBits(dib, NULL);
 
-  dib->is_reference = 0;
   
   return dib;
 }
@@ -422,12 +422,9 @@ imDib* imDibCreateSection(HDC hDC, HBITMAP *bitmap, int width, int height, int b
 
   *bitmap = CreateDIBSection(hDC, bmi, DIB_RGB_COLORS, (void**)&bits, NULL, 0);
 
-  {
-    imDib* dib;
-    dib = imDibCreateReference((BYTE*)bmi, bits);
-    dib->is_reference = 0;
-    return dib;
-  }
+  imDib* dib = imDibCreateReference((BYTE*)bmi, bits);
+  dib->free_buffer = 1;
+  return dib;
 }
 
 
@@ -438,11 +435,10 @@ imDib* imDibCreateCopy(const imDib* src_dib)
   assert(src_dib);
 
   dib = (imDib*)malloc(sizeof(imDib));
-
   memcpy(dib, src_dib, sizeof(imDib));
 
-  AllocDib(dib);
-  if (dib->dib == NULL)
+  AllocHandle(dib);
+  if (dib->buffer == NULL)
   {
     free(dib);
     return NULL;
@@ -450,13 +446,11 @@ imDib* imDibCreateCopy(const imDib* src_dib)
 
   iInitHeadersReference(dib);
 
-  memcpy(dib->dib, src_dib->dib, dib->size - dib->bits_size);
+  memcpy(dib->buffer, src_dib->buffer, dib->size - dib->bits_size);
 
   iInitBits(dib, NULL);
 
   memcpy(dib->bits, src_dib->bits, dib->bits_size);
-
-  dib->is_reference = 0;
 
   return dib;
 }
@@ -468,9 +462,11 @@ imDib* imDibCreateReference(BYTE* bmi, BYTE* bits)
   assert(bmi);
 
   dib = (imDib*)malloc(sizeof(imDib));
+  memset(dib, 0, sizeof(imDib));
 
-  dib->dib = bmi;
-  
+  dib->buffer = bmi;
+  dib->handle = NULL; /* dib->handle is NOT allocated */
+
   iInitHeadersReference(dib);
   
   if (dib->bmih->biBitCount > 8)
@@ -489,8 +485,6 @@ imDib* imDibCreateReference(BYTE* bmi, BYTE* bits)
   }
   
   iInitBits(dib, bits);
-  
-  dib->is_reference = 1;
 
   iInitSizes(dib, dib->bmih->biWidth, abs(dib->bmih->biHeight), dib->bmih->biBitCount);
 
@@ -500,16 +494,21 @@ imDib* imDibCreateReference(BYTE* bmi, BYTE* bits)
 void imDibDestroy(imDib* dib)
 {
   assert(dib);
-  if (!dib->is_reference) 
+
+  if (dib->handle) 
   {
     GlobalUnlock(dib->handle);
     GlobalFree(dib->handle);
   }
+
+  if (dib->free_buffer)
+    free(dib->buffer);
+
   free(dib);
 }
 
 /*****************
-  Line Acess
+  Line Access
 *****************/
 
 imDibLineGetPixel imDibLineGetPixelFunc(int bpp)
@@ -567,17 +566,14 @@ imDibLineSetPixel imDibLineSetPixelFunc(int bpp)
 imDib* imDibFromHBitmap(const HBITMAP bitmap, const HPALETTE hPalette)
 {
   imDib* dib;
+  BITMAP bmp;
 
   assert(bitmap);
-
-  {
-    BITMAP bmp; 
  
-    if (!GetObject(bitmap, sizeof(BITMAP), (LPSTR)&bmp)) 
-      return NULL;
+  if (!GetObject(bitmap, sizeof(BITMAP), (LPSTR)&bmp)) 
+    return NULL;
  
-    dib = imDibCreate(bmp.bmWidth, bmp.bmHeight, bmp.bmPlanes * bmp.bmBitsPixel);
-  }
+  dib = imDibCreate(bmp.bmWidth, bmp.bmHeight, bmp.bmPlanes * bmp.bmBitsPixel);
 
   if (!dib)
     return NULL;
@@ -688,6 +684,9 @@ void imDibCopyClipboard(imDib* dib)
 {
   assert(dib);
 
+  if (!dib->handle)
+    return;
+
   if (!OpenClipboard(NULL))
     return;
   EmptyClipboard();
@@ -695,8 +694,8 @@ void imDibCopyClipboard(imDib* dib)
   SetClipboardData(CF_DIB, dib->handle);
   CloseClipboard();
 
-  dib->dib = NULL;
-  dib->is_reference = 1;
+  dib->buffer = NULL;
+  dib->handle = NULL;
   imDibDestroy(dib);
 }
 
