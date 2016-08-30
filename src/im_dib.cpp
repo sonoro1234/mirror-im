@@ -420,6 +420,7 @@ imDib* imDibCreateSection(HDC hDC, HBITMAP *bitmap, int width, int height, int b
     masks[2] = 0x7C00;
   }
 
+  /* ATTENTION: You cannot paste a DIB section from one application into another application. */
   *bitmap = CreateDIBSection(hDC, bmi, DIB_RGB_COLORS, (void**)&bits, NULL, 0);
 
   imDib* dib = imDibCreateReference((BYTE*)bmi, bits);

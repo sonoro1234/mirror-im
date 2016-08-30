@@ -129,9 +129,10 @@ HPALETTE imDibLogicalPalette(const imDib* dib);
 imDib* imDibCaptureScreen(int x, int y, int width, int height);
 
 /** Transfer the DIB to the clipboard. \n 
- * "dib" pointer can not be used after, or use imDibCopyClipboard(imDibCreateCopy(dib)).
+ * "dib" pointer can not be used after, or use imDibCopyClipboard(imDibCreateCopy(dib)). \n
+ * You cannot paste a DIB section from one application into another application. \n
  * Warning: Clipboard functions in C++ can fail with Visual C++ /EHsc (Enable C++ Exceptions)
-* \ingroup dib */
+ * \ingroup dib */
 void imDibCopyClipboard(imDib* dib); 
 
 /** Creates a reference for the DIB in the clipboard if any. Returns NULL otherwise.
