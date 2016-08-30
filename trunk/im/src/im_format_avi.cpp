@@ -364,7 +364,7 @@ int imFileFormatAVI::WriteImageInfo()
 
     if (imStrEqual(this->compression, "CUSTOM"))
     {
-      if (ICCompressorChoose(NULL, ICMF_CHOOSE_DATARATE | ICMF_CHOOSE_KEYFRAME, dib->dib, NULL, &compvars, "Choose Compression") == FALSE)
+      if (ICCompressorChoose(NULL, ICMF_CHOOSE_DATARATE | ICMF_CHOOSE_KEYFRAME, dib->buffer, NULL, &compvars, "Choose Compression") == FALSE)
         return IM_ERR_COMPRESS;
     }
     else
@@ -436,7 +436,7 @@ int imFileFormatAVI::WriteImageInfo()
     hr = AVIStreamSetFormat(stream, 0, compvars.lpbiOut, dib->size - dib->bits_size); 
   }
   else
-    hr = AVIStreamSetFormat(stream, 0, dib->dib, dib->size - dib->bits_size); 
+    hr = AVIStreamSetFormat(stream, 0, dib->buffer, dib->size - dib->bits_size); 
 
   if (hr != 0)
     return IM_ERR_ACCESS;
@@ -630,7 +630,7 @@ int imFileFormatAVI::WriteImageData(void* data)
     WritePalette((unsigned char*)dib->bmic);
 
     /* this must be called here to update the palette */
-    AVIStreamSetFormat(this->stream, 0, dib->dib, dib->size - dib->bits_size);
+    AVIStreamSetFormat(this->stream, 0, dib->buffer, dib->size - dib->bits_size);
   }
 
   imbyte* bits = dib->bits;
