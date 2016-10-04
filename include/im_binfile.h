@@ -17,11 +17,11 @@ extern "C" {
 /** \defgroup binfile Binary File Access 
  *
  * \par
- * These functions are very usefull for reading/writing binary files 
+ * These functions are very useful for reading/writing binary files 
  * that have headers or data that have to be converted depending on 
  * the current CPU byte order. It can invert 2, 4 or 8 bytes numbers to/from little/big-endian orders.
  * \par
- * It will process the data only if the file format is diferent from the current CPU.
+ * It will process the data only if the file format is different from the current CPU.
  * \par
  * Can read from disk or memory. In case of a memory buffer, the file name must be the \ref imBinMemoryFileName structure.
  * \par
@@ -67,19 +67,19 @@ unsigned long imBinFileRead(imBinFile* bfile, void* pValues, unsigned long pCoun
 
 /** Writes an array of values with sizes: 1, 2, 4, or 8. And invert the byte order if necessary before write.\n
  * <b>ATENTION</b>: The function will not make a temporary copy of the values to invert the byte order.\n
- * So after the call the values will be invalid, if the file byte order is diferent from the CPU byte order. \n
- * Returns the actual count of values writen.
+ * So after the call the values will be invalid, if the file byte order is different from the CPU byte order. \n
+ * Returns the actual count of values written.
  * \ingroup binfile */
 unsigned long imBinFileWrite(imBinFile* bfile, void* pValues, unsigned long pCount, int pSizeOf);
 
 /** Writes a string without the NULL terminator. The function uses sprintf to compose the string. \n
- * The internal buffer is fixed at 4096 bytes. \n
- * Returns the actual count of values writen.
+ * The internal buffer is fixed at 10240 bytes. \n
+ * Returns the actual count of values written.
  * \ingroup binfile */
 unsigned long imBinFilePrintf(imBinFile* bfile, const char *format, ...);
 
 /** Reads a line until line break. \n
- * Returns the line in array, must have room enough. Line break is discarted. \n
+ * Returns the line in array, must have room enough. Line break is discarded. \n
  * Use *size to inform buffer size. *size return the actual number os characters read.
  * \ingroup binfile */
 int imBinFileReadLine(imBinFile* handle, char* comment, int *size);
@@ -89,16 +89,16 @@ int imBinFileReadLine(imBinFile* handle, char* comment, int *size);
 int imBinFileSkipLine(imBinFile* handle);
 
 /** Reads an integer number from the current position until found a non integer character.
- * Returns a non zero value if sucessfull.
+ * Returns a non zero value if successful.
  * \ingroup binfile */
 int imBinFileReadInteger(imBinFile* handle, int *value);
 
 /** Reads an floating point number from the current position until found a non number character.
- * Returns a non zero value if sucessfull.
+ * Returns a non zero value if successful.
  * \ingroup binfile */
 int imBinFileReadReal(imBinFile* handle, double *value);
 
-/** Moves the file pointer from the begining of the file.\n
+/** Moves the file pointer from the beginning of the file.\n
  * When writing to a file seeking can go beyond the end of the file.
  * \ingroup binfile */
 void imBinFileSeekTo(imBinFile* bfile, unsigned long pOffset);
@@ -125,11 +125,11 @@ int imBinFileEndOfFile(imBinFile* bfile);
  * \ingroup binfile */
 enum imBinFileModule 	
 {               
-	IM_RAWFILE,   /**< System dependent file I/O Rotines. */
-	IM_STREAM,    /**< Standard Ansi C Stream I/O Rotines. */
+	IM_RAWFILE,   /**< System dependent file I/O Routines. */
+	IM_STREAM,    /**< Standard Ansi C Stream I/O Routines. */
 	IM_MEMFILE,   /**< Uses a memory buffer (see \ref imBinMemoryFileName). */
 	IM_SUBFILE,   /**< It is a sub file. FileName is a imBinFile* pointer from any other module. */
-  IM_FILEHANDLE,/**< System dependent file I/O Rotines, but FileName is a system file handle ("int" in UNIX and "HANDLE" in Windows). */
+  IM_FILEHANDLE,/**< System dependent file I/O Routines, but FileName is a system file handle ("int" in UNIX and "HANDLE" in Windows). */
 	IM_IOCUSTOM0  /**< Other registered modules starts from here. */
 };
 
