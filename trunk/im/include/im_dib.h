@@ -16,7 +16,7 @@ extern "C" {
  *
  * \par
  * Windows DIBs in memory are handled just like a BMP file without the file header. \n
- * These functions will work only in Windows. They are usefull for interchanging data 
+ * These functions will work only in Windows. They are useful for interchanging data 
  * with the clipboard, with capture drivers, with the AVI and WMF file formats and others.
  * \par
  * Supported DIB aspects:
@@ -27,7 +27,7 @@ extern "C" {
  * \li biHeight can be negative, compression can be RLE only if created
  *   from imDibCreateReference, imDibPasteClipboard, imDibLoadFile. 
  * \li can not encode/decode Images to/from RLE compressed Dibs. 
- * \li if working with RLE Dibs bits_size is greatter than used. 
+ * \li if working with RLE Dibs bits_size is greater than used. 
  * \li the resolution of a new Dib is taken from the screen. 
  * \li SetDIBitsToDevice(start_scan is 0, scan_lines is dib->bmih->biHeight).  
  * \li StretchDIBits(use always DIB_RGB_COLORS). 

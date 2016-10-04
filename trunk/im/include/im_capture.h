@@ -45,7 +45,7 @@ int IM_DECL imVideoCaptureDeviceCount(void);
  * \ingroup capture */
 const char* IM_DECL imVideoCaptureDeviceDesc(int device);
 
-/** Returns the extendend device description. May return NULL.
+/** Returns the extended device description. May return NULL.
  *
  * \verbatim im.VideoCaptureDeviceExDesc(device: number) -> desc: string [in Lua 5] \endverbatim
  * \ingroup capture */
@@ -70,7 +70,7 @@ const char* IM_DECL imVideoCaptureDeviceVendorInfo(int device);
  * \ingroup capture */
 int IM_DECL imVideoCaptureReloadDevices(void);
 
-/** Release the device list. Usefull is you need to track leak erros in your application.
+/** Release the device list. Useful is you need to track leak erros in your application.
  *
  * \verbatim im.imVideoCaptureReleaseDevices() [in Lua 5] \endverbatim
  * \ingroup capture */
@@ -98,7 +98,7 @@ void IM_DECL imVideoCaptureDestroy(imVideoCapture* vc);
 /** Connects to a capture device. 
  * More than one imVideoCapture object can be created
  * but they must be connected to different devices.  \n
- * If the object is conected it will disconnect first. \n
+ * If the object is connected it will disconnect first. \n
  * Use -1 to return the current connected device, 
  * in this case returns -1 if not connected. \n
  * Returns zero if failed.
@@ -201,7 +201,7 @@ int IM_DECL imVideoCaptureSetImageSize(imVideoCapture* vc, int width, int height
 int IM_DECL imVideoCaptureFrame(imVideoCapture* vc, unsigned char* data, int color_mode, int timeout);
 
 /** Start capturing, returns the new captured frame and stop capturing.  \n
- * This is more usefull if you are switching between devices. \n
+ * This is more useful if you are switching between devices. \n
  * Data format is the same as imVideoCaptureFrame. \n
  * Returns zero if failed.
  *
