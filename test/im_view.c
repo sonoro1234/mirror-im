@@ -1,6 +1,6 @@
 /* IM 3 sample that shows an image.
 
-  Needs "im.lib", "iup.lib", "cd.lib" and "cdiup.lib".
+  Needs "im.lib", "iup.lib", "cd.lib" and "iupcd.lib".
 
   Usage: im_view <file_name>
 
@@ -15,6 +15,7 @@
 #include <cdiup.h>
 #include <im.h>
 #include <im_image.h>
+
 #include <im_format_jp2.h>
 #include <im_format_avi.h>
 #include <im_format_wmv.h>
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
   Ihandle* dlg;
 
 //  imFormatRegisterJP2();
-  imFormatRegisterAVI();
+//  imFormatRegisterAVI();
 //  imFormatRegisterWMV();   
 
   IupOpen(&argc, &argv);
