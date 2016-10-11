@@ -14,6 +14,10 @@
 #include <cd_plus.h>
 #include <iup_plus.h>
 
+#include <im_format_jp2.h>
+#include <im_format_avi.h>
+#include <im_format_wmv.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -25,25 +29,25 @@ static void PrintError(int error)
   switch (error)
   {
   case IM_ERR_OPEN:
-    IupMessage("IM", "Error Opening File.");
+    iup::Message("IM", "Error Opening File.");
     break;
   case IM_ERR_MEM:
-    IupMessage("IM", "Insufficient memory.");
+    iup::Message("IM", "Insufficient memory.");
     break;
   case IM_ERR_ACCESS:
-    IupMessage("IM", "Error Accessing File.");
+    iup::Message("IM", "Error Accessing File.");
     break;
   case IM_ERR_DATA:
-    IupMessage("IM", "Image type not Supported.");
+    iup::Message("IM", "Image type not Supported.");
     break;
   case IM_ERR_FORMAT:
-    IupMessage("IM", "Invalid Format.");
+    iup::Message("IM", "Invalid Format.");
     break;
   case IM_ERR_COMPRESS:
-    IupMessage("IM", "Invalid or unsupported compression.");
+    iup::Message("IM", "Invalid or unsupported compression.");
     break;
   default:
-    IupMessage("IM", "Unknown Error.");
+    iup::Message("IM", "Unknown Error.");
   }
 }
 
@@ -145,6 +149,10 @@ static Ihandle* CreateDialog(void)
 int main(int argc, char* argv[])
 {
   Ihandle* dlg;
+
+  //  imFormatRegisterJP2();
+  //  imFormatRegisterAVI();
+  //  imFormatRegisterWMV();   
 
   IupOpen(&argc, &argv);
 
