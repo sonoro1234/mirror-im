@@ -56,8 +56,8 @@ int main(int argc, char* argv[])
   }
 
 #ifdef WIN32
-  imFormatRegisterAVI();
-  imFormatRegisterWMV();
+//  imFormatRegisterAVI();
+//  imFormatRegisterWMV();
 #endif
 
   int error;
