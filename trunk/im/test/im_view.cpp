@@ -29,61 +29,61 @@ static void PrintError(int error)
   switch (error)
   {
   case IM_ERR_OPEN:
-    iup::Message("IM", "Error Opening File.");
+    Iup::Message("IM", "Error Opening File.");
     break;
   case IM_ERR_MEM:
-    iup::Message("IM", "Insufficient memory.");
+    Iup::Message("IM", "Insufficient memory.");
     break;
   case IM_ERR_ACCESS:
-    iup::Message("IM", "Error Accessing File.");
+    Iup::Message("IM", "Error Accessing File.");
     break;
   case IM_ERR_DATA:
-    iup::Message("IM", "Image type not Supported.");
+    Iup::Message("IM", "Image type not Supported.");
     break;
   case IM_ERR_FORMAT:
-    iup::Message("IM", "Invalid Format.");
+    Iup::Message("IM", "Invalid Format.");
     break;
   case IM_ERR_COMPRESS:
-    iup::Message("IM", "Invalid or unsupported compression.");
+    Iup::Message("IM", "Invalid or unsupported compression.");
     break;
   default:
-    iup::Message("IM", "Unknown Error.");
+    Iup::Message("IM", "Unknown Error.");
   }
 }
 
 static int cbCanvasRepaint(Ihandle* iup_canvas)
 {
-  cdCanvas* cd_canvas = (cdCanvas*)IupGetAttribute(iup_canvas, "cdCanvas");
-  imImage* image = (imImage*)IupGetAttribute(iup_canvas, "imImage");
+  cd::Canvas* cd_canvas = (cd::Canvas*)IupGetAttribute(iup_canvas, "cd::Canvas");
+  im::Image* image = (im::Image*)IupGetAttribute(iup_canvas, "im::Image");
 
   if (!cd_canvas || disable_repaint)
     return IUP_DEFAULT;
 
-  cdCanvasActivate(cd_canvas);
-  cdCanvasClear(cd_canvas);
+  cd_canvas->Activate();
+  cd_canvas->Clear();
 
   if (!image)
     return IUP_DEFAULT;
 
-  imcdCanvasPutImage(cd_canvas, image, 0, 0, image->width, image->height, 0, 0, 0, 0);
+  cd_canvas->PutImage(*image, 0, 0, image->Width(), image->Height());
   
-  cdCanvasFlush(cd_canvas);
+  cd_canvas->Flush();
   
   return IUP_DEFAULT;
 }
 
 static void ShowImage(char* file_name, Ihandle* iup_dialog)
 {
-  int error;
-  imImage* image = (imImage*)IupGetAttribute(iup_dialog, "imImage");
-  if (image) imImageDestroy(image);
-  IupSetAttribute(iup_dialog, "imImage", NULL);
+  int error = 0;
+  im::Image* image = (im::Image*)IupGetAttribute(iup_dialog, "im::Image");
+  if (image) delete image;
+  IupSetAttribute(iup_dialog, "im::Image", NULL);
 
-  image = imFileImageLoadBitmap(file_name, 0, &error);
+  image = new im::Image(file_name, 0, error, true);
   if (error) PrintError(error);
   if (!image) return;
 
-  IupSetAttribute(iup_dialog, "imImage", (char*)image);
+  IupSetAttribute(iup_dialog, "im::Image", (char*)image);
   IupStoreAttribute(iup_dialog, "TITLE", file_name);
 
   cbCanvasRepaint(iup_dialog); /* we can do this because canvas inherit attributes from the dialog */
@@ -97,7 +97,7 @@ static int cbCanvasButton(Ihandle* iup_canvas, int but, int pressed)
     return IUP_DEFAULT;
   
   disable_repaint = 1;
-  if (IupGetFile(file_name) != 0)
+  if (Iup::GetFile(file_name) != 0)
   {
     disable_repaint = 0;
     return IUP_DEFAULT;
@@ -111,21 +111,21 @@ static int cbCanvasButton(Ihandle* iup_canvas, int but, int pressed)
 
 static int cbCanvasMap(Ihandle* iup_canvas)
 {
-  cdCanvas* cd_canvas = cdCreateCanvas(CD_IUP, iup_canvas);
-  IupSetAttribute(IupGetDialog(iup_canvas), "cdCanvas", (char*)cd_canvas);
+  cd::Canvas* cd_canvas = new cd::CanvasIup(iup_canvas);
+  IupSetAttribute(IupGetDialog(iup_canvas), "cd::Canvas", (char*)cd_canvas);
   return IUP_DEFAULT;
 }
 
 static int cbDialogClose(Ihandle* iup_dialog)
 {
-  cdCanvas* cd_canvas = (cdCanvas*)IupGetAttribute(iup_dialog, "cdCanvas");
-  imImage* image = (imImage*)IupGetAttribute(iup_dialog, "imImage");
+  cd::Canvas* cd_canvas = (cd::Canvas*)IupGetAttribute(iup_dialog, "cd::Canvas");
+  im::Image* image = (im::Image*)IupGetAttribute(iup_dialog, "im::Image");
 
-  if (cd_canvas) cdKillCanvas(cd_canvas);
-  if (image) imImageDestroy(image);
+  if (cd_canvas) delete cd_canvas;
+  if (image) delete image;
 
-  IupSetAttribute(iup_dialog, "cdCanvas", NULL);
-  IupSetAttribute(iup_dialog, "imImage", NULL);
+  IupSetAttribute(iup_dialog, "cd::Canvas", NULL);
+  IupSetAttribute(iup_dialog, "im::Image", NULL);
 
   return IUP_CLOSE;
 }
@@ -148,17 +148,17 @@ static Ihandle* CreateDialog(void)
 
 int main(int argc, char* argv[])
 {
-  Ihandle* dlg;
+  Iup::Dialog dlg;
 
   //  imFormatRegisterJP2();
   //  imFormatRegisterAVI();
   //  imFormatRegisterWMV();   
 
-  IupOpen(&argc, &argv);
+  Iup::Open(argc, argv);
 
   dlg = CreateDialog();
 
-  IupShow(dlg);
+  dlg.Show();
   
   /* Try to get a file name from the command line. */
   if (argc > 1)
@@ -170,9 +170,9 @@ int main(int argc, char* argv[])
       ShowImage(file_name, dlg);
   }
                                    
-  IupMainLoop();
+  Iup::MainLoop();
   IupDestroy(dlg);
-  IupClose();
+  Iup::Close();
 
   return 0;
 }
