@@ -255,11 +255,14 @@ namespace im
     /* forbidden */
     Image() { im_image = 0; };
 
-    void IncRef() {
+    void IncRef() 
+    {
       int image_ref = GetAttribInteger("_IMAGE_REF");
       image_ref++;
-      SetAttribInteger("_IMAGE_REF", IM_INT, image_ref); }
-    bool DecRef() {
+      SetAttribInteger("_IMAGE_REF", IM_INT, image_ref); 
+    }
+    bool DecRef() 
+    {
       int image_ref = GetAttribInteger("_IMAGE_REF");
       if (image_ref > 0)
       {
