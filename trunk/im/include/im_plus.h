@@ -52,7 +52,7 @@ namespace im
     Palette(const Palette& src_palette) {
       count = src_palette.count;
       pal = imPaletteDuplicate(src_palette.pal, src_palette.count); }
-    ~Palette() {
+    virtual ~Palette() {
       if (pal)
         imPaletteRelease(pal);
     }
@@ -296,7 +296,7 @@ namespace im
       im_image = ref_image;
       IncRef(); 
     }
-    ~Image() {
+    virtual ~Image() {
       if (im_image)
       {
         if (DecRef())
@@ -579,7 +579,7 @@ namespace im
       im_file = imFileNew(file_name, format, &error); }
     File(imFile* ref_file) {
       im_file = ref_file; }
-    ~File() {
+    virtual ~File() {
       if (im_file) 
         imFileClose(im_file); 
     }
@@ -715,7 +715,7 @@ namespace im
       im_vc = imVideoCaptureCreate(); }
     VideoCapture(imVideoCapture* ref_vc) {
       im_vc = ref_vc; }
-    ~VideoCapture() {
+    virtual ~VideoCapture() {
       if (im_vc) 
         imVideoCaptureDestroy(im_vc); }
 
@@ -1209,7 +1209,7 @@ namespace im
       count = imHistogramCount(image_data_type);
       histo = new unsigned long[count]; 
     }
-    ~Histogram() {
+    virtual ~Histogram() {
       if (histo)
         delete[] histo; 
     }
@@ -1264,7 +1264,7 @@ namespace im
     MeasureTable(int _region_count)
       :AttribTable(0), region_count(_region_count) {
     }
-    ~MeasureTable() {}
+    virtual ~MeasureTable() {}
 
     int RegionCount() const { return region_count; }
 

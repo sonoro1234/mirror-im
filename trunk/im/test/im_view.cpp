@@ -66,12 +66,12 @@ public:
     iup_dialog.SetAttribute("SIZE", "HALFxHALF");  /* initial size */
 
     // 1) Register "this" object as a callback receiver (need only once)
-    IUP_CLASS_INITCALLBACK(iup_dialog.GetHandle(), imView);
+    IUP_PLUS_INITCALLBACK(iup_dialog, imView);
 
     // 2) Associate the callback with the button
-    IUP_CLASS_SETCALLBACK(canvas.GetHandle(), "BUTTON_CB", CanvasButton);
-    IUP_CLASS_SETCALLBACK(canvas.GetHandle(), "ACTION", CanvasRepaint);
-    IUP_CLASS_SETCALLBACK(canvas.GetHandle(), "MAP_CB", CanvasMap);
+    IUP_PLUS_SETCALLBACK(canvas, "BUTTON_CB", CanvasButton);
+    IUP_PLUS_SETCALLBACK(canvas, "ACTION", CanvasRepaint);
+    IUP_PLUS_SETCALLBACK(canvas, "MAP_CB", CanvasMap);
 
     iup_dialog.Show();
 
@@ -148,9 +148,8 @@ int imView::CanvasButton(Ihandle*, int but, int pressed)
   return IUP_DEFAULT;
 }
 
-int imView::CanvasMap(Ihandle* ih)
+int imView::CanvasMap(Ihandle*)
 {
-  Iup::Canvas canvas(ih);
   canvas_draw = new cd::CanvasIup(canvas);
   return IUP_DEFAULT;
 }
