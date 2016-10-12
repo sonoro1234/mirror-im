@@ -115,13 +115,15 @@ int imView::CanvasRepaint(Ihandle*)
 void imView::ShowImage(const char* file_name)
 {
   int error = 0;
-  if (image) delete image;
-
-  image = new im::Image(file_name, 0, error, true);
+  im::Image* new_image = new im::Image(file_name, 0, error, true);
   if (error) PrintError(error);
-  if (!image) return;
+  if (!new_image) return;
 
-  canvas.GetParent().SetString("TITLE", file_name);
+  if (image) delete image;
+  image = new_image;
+
+  Iup::Dialog dialog(canvas.GetParent());
+  dialog.SetString("TITLE", file_name);
 
   canvas.Update();
 }
@@ -149,8 +151,6 @@ int imView::CanvasButton(Ihandle*, int but, int pressed)
 int imView::CanvasMap(Ihandle* ih)
 {
   Iup::Canvas canvas(ih);
-  cd::CanvasIup teste_canvas(canvas);
-
   canvas_draw = new cd::CanvasIup(canvas);
   return IUP_DEFAULT;
 }
