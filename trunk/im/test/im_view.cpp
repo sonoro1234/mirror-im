@@ -13,6 +13,7 @@
 #include <im_plus.h>
 #include <cd_plus.h>
 #include <iup_plus.h>
+#include <iup_class_cbs.hpp>
 
 #include <im_format_jp2.h>
 #include <im_format_avi.h>
@@ -21,8 +22,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
-static int disable_repaint = 0; /* used to optimize repaint, while opening a new file */
 
 static void PrintError(int error)
 {
@@ -51,45 +50,83 @@ static void PrintError(int error)
   }
 }
 
-static int cbCanvasRepaint(Ihandle* iup_canvas)
+class imView
 {
-  cd::Canvas* cd_canvas = (cd::Canvas*)IupGetAttribute(iup_canvas, "cd::Canvas");
-  im::Image* image = (im::Image*)IupGetAttribute(iup_canvas, "im::Image");
+  cd::Canvas* canvas_draw;
+  im::Image* image;
+  Iup::Canvas canvas;
 
-  if (!cd_canvas || disable_repaint)
+  int disable_repaint;  /* used to optimize repaint, while opening a new file */
+
+public:
+  imView()
+    :canvas_draw(NULL), image(NULL), disable_repaint(0), canvas()
+  {
+    Iup::Dialog iup_dialog(canvas);
+    iup_dialog.SetAttribute("SIZE", "HALFxHALF");  /* initial size */
+
+    // 1) Register "this" object as a callback receiver (need only once)
+    IUP_CLASS_INITCALLBACK(iup_dialog.GetHandle(), imView);
+
+    // 2) Associate the callback with the button
+    IUP_CLASS_SETCALLBACK(canvas.GetHandle(), "BUTTON_CB", CanvasButton);
+    IUP_CLASS_SETCALLBACK(canvas.GetHandle(), "ACTION", CanvasRepaint);
+    IUP_CLASS_SETCALLBACK(canvas.GetHandle(), "MAP_CB", CanvasMap);
+
+    iup_dialog.Show();
+
+    iup_dialog.SetAttribute("SIZE", NULL); /* remove initial size limitation */
+  };
+
+  ~imView()
+  {
+    if (canvas_draw) delete canvas_draw;
+    if (image) delete image;
+  }
+
+  void ShowImage(const char* file_name);
+
+protected:
+  // 3) Declare the callback as a member function
+  IUP_CLASS_DECLARECALLBACK_IFn(imView, CanvasRepaint);
+  IUP_CLASS_DECLARECALLBACK_IFnii(imView, CanvasButton);
+  IUP_CLASS_DECLARECALLBACK_IFn(imView, CanvasMap);
+  IUP_CLASS_DECLARECALLBACK_IFn(imView, DialogClose);
+};
+
+int imView::CanvasRepaint(Ihandle*)
+{
+  if (!canvas_draw || disable_repaint)
     return IUP_DEFAULT;
 
-  cd_canvas->Activate();
-  cd_canvas->Clear();
+  canvas_draw->Activate();
+  canvas_draw->Clear();
 
   if (!image)
     return IUP_DEFAULT;
 
-  cd_canvas->PutImage(*image, 0, 0, image->Width(), image->Height());
+  canvas_draw->PutImage(*image, 0, 0, image->Width(), image->Height());
   
-  cd_canvas->Flush();
+  canvas_draw->Flush();
   
   return IUP_DEFAULT;
 }
 
-static void ShowImage(char* file_name, Ihandle* iup_dialog)
+void imView::ShowImage(const char* file_name)
 {
   int error = 0;
-  im::Image* image = (im::Image*)IupGetAttribute(iup_dialog, "im::Image");
   if (image) delete image;
-  IupSetAttribute(iup_dialog, "im::Image", NULL);
 
   image = new im::Image(file_name, 0, error, true);
   if (error) PrintError(error);
   if (!image) return;
 
-  IupSetAttribute(iup_dialog, "im::Image", (char*)image);
-  IupStoreAttribute(iup_dialog, "TITLE", file_name);
+  canvas.GetParent().SetString("TITLE", file_name);
 
-  cbCanvasRepaint(iup_dialog); /* we can do this because canvas inherit attributes from the dialog */
+  canvas.Update();
 }
 
-static int cbCanvasButton(Ihandle* iup_canvas, int but, int pressed)
+int imView::CanvasButton(Ihandle*, int but, int pressed)
 {
   char file_name[200] = "*.*";
 
@@ -104,74 +141,42 @@ static int cbCanvasButton(Ihandle* iup_canvas, int but, int pressed)
   }
 
   disable_repaint = 0;
-  ShowImage(file_name, IupGetDialog(iup_canvas));
+  ShowImage(file_name);
   
   return IUP_DEFAULT;
 }
 
-static int cbCanvasMap(Ihandle* iup_canvas)
+int imView::CanvasMap(Ihandle* ih)
 {
-  cd::Canvas* cd_canvas = new cd::CanvasIup(iup_canvas);
-  IupSetAttribute(IupGetDialog(iup_canvas), "cd::Canvas", (char*)cd_canvas);
+  Iup::Canvas canvas(ih);
+  cd::CanvasIup teste_canvas(canvas);
+
+  canvas_draw = new cd::CanvasIup(canvas);
   return IUP_DEFAULT;
-}
-
-static int cbDialogClose(Ihandle* iup_dialog)
-{
-  cd::Canvas* cd_canvas = (cd::Canvas*)IupGetAttribute(iup_dialog, "cd::Canvas");
-  im::Image* image = (im::Image*)IupGetAttribute(iup_dialog, "im::Image");
-
-  if (cd_canvas) delete cd_canvas;
-  if (image) delete image;
-
-  IupSetAttribute(iup_dialog, "cd::Canvas", NULL);
-  IupSetAttribute(iup_dialog, "im::Image", NULL);
-
-  return IUP_CLOSE;
-}
-
-static Ihandle* CreateDialog(void)
-{
-  Ihandle *iup_dialog, *iup_canvas;
-
-  iup_canvas = IupCanvas(NULL);
-  IupSetCallback(iup_canvas, "BUTTON_CB", (Icallback)cbCanvasButton);
-  IupSetCallback(iup_canvas, "ACTION", (Icallback)cbCanvasRepaint);
-  IupSetCallback(iup_canvas, "MAP_CB", (Icallback)cbCanvasMap);
-  
-  iup_dialog = IupDialog(iup_canvas);
-  IupSetCallback(iup_dialog, "CLOSE_CB", (Icallback)cbDialogClose);
-  IupSetAttribute(iup_dialog, "SIZE", "HALFxHALF");  /* initial size */
-
-  return iup_dialog;
 }
 
 int main(int argc, char* argv[])
 {
-  Iup::Dialog dlg;
-
   //  imFormatRegisterJP2();
   //  imFormatRegisterAVI();
   //  imFormatRegisterWMV();   
 
   Iup::Open(argc, argv);
 
-  dlg = CreateDialog();
-
-  dlg.Show();
-  
+  imView view;
+ 
   /* Try to get a file name from the command line. */
   if (argc > 1)
-    ShowImage(argv[1], dlg);
+    view.ShowImage(argv[1]);
   else   
   {
     char file_name[1024] = "*.*";
     if (IupGetFile(file_name) == 0)
-      ShowImage(file_name, dlg);
+      view.ShowImage(file_name);
   }
                                    
   Iup::MainLoop();
-  IupDestroy(dlg);
+  
   Iup::Close();
 
   return 0;
