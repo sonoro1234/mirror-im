@@ -13,5 +13,8 @@
     <ClCompile Include="..\test\im_view.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\cd\html\examples\emf2pdf.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
