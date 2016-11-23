@@ -220,7 +220,7 @@ int imProcessMedianConvolve(const imImage* src_image, imImage* dst_image, int ks
   int counter;
 
   counter = imProcessCounterBegin("Median Filter");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_image->depth; i++)
   {
@@ -315,7 +315,7 @@ int imProcessRangeConvolve(const imImage* src_image, imImage* dst_image, int ks)
   int counter;
 
   counter = imProcessCounterBegin("Range Filter");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_image->depth; i++)
   {
@@ -473,7 +473,7 @@ int imProcessRangeContrastThreshold(const imImage* src_image, imImage* dst_image
 {
   int ret = 0;
   int counter = imProcessCounterBegin("Range Contrast Threshold");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   thresAux = min_range;
 
@@ -566,7 +566,7 @@ int imProcessLocalMaxThreshold(const imImage* src_image, imImage* dst_image, int
 {
   int ret = 0;
   int counter = imProcessCounterBegin("Local Max Threshold");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   thresAux = min_thres;
 
@@ -680,7 +680,7 @@ int imProcessRankClosestConvolve(const imImage* src_image, imImage* dst_image, i
   int counter;
 
   counter = imProcessCounterBegin("Rank Closest");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_image->depth; i++)
   {
@@ -775,7 +775,7 @@ int imProcessRankMaxConvolve(const imImage* src_image, imImage* dst_image, int k
   int counter;
 
   counter = imProcessCounterBegin("Rank Max");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_image->depth; i++)
   {
@@ -870,7 +870,7 @@ int imProcessRankMinConvolve(const imImage* src_image, imImage* dst_image, int k
   int counter;
 
   counter = imProcessCounterBegin("Rank Min");
-  imCounterTotal(counter, src_image->depth*src_image->height, "Filtering...");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_image->depth; i++)
   {

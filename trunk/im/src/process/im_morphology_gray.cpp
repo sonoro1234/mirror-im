@@ -122,9 +122,7 @@ int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, con
   int ret = 0;
 
   int counter = imProcessCounterBegin("Gray Morphological Convolution");
-  const char* msg = (const char*)imImageGetAttribute(kernel, "Description", NULL, NULL);
-  if (!msg) msg = "Processing...";
-  imCounterTotal(counter, src_image->depth*src_image->height, msg);
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   imImage* fkernel = NULL;
     

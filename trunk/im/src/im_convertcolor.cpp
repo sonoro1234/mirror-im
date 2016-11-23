@@ -169,8 +169,6 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
   const T* src_map3 = (src_color_space == IM_CMYK)? src_data[3]: 0;
   T* dst_map = dst_data[0];
 
-  imCounterTotal(counter, count, "Converting To Gray...");
-
   IM_INT_PROCESSING;
 
   switch(src_color_space)
@@ -292,8 +290,6 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
   T* dst_map0 = dst_data[0];
   T* dst_map1 = dst_data[1];
   T* dst_map2 = dst_data[2];
-
-  imCounterTotal(counter, count, "Converting To RGB...");
 
   IM_INT_PROCESSING;
 
@@ -428,8 +424,6 @@ IM_STATIC int iDoConvert2YCbCr(int count, int data_type,
   T* dst_map1 = dst_data[1];
   T* dst_map2 = dst_data[2];
 
-  imCounterTotal(counter, count, "Converting To YCbCr...");
-
   IM_INT_PROCESSING;
 
   switch(src_color_space)
@@ -477,8 +471,6 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
   T* dst_map0 = dst_data[0];
   T* dst_map1 = dst_data[1];
   T* dst_map2 = dst_data[2];
-
-  imCounterTotal(counter, count, "Converting To XYZ...");
 
   IM_INT_PROCESSING;
 
@@ -610,8 +602,6 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
   T* dst_map0 = dst_data[0];
   T* dst_map1 = dst_data[1];
   T* dst_map2 = dst_data[2];
-
-  imCounterTotal(counter, count, "Converting To Lab...");
 
   IM_INT_PROCESSING;
 
@@ -776,8 +766,6 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
   T* dst_map1 = dst_data[1];
   T* dst_map2 = dst_data[2];
 
-  imCounterTotal(counter, count, "Converting To Luv...");
-
   IM_INT_PROCESSING;
 
   switch(src_color_space)
@@ -933,6 +921,7 @@ IM_STATIC int iDoConvertColorSpace(int count, int data_type,
 {
   int ret = IM_ERR_DATA, 
       convert2rgb = 0;
+  int total_counter = count;
 
   if ((dst_color_space == IM_XYZ ||
        dst_color_space == IM_LAB ||
@@ -944,7 +933,10 @@ IM_STATIC int iDoConvertColorSpace(int count, int data_type,
   }    
 
   if (dst_color_space == IM_YCBCR && src_color_space != IM_RGB)
+  {
     convert2rgb = 1;
+    total_counter *= 2;
+  }
 
 #ifdef IM_PROCESS
   int counter = imProcessCounterBegin("Convert Color Space");
@@ -952,9 +944,11 @@ IM_STATIC int iDoConvertColorSpace(int count, int data_type,
   int counter = imCounterBegin("Convert Color Space");
 #endif
 
+  imCounterTotal(counter, total_counter, "Converting...");
+
   if (convert2rgb)
   {
-    ret = iDoConvert2RGB(count, data_type, src_data, src_color_space, dst_data, counter);     
+    ret = iDoConvert2RGB(count, data_type, src_data, src_color_space, dst_data, counter);
 
     if (ret != IM_ERR_NONE) 
     {

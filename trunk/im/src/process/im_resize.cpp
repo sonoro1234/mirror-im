@@ -131,9 +131,8 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order)
 {
   int ret = 0;
   int counter = imProcessCounterBegin("Reduce Size");
-  const char* int_msg = (order == 1)? "Bilinear Decimation": "Zero Order Decimation";
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
-  imCounterTotal(counter, src_depth*dst_image->height, int_msg);
+  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");
 
   for (int i = 0; i < src_depth; i++)
   {
@@ -190,9 +189,8 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order)
 {
   int ret = 0;
   int counter = imProcessCounterBegin("Resize");
-  const char* int_msg = (order == 3)? "Bicubic Interpolation": (order == 1)? "Bilinear Interpolation": "Zero Order Interpolation";
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
-  imCounterTotal(counter, src_depth*dst_image->height, int_msg);
+  imCounterTotal(counter, src_depth*dst_image->height, "Processing...");
 
   for (int i = 0; i < src_depth; i++)
   {

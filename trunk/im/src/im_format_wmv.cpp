@@ -1504,7 +1504,7 @@ void imFileFormatWMV::FixRGB(int bpp)
 
 int imFileFormatWMV::ReadImageData(void* data)
 {
-  imCounterTotal(this->counter, this->height, "Reading WMV Frame...");
+  imCounterTotal(this->counter, this->height, "Reading WMV...");
 
   INSSBuffer* pSample = NULL;
 
@@ -1570,7 +1570,7 @@ int imFileFormatWMV::ReadImageData(void* data)
 
 int imFileFormatWMV::WriteImageData(void* data)
 {
-  imCounterTotal(this->counter, this->height, "Writing WMV Frame...");
+  imCounterTotal(this->counter, this->height, "Writing WMV...");
 
   INSSBuffer* pSample = NULL;
   Writer->AllocateSample(BitmapDataSize, &pSample);

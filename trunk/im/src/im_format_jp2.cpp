@@ -392,7 +392,7 @@ int imFileFormatJP2::ReadImageData(void* data)
 {
   int count = imFileLineBufferCount(this);
 
-  imCounterTotal(this->counter, count, NULL);
+  imCounterTotal(this->counter, count, NULL); /* dummy call just to prepare the counter */
 
   int alpha_plane = -1;
   if (imColorModeHasAlpha(this->user_color_mode) && imColorModeHasAlpha(this->file_color_mode))

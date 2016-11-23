@@ -575,9 +575,7 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
 #else
   int counter = imCounterBegin("Convert Data Type");
 #endif
-  char msg[50];
-  sprintf(msg, "Converting to %s...", imDataTypeName(dst_image->data_type));
-  imCounterTotal(counter, total_count, msg);
+  imCounterTotal(counter, total_count, "Converting...");
 
   imAttribTable* attrib_table = (imAttribTable*)(src_image->attrib_table);
 

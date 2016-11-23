@@ -579,7 +579,7 @@ void imFileFormatAVI::FixRGBOrder(int bpp)
 
 int imFileFormatAVI::ReadImageData(void* data)
 {
-  imCounterTotal(this->counter, this->height, "Reading AVI Frame...");
+  imCounterTotal(this->counter, this->height, "Reading AVI...");
 
   void* packed_dib = AVIStreamGetFrame(this->frame, this->current_frame);
   if (!packed_dib)
@@ -623,7 +623,7 @@ int imFileFormatAVI::ReadImageData(void* data)
 
 int imFileFormatAVI::WriteImageData(void* data)
 {
-  imCounterTotal(this->counter, this->height, "Writing AVI Frame...");
+  imCounterTotal(this->counter, this->height, "Writing AVI...");
 
   if (dib->bmih->biBitCount <= 8)
   {
