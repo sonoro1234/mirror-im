@@ -22,11 +22,11 @@ extern "C" {
 /** Counter callback, informs the progress of the operation to the client. \n
  * Counter id identifies different counters. \n
  * Progress in a count reports a value from 0 to 1000 always, proportional to total value and increment. 
- * If -1 indicates the start of a sequence of operations, 1001 ends the sequence. \n
+ * If -1 indicates that Begin was called, 1001 indicates that End was called. \n
  * If returns 0 the client should abort the operation. \n
- * If the counter is aborted, the callback will be called one last time at 1001.
- * Text is NULL most of the time, but contains a title in the beginning of a sequence (progress==-1)
- * and a message in the beginning of a count (progress==0).
+ * Noticed that if the counter is aborted, the callback will still be called one last time at 1001.
+ * Text is NULL most of the time, but contains a title in Begin (progress==-1)
+ * and a message in the start of a count (progress==0).
  * \ingroup counter */
 typedef int (*imCounterCallback)(int counter, void* cb_user_data, const char* text, int progress);
 
@@ -40,14 +40,16 @@ imCounterCallback imCounterSetCallback(void* cb_user_data, imCounterCallback cou
  * \ingroup counter */
 int imCounterHasCallback(void);
 
-/** Begins a new count, or a partial-count in a sequence. \n
- * Calls the callback with "-1" and text=title, if it is at the top level. \n     
- * This is to be used by the operations. Returns a counter Id.
+/** Begins a new count. \n
+ * Calls the callback with "-1" and text=title. \n     
+ * This is to be used by the operations. Returns a new counter Id. \n
+ * Several counters can coexist at the same time, as part of a sequence with sub-counter 
+ * or simultaneous counter in multi-thread applications.
  * \ingroup counter */
 int imCounterBegin(const char* title);
 
-/** Ends a count, or a partial-count in a sequence. \n
- * Calls the callback with "1001", text=null, and releases the counter if it is at top level count. \n
+/** Ends a count. \n
+ * Calls the callback with "1001", text=null, and releases the counter. \n
  * \ingroup counter */
 void imCounterEnd(int counter);
 
@@ -63,7 +65,9 @@ int imCounterInc(int counter);
  * \ingroup counter */
 int imCounterIncTo(int counter, int count);
 
-/** Sets the total increments of a count.
+/** Sets the total increments of a count. \n
+ * Must be set at least one time. \n
+ * Notice that if total is set more than one time counter should simply restart.
  * \ingroup counter */
 void imCounterTotal(int counter, int total, const char* message);
 

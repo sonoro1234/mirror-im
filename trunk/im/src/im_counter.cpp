@@ -31,12 +31,12 @@ struct iCounter
 {
   int total;
   int current;
-  int sequence;
+  int has_begin;
   const char* message;
   void* userdata;
 };
 
-#define MAX_COUNTERS 10
+#define MAX_COUNTERS 50
 static iCounter iCounterList[MAX_COUNTERS];
 
 int imCounterBegin(const char* title)
@@ -54,8 +54,7 @@ int imCounterBegin(const char* title)
   int counter = -1;
   for (int i = 0; i < MAX_COUNTERS; i++)
   {
-    if (iCounterList[i].sequence == 0 ||  // the counter is free
-        iCounterList[i].current == 0)     // or we are in a sequence
+    if (iCounterList[i].has_begin == 0)  // the counter is free
     {
       counter = i;
       break;
@@ -67,58 +66,55 @@ int imCounterBegin(const char* title)
 
   iCounter *ct = &iCounterList[counter];
 
-  ct->sequence++;
+  ct->has_begin = 1;
 
-  if (ct->sequence == 1)   // top level counter
-    iCounterFunc(counter, iCounterUserData, title, -1);
+  iCounterFunc(counter, iCounterUserData, title, -1);
 
   return counter;
 }
 
 void imCounterEnd(int counter)
 {
-  if (counter == -1 || !iCounterFunc) 
-    return;                // invalid counter
-
-  iCounter *ct = &iCounterList[counter];
-  if (ct->sequence == 0 || // counter with no begin or no total
-      ct->total == 0)
+  if (counter < 0 || counter >= MAX_COUNTERS || !iCounterFunc)  // invalid counter
     return;
 
-  if (ct->sequence == 1)   // top level counter
-  {
-    iCounterFunc(counter, iCounterUserData, NULL, 1001);
-    memset(ct, 0, sizeof(iCounter));
-  }
-  else
-    ct->sequence--;
+  iCounter *ct = &iCounterList[counter];
+
+  if (ct->has_begin == 0) // counter with no begin
+    return;
+
+  iCounterFunc(counter, iCounterUserData, NULL, 1001);
+  memset(ct, 0, sizeof(iCounter));
 }
 
 void* imCounterGetUserData(int counter)
 {
-  if (counter == -1 || !iCounterFunc) 
-    return NULL;            // invalid counter
+  if (counter < 0 || counter >= MAX_COUNTERS || !iCounterFunc)  // invalid counter
+    return NULL;
 
   iCounter *ct = &iCounterList[counter];
+
   return ct->userdata;
 }
 
 void imCounterSetUserData(int counter, void* userdata)
 {
-  if (counter == -1 || !iCounterFunc) 
-    return;                // invalid counter
+  if (counter < 0 || counter >= MAX_COUNTERS || !iCounterFunc)  // invalid counter
+    return;
 
   iCounter *ct = &iCounterList[counter];
+
   ct->userdata = userdata;
 }
 
 int imCounterInc(int counter)
 {
-  if (counter == -1 || !iCounterFunc)                       
-    return 1;              // invalid counter
+  if (counter < 0 || counter >= MAX_COUNTERS || !iCounterFunc)  // invalid counter
+    return 1;
 
   iCounter *ct = &iCounterList[counter];
-  if (ct->sequence == 0 || // counter with no begin or no total
+
+  if (ct->has_begin == 0 ||  // counter with no begin or no total
       ct->total == 0)
     return 1;
 
@@ -138,11 +134,12 @@ int imCounterInc(int counter)
 
 int imCounterIncTo(int counter, int count)
 {
-  if (counter == -1 || !iCounterFunc)        
-    return 1;              // invalid counter
+  if (counter < 0 || counter >= MAX_COUNTERS || !iCounterFunc)  // invalid counter
+    return 1;
 
   iCounter *ct = &iCounterList[counter];
-  if (ct->sequence == 0 || // counter with no begin or no total
+
+  if (ct->has_begin == 0 ||  // counter with no begin or no total
       ct->total == 0)
     return 1;
 
@@ -165,12 +162,13 @@ int imCounterIncTo(int counter, int count)
 
 void imCounterTotal(int counter, int total, const char* message)
 {
-  if (counter == -1 || !iCounterFunc) 
-    return;                // invalid counter
+  if (counter < 0 || counter >= MAX_COUNTERS || !iCounterFunc)  // invalid counter
+    return;
 
   iCounter *ct = &iCounterList[counter];
-  if (ct->sequence == 0) 
-    return;                // counter with no begin
+
+  if (ct->has_begin == 0)  // counter with no begin 
+    return;
 
   ct->message = message;
   ct->total = total;
