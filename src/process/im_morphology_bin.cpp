@@ -103,9 +103,7 @@ int imProcessBinMorphConvolve(const imImage* src_image, imImage* dst_image, cons
   }
 
   counter = imProcessCounterBegin("Binary Morphological Convolution");
-  const char* msg = (const char*)imImageGetAttribute(kernel, "Description", NULL, NULL);
-  if (!msg) msg = "Processing...";
-  imCounterTotal(counter, src_image->height*iter, msg);
+  imCounterTotal(counter, src_image->height*iter, "Processing...");
 
   if (iter > 1)
     tmp = malloc(src_image->size);
