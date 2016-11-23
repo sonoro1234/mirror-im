@@ -20,20 +20,20 @@ extern "C" {
  * \ingroup util */
 
 /** Counter callback, informs the progress of the operation to the client. \n
- * Text contains a constant string that is NULL during normal counting, a title in the begining of a sequence 
- * and a message in the begining of a count.
- * Counter id identifies diferrent counters. \n
- * Progress in a count reports a value from 0 to 1000. 
+ * Counter id identifies different counters. \n
+ * Progress in a count reports a value from 0 to 1000 always, proportional to total value and increment. 
  * If -1 indicates the start of a sequence of operations, 1001 ends the sequence. \n
  * If returns 0 the client should abort the operation. \n
  * If the counter is aborted, the callback will be called one last time at 1001.
+ * Text is NULL most of the time, but contains a title in the beginning of a sequence (progress==-1)
+ * and a message in the beginning of a count (progress==0).
  * \ingroup counter */
-typedef int (*imCounterCallback)(int counter, void* user_data, const char* text, int progress);
+typedef int (*imCounterCallback)(int counter, void* cb_user_data, const char* text, int progress);
 
 /** Changes the counter callback. Returns old callback. \n
  * User data is changed only if not NULL.
  * \ingroup counter */
-imCounterCallback imCounterSetCallback(void* user_data, imCounterCallback counter_func);
+imCounterCallback imCounterSetCallback(void* cb_user_data, imCounterCallback counter_func);
 
 /** Returns true if the counter callback is set.
  * When the callback is NULL the counter is inactive and all functions do nothing.
