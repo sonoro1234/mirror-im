@@ -102,7 +102,7 @@ int imProcessBinMorphConvolve(const imImage* src_image, imImage* dst_image, cons
     miss_value = 1;
   }
 
-  counter = imProcessCounterBegin("Binary Morphological Convolution");
+  counter = imProcessCounterBegin("BinMorphConvolve");
   imCounterTotal(counter, src_image->height*iter, "Processing...");
 
   if (iter > 1)

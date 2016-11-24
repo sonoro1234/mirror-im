@@ -33,9 +33,9 @@ int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real
     return IM_ERR_DATA;
 
 #ifdef IM_PROCESS
-  int counter = imProcessCounterBegin("Building Bitmap");
+  int counter = imProcessCounterBegin("ConvertToBitmap");
 #else
-  int counter = imCounterBegin("Building Bitmap");
+  int counter = imCounterBegin("ConvertToBitmap");
 #endif
 
   int ret;

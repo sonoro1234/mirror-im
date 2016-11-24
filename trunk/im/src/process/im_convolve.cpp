@@ -299,7 +299,7 @@ int imProcessCompassConvolve(const imImage* src_image, imImage* dst_image, imIma
 {
   int ret = 0;
 
-  int counter = imProcessCounterBegin("Compass Convolution");
+  int counter = imProcessCounterBegin("CompassConvolve");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   for (int i = 0; i < src_image->depth; i++)
@@ -527,7 +527,7 @@ static int DoConvolveDualCpx(imComplex<T>* map, imComplex<T>* new_map, int width
 
 int imProcessConvolveDual(const imImage* src_image, imImage* dst_image, const imImage *kernel1, const imImage *kernel2)
 {
-  int counter = imProcessCounterBegin("Convolution");
+  int counter = imProcessCounterBegin("ConvolveDual");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   int ret = 0;
@@ -806,7 +806,7 @@ static int DoConvolveStep(const imImage* src_image, imImage* dst_image, const im
 
 int imProcessConvolve(const imImage* src_image, imImage* dst_image, const imImage *kernel)
 {
-  int counter = imProcessCounterBegin("Convolution");
+  int counter = imProcessCounterBegin("Convolve");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   int ret = DoConvolveStep(src_image, dst_image, kernel, counter);
@@ -822,7 +822,7 @@ int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imI
   if (!AuxImage)
     return 0;
 
-  int counter = imProcessCounterBegin("Repeated Convolution");
+  int counter = imProcessCounterBegin("ConvolveRep");
   imCounterTotal(counter, src_image->depth*src_image->height*ntimes, "Processing...");
 
   const imImage *image1 = src_image;
@@ -1117,7 +1117,7 @@ static int DoConvolveSepCpx(imComplex<T>* map, imComplex<T>* new_map, int width,
 
 int imProcessConvolveSep(const imImage* src_image, imImage* dst_image, const imImage *kernel)
 {
-  int counter = imProcessCounterBegin("Separable Convolution");
+  int counter = imProcessCounterBegin("ConvolveSep");
   imCounterTotal(counter, 2 * src_image->depth*src_image->height, "Processing...");
 
   int ret = 0;
@@ -1555,7 +1555,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
 
 int imProcessMeanConvolve(const imImage* src_image, imImage* dst_image, int ks)
 {
-  int counter = imProcessCounterBegin("Mean Convolve");
+  int counter = imProcessCounterBegin("MeanConvolve");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   imImage* kernel = imImageCreate(ks, ks, IM_GRAY, IM_INT);

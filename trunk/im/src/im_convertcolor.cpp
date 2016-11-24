@@ -939,9 +939,9 @@ IM_STATIC int iDoConvertColorSpace(int count, int data_type,
   }
 
 #ifdef IM_PROCESS
-  int counter = imProcessCounterBegin("Convert Color Space");
+  int counter = imProcessCounterBegin("ConvertColorSpace");
 #else
-  int counter = imCounterBegin("Convert Color Space");
+  int counter = imCounterBegin("ConvertColorSpace");
 #endif
 
   imCounterTotal(counter, total_counter, "Converting...");
