@@ -130,7 +130,7 @@ static int iReduce(int src_width, int src_height, const DT *src_map,
 int imProcessReduce(const imImage* src_image, imImage* dst_image, int order)
 {
   int ret = 0;
-  int counter = imProcessCounterBegin("Reduce Size");
+  int counter = imProcessCounterBegin("Reduce");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");
 

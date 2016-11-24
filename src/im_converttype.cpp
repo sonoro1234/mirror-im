@@ -571,9 +571,9 @@ int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real
   int total_count = src_image->depth * src_image->count;
   int ret = IM_ERR_DATA;
 #ifdef IM_PROCESS
-  int counter = imProcessCounterBegin("Convert Data Type");
+  int counter = imProcessCounterBegin("ConvertDataType");
 #else
-  int counter = imCounterBegin("Convert Data Type");
+  int counter = imCounterBegin("ConvertDataType");
 #endif
   imCounterTotal(counter, total_count, "Converting...");
 

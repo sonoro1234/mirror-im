@@ -199,7 +199,7 @@ int imProcessRenderAddSpeckleNoise(const imImage* src_image, imImage* dst_image,
   param[1] = percent / 100.0f;
   srand((unsigned)time(NULL));
   imImageCopyData(src_image, dst_image);
-  return imProcessRenderCondOp(dst_image, do_add_specklenoise, "Add Speckle Noise", param);
+  return imProcessRenderCondOp(dst_image, do_add_specklenoise, "RenderAddSpeckleNoise", param);
 }
 
 static float do_add_gaussiannoise(int, int, int, float* param)
@@ -226,7 +226,7 @@ int imProcessRenderAddGaussianNoise(const imImage* src_image, imImage* dst_image
   param[1] = stddev;
   srand((unsigned)time(NULL));
   imImageCopyData(src_image, dst_image);
-  return imProcessRenderOp(dst_image, do_add_gaussiannoise, "Add Gaussian Noise", param, 1);
+  return imProcessRenderOp(dst_image, do_add_gaussiannoise, "RenderAddGaussianNoise", param, 1);
 }
    
 static float do_add_uniformnoise(int, int, int, float* param)
@@ -243,7 +243,7 @@ int imProcessRenderAddUniformNoise(const imImage* src_image, imImage* dst_image,
   param[1] = stddev;
   srand((unsigned)time(NULL));
   imImageCopyData(src_image, dst_image);
-  return imProcessRenderOp(dst_image, do_add_uniformnoise, "Add Uniform Noise", param, 1);
+  return imProcessRenderOp(dst_image, do_add_uniformnoise, "RenderAddUniformNoise", param, 1);
 }
    
 static float do_const(int, int, int d, float* param)
@@ -253,7 +253,7 @@ static float do_const(int, int, int d, float* param)
 
 int imProcessRenderConstant(imImage* image, float* value)
 {
-  return imProcessRenderOp(image, do_const, "Constant", value, 0);
+  return imProcessRenderOp(image, do_const, "RenderConstant", value, 0);
 }
 
 static float do_noise(int, int, int, float* param)
@@ -266,7 +266,7 @@ int imProcessRenderRandomNoise(imImage* image)
   static float param[1];
   param[0] = (float)imColorMax(image->data_type);
   srand((unsigned)time(NULL));
-  return imProcessRenderOp(image, do_noise, "Random Noise", param, 0);
+  return imProcessRenderOp(image, do_noise, "RenderRandomNoise", param, 0);
 }
 
 static float do_cosine(int x, int y, int, float* param)
@@ -296,7 +296,7 @@ int imProcessRenderCosine(imImage* image, float xperiod, float yperiod)
   else
     param[5] = 0.0f;
 
-  return imProcessRenderOp(image, do_cosine, "Cosine", param, 0);
+  return imProcessRenderOp(image, do_cosine, "RenderCosine", param, 0);
 }
 
 static float do_gaussian(int x, int y, int, float* param)
@@ -315,7 +315,7 @@ int imProcessRenderGaussian(imImage* image, float stddev)
   param[1] = -1.0f / (2.0f * stddev * stddev);
   param[2] = image->width/2.0f;
   param[3] = image->height/2.0f;
-  return imProcessRenderOp(image, do_gaussian, "Gaussian", param, 0);
+  return imProcessRenderOp(image, do_gaussian, "RenderGaussian", param, 0);
 }
 
 static float do_lapgauss(int x, int y, int, float* param)
@@ -337,7 +337,7 @@ int imProcessRenderLapOfGaussian(imImage* image, float stddev)
   param[3] = image->height/2.0f;
   param[4] = 2.0f * stddev * stddev;
   param[0] /= param[4];
-  return imProcessRenderOp(image, do_lapgauss, "Laplacian of Gaussian", param, 0);
+  return imProcessRenderOp(image, do_lapgauss, "RenderLapOfGaussian", param, 0);
 }
 
 static inline float sinc(float x)
@@ -375,7 +375,7 @@ int imProcessRenderSinc(imImage* image, float xperiod, float yperiod)
   else
     param[5] = 0.0f;
 
-  return imProcessRenderOp(image, do_sinc, "Sinc", param, 0);
+  return imProcessRenderOp(image, do_sinc, "RenderSinc", param, 0);
 }
 
 static float do_box(int x, int y, int, float* param)
@@ -397,7 +397,7 @@ int imProcessRenderBox(imImage* image, int width, int height)
   param[2] = height/2.0f;
   param[3] = image->width/2.0f;
   param[4] = image->height/2.0f;
-  return imProcessRenderOp(image, do_box, "Box", param, 0);
+  return imProcessRenderOp(image, do_box, "RenderBox", param, 0);
 }
 
 static float do_ramp(int x, int y, int, float* param)
@@ -430,7 +430,7 @@ int imProcessRenderRamp(imImage* image, int start, int end, int dir)
   param[2] = (float)end;
   param[3] = (float)dir;
   param[0] /= float(end-start);
-  return imProcessRenderOp(image, do_ramp, "Ramp", param, 0);
+  return imProcessRenderOp(image, do_ramp, "RenderRamp", param, 0);
 }
 
 static inline int Tent(int t, int T)
@@ -461,7 +461,7 @@ int imProcessRenderTent(imImage* image, int width, int height)
   param[0] /= param[1]*param[2];
   param[3] = image->width/2.0f;
   param[4] = image->height/2.0f;
-  return imProcessRenderOp(image, do_tent, "Tent", param, 0);
+  return imProcessRenderOp(image, do_tent, "RenderTent", param, 0);
 }
 
 static float do_cone(int x, int y, int, float* param)
@@ -483,7 +483,7 @@ int imProcessRenderCone(imImage* image, int radius)
   param[0] /= param[1];
   param[2] = image->width/2.0f;
   param[3] = image->height/2.0f;
-  return imProcessRenderOp(image, do_cone, "Cone", param, 0);
+  return imProcessRenderOp(image, do_cone, "RenderCone", param, 0);
 }
 
 static float do_wheel(int x, int y, int, float* param)
@@ -505,7 +505,7 @@ int imProcessRenderWheel(imImage* image, int int_radius, int ext_radius)
   param[2] = (float)ext_radius;
   param[3] = image->width/2.0f;
   param[4] = image->height/2.0f;
-  return imProcessRenderOp(image, do_wheel, "Wheel", param, 0);
+  return imProcessRenderOp(image, do_wheel, "RenderWheel", param, 0);
 }
 
 static float do_grid(int x, int y, int, float* param)
@@ -526,7 +526,7 @@ int imProcessRenderGrid(imImage* image, int x_space, int y_space)
   param[2] = (float)y_space;
   param[3] = image->width/2.0f;
   param[4] = image->height/2.0f;
-  return imProcessRenderOp(image, do_grid, "Grid", param, 0);
+  return imProcessRenderOp(image, do_grid, "RenderGrid", param, 0);
 }
 
 static float do_chessboard(int x, int y, int, float* param)
@@ -554,7 +554,7 @@ int imProcessRenderChessboard(imImage* image, int x_space, int y_space)
   param[2] = (float)y_space*2;
   param[3] = image->width/2.0f;
   param[4] = image->height/2.0f;
-  return imProcessRenderOp(image, do_chessboard, "Chessboard", param, 0);
+  return imProcessRenderOp(image, do_chessboard, "RenderChessboard", param, 0);
 }
 
 
