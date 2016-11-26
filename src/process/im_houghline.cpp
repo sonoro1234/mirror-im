@@ -11,6 +11,7 @@
 #include <im_counter.h>
 
 #include "im_process_glo.h"
+#include "im_process_counter.h"
 
 #include <stdlib.h>
 #include <memory.h>
@@ -139,6 +140,20 @@ ________________________________________________________________
   Author:		Tor Lønnestad, BLAB, Ifi, UiO
 */
 
+static void init_sin_cos_table(int thetamax)
+{
+  int theta;
+
+  costab = (double*)malloc(thetamax*sizeof(double));
+  sintab = (double*)malloc(thetamax*sizeof(double));
+
+  for (theta = 0; theta < thetamax; theta++)
+  {
+    double th = (M_PI * theta) / (double)thetamax;
+    costab[theta] = cos(th);
+    sintab[theta] = sin(th);
+  }
+}
 
 static int houghLine(const imImage* input, imImage* output, int counter)
 {
@@ -154,19 +169,21 @@ static int houghLine(const imImage* input, imImage* output, int counter)
   thetamax = output->width;   /* theta max = 180 */
   rhomax = output->height/2;  /* rho shift to 0, -rmax <= r <= +rmax */
 
-  costab = (double*)malloc(thetamax*sizeof(double));
-  sintab = (double*)malloc(thetamax*sizeof(double));
+  init_sin_cos_table(thetamax);
 
-  for (theta=0; theta < thetamax; theta++)
-  {
-    double th = (M_PI*theta)/thetamax;
-    costab[theta] = cos(th);
-    sintab[theta] = sin(th);
-  }
+  IM_INT_PROCESSING;
 
+#ifdef _OPENMP
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#endif
   for (y=0; y < iysize; y++)
   {
-    for (x=0; x < ixsize; x++)
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    for (x = 0; x < ixsize; x++)
     {
       if (input_map[y*ixsize + x])
       {
@@ -180,18 +197,14 @@ static int houghLine(const imImage* input, imImage* output, int counter)
       }
     }
 
-    if (!imCounterInc(counter))
-    {
-      free(costab); costab = NULL;
-      free(sintab); sintab = NULL;
-      return 0;
-    }
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
 
-  free(costab); costab = NULL;
-  free(sintab); sintab = NULL;
-
-  return 1;
+  return processing;
 }
 
 static listnode* findMaxima(const imImage* hough_points, int *line_count, const imImage* hough)
@@ -366,12 +379,15 @@ static void drawLine(imImage* image, int theta, int rho)
 
 int imProcessHoughLines(const imImage* src_image, imImage *dst_image)
 {
-  int counter = imCounterBegin("Hough Line Transform");
+  int counter = imProcessCounterBegin("HoughLines");
   imCounterTotal(counter, src_image->height, "Processing...");
 
   int ret = houghLine(src_image, dst_image, counter);
 
-  imCounterEnd(counter);
+  free(costab); costab = NULL;
+  free(sintab); sintab = NULL;
+
+  imProcessCounterEnd(counter);
 
   return ret;
 }
@@ -408,7 +424,7 @@ static void ReplaceColor(imImage* image)
 
 int imProcessHoughLinesDraw(const imImage* src_image, const imImage *hough, const imImage *hough_points, imImage *dst_image)
 {
-  int theta, line_count = 0;
+  int line_count = 0;
 
   if (src_image != dst_image)
     imImageCopyData(src_image, dst_image);
@@ -417,15 +433,7 @@ int imProcessHoughLinesDraw(const imImage* src_image, const imImage *hough, cons
 
   ReplaceColor(dst_image);
 
-  costab = (double*)malloc(180*sizeof(double));
-  sintab = (double*)malloc(180*sizeof(double));
-
-  for (theta=0; theta < 180; theta++)
-  {
-    double th = (M_PI*theta)/180.;
-    costab[theta] = cos(th);
-    sintab[theta] = sin(th);
-  }
+  init_sin_cos_table(180);
 
   DrawPoints(dst_image, maxima);
 
