@@ -123,40 +123,45 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
 /** Rotates the image in 90 degrees counterclockwise or clockwise. Swap columns by lines. \n
  * Images must be of the same type. Target width and height must be source height and width. \n
  * Direction can be clockwise (1) or counter clockwise (-1).
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessRotate90(src_image: imImage, dst_image: imImage, dir_clockwise: boolean) [in Lua 5] \endverbatim
  * \verbatim im.ProcessRotate90New(image: imImage, dir_clockwise: boolean) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-void imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir_clockwise);
+int imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir_clockwise);
 
 /** Rotates the image in 180 degrees. Swap columns and swap lines. \n
  * Images must be of the same type and size.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessRotate180(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessRotate180New(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-void imProcessRotate180(const imImage* src_image, imImage* dst_image);
+int imProcessRotate180(const imImage* src_image, imImage* dst_image);
 
 /** Mirror the image in a horizontal flip. Swap columns. \n
  * Images must be of the same type and size.
  * Can be done in-place.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessMirror(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessMirrorNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-void imProcessMirror(const imImage* src_image, imImage* dst_image);
+int imProcessMirror(const imImage* src_image, imImage* dst_image);
 
 /** Apply a vertical flip. Swap lines. \n
  * Images must be of the same type and size.
  * Can be done in-place.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessFlip(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessFlipNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-void imProcessFlip(const imImage* src_image, imImage* dst_image);
+int imProcessFlip(const imImage* src_image, imImage* dst_image);
 
 /** Apply a radial distortion using the given interpolation order (see imProcessResize). \n
- * Images must be of the same type and size. Returns zero if the counter aborted.
+ * Images must be of the same type and size.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessRadial(src_image: imImage, dst_image: imImage, k1: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRadialNew(image: imImage, k1: number[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -164,7 +169,8 @@ void imProcessFlip(const imImage* src_image, imImage* dst_image);
 int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int order);
 
 /** Apply a swirl distortion using the given interpolation order (see imProcessResize). \n
- * Images must be of the same type and size. Returns zero if the counter aborted.
+ * Images must be of the same type and size.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessSwirl(src_image: imImage, dst_image: imImage, k: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessSwirlNew(image: imImage, k: number[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -174,11 +180,12 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k1, int o
 /** Split the image in two images, one containing the odd lines and other containing the even lines. \n
  * Images must be of the same type. Height of the output images must be half the height of the input image.
  * If the height of the input image is odd then the first image must have height equals to half+1.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessInterlaceSplit(src_image: imImage, dst_image1: imImage, dst_image2: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessInterlaceSplitNew(image: imImage) -> new_image1: imImage, new_image2: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-void imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2);
+int imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2);
 
 
 

@@ -863,8 +863,8 @@ static int imluaProcessRotate90 (lua_State *L)
   luaL_argcheck(L, dst_image->width == src_image->height && dst_image->height == src_image->width, 2, "target width and height must be equal to source height and width");
   luaL_argcheck(L, (dir == -1 || dir == 1), 3, "invalid dir, can be -1 or 1 only");
 
-  imProcessRotate90(src_image, dst_image, dir);
-  return 0;
+  lua_pushboolean(L, imProcessRotate90(src_image, dst_image, dir));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -877,8 +877,8 @@ static int imluaProcessRotate180 (lua_State *L)
 
   imlua_match(L, src_image, dst_image);
 
-  imProcessRotate180(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessRotate180(src_image, dst_image));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -891,8 +891,8 @@ static int imluaProcessMirror (lua_State *L)
 
   imlua_match(L, src_image, dst_image);
 
-  imProcessMirror(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessMirror(src_image, dst_image));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -905,8 +905,8 @@ static int imluaProcessFlip (lua_State *L)
 
   imlua_match(L, src_image, dst_image);
 
-  imProcessFlip(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessFlip(src_image, dst_image));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -932,8 +932,8 @@ static int imluaProcessInterlaceSplit (lua_State *L)
 
   luaL_argcheck(L, dst_image2->height == src_image->height/2, 2, "dst_image2 height must be equal to source height/2");
 
-  imProcessInterlaceSplit(src_image, dst_image1, dst_image2);
-  return 0;
+  lua_pushboolean(L, imProcessInterlaceSplit(src_image, dst_image1, dst_image2));
+  return 1;
 }
 
 /*****************************************************************************\
