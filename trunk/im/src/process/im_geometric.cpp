@@ -281,17 +281,25 @@ static int Rotate(int src_width, int src_height, DT *src_map,
 
 
 template <class DT> 
-static void Rotate90(int src_width, 
+static int Rotate90(int src_width, 
                    int src_height, 
                    DT *src_map, 
                    DT *dst_map, 
-                   int dir)
+                   int dir, 
+                   int counter)
 {
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(src_height))
 #endif
   for(int y = 0; y < src_height; y++)
   {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
     int yd, xd;
 
     // dir = clockwise (1) or counter clockwise (-1).
@@ -314,21 +322,37 @@ static void Rotate90(int src_width,
 
       dst_map[yd*src_height + xd] = src_map[line_offset + x];
     }        
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
 template <class DT> 
-static void Rotate180(int width, 
+static int Rotate180(int width, 
                    int height, 
                    DT *src_map, 
-                   DT *dst_map)
+                   DT *dst_map, 
+                   int counter)
 {
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for(int y = 0; y < height; y++)
   {
-    int yd = height-1 - y;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    int yd = height - 1 - y;
 
     int src_line_offset = y*width;
     int dst_line_offset = yd*width;
@@ -338,15 +362,26 @@ static void Rotate180(int width,
       int xd = width-1 - x;
       dst_map[dst_line_offset + xd] = src_map[src_line_offset + x];
     }        
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
 template <class DT> 
-static void Mirror(int width, 
+static int Mirror(int width, 
                    int height, 
                    DT *src_map, 
-                   DT *dst_map)
+                   DT *dst_map, 
+                   int counter)
 {
+  IM_INT_PROCESSING;
+
   if (src_map == dst_map) // check of in-place operation
   {
     int half_width = width/2;
@@ -356,6 +391,11 @@ static void Mirror(int width,
 #endif
     for(int y = 0 ; y < height; y++)
     {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
       int line_offset = y*width;
 
       for(int x = 0 ; x < half_width; x++)
@@ -366,6 +406,12 @@ static void Mirror(int width,
         src_map[line_offset + x] = temp_value;
         xd--;
       }        
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
   }
   else
@@ -375,6 +421,11 @@ static void Mirror(int width,
 #endif
     for(int y = 0 ; y < height; y++)
     {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
       int line_offset = y*width;
 
       for(int x = 0 ; x < width; x++)
@@ -382,16 +433,27 @@ static void Mirror(int width,
         int xd = width-1 - x;
         dst_map[line_offset + xd] = src_map[line_offset + x];
       }        
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
   }
+
+  return processing;
 }
 
 template <class DT> 
-static void Flip(int width, 
+static int Flip(int width, 
                    int height, 
                    DT *src_map, 
-                   DT *dst_map)
+                   DT *dst_map, 
+                   int counter)
 {
+  IM_INT_PROCESSING;
+
   if (src_map == dst_map) // check of in-place operation
   {
     DT* temp_line = (DT*)malloc(width*sizeof(DT));
@@ -400,10 +462,21 @@ static void Flip(int width,
     // Can NOT run in parallel
     for(int y = 0 ; y < half_height; y++)
     {
-      int yd = height-1 - y;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
+      int yd = height - 1 - y;
       memcpy(temp_line, dst_map + yd*width, width*sizeof(DT));
       memcpy(dst_map + yd*width, src_map + y*width, width*sizeof(DT));
       memcpy(src_map + y*width, temp_line, width*sizeof(DT));
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
 
     free(temp_line);
@@ -415,111 +488,164 @@ static void Flip(int width,
 #endif
     for(int y = 0 ; y < height; y++)
     {
-      int yd = height-1 - y;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
+      int yd = height - 1 - y;
       memcpy(dst_map + yd*width, src_map + y*width,width * sizeof(DT));
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
   }
+
+  return processing;
 }
 
 template <class DT> 
-static void InterlaceSplit(int width, 
+static int InterlaceSplit(int width, 
                    int height, 
                    DT *src_map, 
                    DT *dst_map1,
-                   DT *dst_map2)
+                   DT *dst_map2, 
+                   int counter)
 {
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for(int y = 0; y < height; y++)
   {
-    int yd = y/2;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    int yd = y / 2;
     if (y%2)
       memcpy(dst_map2 + yd*width, src_map + y*width, width*sizeof(DT));
     else
       memcpy(dst_map1 + yd*width, src_map + y*width, width*sizeof(DT));
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
 
 /********************************************************************************/
 
 
-void imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir)
+int imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir)
 {
-  int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+  int ret = 0;
+
+  int src_depth = src_image->has_alpha && dst_image->has_alpha ? src_image->depth + 1 : src_image->depth;
+  int counter = imProcessCounterBegin("Rotate90");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");  /* size of the source image */
+
   for (int i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      Rotate90(src_image->width, src_image->height, (imbyte*)src_image->data[i],  (imbyte*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], dir, counter);
       break;
     case IM_SHORT:
-      Rotate90(src_image->width, src_image->height, (short*)src_image->data[i],  (short*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], dir, counter);
       break;
     case IM_USHORT:
-      Rotate90(src_image->width, src_image->height, (imushort*)src_image->data[i],  (imushort*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], dir, counter);
       break;
     case IM_INT:
-      Rotate90(src_image->width, src_image->height, (int*)src_image->data[i],  (int*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], dir, counter);
       break;
     case IM_FLOAT:
-      Rotate90(src_image->width, src_image->height, (float*)src_image->data[i],  (float*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], dir, counter);
       break;
     case IM_CFLOAT:
-      Rotate90(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], dir, counter);
       break;
     case IM_DOUBLE:
-      Rotate90(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], dir, counter);
       break;
     case IM_CDOUBLE:
-      Rotate90(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], dir);
+      ret = Rotate90(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], dir, counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+
+  return ret;
 }
 
-void imProcessRotate180(const imImage* src_image, imImage* dst_image)
+int imProcessRotate180(const imImage* src_image, imImage* dst_image)
 {
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int ret = 0;
+  int counter = imProcessCounterBegin("Rotate180");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
+
   for (int i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      Rotate180(src_image->width, src_image->height, (imbyte*)src_image->data[i],  (imbyte*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], counter);
       break;
     case IM_SHORT:
-      Rotate180(src_image->width, src_image->height, (short*)src_image->data[i],  (short*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], counter);
       break;
     case IM_USHORT:
-      Rotate180(src_image->width, src_image->height, (imushort*)src_image->data[i],  (imushort*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], counter);
       break;
     case IM_INT:
-      Rotate180(src_image->width, src_image->height, (int*)src_image->data[i],  (int*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], counter);
       break;
     case IM_FLOAT:
-      Rotate180(src_image->width, src_image->height, (float*)src_image->data[i],  (float*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], counter);
       break;
     case IM_CFLOAT:
-      Rotate180(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], counter);
       break;
     case IM_DOUBLE:
-      Rotate180(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_CDOUBLE:
-      Rotate180(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i]);
+      ret = Rotate180(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+
+  return ret;
 }
 
 int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int order)
 {
   int ret = 0;
 
-  int counter = imProcessCounterBegin("Radial Distort");
+  int counter = imProcessCounterBegin("Radial");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the target image */
 
@@ -566,7 +692,7 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int or
 {
   int ret = 0;
 
-  int counter = imProcessCounterBegin("Swirl Distort");
+  int counter = imProcessCounterBegin("Swirl");
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
   imCounterTotal(counter, src_depth*dst_image->height, "Processing...");  /* size of the target image */
 
@@ -756,113 +882,146 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
   return ret;
 }
 
-void imProcessMirror(const imImage* src_image, imImage* dst_image)
+int imProcessMirror(const imImage* src_image, imImage* dst_image)
 {
   int i;
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int ret = 0;
+  int counter = imProcessCounterBegin("Mirror");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      Mirror(src_image->width, src_image->height, (imbyte*)src_image->data[i],  (imbyte*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], counter);
       break;
     case IM_SHORT:
-      Mirror(src_image->width, src_image->height, (short*)src_image->data[i],  (short*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], counter);
       break;
     case IM_USHORT:
-      Mirror(src_image->width, src_image->height, (imushort*)src_image->data[i],  (imushort*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], counter);
       break;
     case IM_INT:
-      Mirror(src_image->width, src_image->height, (int*)src_image->data[i],  (int*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], counter);
       break;
     case IM_FLOAT:
-      Mirror(src_image->width, src_image->height, (float*)src_image->data[i],  (float*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], counter);
       break;
     case IM_CFLOAT:
-      Mirror(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], counter);
       break;
     case IM_DOUBLE:
-      Mirror(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_CDOUBLE:
-      Mirror(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i]);
+      ret = Mirror(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+
+  return ret;
 }
 
-void imProcessFlip(const imImage* src_image, imImage* dst_image)
+int imProcessFlip(const imImage* src_image, imImage* dst_image)
 {
   int i;
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int ret = 0;
+  int counter = imProcessCounterBegin("Flip");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      Flip(src_image->width, src_image->height, (imbyte*)src_image->data[i],  (imbyte*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], counter);
       break;
     case IM_SHORT:
-      Flip(src_image->width, src_image->height, (short*)src_image->data[i],  (short*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], counter);
       break;
     case IM_USHORT:
-      Flip(src_image->width, src_image->height, (imushort*)src_image->data[i],  (imushort*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], counter);
       break;
     case IM_INT:
-      Flip(src_image->width, src_image->height, (int*)src_image->data[i],  (int*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], counter);
       break;
     case IM_FLOAT:
-      Flip(src_image->width, src_image->height, (float*)src_image->data[i],  (float*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], counter);
       break;
     case IM_CFLOAT:
-      Flip(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], counter);
       break;
     case IM_DOUBLE:
-      Flip(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_CDOUBLE:
-      Flip(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i]);
+      ret = Flip(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+
+  return ret;
 }
 
-void imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2)
+int imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2)
 {
   int i;
   int src_depth = src_image->has_alpha && dst_image1->has_alpha && dst_image2->has_alpha ? src_image->depth + 1 : src_image->depth;
 
+  int ret = 0;
+  int counter = imProcessCounterBegin("InterlaceSplit");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
+
   for (i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      InterlaceSplit(src_image->width, src_image->height, (imbyte*)src_image->data[i],  (imbyte*)dst_image1->data[i], (imbyte*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image1->data[i], (imbyte*)dst_image2->data[i], counter);
       break;
     case IM_SHORT:
-      InterlaceSplit(src_image->width, src_image->height, (short*)src_image->data[i],  (short*)dst_image1->data[i], (short*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image1->data[i], (short*)dst_image2->data[i], counter);
       break;
     case IM_USHORT:
-      InterlaceSplit(src_image->width, src_image->height, (imushort*)src_image->data[i],  (imushort*)dst_image1->data[i], (imushort*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image1->data[i], (imushort*)dst_image2->data[i], counter);
       break;
     case IM_INT:
-      InterlaceSplit(src_image->width, src_image->height, (int*)src_image->data[i],  (int*)dst_image1->data[i], (int*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image1->data[i], (int*)dst_image2->data[i], counter);
       break;
     case IM_FLOAT:
-      InterlaceSplit(src_image->width, src_image->height, (float*)src_image->data[i],  (float*)dst_image1->data[i], (float*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image1->data[i], (float*)dst_image2->data[i], counter);
       break;
     case IM_CFLOAT:
-      InterlaceSplit(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  (imcfloat*)dst_image1->data[i], (imcfloat*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image1->data[i], (imcfloat*)dst_image2->data[i], counter);
       break;
     case IM_DOUBLE:
-      InterlaceSplit(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image1->data[i], (double*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (double*)src_image->data[i], (double*)dst_image1->data[i], (double*)dst_image2->data[i], counter);
       break;
     case IM_CDOUBLE:
-      InterlaceSplit(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image1->data[i], (imcdouble*)dst_image2->data[i]);
+      ret = InterlaceSplit(src_image->width, src_image->height, (imcdouble*)src_image->data[i], (imcdouble*)dst_image1->data[i], (imcdouble*)dst_image2->data[i], counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+
+  return ret;
 }

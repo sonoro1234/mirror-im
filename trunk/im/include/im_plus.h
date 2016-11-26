@@ -1053,20 +1053,20 @@ namespace im
       return imProcessRotate(src_image.GetHandle(), dst_image.GetHandle(), cos0, sin0, order); }
     inline int RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order) {
       return imProcessRotateRef(src_image.GetHandle(), dst_image.GetHandle(), cos0, sin0, x, y, to_origin, order); }
-    inline void Rotate90(const Image& src_image, Image& dst_image, int dir_clockwise) {
-      imProcessRotate90(src_image.GetHandle(), dst_image.GetHandle(), dir_clockwise); }
-    inline void Rotate180(const Image& src_image, Image& dst_image) {
-      imProcessRotate180(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void Mirror(const Image& src_image, Image& dst_image) {
-      imProcessMirror(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void Flip(const Image& src_image, Image& dst_image) {
-      imProcessFlip(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int Rotate90(const Image& src_image, Image& dst_image, int dir_clockwise) {
+      return imProcessRotate90(src_image.GetHandle(), dst_image.GetHandle(), dir_clockwise); }
+    inline int Rotate180(const Image& src_image, Image& dst_image) {
+      return imProcessRotate180(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int Mirror(const Image& src_image, Image& dst_image) {
+      return imProcessMirror(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int Flip(const Image& src_image, Image& dst_image) {
+      return imProcessFlip(src_image.GetHandle(), dst_image.GetHandle()); }
     inline int Radial(const Image& src_image, Image& dst_image, float k1, int order) {
       return imProcessRadial(src_image.GetHandle(), dst_image.GetHandle(), k1, order); }
     inline int Swirl(const Image& src_image, Image& dst_image, float k1, int order) {
       return imProcessSwirl(src_image.GetHandle(), dst_image.GetHandle(), k1, order); }
-    inline void InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2) {
-      imProcessInterlaceSplit(src_image.GetHandle(), dst_image1.GetHandle(), dst_image2.GetHandle()); }
+    inline int InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2) {
+      return imProcessInterlaceSplit(src_image.GetHandle(), dst_image1.GetHandle(), dst_image2.GetHandle()); }
     inline int GrayMorphConvolve(const Image& src_image, Image& dst_image, const Image& kernel, int ismax) {
       return imProcessGrayMorphConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle(), ismax); }
     inline int GrayMorphErode(const Image& src_image, Image& dst_image, int kernel_size) {
