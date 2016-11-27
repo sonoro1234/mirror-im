@@ -1095,8 +1095,8 @@ namespace im
       return imProcessBinMorphClose(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter); }
     inline int BinMorphOutline(const Image& src_image, Image& dst_image, int kernel_size, int iter) {
       return imProcessBinMorphOutline(src_image.GetHandle(), dst_image.GetHandle(), kernel_size, iter); }
-    inline void BinMorphThin(const Image& src_image, Image& dst_image) {
-      imProcessBinMorphThin(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int BinMorphThin(const Image& src_image, Image& dst_image) {
+      return imProcessBinMorphThin(src_image.GetHandle(), dst_image.GetHandle()); }
     inline int MedianConvolve(const Image& src_image, Image& dst_image, int kernel_size) {
       return imProcessMedianConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size); }
     inline int RangeConvolve(const Image& src_image, Image& dst_image, int kernel_size) {
@@ -1137,8 +1137,8 @@ namespace im
       return imProcessPrewittConvolve(src_image.GetHandle(), dst_image.GetHandle()); }
     inline int SplineEdgeConvolve(const Image& src_image, Image& dst_image) {
       return imProcessSplineEdgeConvolve(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void ZeroCrossing(const Image& src_image, Image& dst_image) {
-      imProcessZeroCrossing(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int ZeroCrossing(const Image& src_image, Image& dst_image) {
+      return imProcessZeroCrossing(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void Canny(const Image& src_image, Image& dst_image, float stddev) {
       imProcessCanny(src_image.GetHandle(), dst_image.GetHandle(), stddev); }
     inline int Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold) {

@@ -337,11 +337,12 @@ int imProcessBinMorphOutline(const imImage* src_image, imImage* dst_image, int k
  * by Joseph M. Cychosz, 3ksnn64@ecn.purdue.edu              \n
  * in "Graphics Gems IV", Academic Press, 1994               \n
  * Not using OpenMP when enabled.
+ * Returns zero if the counter aborted (counter is approximate).
  *
- * \verbatim im.ProcessBinMorphThin(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessBinMorphThinNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessBinMorphThin(src_image: imImage, dst_image: imImage)-> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessBinMorphThinNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup morphbin */
-void imProcessBinMorphThin(const imImage* src_image, imImage* dst_image);
+int imProcessBinMorphThin(const imImage* src_image, imImage* dst_image);
 
 
 
@@ -564,11 +565,12 @@ int imProcessSplineEdgeConvolve(const imImage* src_image, imImage* dst_image);
  * indicating the intensity of the edge. It is usually used after a second derivative, laplace. \n
  * Extracted from XITE, Copyright 1991, Blab, UiO \n
  * http://www.ifi.uio.no/~blab/Software/Xite/
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessZeroCrossing(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessZeroCrossingNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessZeroCrossing(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessZeroCrossingNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-void imProcessZeroCrossing(const imImage* src_image, imImage* dst_image);
+int imProcessZeroCrossing(const imImage* src_image, imImage* dst_image);
 
 /** First part of the Canny edge detector. Includes the gaussian filtering and the nonmax suppression. \n
  * After using this you could apply a Hysteresis Threshold, see \ref imProcessHysteresisThreshold. \n
