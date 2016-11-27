@@ -240,7 +240,7 @@ static unsigned char isdelete[512] =
   1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
-static void DoThinImage(imbyte *map, int xsize, int ysize)
+static int DoThinImage(imbyte *map, int xsize, int ysize, int counter)
 {
   int    x, y;    /* Pixel location    */
   int    i;    /* Pass index      */
@@ -252,13 +252,15 @@ static void DoThinImage(imbyte *map, int xsize, int ysize)
   
   qb = (imbyte *) malloc(xsize);
   qb[xsize-1] = 0;    /* Used for lower-right pixel  */
-  
+
   while ( count ) 
   {    
     /* Scan src_image while deletions  */
     pc++;
     count = 0;
-    
+
+    imCounterTotal(counter, ysize+1, "Processing... (undef.)");
+
     for ( i = 0 ; i < 4 ; i++ ) 
     {
       m = masks[i];
@@ -271,7 +273,13 @@ static void DoThinImage(imbyte *map, int xsize, int ysize)
         p = ((p<<1)&0006) | (map[x+1] != 0);
         qb[x] = (imbyte)p;
       }
-      
+
+      if (!imCounterInc(counter)) 
+      {
+        free(qb);
+        return 0;
+      }
+
       /* Scan src_image for pixel deletion candidates.    */
       
       for ( y = 0 ; y < ysize-1 ; y++ ) 
@@ -300,6 +308,12 @@ static void DoThinImage(imbyte *map, int xsize, int ysize)
           count++;
           map[y*xsize + xsize-1] = 0;
         }
+
+        if (!imCounterInc(counter))
+        {
+          free(qb);
+          return 0;
+        }
       }
       
       /* Process bottom scan line.        */
@@ -315,14 +329,24 @@ static void DoThinImage(imbyte *map, int xsize, int ysize)
           map[(ysize-1)*xsize + x] = 0;
         }
       }
+
+      if (!imCounterInc(counter))
+      {
+        free(qb);
+        return 0;
+      }
     }
   }
   
   free (qb);
+  return 1;
 }
 
-void imProcessBinMorphThin(const imImage* src_image, imImage* dst_image)
+int imProcessBinMorphThin(const imImage* src_image, imImage* dst_image)
 {
+  int counter = imCounterBegin("BinMorphThin");
   imImageCopyData(src_image, dst_image);
-  DoThinImage((imbyte*)dst_image->data[0], dst_image->width, dst_image->height);
+  int ret = DoThinImage((imbyte*)dst_image->data[0], dst_image->width, dst_image->height, counter);
+  imCounterEnd(counter);
+  return ret;
 }

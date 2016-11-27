@@ -1226,8 +1226,8 @@ static int imluaProcessBinMorphThin (lua_State *L)
   imlua_checkcolorspace(L, 1, src_image, IM_BINARY);
   imlua_match(L, src_image, dst_image);
 
-  imProcessBinMorphThin(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessBinMorphThin(src_image, dst_image));
+  return 1;
 }
 
 
@@ -1565,8 +1565,8 @@ static int imluaProcessZeroCrossing (lua_State *L)
                    "image data type can be short, int, float or double only");
   imlua_match(L, src_image, dst_image);
 
-  imProcessZeroCrossing(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessZeroCrossing(src_image, dst_image));
+  return 1;
 }
 
 /*****************************************************************************\

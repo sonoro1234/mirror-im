@@ -1208,13 +1208,20 @@ Image processing lab, Department of Informatics
 University of Oslo
 */
 template <class T> 
-static void do_crossing(T* iband, T* oband, int width, int height, T t)
+static int do_crossing(T* iband, T* oband, int width, int height, T t, int counter)
 {
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for (int y=0; y < height-1; y++)
   {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
     int offset00 = y*width;
     int offset10 = (y+1)*width;
     int offset01 = offset00 + 1;
@@ -1271,7 +1278,16 @@ static void do_crossing(T* iband, T* oband, int width, int height, T t)
     }
 
     oband[offset00] = v;
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  if (!processing)
+    return 0;
 
   /* last line */
   int offset00 = (height-1)*width;
@@ -1302,28 +1318,43 @@ static void do_crossing(T* iband, T* oband, int width, int height, T t)
 
   /* last pixel */
   oband[offset00] = 0;
+
+  if (!imCounterInc(counter)) 
+    processing = 0;
+
+  return processing;
 }
 
-void imProcessZeroCrossing(const imImage* src_image, imImage* dst_image)
+int imProcessZeroCrossing(const imImage* src_image, imImage* dst_image)
 {
+  int ret = 0;
+  int counter = imProcessCounterBegin("ZeroCrossing");
+  imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
+
   for (int i = 0; i < src_image->depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_SHORT:
-      do_crossing((short*)src_image->data[i], (short*)dst_image->data[i], src_image->width, src_image->height, (short)0);
+      ret = do_crossing((short*)src_image->data[i], (short*)dst_image->data[i], src_image->width, src_image->height, (short)0, counter);
       break;
     case IM_INT:
-      do_crossing((int*)src_image->data[i], (int*)dst_image->data[i], src_image->width, src_image->height, 0);
+      ret = do_crossing((int*)src_image->data[i], (int*)dst_image->data[i], src_image->width, src_image->height, 0, counter);
       break;                                                                                
     case IM_FLOAT:                                                                           
-      do_crossing((float*)src_image->data[i], (float*)dst_image->data[i], src_image->width, src_image->height, 0.0f);
+      ret = do_crossing((float*)src_image->data[i], (float*)dst_image->data[i], src_image->width, src_image->height, 0.0f, counter);
       break;                                                                                
     case IM_DOUBLE:
-      do_crossing((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, 0.0);
+      ret = do_crossing((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, 0.0, counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
 int imProcessBarlettConvolve(const imImage* src_image, imImage* dst_image, int kernel_size)
