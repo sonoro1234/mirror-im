@@ -49,6 +49,7 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order);
 int imProcessResize(const imImage* src_image, imImage* dst_image, int order);
 
 /** Reduze the image area by 4 (w/2,h/2). \n
+  * Uses a fast average of neighbors. 
  * Images must be of the same type. Target image size must be source image width/2, height/2.
  * Can not operate on IM_MAP nor IM_BINARY images.
  * Returns zero if the counter aborted.
