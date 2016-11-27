@@ -182,30 +182,33 @@ int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int conne
  * This is the number of pixels of each region. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
  * area has size the number of regions.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeMeasureArea(image: imImage, [region_count: number]) -> area: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeMeasureArea(image: imImage, [region_count: number]) -> counter: boolean, area: table of numbers [in Lua 5] \endverbatim
  * The returned table is zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasureArea(const imImage* image, int* area, int region_count);
+int imAnalyzeMeasureArea(const imImage* image, int* area, int region_count);
 
 /** Measure the polygonal area limited by the perimeter line of all regions. Holes are not included. \n
  * Notice that some regions may have polygonal area zero. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
  * perimarea has size the number of regions.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeMeasurePerimArea(image: imImage, [region_count: number]) -> perimarea: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeMeasurePerimArea(image: imImage, [region_count: number]) -> counter: boolean, perimarea: table of numbers [in Lua 5] \endverbatim
  * The returned table is zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea, int region_count);
+int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea, int region_count);
 
 /** Calculate the centroid position of all regions. Holes are not included. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
  * area, cx and cy have size the number of regions. If area is NULL will be internally calculated.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeMeasureCentroid(image: imImage, [area: table of numbers], [region_count: number]) -> cx: table of numbers, cy: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeMeasureCentroid(image: imImage, [area: table of numbers], [region_count: number]) -> counter: boolean, cx: table of numbers, cy: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_count, float* cx, float* cy);
+int imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_count, float* cx, float* cy);
 
 /** Calculate the principal major axis slope of all regions. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
@@ -213,12 +216,13 @@ void imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_
  * Principal (major and minor) axes are defined to be those axes that pass through the
  * centroid, about which the moment of inertia of the region is, respectively maximal or minimal.
  * Partially using OpenMP when enabled.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeMeasurePrincipalAxis(image: imImage, [area: table of numbers], [cx: table of numbers], [cy: table of numbers], [region_count: number]) 
+ * \verbatim im.AnalyzeMeasurePrincipalAxis(image: imImage, counter: boolean, [area: table of numbers], [cx: table of numbers], [cy: table of numbers], [region_count: number]) 
                               -> major_slope: table of numbers, major_length: table of numbers, minor_slope: table of numbers, minor_length: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const float* cx, const float* cy, 
+int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const float* cx, const float* cy,
                                    const int region_count, float* major_slope, float* major_length, 
                                                            float* minor_slope, float* minor_length);
 
@@ -226,48 +230,52 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const 
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
  * count, area and perim has size the number of regions, if some is NULL it will be not calculated.
  * Not using OpenMP when enabled.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeMeasureHoles(image: imImage, connect: number, [region_count: number]) -> holes_count: number, holes_area: table of numbers, holes_perim: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeMeasureHoles(image: imImage, connect: number, [region_count: number])-> counter: boolean, holes_count: number, holes_area: table of numbers, holes_perim: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int *holes_count, int* holes_area, float* holes_perim);
+int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int *holes_count, int* holes_area, float* holes_perim);
 
 /** Measure the total perimeter of all regions (external and internal). \n
  * Source image is IM_GRAY/IM_USHORT type (the result of imAnalyzeFindRegions). \n
  * It uses a half-pixel inter distance for 8 neighbors in a perimeter of a 4 connected region. \n
  * This function can also be used to measure line length. \n
  * perim has size the number of regions.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeMeasurePerimeter(image: imImage) -> perim: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeMeasurePerimeter(image: imImage)-> counter: boolean, perim: table of numbers [in Lua 5] \endverbatim
  * \ingroup analyze */
-void imAnalyzeMeasurePerimeter(const imImage* image, float* perim, int region_count);
+int imAnalyzeMeasurePerimeter(const imImage* image, float* perim, int region_count);
 
 /** Isolates the perimeter line of gray integer images. Background is defined as being black (0). \n
  * It just checks if at least one of the 4 connected neighbors is non zero. Image borders are extended with zeros.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessPerimeterLine(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessPerimeterLineNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessPerimeterLine(src_image: imImage, dst_image: imImage)-> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessPerimeterLineNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup analyze */
-void imProcessPerimeterLine(const imImage* src_image, imImage* dst_image);
+int imProcessPerimeterLine(const imImage* src_image, imImage* dst_image);
 
 /** Eliminates regions that have area size outside or inside the given interval. \n
  * Source and target are a binary images. Regions can be 4 connected or 8 connected. \n
  * Can be done in-place. end_size can be zero to indicate no upper limit or an area with width*height size. \n
  * When searching inside the region the limits are inclusive (<= size >=), when searching outside the limits are exclusive (> size <).
  *
- * \verbatim im.ProcessRemoveByArea(src_image: imImage, dst_image: imImage, connect: number, start_size: number, end_size: number, inside: boolean) [in Lua 5] \endverbatim
- * \verbatim im.ProcessRemoveByAreaNew(image: imImage, connect: number, start_size: number, end_size: number, inside: boolean) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRemoveByArea(src_image: imImage, dst_image: imImage, connect: number, start_size: number, end_size: number, inside: boolean)-> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRemoveByAreaNew(image: imImage, connect: number, start_size: number, end_size: number, inside: boolean) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup analyze */
-void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int connect, int start_size, int end_size, int inside);
+int imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int connect, int start_size, int end_size, int inside);
 
 /** Fill holes inside white regions. \n
  * Source and target are a binary images. Regions can be 4 connected or 8 connected. \n
  * Can be done in-place. 
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessFillHoles(src_image: imImage, dst_image: imImage, connect: number) [in Lua 5] \endverbatim
- * \verbatim im.ProcessFillHolesNew(image: imImage, connect: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessFillHoles(src_image: imImage, dst_image: imImage, connect: number)-> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessFillHolesNew(image: imImage, connect: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup analyze */
-void imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect);
+int imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect);
 
 
 #if defined(__cplusplus)

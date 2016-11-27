@@ -351,12 +351,12 @@ static int imluaAnalyzeMeasureArea (lua_State *L)
   count = imlua_checkregioncount(L, 2, image);
   area = (int*) malloc(sizeof(int) * count);
 
-  imAnalyzeMeasureArea(image, area, count);
+  lua_pushboolean(L, imAnalyzeMeasureArea(image, area, count));
 
   imlua_newarrayint(L, area, count, 0);
   free(area);
 
-  return 1;
+  return 2;
 }
 
 /*****************************************************************************\
@@ -374,12 +374,12 @@ static int imluaAnalyzeMeasurePerimArea (lua_State *L)
   count = imlua_checkregioncount(L, 2, image);
   perimarea = (float*) malloc(sizeof(float) * count);
 
-  imAnalyzeMeasurePerimArea(image, perimarea, count);
+  lua_pushboolean(L, imAnalyzeMeasurePerimArea(image, perimarea, count));
 
   imlua_newarrayfloat (L, perimarea, count, 0);
   free(perimarea);
 
-  return 1;
+  return 2;
 }
 
 /*****************************************************************************\
@@ -402,7 +402,7 @@ static int imluaAnalyzeMeasureCentroid (lua_State *L)
   cx = (float*) malloc (sizeof(float) * count);
   cy = (float*) malloc (sizeof(float) * count);
 
-  imAnalyzeMeasureCentroid(image, area, count, cx, cy);
+  lua_pushboolean(L, imAnalyzeMeasureCentroid(image, area, count, cx, cy));
 
   imlua_newarrayfloat(L, cx, count, 0);
   imlua_newarrayfloat(L, cy, count, 0);
@@ -412,7 +412,7 @@ static int imluaAnalyzeMeasureCentroid (lua_State *L)
   free(cx);
   free(cy);
 
-  return 2;
+  return 3;
 }
 
 /*****************************************************************************\
@@ -440,7 +440,7 @@ static int imluaAnalyzeMeasurePrincipalAxis (lua_State *L)
   minor_slope = (float*) malloc (sizeof(float) * count);
   minor_length = (float*) malloc (sizeof(float) * count);
 
-  imAnalyzeMeasurePrincipalAxis(image, area, cx, cy, count, major_slope, major_length, minor_slope, minor_length);
+  lua_pushboolean(L, imAnalyzeMeasurePrincipalAxis(image, area, cx, cy, count, major_slope, major_length, minor_slope, minor_length));
 
   imlua_newarrayfloat(L, major_slope, count, 0);
   imlua_newarrayfloat(L, major_length, count, 0);
@@ -459,7 +459,7 @@ static int imluaAnalyzeMeasurePrincipalAxis (lua_State *L)
   free(minor_slope);
   free(minor_length);
 
-  return 4;
+  return 5;
 }
 
 /*****************************************************************************\
@@ -476,13 +476,13 @@ static int imluaAnalyzeMeasureHoles (lua_State *L)
 
   imlua_checktype(L, 1, image, IM_GRAY, IM_USHORT);
 
-  connect = luaL_checkinteger(L, 2);
+  connect = (int)luaL_checkinteger(L, 2);
   count = imlua_checkregioncount(L, 3, image);
 
   area = (int*) malloc (sizeof(int) * count);
   perim = (float*) malloc (sizeof(float) * count);
 
-  imAnalyzeMeasureHoles(image, connect, count, &holes_count, area, perim);
+  lua_pushboolean(L, imAnalyzeMeasureHoles(image, connect, count, &holes_count, area, perim));
 
   lua_pushnumber(L, holes_count);
   imlua_newarrayint(L, area, holes_count, 0);
@@ -493,7 +493,7 @@ static int imluaAnalyzeMeasureHoles (lua_State *L)
   if (perim)
     free(perim);
 
-  return 3;
+  return 4;
 }
 
 /*****************************************************************************\
@@ -511,13 +511,13 @@ static int imluaAnalyzeMeasurePerimeter (lua_State *L)
   count = imlua_checkregioncount(L, 2, image);
   perim = (float*) malloc(sizeof(float) * count);
 
-  imAnalyzeMeasurePerimeter(image, perim, count);
+  lua_pushboolean(L, imAnalyzeMeasurePerimeter(image, perim, count));
 
   imlua_newarrayfloat(L, perim, count, 0);
 
   free(perim);
 
-  return 1;
+  return 2;
 }
 
 /*****************************************************************************\
@@ -531,8 +531,8 @@ static int imluaProcessPerimeterLine (lua_State *L)
   imlua_checkinteger(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
-  imProcessPerimeterLine(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessPerimeterLine(src_image, dst_image));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -551,8 +551,8 @@ static int imluaProcessRemoveByArea (lua_State *L)
   imlua_match(L, src_image, dst_image);
   luaL_argcheck(L, (connect == 4 || connect == 8), 3, "invalid connect value, must be 4 or 8");
 
-  imProcessRemoveByArea(src_image, dst_image, connect, start_size, end_size, inside);
-  return 0;
+  lua_pushboolean(L, imProcessRemoveByArea(src_image, dst_image, connect, start_size, end_size, inside));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -568,8 +568,8 @@ static int imluaProcessFillHoles (lua_State *L)
   imlua_match(L, src_image, dst_image);
   luaL_argcheck(L, (connect == 4 || connect == 8), 3, "invalid connect value, must be 4 or 8");
 
-  imProcessFillHoles(src_image, dst_image, connect);
-  return 0;
+  lua_pushboolean(L, imProcessFillHoles(src_image, dst_image, connect));
+  return 1;
 }
 
 static void imlua_checkhoughsize(lua_State *L, imImage* image, imImage* hough_image, int param)
@@ -680,7 +680,7 @@ static int imlua_getorder(lua_State *L, imImage* image, int param)
   }
   else
   {
-    order = luaL_checkinteger(L, param);
+    order = (int)luaL_checkinteger(L, param);
     luaL_argcheck(L, (order == 0 || order == 1 || order == 3), param, "invalid order, must be 0, 1 or 3");
   }
 

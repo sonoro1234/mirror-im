@@ -21,7 +21,7 @@
 
 #define MAX_COUNT 65536  // maximum number of regions
 
-/* ajust the alias table to be a remap table (final step) */
+/* adjust the alias table to be a remap table (final step) */
 static void alias_update(imushort* alias_table, int &region_count)
 {
   int i, real_count = region_count;
@@ -236,7 +236,7 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
             if (*region_count > MAX_COUNT)
             {
               delete [] alias_table;
-              return -1;
+              return 0;
             }
           }
         }
@@ -374,7 +374,7 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
           if (*region_count > MAX_COUNT)
           {
             delete [] alias_table;
-            return -1;
+            return 0;
           }
         }
       }
@@ -425,17 +425,30 @@ int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int conne
   return ret;
 }
 
-void imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count)
+int imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count)
 {
   imushort* img_data = (imushort*)image->data[0];
 
+  int counter = imProcessCounterBegin("MeasureArea");
+  imCounterTotal(counter, image->height, "Analyzing...");
+
   memset(data_area, 0, region_count*sizeof(int));
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(image->count))
 #endif
   for (int i = 0; i < image->count; i++)
   {
+    if (i % image->height == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     if (img_data[i])
     {
       int index = img_data[i] - 1;
@@ -444,29 +457,59 @@ void imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count
 #endif
       data_area[index]++;
     }
+
+    if (i % image->height == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
 
-void imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int region_count, float* data_cx, float* data_cy)
+int imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int region_count, float* data_cx, float* data_cy)
 {
   imushort* img_data = (imushort*)image->data[0];
   int* local_data_area = 0;
+  int ret;
+
+  int counter = imProcessCounterBegin("MeasureCentroid");
+  imCounterTotal(counter, image->height, "Analyzing...");
 
   if (!data_area)
   {
     local_data_area = (int*)malloc(region_count*sizeof(int));
-    imAnalyzeMeasureArea(image, local_data_area, region_count);
+    ret = imAnalyzeMeasureArea(image, local_data_area, region_count);
     data_area = (const int*)local_data_area;
+
+    if (!ret)
+    {
+      free(local_data_area);
+      imProcessCounterEnd(counter);
+      return 0;
+    }
   }
 
   if (data_cx) memset(data_cx, 0, region_count*sizeof(float));
   if (data_cy) memset(data_cy, 0, region_count*sizeof(float));
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(image->height))
 #endif
   for (int y = 0; y < image->height; y++) 
   {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
     int offset = y*image->width;
 
     for (int x = 0; x < image->width; x++)
@@ -491,6 +534,12 @@ void imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int re
         }
       }
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
 
   for (int i = 0; i < region_count; i++) 
@@ -501,6 +550,9 @@ void imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int re
 
   if (local_data_area)
     free(local_data_area);
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
 
 static inline double ipow(double x, int j)
@@ -511,17 +563,24 @@ static inline double ipow(double x, int j)
 	return r;
 }
 
-static void iCalcMoment(double* cm, int px, int py, const imImage* image, const float* cx, const float* cy, int region_count)
+static int iCalcMoment(double* cm, int px, int py, const imImage* image, const float* cx, const float* cy, int region_count, int counter)
 {
   imushort* img_data = (imushort*)image->data[0];
 
   memset(cm, 0, region_count*sizeof(double));
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(image->height))
 #endif
   for (int y = 0; y < image->height; y++) 
   {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
     int offset = y*image->width;
 
     for (int x = 0; x < image->width; x++)
@@ -557,7 +616,15 @@ static void iCalcMoment(double* cm, int px, int py, const imImage* image, const 
         }
       }
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
 template<class T>
@@ -589,18 +656,28 @@ static inline int IsPerimeterPoint(T* map, int width, int height, int x, int y)
   return 0;
 }
 
-void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, const float* data_cx, const float* data_cy, 
+int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, const float* data_cx, const float* data_cy,
                                    const int region_count, float* major_slope, float* major_length, 
                                                            float* minor_slope, float* minor_length)
 {
   int *local_data_area = 0;
   float *local_data_cx = 0, *local_data_cy = 0;
+  int ret;
+
+  int counter = imProcessCounterBegin("PrincipalAxis");
 
   if (!data_area)
   {
     local_data_area = (int*)malloc(region_count*sizeof(int));
-    imAnalyzeMeasureArea(image, local_data_area, region_count);
+    ret = imAnalyzeMeasureArea(image, local_data_area, region_count);
     data_area = (const int*)local_data_area;
+
+    if (!ret)
+    {
+      free(local_data_area);
+      imProcessCounterEnd(counter);
+      return 0;
+    }
   }
 
   if (!data_cx || !data_cy)
@@ -617,22 +694,36 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
       data_cy = (const float*)local_data_cy;
     }
 
+    ret = 1;
     if (local_data_cx && local_data_cy)
-      imAnalyzeMeasureCentroid(image, data_area, region_count, local_data_cx, local_data_cy);
+      ret = imAnalyzeMeasureCentroid(image, data_area, region_count, local_data_cx, local_data_cy);
     else if (local_data_cx)
-      imAnalyzeMeasureCentroid(image, data_area, region_count, local_data_cx, NULL);
+      ret = imAnalyzeMeasureCentroid(image, data_area, region_count, local_data_cx, NULL);
     else if (local_data_cy)
-      imAnalyzeMeasureCentroid(image, data_area, region_count, NULL, local_data_cy);
+      ret = imAnalyzeMeasureCentroid(image, data_area, region_count, NULL, local_data_cy);
+
+    if (!ret)
+    {
+      if (local_data_cx) free(local_data_cx);
+      if (local_data_cy) free(local_data_cy);
+      imProcessCounterEnd(counter);
+      return 0;
+    }
   }
+
+  imCounterTotal(counter, 4 * image->height + 2 * region_count, "Analyzing...");
 
   // additional moments
   double* cm20 = (double*)malloc(region_count*sizeof(double));
   double* cm02 = (double*)malloc(region_count*sizeof(double));
   double* cm11 = (double*)malloc(region_count*sizeof(double));
   
-  iCalcMoment(cm20, 2, 0, image, data_cx, data_cy, region_count);
-  iCalcMoment(cm02, 0, 2, image, data_cx, data_cy, region_count);
-  iCalcMoment(cm11, 1, 1, image, data_cx, data_cy, region_count);
+  ret = iCalcMoment(cm20, 2, 0, image, data_cx, data_cy, region_count, counter);
+  if (!ret) goto principal_axis_cleanup1;
+  ret = iCalcMoment(cm02, 0, 2, image, data_cx, data_cy, region_count, counter);
+  if (!ret) goto principal_axis_cleanup1;
+  ret = iCalcMoment(cm11, 1, 1, image, data_cx, data_cy, region_count, counter);
+  if (!ret) goto principal_axis_cleanup1;
 
   float *local_major_slope = 0, *local_minor_slope = 0;
   if (!major_slope)
@@ -666,9 +757,6 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
   float *slope1 = major_slope; // Use major_slope as a storage place, 
   float *slope2 = minor_slope; // and create an alias to make code clear.
 
-#ifdef _OPENMP
-#pragma omp parallel for if (IM_OMP_MINHEIGHT(region_count))
-#endif
   for (int i = 0; i < region_count; i++) 
   {
     if (cm11[i] == 0)
@@ -711,6 +799,12 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
 
       C1[i] = data_cy[i] - A1[i] * data_cx[i];
       C2[i] = data_cy[i] - A2[i] * data_cx[i];
+    }
+
+    if (!imCounterInc(counter))
+    {
+      ret = 0;
+      goto principal_axis_cleanup2;
     }
   }
 
@@ -779,11 +873,14 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
         }
       }
     }
+
+    if (!imCounterInc(counter))
+    {
+      ret = 0;
+      goto principal_axis_cleanup3;
+    }
   }
 
-#ifdef _OPENMP
-#pragma omp parallel for if (IM_OMP_MINHEIGHT(region_count))
-#endif
   for (int i = 0; i < region_count; i++) 
   {
     float AB1 = (float)sqrt(A1[i]*A1[i] + 1);
@@ -810,43 +907,59 @@ void imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, c
       if (minor_length) minor_length[i] = D2;
       if (major_length) major_length[i] = D1;
     }
+
+    if (!imCounterInc(counter))
+    {
+      ret = 0;
+      goto principal_axis_cleanup3;
+    }
   }
 
+principal_axis_cleanup3:
+  free(D1b);
+  free(D2b);
+  free(D1a);
+  free(D2a);
+
+principal_axis_cleanup2:
   if (local_major_slope) free(local_major_slope);
   if (local_minor_slope) free(local_minor_slope);
-  if (local_data_area) free(local_data_area);
-  if (local_data_cx) free(local_data_cx);
-  if (local_data_cy) free(local_data_cy);
-
   free(A1);  
   free(A2);  
   free(C1);  
   free(C2);
 
-  free(D1b); 
-  free(D2b);
-  free(D1a); 
-  free(D2a); 
+principal_axis_cleanup1:
+  if (local_data_area) free(local_data_area);
+  if (local_data_cx) free(local_data_cx);
+  if (local_data_cy) free(local_data_cy);
+  if (cm20) free(cm20); if (cm02) free(cm02); if (cm11) free(cm11);
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
-void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int* count_data, int* area_data, float* perim_data)
+int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int* count_data, int* area_data, float* perim_data)
 {
+  int counter = imProcessCounterBegin("MeasureHoles");
+  int ret;
+
   int i;
   imImage *inv_image = imImageCreate(image->width, image->height, IM_BINARY, IM_BYTE);
   imbyte* inv_data = (imbyte*)inv_image->data[0];
   imushort* img_data = (imushort*)image->data[0];
 
   if (!inv_image)
-    return;
+  {
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   memset(count_data, 0, region_count*sizeof(int));
   memset(area_data, 0, region_count*sizeof(int));
   memset(perim_data, 0, region_count*sizeof(float));
 
   // finds the holes in the inverted image
-#ifdef _OPENMP
-#pragma omp parallel for if (IM_OMP_MINCOUNT(image->count))
-#endif
   for (i = 0; i < image->count; i++)
   {
     if (img_data[i])
@@ -859,7 +972,8 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, 
   if (!holes_image)
   {
     imImageDestroy(inv_image);
-    return;
+    imProcessCounterEnd(counter);
+    return 0;
   }
 
   int holes_count = 0;
@@ -867,7 +981,8 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, 
   {
     imImageDestroy(inv_image);
     imImageDestroy(holes_image);
-    return;
+    imProcessCounterEnd(counter);
+    return 0;
   }
 
   imImageDestroy(inv_image);
@@ -875,19 +990,39 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, 
   if (!holes_count)
   {
     imImageDestroy(holes_image);
-    return;
+    imProcessCounterEnd(counter);
+    return 1;
   }
 
   // measure each holes area
   int* holes_area = (int*)malloc(holes_count*sizeof(int));
-  imAnalyzeMeasureArea(holes_image, holes_area, holes_count);
+  ret = imAnalyzeMeasureArea(holes_image, holes_area, holes_count);
+  if (!ret)
+  {
+    free(holes_area);
+    imImageDestroy(holes_image);
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   float* holes_perim = 0;
   if (perim_data) 
   {
     holes_perim = (float*)malloc(holes_count*sizeof(int));
-    imAnalyzeMeasurePerimeter(holes_image, holes_perim, holes_count);
+    ret = imAnalyzeMeasurePerimeter(holes_image, holes_perim, holes_count);
+
+    if (!ret)
+    {
+      free(holes_perim);
+      free(holes_area);
+      imImageDestroy(holes_image);
+      imProcessCounterEnd(counter);
+      return 0;
+    }
   }
+
+  ret = 1;
+  imCounterTotal(counter, image->height - 2, "Analyzing...");
 
   imushort* holes_data = (imushort*)holes_image->data[0];
   img_data = (imushort*)image->data[0];
@@ -930,21 +1065,37 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, 
         }
       }
     }
+
+    if (!imCounterInc(counter))
+    {
+      ret = 0;
+      break;
+    }
   }
 
   if (holes_perim) free(holes_perim);
   free(holes_area);
   imImageDestroy(holes_image);
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
 template<class T>
-static void DoPerimeterLine(T* map, T* new_map, int width, int height)
+static int DoPerimeterLine(T* map, T* new_map, int width, int height, int counter)
 {
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for (int y = 0; y < height; y++) 
   {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
     int offset = y*width;
 
     for (int x = 0; x < width; x++)
@@ -954,26 +1105,41 @@ static void DoPerimeterLine(T* map, T* new_map, int width, int height)
       else
         new_map[offset+x] = 0;
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
-void imProcessPerimeterLine(const imImage* src_image, imImage* dst_image)
+int imProcessPerimeterLine(const imImage* src_image, imImage* dst_image)
 {
-  switch(src_image->data_type)
+  int ret = 0;
+  int counter = imProcessCounterBegin("PerimeterLine");
+  imCounterTotal(counter, src_image->height, "Processing...");
+
+  switch (src_image->data_type)
   {
   case IM_BYTE:
-    DoPerimeterLine((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->width, src_image->height);
+    ret = DoPerimeterLine((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->width, src_image->height, counter);
     break;                                                                                
   case IM_SHORT:
-    DoPerimeterLine((short*)src_image->data[0], (short*)dst_image->data[0], src_image->width, src_image->height);
+    ret = DoPerimeterLine((short*)src_image->data[0], (short*)dst_image->data[0], src_image->width, src_image->height, counter);
     break;                                                                                
   case IM_USHORT:
-    DoPerimeterLine((imushort*)src_image->data[0], (imushort*)dst_image->data[0], src_image->width, src_image->height);
+    ret = DoPerimeterLine((imushort*)src_image->data[0], (imushort*)dst_image->data[0], src_image->width, src_image->height, counter);
     break;                                                                                
   case IM_INT:                                                                           
-    DoPerimeterLine((int*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height);
+    ret = DoPerimeterLine((int*)src_image->data[0], (int*)dst_image->data[0], src_image->width, src_image->height, counter);
     break;                                                                                
   }
+
+  imProcessCounterEnd(counter);
+  return 1;
 }
 
 /* Perimeter Templates idea based in
@@ -1070,7 +1236,7 @@ const float DT_SQRT2D2 = 0.707106781187f;
   v[4] = 0.5f;
 }
 
-void imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int region_count)
+int imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int region_count)
 {
   static imbyte templ[256];
   static float vt[5];
@@ -1081,6 +1247,9 @@ void imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regi
     first = 0;
   }
 
+  int counter = imProcessCounterBegin("MeasurePerimeter");
+  imCounterTotal(counter, image->height, "Analyzing...");
+
   imushort* map = (imushort*)image->data[0];
 
   memset(perim_data, 0, region_count*sizeof(float));
@@ -1088,11 +1257,18 @@ void imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regi
   int width = image->width;
   int height = image->height;
 
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for (int y = 0; y < height; y++) 
   {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
     int offset = y*image->width;
 
     for (int x = 0; x < width; x++)
@@ -1131,8 +1307,17 @@ void imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regi
           perim_data[index] += inc;
         }
       }
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
   }
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
 
 /* Perimeter Area Templates
@@ -1256,7 +1441,7 @@ static void iInitPerimAreaTemplate(imbyte *templ, float *v)
   v[6] = 0.125f;
 }
 
-void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int region_count)
+int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int region_count)
 {
   static imbyte templ[256];
   static float vt[7];
@@ -1274,12 +1459,22 @@ void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int 
   int width = image->width;
   int height = image->height;
 
+  int counter = imProcessCounterBegin("PerimArea");
+  imCounterTotal(counter, image->height, "Analyzing...");
+
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for (int y = 0; y < height; y++) 
   {
-    int offset_up = (y+1)*width;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    int offset_up = (y + 1)*width;
     int offset = y*width;
     int offset_dw = (y-1)*width;
 
@@ -1309,23 +1504,40 @@ void imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int 
         }
       }
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
 
-void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int connect, int start_size, int end_size, int inside)
+int imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int connect, int start_size, int end_size, int inside)
 {
+  int counter = imProcessCounterBegin("RemoveByArea");
+
   imImage *region_image = imImageCreate(src_image->width, src_image->height, IM_GRAY, IM_USHORT);
   if (!region_image)
-    return;
+  {
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   int region_count = 0;
-  
+
   int ret = imAnalyzeFindRegions(src_image, region_image, connect, 1, &region_count);
   if (!region_count || !ret)
   {
-    imImageClear(dst_image);
+    if (ret)
+      imImageClear(dst_image);
+
     imImageDestroy(region_image);
-    return;
+    imProcessCounterEnd(counter);
+    return ret;
   }
 
   if (end_size == 0)
@@ -1346,16 +1558,35 @@ void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int con
   }
 
   int* area_data = (int*)malloc(region_count*sizeof(int));
-  imAnalyzeMeasureArea(region_image, area_data, region_count);
+  ret = imAnalyzeMeasureArea(region_image, area_data, region_count);
+  if (!ret)
+  {
+    free(area_data);
+    imImageDestroy(region_image);
+    imProcessCounterEnd(counter);
+    return ret;
+  }
 
   imushort* region_data = (imushort*)region_image->data[0];
   imbyte* img_data = (imbyte*)dst_image->data[0];
+
+  imCounterTotal(counter, src_image->height, "Processing...");
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(src_image->count))
 #endif
   for (int i = 0; i < src_image->count; i++)
   {
+    if (i % src_image->height == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     if (region_data[i])
     {
       int area = area_data[region_data[i] - 1];
@@ -1366,20 +1597,37 @@ void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int con
     }
     else
       img_data[i] = 0;
+
+    if (i % src_image->height == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
 
   free(area_data);
   imImageDestroy(region_image);
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
 
-void imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect)
+int imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect)
 {
+  int counter = imProcessCounterBegin("FillHoles");
+
   // finding regions in the inverted src_image will isolate only the holes.
   imProcessNegative(src_image, dst_image);
 
   imImage *region_image = imImageCreate(src_image->width, src_image->height, IM_GRAY, IM_USHORT);
   if (!region_image)
-    return;
+  {
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   int holes_count = 0;
   
@@ -1388,22 +1636,47 @@ void imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connec
   {
     imImageCopy(src_image, dst_image);
     imImageDestroy(region_image);
-    return;
+    imProcessCounterEnd(counter);
+    return ret;
   }
 
   imushort* region_data = (imushort*)region_image->data[0];
   imbyte* dst_data = (imbyte*)dst_image->data[0];
+
+  imCounterTotal(counter, src_image->height, "Processing...");
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(src_image->count))
 #endif
   for (int i = 0; i < src_image->count; i++)
   {
+    if (i % src_image->height == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     if (region_data[i])
       dst_data[i] = 1;
     else
       dst_data[i] = !(dst_data[i]);  // Fix negative data.
+
+    if (i % src_image->height == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
 
   imImageDestroy(region_image);
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
