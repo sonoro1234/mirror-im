@@ -1304,8 +1304,8 @@ namespace im
 
   namespace Analyze
   {
-    inline int FindRegions(const Image& image, Image& region_image, int connect, int touch_border) {
-      return imAnalyzeFindRegions(image.GetHandle(), region_image.GetHandle(), connect, touch_border); }
+    inline int FindRegions(const Image& image, Image& region_image, int connect, int touch_border, int &region_count) {
+      return imAnalyzeFindRegions(image.GetHandle(), region_image.GetHandle(), connect, touch_border, &region_count); }
 
     inline void MeasureArea(const Image& region_image, MeasureTable& measure_table) {
       imAnalyzeMeasureArea(region_image.GetHandle(), measure_table.AddMeasureInt("Area"), measure_table.RegionCount()); }

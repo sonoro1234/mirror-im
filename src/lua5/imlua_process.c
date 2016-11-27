@@ -299,13 +299,15 @@ static int imluaAnalyzeFindRegions (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
   int connect = luaL_checkinteger(L, 3);
   int touch_border = lua_toboolean(L, 4);
+  int region_count = 0;
 
   imlua_checkcolorspace(L, 1, src_image, IM_BINARY);
   imlua_checktype(L, 2, dst_image, IM_GRAY, IM_USHORT);
 
   luaL_argcheck(L, (connect == 4 || connect == 8), 3, "invalid connect value, must be 4 or 8");
-  lua_pushnumber(L, imAnalyzeFindRegions(src_image, dst_image, connect, touch_border));
-  return 1;
+  lua_pushboolean(L, imAnalyzeFindRegions(src_image, dst_image, connect, touch_border, &region_count));
+  lua_pushnumber(L, region_count);
+  return 2;
 }
 
 static int iGetMax(imImage* image)
@@ -785,7 +787,7 @@ static int imluaProcessAddMargins (lua_State *L)
   luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "target image width must be greatter or equal than source image width+xmin");
   luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "target image height must be greatter or equal than source image height+ymin");
 
-  imProcessAddMargins(src_image, dst_image, xmilua_pushboolean(L, n, ymin));
+  lua_pushboolean(L, imProcessAddMargins(src_image, dst_image, xmin, ymin));
   return 1;
 }
 
