@@ -728,8 +728,8 @@ static int imluaProcessReduceBy4 (lua_State *L)
   luaL_argcheck(L, dst_image->width == (src_image->width / 2) &&
                    dst_image->height == (src_image->height / 2), 3, "target image size must be euqal to source image width/2, height/2");
 
-  imProcessReduceBy4(src_image, dst_image);
-  return 0;
+  lua_pushboolean(L, imProcessReduceBy4(src_image, dst_image));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -748,8 +748,8 @@ static int imluaProcessCrop (lua_State *L)
   luaL_argcheck(L, dst_image->width <= (src_image->width - xmin), 2, "target image width must be less than or equal to source image width-xmin");
   luaL_argcheck(L, dst_image->height <= (src_image->height - ymin), 2, "target image height must be less than or equal to source image height-ymin");
 
-  imProcessCrop(src_image, dst_image, xmin, ymin);
-  return 0;
+  lua_pushboolean(L, imProcessCrop(src_image, dst_image, xmin, ymin));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -767,8 +767,8 @@ static int imluaProcessInsert (lua_State *L)
   luaL_argcheck(L, xmin >= 0 && xmin < src_image->width, 3, "xmin must be >= 0 and < width");
   luaL_argcheck(L, ymin >= 0 && ymin < src_image->height, 3, "ymin must be >= 0 and < height");
 
-  imProcessInsert(src_image, region_image, dst_image, xmin, ymin);
-  return 0;
+  lua_pushboolean(L, imProcessInsert(src_image, region_image, dst_image, xmin, ymin));
+  return 1;
 }
 
 /*****************************************************************************\
@@ -785,8 +785,8 @@ static int imluaProcessAddMargins (lua_State *L)
   luaL_argcheck(L, dst_image->width >= (src_image->width + xmin), 2, "target image width must be greatter or equal than source image width+xmin");
   luaL_argcheck(L, dst_image->height >= (src_image->height + ymin), 2, "target image height must be greatter or equal than source image height+ymin");
 
-  imProcessAddMargins(src_image, dst_image, xmin, ymin);
-  return 0;
+  imProcessAddMargins(src_image, dst_image, xmilua_pushboolean(L, n, ymin));
+  return 1;
 }
 
 

@@ -51,38 +51,42 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order);
 /** Reduze the image area by 4 (w/2,h/2). \n
  * Images must be of the same type. Target image size must be source image width/2, height/2.
  * Can not operate on IM_MAP nor IM_BINARY images.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessReduceBy4(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessReduceBy4New(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessReduceBy4(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessReduceBy4New(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup resize */
-void imProcessReduceBy4(const imImage* src_image, imImage* dst_image);
+int imProcessReduceBy4(const imImage* src_image, imImage* dst_image);
 
 /** Extract a rectangular region from an image. \n
  * Images must be of the same type. Target image size must be smaller than source image width-xmin, height-ymin. \n
  * ymin and xmin must be >0 and <size.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessCrop(src_image: imImage, dst_image: imImage, xmin: number, ymin: number) [in Lua 5] \endverbatim
- * \verbatim im.ProcessCropNew(image: imImage, xmin, xmax, ymin, ymax: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessCrop(src_image: imImage, dst_image: imImage, xmin: number, ymin: number) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessCropNew(image: imImage, xmin, xmax, ymin, ymax: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup resize */
-void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
+int imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
 
 /** Insert a rectangular region in an image. \n
  * Images must be of the same type. Region image size can be larger than source image. \n
  * ymin and xmin must be >0 and <size. \n
  * Source and target must be of the same size. Can be done in-place.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessInsert(src_image: imImage, region_image: imImage, dst_image: imImage, xmin: number, ymin: number) [in Lua 5] \endverbatim
- * \verbatim im.ProcessInsertNew(image: imImage, region_image: imImage, xmin: number, ymin: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessInsert(src_image: imImage, region_image: imImage, dst_image: imImage, xmin: number, ymin: number) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessInsertNew(image: imImage, region_image: imImage, xmin: number, ymin: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup resize */
-void imProcessInsert(const imImage* src_image, const imImage* region_image, imImage* dst_image, int xmin, int ymin);
+int imProcessInsert(const imImage* src_image, const imImage* region_image, imImage* dst_image, int xmin, int ymin);
 
 /** Increase the image size by adding pixels with zero value. \n
  * Images must be of the same type. Target image size must be greatter or equal than source image width+xmin, height+ymin.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessAddMargins(src_image: imImage, dst_image: imImage, xmin: number, ymin: number) [in Lua 5] \endverbatim
- * \verbatim im.ProcessAddMarginsNew(image: imImage, xmin, xmax, ymin, ymax: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessAddMargins(src_image: imImage, dst_image: imImage, xmin: number, ymin: number) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessAddMarginsNew(image: imImage, xmin, xmax, ymin, ymax: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup resize */
-void imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
+int imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
 
 
 
@@ -125,8 +129,8 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
  * Direction can be clockwise (1) or counter clockwise (-1).
  * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessRotate90(src_image: imImage, dst_image: imImage, dir_clockwise: boolean) [in Lua 5] \endverbatim
- * \verbatim im.ProcessRotate90New(image: imImage, dir_clockwise: boolean) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRotate90(src_image: imImage, dst_image: imImage, dir_clockwise: boolean) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRotate90New(image: imImage, dir_clockwise: boolean) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir_clockwise);
 
@@ -134,8 +138,8 @@ int imProcessRotate90(const imImage* src_image, imImage* dst_image, int dir_cloc
  * Images must be of the same type and size.
  * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessRotate180(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessRotate180New(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRotate180(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessRotate180New(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessRotate180(const imImage* src_image, imImage* dst_image);
 
@@ -144,8 +148,8 @@ int imProcessRotate180(const imImage* src_image, imImage* dst_image);
  * Can be done in-place.
  * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessMirror(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessMirrorNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessMirror(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessMirrorNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessMirror(const imImage* src_image, imImage* dst_image);
 
@@ -154,8 +158,8 @@ int imProcessMirror(const imImage* src_image, imImage* dst_image);
  * Can be done in-place.
  * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessFlip(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessFlipNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessFlip(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessFlipNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessFlip(const imImage* src_image, imImage* dst_image);
 
@@ -182,8 +186,8 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k1, int o
  * If the height of the input image is odd then the first image must have height equals to half+1.
  * Returns zero if the counter aborted.
  *
- * \verbatim im.ProcessInterlaceSplit(src_image: imImage, dst_image1: imImage, dst_image2: imImage) [in Lua 5] \endverbatim
- * \verbatim im.ProcessInterlaceSplitNew(image: imImage) -> new_image1: imImage, new_image2: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessInterlaceSplit(src_image: imImage, dst_image1: imImage, dst_image2: imImage) -> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessInterlaceSplitNew(image: imImage) -> counter: boolean, new_image1: imImage, new_image2: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
 int imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imImage* dst_image2);
 

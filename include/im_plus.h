@@ -1041,14 +1041,14 @@ namespace im
       return imProcessReduce(src_image.GetHandle(), dst_image.GetHandle(), order); }
     inline int Resize(const Image& src_image, Image& dst_image, int order) {
       return imProcessResize(src_image.GetHandle(), dst_image.GetHandle(), order); }
-    inline void ReduceBy4(const Image& src_image, Image& dst_image) {
-      imProcessReduceBy4(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void Crop(const Image& src_image, Image& dst_image, int xmin, int ymin) {
-      imProcessCrop(src_image.GetHandle(), dst_image.GetHandle(), xmin, ymin); }
-    inline void Insert(const Image& src_image, const Image& region_image, Image& dst_image, int xmin, int ymin) {
-      imProcessInsert(src_image.GetHandle(), region_image.GetHandle(), dst_image.GetHandle(), xmin, ymin); }
-    inline void AddMargins(const Image& src_image, Image& dst_image, int xmin, int ymin) {
-      imProcessAddMargins(src_image.GetHandle(), dst_image.GetHandle(), xmin, ymin); }
+    inline int ReduceBy4(const Image& src_image, Image& dst_image) {
+      return imProcessReduceBy4(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int Crop(const Image& src_image, Image& dst_image, int xmin, int ymin) {
+      return imProcessCrop(src_image.GetHandle(), dst_image.GetHandle(), xmin, ymin); }
+    inline int Insert(const Image& src_image, const Image& region_image, Image& dst_image, int xmin, int ymin) {
+      return imProcessInsert(src_image.GetHandle(), region_image.GetHandle(), dst_image.GetHandle(), xmin, ymin); }
+    inline int AddMargins(const Image& src_image, Image& dst_image, int xmin, int ymin) {
+      return imProcessAddMargins(src_image.GetHandle(), dst_image.GetHandle(), xmin, ymin); }
     inline int Rotate(const Image& src_image, Image& dst_image, double cos0, double sin0, int order) {
       return imProcessRotate(src_image.GetHandle(), dst_image.GetHandle(), cos0, sin0, order); }
     inline int RotateRef(const Image& src_image, Image& dst_image, double cos0, double sin0, int x, int y, int to_origin, int order) {

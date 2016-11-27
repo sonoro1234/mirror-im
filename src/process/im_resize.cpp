@@ -244,12 +244,13 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order)
 }
 
 template <class DT> 
-static void ReduceBy4(int src_width, 
+static int ReduceBy4(int src_width,
                       int src_height, 
                       DT *src_map, 
                       int dst_width,
                       int dst_height,
-                      DT *dst_map)
+                      DT *dst_map, 
+                      int counter)
 {
   (void)dst_height;
 
@@ -257,12 +258,19 @@ static void ReduceBy4(int src_width,
   int height = (src_height/2)*2;
   int width = (src_width/2)*2;
 
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
   for(int y = 0 ; y < height; y += 2)
   {
-    int yd = y/2;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    int yd = y / 2;
     for(int x = 0 ; x < width; x += 2)
     {
       int xd = x/2;
@@ -270,51 +278,76 @@ static void ReduceBy4(int src_width,
                                        src_map[y * src_width + (x+1)] +
                                        src_map[(y+1) * src_width + x] +
                                        src_map[(y+1) * src_width + (x+1)])/DT(4));
-    }        
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
+    }
   }
+
+  return processing;
 }
 
-void imProcessReduceBy4(const imImage* src_image, imImage* dst_image)
+int imProcessReduceBy4(const imImage* src_image, imImage* dst_image)
 {
   int i;
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int ret = 0;
+  int counter = imProcessCounterBegin("ReduceBy4");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
 
   for (i = 0; i < src_depth; i++)
   {
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      ReduceBy4(src_image->width, src_image->height, (imbyte*)src_image->data[i],  dst_image->width, dst_image->height, (imbyte*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (imbyte*)src_image->data[i], dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], counter);
       break;
     case IM_SHORT:
-      ReduceBy4(src_image->width, src_image->height, (short*)src_image->data[i],  dst_image->width, dst_image->height, (short*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (short*)src_image->data[i], dst_image->width, dst_image->height, (short*)dst_image->data[i], counter);
       break;
     case IM_USHORT:
-      ReduceBy4(src_image->width, src_image->height, (imushort*)src_image->data[i],  dst_image->width, dst_image->height, (imushort*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (imushort*)src_image->data[i], dst_image->width, dst_image->height, (imushort*)dst_image->data[i], counter);
       break;
     case IM_INT:
-      ReduceBy4(src_image->width, src_image->height, (int*)src_image->data[i],  dst_image->width, dst_image->height, (int*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (int*)src_image->data[i], dst_image->width, dst_image->height, (int*)dst_image->data[i], counter);
       break;
     case IM_FLOAT:
-      ReduceBy4(src_image->width, src_image->height, (float*)src_image->data[i],  dst_image->width, dst_image->height, (float*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (float*)src_image->data[i], dst_image->width, dst_image->height, (float*)dst_image->data[i], counter);
       break;
     case IM_CFLOAT:
-      ReduceBy4(src_image->width, src_image->height, (imcfloat*)src_image->data[i],  dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (imcfloat*)src_image->data[i], dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], counter);
       break;
     case IM_DOUBLE:
-      ReduceBy4(src_image->width, src_image->height, (double*)src_image->data[i], dst_image->width, dst_image->height, (double*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (double*)src_image->data[i], dst_image->width, dst_image->height, (double*)dst_image->data[i], counter);
       break;
     case IM_CDOUBLE:
-      ReduceBy4(src_image->width, src_image->height, (imcdouble*)src_image->data[i], dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i]);
+      ret = ReduceBy4(src_image->width, src_image->height, (imcdouble*)src_image->data[i], dst_image->width, dst_image->height, (imcdouble*)dst_image->data[i], counter);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+
+  return ret;
 }
 
-void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin)
+int imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin)
 {
   int type_size = imDataTypeSize(src_image->data_type);
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int counter = imProcessCounterBegin("Crop");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
+
+  IM_INT_PROCESSING;
+
   for (int i = 0; i < src_depth; i++)
   {
     imbyte *src_map = (imbyte*)src_image->data[i];
@@ -325,15 +358,30 @@ void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int y
 #endif
     for (int y = 0; y < dst_image->height; y++)
     {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
       int src_offset = (y + ymin)*src_image->line_size + xmin*type_size;
       int dst_offset = y*dst_image->line_size;
 
       memcpy(&dst_map[dst_offset], &src_map[src_offset], dst_image->line_size);
-    }
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
   }
+  }
+
+  imProcessCounterEnd(counter);
+
+  return processing;
 }
 
-void imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage* dst_image, int xmin, int ymin)
+int imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage* dst_image, int xmin, int ymin)
 {
   int type_size = imDataTypeSize(src_image->data_type);
   int dst_size1 = xmin*type_size;
@@ -344,6 +392,11 @@ void imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage
   int src_line_size = src_image->line_size;
   int dst_line_size = dst_image->line_size;
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int counter = imProcessCounterBegin("Insert");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
+
+  IM_INT_PROCESSING;
 
   if (dst_size2 < 0)
   {
@@ -368,6 +421,11 @@ void imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage
 #endif
     for (int y = 0; y < src_image->height; y++)
     {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
       if (y < ymin || y > ymax)
       {
         if (dst_map != src_map)  // avoid in-place processing
@@ -390,14 +448,30 @@ void imProcessInsert(const imImage* src_image, const imImage* rgn_image, imImage
                    src_map + y*src_line_size + dst_offset2, dst_size2);
         }
       }
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
   }
+
+  imProcessCounterEnd(counter);
+
+  return processing;
 }
 
-void imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin, int ymin)
+int imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin, int ymin)
 {
   int type_size = imDataTypeSize(src_image->data_type);
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
+
+  int counter = imProcessCounterBegin("AddMargins");
+  imCounterTotal(counter, src_depth*src_image->height, "Processing...");
+
+  IM_INT_PROCESSING;
+
   for (int i = 0; i < src_depth; i++)
   {
     imbyte *dst_map = (imbyte*)dst_image->data[i];
@@ -408,10 +482,25 @@ void imProcessAddMargins(const imImage* src_image, imImage* dst_image, int xmin,
 #endif
     for (int y = 0; y < src_image->height; y++)
     {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_BEGIN_PROCESSING;
+
       int src_offset = y*src_image->line_size;
       int dst_offset = (y + ymin)*dst_image->line_size + xmin*type_size;
 
       memcpy(&dst_map[dst_offset], &src_map[src_offset], src_image->line_size);
+
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+      IM_END_PROCESSING;
     }
   }
+
+  imProcessCounterEnd(counter);
+
+  return processing;
 }
