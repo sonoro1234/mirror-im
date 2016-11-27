@@ -168,14 +168,15 @@ void imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, i
 
 /** Find white regions in binary image. \n
  * Result is IM_GRAY/IM_USHORT type. Regions can be 4 connected or 8 connected. \n
- * Returns the number of regions found. Background is marked as 0. \n
+ * The number of regions found is returned in region_count. Background is marked as 0. \n
  * Regions touching the border are considered only if touch_border=1.
  * Not using OpenMP when enabled.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.AnalyzeFindRegions(src_image: imImage, dst_image: imImage, connect: number, touch_border: boolean) -> count: number [in Lua 5] \endverbatim
- * \verbatim im.AnalyzeFindRegionsNew(image: imImage, connect: number, touch_border: boolean) -> count: number, new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeFindRegions(src_image: imImage, dst_image: imImage, connect: number, touch_border: boolean) -> counter: boolean, region_count: number [in Lua 5] \endverbatim
+ * \verbatim im.AnalyzeFindRegionsNew(image: imImage, connect: number, touch_border: boolean) -> counter: boolean, region_count: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup analyze */
-int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int connect, int touch_border);
+int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int connect, int touch_border, int *region_count);
 
 /** Measure the actual area of all regions. Holes are not included. \n
  * This is the number of pixels of each region. \n

@@ -104,12 +104,14 @@ static void alias_set(imushort* alias_table, imushort region1, imushort region2)
     alias_setmin(alias_table, region2, min);
 }
 
-static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* new_map, int connect)
+static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* new_map, int connect, int *region_count, int counter)
 {
   int i, j;
 
   // mark the pixels that touch the border
   // if a region touch the border, is the invalid region 1
+
+  imCounterTotal(counter, height, "Analyzing...");
 
   imbyte* pmap = map;
   imushort* new_pmap = new_map;
@@ -130,6 +132,9 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
     new_pmap += width;
   }
 
+  if (!imCounterInc(counter)) 
+    return 0;
+
   // find and connect the regions
 
   imbyte* pmap1 = map;         // previous line (line 0)
@@ -138,7 +143,7 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
   pmap = map + width;          // current line (line 1)
   new_pmap = new_map + width;
 
-  int region_count = 2;  // 0- background, 1-border
+  *region_count = 2;  // 0- background, 1-border
   imushort* alias_table = new imushort [MAX_COUNT];
   memset(alias_table, 0, MAX_COUNT*sizeof(imushort)); // aliases are all zero at start (not used)
 
@@ -225,10 +230,10 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
           {
             // create a new region  000
             //                      01
-            new_pmap[j] = (imushort)region_count;
-            region_count++;
+            new_pmap[j] = (imushort)*region_count;
+            (*region_count)++;
 
-            if (region_count > MAX_COUNT)
+            if (*region_count > MAX_COUNT)
             {
               delete [] alias_table;
               return -1;
@@ -242,6 +247,12 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
     new_pmap1 = new_pmap;
     pmap += width;
     new_pmap += width;
+
+    if (!imCounterInc(counter))
+    {
+      delete[] alias_table;
+      return 0;
+    }
   }
 
   // now all pixels are marked, 
@@ -249,7 +260,7 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
 
   // adjust the alias table to be a remap table
   // and return the real region count
-  alias_update(alias_table, region_count);
+  alias_update(alias_table, *region_count);
 
   int count = width*height;
   for (i = 0; i < count; i++)
@@ -259,10 +270,10 @@ static int DoAnalyzeFindRegions(int width, int height, imbyte* map, imushort* ne
 
   delete [] alias_table;
 
-  return region_count;
+  return 1;
 }
 
-static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imushort* new_map, int connect)
+static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imushort* new_map, int connect, int *region_count, int counter)
 {
   int i, j;
 
@@ -272,7 +283,9 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
   imbyte* pmap = map;                  // current line (line 0)
   imushort* new_pmap = new_map;
 
-  int region_count = 2;  // still consider: 0- background, 1-border
+  imCounterTotal(counter, height, "Analyzing...");
+
+  *region_count = 2;  // still consider: 0- background, 1-border
   imushort* alias_table = new imushort [MAX_COUNT];
   memset(alias_table, 0, MAX_COUNT*sizeof(imushort)); // aliases are all zero at start (not used)
 
@@ -355,10 +368,10 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
 
           // create a new region  000
           //                      01
-          new_pmap[j] = (imushort)region_count;
-          region_count++;
+          new_pmap[j] = (imushort)*region_count;
+          (*region_count)++;
 
-          if (region_count > MAX_COUNT)
+          if (*region_count > MAX_COUNT)
           {
             delete [] alias_table;
             return -1;
@@ -371,6 +384,12 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
     new_pmap1 = new_pmap;
     pmap += width;
     new_pmap += width;
+
+    if (!imCounterInc(counter))
+    {
+      delete[] alias_table;
+      return 0;
+    }
   }
 
   // now all pixels are marked, 
@@ -378,7 +397,7 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
 
   // adjust the alias table to be a remap table
   // and return the real region count
-  alias_update(alias_table, region_count);
+  alias_update(alias_table, *region_count);
 
   int count = width*height;
   for (i = 0; i < count; i++)
@@ -388,16 +407,22 @@ static int DoAnalyzeFindRegionsBorder(int width, int height, imbyte* map, imusho
 
   delete [] alias_table;
 
-  return region_count;
+  return 1;
 }
 
-int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int connect, int touch_border)
+int imAnalyzeFindRegions(const imImage* src_image, imImage* dst_image, int connect, int touch_border, int *region_count)
 {
-  imImageSetAttribute(dst_image, "REGION_CONNECT", IM_BYTE, 1, connect==4?"4":"8");
+  int ret = 0;
+  int counter = imCounterBegin("FindRegions");
+
+  imImageSetAttribute(dst_image, "REGION_CONNECT", IM_BYTE, 1, connect == 4 ? "4" : "8");
   if (touch_border)
-    return DoAnalyzeFindRegionsBorder(src_image->width, src_image->height, (imbyte*)src_image->data[0], (imushort*)dst_image->data[0], connect);
+    ret = DoAnalyzeFindRegionsBorder(src_image->width, src_image->height, (imbyte*)src_image->data[0], (imushort*)dst_image->data[0], connect, region_count, counter);
   else
-    return DoAnalyzeFindRegions(src_image->width, src_image->height, (imbyte*)src_image->data[0], (imushort*)dst_image->data[0], connect);
+    ret = DoAnalyzeFindRegions(src_image->width, src_image->height, (imbyte*)src_image->data[0], (imushort*)dst_image->data[0], connect, region_count, counter);
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
 void imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count)
@@ -811,6 +836,9 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, 
   imbyte* inv_data = (imbyte*)inv_image->data[0];
   imushort* img_data = (imushort*)image->data[0];
 
+  if (!inv_image)
+    return;
+
   memset(count_data, 0, region_count*sizeof(int));
   memset(area_data, 0, region_count*sizeof(int));
   memset(perim_data, 0, region_count*sizeof(float));
@@ -829,9 +857,19 @@ void imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, 
 
   imImage *holes_image = imImageClone(image);
   if (!holes_image)
+  {
+    imImageDestroy(inv_image);
     return;
+  }
 
-  int holes_count = imAnalyzeFindRegions(inv_image, holes_image, connect, 0);
+  int holes_count = 0;
+  if (!imAnalyzeFindRegions(inv_image, holes_image, connect, 0, &holes_count))
+  {
+    imImageDestroy(inv_image);
+    imImageDestroy(holes_image);
+    return;
+  }
+
   imImageDestroy(inv_image);
 
   if (!holes_count)
@@ -1280,8 +1318,10 @@ void imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int con
   if (!region_image)
     return;
 
-  int region_count = imAnalyzeFindRegions(src_image, region_image, connect, 1); 
-  if (!region_count)
+  int region_count = 0;
+  
+  int ret = imAnalyzeFindRegions(src_image, region_image, connect, 1, &region_count);
+  if (!region_count || !ret)
   {
     imImageClear(dst_image);
     imImageDestroy(region_image);
@@ -1341,8 +1381,10 @@ void imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connec
   if (!region_image)
     return;
 
-  int holes_count = imAnalyzeFindRegions(dst_image, region_image, connect, 0);
-  if (!holes_count)
+  int holes_count = 0;
+  
+  int ret = imAnalyzeFindRegions(dst_image, region_image, connect, 0, &holes_count);
+  if (!holes_count || !ret)
   {
     imImageCopy(src_image, dst_image);
     imImageDestroy(region_image);
