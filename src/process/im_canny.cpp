@@ -24,17 +24,21 @@ static float ** f2d (int nr, int nc);
 static float gauss(float x, float sigma);
 static float dGauss (float x, float sigma);
 static float meanGauss (float x, float sigma);
-static void seperable_convolution (const imImage* im, float *gau, int width, float **smx, float **smy);
-static void dxy_seperable_convolution (float** im, int nr, int nc, float *gau, int width, float **sm, int which);
-static void nonmax_suppress (float **dx, float **dy, imImage* mag);
+static int seperable_convolution(const imImage* im, float *gau, int width, float **smx, float **smy, int counter);
+static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int width, float **sm, int which, int counter);
+static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter);
 
-void imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev)
+int imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev)
 {
   int width = 1;
   float **smx,**smy;
   float **dx,**dy;
   int i;
   float gau[MAX_MASK_SIZE], dgau[MAX_MASK_SIZE];
+
+  int counter = imCounterBegin("Canny");
+
+  imCounterTotal(counter, 3* src_image->height + dst_image->height-2, "Processing...");
 
 /* Create a Gaussian and a derivative of Gaussian filter mask */
   for(i=0; i<MAX_MASK_SIZE; i++)
@@ -52,27 +56,54 @@ void imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev)
   smy = f2d (src_image->height, src_image->width);
 
 /* Convolution of source src_image with a Gaussian in X and Y directions  */
-  seperable_convolution (src_image, gau, width, smx, smy);
+  if (!seperable_convolution(src_image, gau, width, smx, smy, counter))
+  {
+    free(smx[0]); free(smx);
+    imCounterEnd(counter);
+    return 0;
+  }
 
   MAG_SCALE = 0;
 
 /* Now convolve smoothed data with a derivative */
   dx = f2d (src_image->height, src_image->width);
-  dxy_seperable_convolution (smx, src_image->height, src_image->width, dgau, width, dx, 1);
+  if (!dxy_seperable_convolution(smx, src_image->height, src_image->width, dgau, width, dx, 1, counter))
+  {
+    free(dx[0]); free(dx);
+    free(smx[0]); free(smx);
+    imCounterEnd(counter);
+    return 0;
+  }
   free(smx[0]); free(smx);
 
   dy = f2d (src_image->height, src_image->width);
-  dxy_seperable_convolution (smy, src_image->height, src_image->width, dgau, width, dy, 0);
+  if (!dxy_seperable_convolution(smy, src_image->height, src_image->width, dgau, width, dy, 0, counter))
+  {
+    free(dx[0]); free(dx);
+    free(dy[0]); free(dy);
+    free(smy[0]); free(smy);
+    imCounterEnd(counter);
+    return 0;
+  }
   free(smy[0]); free(smy);
 
   if (MAG_SCALE)
     MAG_SCALE = 255.0f/(1.4142f*MAG_SCALE);
 
   /* Non-maximum suppression - edge pixels should be a local max */
-  nonmax_suppress (dx, dy, dst_image);
+  if (!nonmax_suppress(dx, dy, dst_image, counter))
+  {
+    free(dx[0]); free(dx);
+    free(dy[0]); free(dy);
+    imCounterEnd(counter);
+    return 0;
+  }
 
   free(dx[0]); free(dx);
   free(dy[0]); free(dy);
+
+  imCounterEnd(counter);
+  return 1;
 }
 
 static float norm (float x, float y)
@@ -125,18 +156,25 @@ static float dGauss (float x, float sigma)
   return -x * gauss(x, sigma);
 }
 
-static void seperable_convolution (const imImage* im, float *gau, int width, float **smx, float **smy)
+static int seperable_convolution(const imImage* im, float *gau, int width, float **smx, float **smy, int counter)
 {
   unsigned char* im_data = (unsigned char*)im->data[0];
   int nr = im->height;
   int nc = im->width;
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(nr))
 #endif
   for (int i=0; i<nr; i++)
   {
-    for (int j=0; j<nc; j++)
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    for (int j = 0; j<nc; j++)
     {
       float x = gau[0] * im_data[i*im->width + j]; 
       float y = gau[0] * im_data[i*im->width + j];
@@ -155,17 +193,32 @@ static void seperable_convolution (const imImage* im, float *gau, int width, flo
       smx[i][j] = x; 
       smy[i][j] = y;
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
-static void dxy_seperable_convolution (float** im, int nr, int nc,  float *gau, int width, float **sm, int which)
+static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int width, float **sm, int which, int counter)
 {
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(nr))
 #endif
   for (int i=0; i<nr; i++)
   {
-    for (int j=0; j<nc; j++)
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    for (int j = 0; j<nc; j++)
     {
       float x = 0.0;
       for (int k=1; k<width; k++)
@@ -188,7 +241,15 @@ static void dxy_seperable_convolution (float** im, int nr, int nc,  float *gau, 
       if (x > MAG_SCALE)
         MAG_SCALE = x;
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
 static unsigned char tobyte(float x)
@@ -197,16 +258,23 @@ static unsigned char tobyte(float x)
   return (unsigned char)x;
 }
 
-static void nonmax_suppress (float **dx, float **dy, imImage* mag)
+static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter)
 {
   unsigned char* mag_data = (unsigned char*)mag->data[0];
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(mag->height))
 #endif
   for (int i=1; i<mag->height-1; i++)
   {
-    for (int j=1; j<mag->width-1; j++)
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_BEGIN_PROCESSING;
+
+    for (int j = 1; j<mag->width - 1; j++)
     {
       float xx, yy, g2, g1, g3, g4, g, xc, yc;
 
@@ -266,5 +334,13 @@ static void nonmax_suppress (float **dx, float **dy, imImage* mag)
         mag_data[i*mag->width + j] = tobyte(g*MAG_SCALE);
       } 
     }
+
+    IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }

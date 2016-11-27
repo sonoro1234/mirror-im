@@ -575,17 +575,18 @@ int imProcessZeroCrossing(const imImage* src_image, imImage* dst_image);
 /** First part of the Canny edge detector. Includes the gaussian filtering and the nonmax suppression. \n
  * After using this you could apply a Hysteresis Threshold, see \ref imProcessHysteresisThreshold. \n
  * Image must be IM_BYTE/IM_GRAY. \n
+ * Returns zero if the counter aborted.
  * Implementation from the book:
  \verbatim
     J. R. Parker
-    "Algoritms for Image Processing and Computer Vision"
+    "Algorithms for Image Processing and Computer Vision"
     WILEY
  \endverbatim
  *
- * \verbatim im.ProcessCanny(src_image: imImage, dst_image: imImage, stddev: number) [in Lua 5] \endverbatim
- * \verbatim im.ProcessCannyNew(image: imImage, stddev: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessCanny(src_image: imImage, dst_image: imImage, stddev: number)-> counter: boolean [in Lua 5] \endverbatim
+ * \verbatim im.ProcessCannyNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-void imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev);
+int imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev);
 
 /** Calculates the kernel size given the standard deviation. \n
  * If sdtdev is negative its magnitude will be used as the kernel size.

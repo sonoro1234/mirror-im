@@ -1139,8 +1139,8 @@ namespace im
       return imProcessSplineEdgeConvolve(src_image.GetHandle(), dst_image.GetHandle()); }
     inline int ZeroCrossing(const Image& src_image, Image& dst_image) {
       return imProcessZeroCrossing(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void Canny(const Image& src_image, Image& dst_image, float stddev) {
-      imProcessCanny(src_image.GetHandle(), dst_image.GetHandle(), stddev); }
+    inline int Canny(const Image& src_image, Image& dst_image, float stddev) {
+      return imProcessCanny(src_image.GetHandle(), dst_image.GetHandle(), stddev); }
     inline int Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold) {
       return imProcessUnsharp(src_image.GetHandle(), dst_image.GetHandle(), stddev, amount, threshold); }
     inline int Sharp(const Image& src_image, Image& dst_image, float amount, float threshold) {

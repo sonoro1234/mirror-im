@@ -1581,8 +1581,8 @@ static int imluaProcessCanny (lua_State *L)
   imlua_checktype(L, 1, src_image, IM_GRAY, IM_BYTE);
   imlua_match(L, src_image, dst_image);
 
-  imProcessCanny(src_image, dst_image, stddev);
-  return 0;
+  lua_pushboolean(L, imProcessCanny(src_image, dst_image, stddev));
+  return 1;
 }
 
 /*****************************************************************************\
