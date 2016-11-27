@@ -1147,13 +1147,13 @@ namespace im
       return imProcessSharp(src_image.GetHandle(), dst_image.GetHandle(), amount, threshold); }
     inline int SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold) {
       return imProcessSharpKernel(src_image.GetHandle(), kernel.GetHandle(), dst_image.GetHandle(), amount, threshold); }
-    inline void PerimeterLine(const Image& src_image, Image& dst_image) {
-      imProcessPerimeterLine(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void RemoveByArea(const Image& src_image, Image& dst_image, int connect, int start_size, int end_size, int inside) {
-      imProcessRemoveByArea(src_image.GetHandle(), dst_image.GetHandle(), connect, start_size, end_size, inside); }
-    inline void FillHoles(const Image& src_image, Image& dst_image, int connect) {
-      imProcessFillHoles(src_image.GetHandle(), dst_image.GetHandle(), connect); }
-    inline void RotateKernel(Image& kernel) {
+    inline int PerimeterLine(const Image& src_image, Image& dst_image) {
+      return imProcessPerimeterLine(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline int RemoveByArea(const Image& src_image, Image& dst_image, int connect, int start_size, int end_size, int inside) {
+      return imProcessRemoveByArea(src_image.GetHandle(), dst_image.GetHandle(), connect, start_size, end_size, inside); }
+    inline int FillHoles(const Image& src_image, Image& dst_image, int connect) {
+      return imProcessFillHoles(src_image.GetHandle(), dst_image.GetHandle(), connect); }
+    inline int RotateKernel(Image& kernel) {
       imProcessRotateKernel(kernel.GetHandle()); }
     inline void FFTraw(Image& image, int inverse, int center, int normalize) {
       imProcessFFTraw(image.GetHandle(), inverse, center, normalize); }
@@ -1307,26 +1307,26 @@ namespace im
     inline int FindRegions(const Image& image, Image& region_image, int connect, int touch_border, int &region_count) {
       return imAnalyzeFindRegions(image.GetHandle(), region_image.GetHandle(), connect, touch_border, &region_count); }
 
-    inline void MeasureArea(const Image& region_image, MeasureTable& measure_table) {
-      imAnalyzeMeasureArea(region_image.GetHandle(), measure_table.AddMeasureInt("Area"), measure_table.RegionCount()); }
-    inline void MeasurePerimArea(const Image& region_image, MeasureTable& measure_table) {
-      imAnalyzeMeasurePerimArea(region_image.GetHandle(), measure_table.AddMeasureFloat("PerimeterArea"), measure_table.RegionCount()); }
-    inline void MeasureCentroid(const Image& region_image, MeasureTable& measure_table) {
-      imAnalyzeMeasureCentroid(region_image.GetHandle(), measure_table.GetMeasureInt("Area"), measure_table.RegionCount(), 
+    inline int MeasureArea(const Image& region_image, MeasureTable& measure_table) {
+      return imAnalyzeMeasureArea(region_image.GetHandle(), measure_table.AddMeasureInt("Area"), measure_table.RegionCount()); }
+    inline int MeasurePerimArea(const Image& region_image, MeasureTable& measure_table) {
+      return imAnalyzeMeasurePerimArea(region_image.GetHandle(), measure_table.AddMeasureFloat("PerimeterArea"), measure_table.RegionCount()); }
+    inline int MeasureCentroid(const Image& region_image, MeasureTable& measure_table) {
+      return imAnalyzeMeasureCentroid(region_image.GetHandle(), measure_table.GetMeasureInt("Area"), measure_table.RegionCount(),
                                                       measure_table.AddMeasureFloat("CentroidX"), measure_table.AddMeasureFloat("CentroidY")); }
-    inline void MeasurePrincipalAxis(const Image& region_image, MeasureTable& measure_table) {
-      imAnalyzeMeasurePrincipalAxis(region_image.GetHandle(), measure_table.GetMeasureInt("Area"), 
+    inline int MeasurePrincipalAxis(const Image& region_image, MeasureTable& measure_table) {
+      return imAnalyzeMeasurePrincipalAxis(region_image.GetHandle(), measure_table.GetMeasureInt("Area"),
                                                            measure_table.GetMeasureFloat("CentroidX"), measure_table.GetMeasureFloat("CentroidY"), 
                                                            measure_table.RegionCount(), 
                                                            measure_table.AddMeasureFloat("MajorSlope"), measure_table.AddMeasureFloat("MajorLength"), 
                                                            measure_table.AddMeasureFloat("MinorSlope"), measure_table.AddMeasureFloat("MinorLength")); }
-    inline void MeasureHoles(const Image& region_image, int connect, MeasureTable& measure_table) {
-      imAnalyzeMeasureHoles(region_image.GetHandle(), connect, measure_table.RegionCount(), 
+    inline int MeasureHoles(const Image& region_image, int connect, MeasureTable& measure_table) {
+      return imAnalyzeMeasureHoles(region_image.GetHandle(), connect, measure_table.RegionCount(),
                                                             measure_table.AddMeasureInt("HolesCount"),
                                                             measure_table.AddMeasureInt("HolesArea"), 
                                                             measure_table.AddMeasureFloat("HolesPerimeter")); }
-    inline void MeasurePerimeter(const Image& region_image, MeasureTable& measure_table) {
-      imAnalyzeMeasurePerimeter(region_image.GetHandle(), measure_table.AddMeasureFloat("Perimeter"), measure_table.RegionCount()); }
+    inline int MeasurePerimeter(const Image& region_image, MeasureTable& measure_table) {
+      return imAnalyzeMeasurePerimeter(region_image.GetHandle(), measure_table.AddMeasureFloat("Perimeter"), measure_table.RegionCount()); }
 
   }
 
