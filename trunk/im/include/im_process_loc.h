@@ -205,7 +205,7 @@ int imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imIma
  * you can use the maximum or the minimum within the kernel area. \n
  * No border extensions are used. 
  * All the gray morphology operations use this function. \n
- * If the kernel image attribute "Description" exists it is used by the counter.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphConvolve(src_image: imImage, dst_image: imImage, kernel: imImage, ismax: boolean) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphConvolveNew(image: imImage, kernel: imImage, ismax: boolean) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -220,6 +220,7 @@ int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, con
 int imProcessGrayMorphErode(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Gray morphology convolution with a kernel full of "0"s and use maximum value.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphDilate(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphDilateNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -227,6 +228,7 @@ int imProcessGrayMorphErode(const imImage* src_image, imImage* dst_image, int ke
 int imProcessGrayMorphDilate(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Erode+Dilate.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphOpen(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphOpenNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -234,6 +236,7 @@ int imProcessGrayMorphDilate(const imImage* src_image, imImage* dst_image, int k
 int imProcessGrayMorphOpen(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Dilate+Erode.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphClose(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphCloseNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -241,6 +244,7 @@ int imProcessGrayMorphOpen(const imImage* src_image, imImage* dst_image, int ker
 int imProcessGrayMorphClose(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Open+Difference.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphTopHat(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphTopHatNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -248,6 +252,7 @@ int imProcessGrayMorphClose(const imImage* src_image, imImage* dst_image, int ke
 int imProcessGrayMorphTopHat(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Close+Difference.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphWell(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphWellNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -255,6 +260,7 @@ int imProcessGrayMorphTopHat(const imImage* src_image, imImage* dst_image, int k
 int imProcessGrayMorphWell(const imImage* src_image, imImage* dst_image, int kernel_size);
 
 /** Difference(Erode, Dilate).
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGrayMorphGradient(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGrayMorphGradientNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -275,7 +281,7 @@ int imProcessGrayMorphGradient(const imImage* src_image, imImage* dst_image, int
  * The operation can be repeated by a number of iterations. 
  * The border is zero extended. \n
  * Almost all the binary morphology operations use this function.\n
- * If the kernel image attribute "Description" exists it is used by the counter.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBinMorphConvolve(src_image: imImage, dst_image: imImage, kernel: imImage, hit_white: boolean, iter: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBinMorphConvolveNew(image: imImage, kernel: imImage, hit_white: boolean, iter: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -283,6 +289,7 @@ int imProcessGrayMorphGradient(const imImage* src_image, imImage* dst_image, int
 int imProcessBinMorphConvolve(const imImage* src_image, imImage* dst_image, const imImage* kernel, int hit_white, int iter);
 
 /** Binary morphology convolution with a kernel full of "1"s and hit white.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBinMorphErode(src_image: imImage, dst_image: imImage, kernel_size: number, iter: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBinMorphErodeNew(image: imImage, kernel_size: number, iter: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -290,6 +297,7 @@ int imProcessBinMorphConvolve(const imImage* src_image, imImage* dst_image, cons
 int imProcessBinMorphErode(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
 
 /** Binary morphology convolution with a kernel full of "0"s and hit black.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBinMorphDilate(src_image: imImage, dst_image: imImage, kernel_size: number, iter: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBinMorphDilateNew(image: imImage, kernel_size: number, iter: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -298,6 +306,7 @@ int imProcessBinMorphDilate(const imImage* src_image, imImage* dst_image, int ke
 
 /** Erode+Dilate.
  * When iteration is more than one it means Erode+Erode+Erode+...+Dilate+Dilate+Dilate+...
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBinMorphOpen(src_image: imImage, dst_image: imImage, kernel_size: number, iter: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBinMorphOpenNew(image: imImage, kernel_size: number, iter: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -305,6 +314,7 @@ int imProcessBinMorphDilate(const imImage* src_image, imImage* dst_image, int ke
 int imProcessBinMorphOpen(const imImage* src_image, imImage* dst_image, int kernel_size, int iter);
 
 /** Dilate+Erode.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBinMorphClose(src_image: imImage, dst_image: imImage, kernel_size: number, iter: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBinMorphCloseNew(image: imImage, kernel_size: number, iter: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -313,6 +323,7 @@ int imProcessBinMorphClose(const imImage* src_image, imImage* dst_image, int ker
 
 /** Erode+Difference. \n
  * The difference from the source image is applied only once.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBinMorphOutline(src_image: imImage, dst_image: imImage, kernel_size: number, iter: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBinMorphOutlineNew(image: imImage, kernel_size: number, iter: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -424,7 +435,6 @@ int imProcessLocalMaxThreshold(const imImage* src_image, imImage* dst_image, int
  * Kernel can be IM_INT or IM_FLOAT, but always IM_GRAY. Use kernel size odd for better results. \n
  * Supports all data types. The border is mirrored. \n
  * Returns zero if the counter aborted. Most of the convolutions use this function.\n
- * If the kernel image attribute "Description" exists it is used by the counter.
  *
  * \verbatim im.ProcessConvolve(src_image: imImage, dst_image: imImage, kernel: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvolveNew(image: imImage, kernel: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -433,7 +443,6 @@ int imProcessConvolve(const imImage* src_image, imImage* dst_image, const imImag
 
 /** Base convolution when the kernel is separable. Only the first line and the first column will be used. \n
  * Returns zero if the counter aborted.\n
- * If the kernel image attribute "Description" exists it is used by the counter.
  *
  * \verbatim im.ProcessConvolveSep(src_image: imImage, dst_image: imImage, kernel: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvolveSepNew(image: imImage, kernel: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -444,7 +453,6 @@ int imProcessConvolveSep(const imImage* src_image, imImage* dst_image, const imI
  * Kernel can be IM_INT or IM_FLOAT, but always IM_GRAY. Use kernel size odd for better results. \n
  * Supports all data types. The border is mirrored. \n
  * Returns zero if the counter aborted. Most of the convolutions use this function.\n
- * If the kernel image attribute "Description" exists it is used by the counter.
  *
  * \verbatim im.ProcessConvolveDual(src_image: imImage, dst_image: imImage, kernel1, kernel2: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvolveDualNew(image: imImage, kernel1, kernel2: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -453,7 +461,6 @@ int imProcessConvolveDual(const imImage* src_image, imImage* dst_image, const im
 
 /** Repeats the convolution a number of times. \n
  * Returns zero if the counter aborted.\n
- * If the kernel image attribute "Description" exists it is used by the counter.
  *
  * \verbatim im.ProcessConvolveRep(src_image: imImage, dst_image: imImage, kernel: imImage, count: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvolveRepNew(image: imImage, kernel: imImage, count: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -465,7 +472,6 @@ int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imI
  * The rotation is implemented only for kernel sizes 3x3, 5x5 and 7x7. \n
  * Supports all data types except complex.
  * Returns zero if the counter aborted.\n
- * If the kernel image attribute "Description" exists it is used by the counter.
  *
  * \verbatim im.ProcessCompassConvolve(src_image: imImage, dst_image: imImage, kernel: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessCompassConvolveNew(image: imImage, kernel: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -481,6 +487,7 @@ void imProcessRotateKernel(imImage* kernel);
 /** Difference(Gaussian1, Gaussian2). \n
  * Supports all data types, 
  * but if source is IM_BYTE or IM_USHORT target image must be of type IM_INT.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessDiffOfGaussianConvolve(src_image: imImage, dst_image: imImage, stddev1: number, stddev2: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessDiffOfGaussianConvolveNew(image: imImage, stddev1: number, stddev2: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -490,6 +497,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
 /** Convolution with a laplacian of a gaussian kernel. \n
  * Supports all data types, 
  * but if source is IM_BYTE or IM_USHORT target image must be of type IM_INT.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessLapOfGaussianConvolve(src_image: imImage, dst_image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessLapOfGaussianConvolveNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -498,6 +506,7 @@ int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image,
 
 /** Convolution with a kernel full of "1"s inside a circle. \n
  * Supports all data types.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessMeanConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessMeanConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -507,6 +516,7 @@ int imProcessMeanConvolve(const imImage* src_image, imImage* dst_image, int kern
 /** Convolution with a float gaussian kernel. \n
  * If sdtdev is negative its magnitude will be used as the kernel size. \n
  * Supports all data types.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessGaussianConvolve(src_image: imImage, dst_image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGaussianConvolveNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -515,6 +525,7 @@ int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, floa
 
 /** Convolution with a barlett kernel. \n
  * Supports all data types.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessBarlettConvolve(src_image: imImage, dst_image: imImage, kernel_size: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessBarlettConvolveNew(image: imImage, kernel_size: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -523,6 +534,7 @@ int imProcessBarlettConvolve(const imImage* src_image, imImage* dst_image, int k
 
 /** Magnitude of the sobel convolution. \n
  * Supports all data types.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessSobelConvolve(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessSobelConvolveNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -531,6 +543,7 @@ int imProcessSobelConvolve(const imImage* src_image, imImage* dst_image);
 
 /** Magnitude of the prewitt convolution. \n
  * Supports all data types.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessPrewittConvolve(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessPrewittConvolveNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -539,6 +552,7 @@ int imProcessPrewittConvolve(const imImage* src_image, imImage* dst_image);
 
 /** Spline edge dectection. \n
  * Supports all data types.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessSplineEdgeConvolve(src_image: imImage, dst_image: imImage) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessSplineEdgeConvolveNew(image: imImage) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
@@ -596,6 +610,7 @@ int imProcessUnsharp(const imImage* src_image, imImage* dst_image, float stddev,
 /** Edge enhancement using Laplacian8 mask. 
  *  amount controls how much the edges will enhance the image (0<amount<1), and
  *  threshold controls which edges will be considered, it compares to twice of the absolute size of the edge.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessSharp(src_image: imImage, dst_image: imImage, amount: number, threshold: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSharpNew(image: imImage, amount: number, threshold: number) -> new_image: imImage [in Lua 5] \endverbatim
@@ -606,6 +621,7 @@ int imProcessSharp(const imImage* src_image, imImage* dst_image, float amount, f
  *  If kernel has all positive values, then the unsharp technique is used, else sharp is used.
  *  amount controls how much the edges will enhance the image (0<amount<1), and
  *  threshold controls which edges will be considered, it compares to twice of the absolute size of the edge.
+ * Returns zero if the counter aborted.
  *
  * \verbatim im.ProcessSharp(src_image: imImage, dst_image: imImage, amount: number, threshold: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSharpNew(image: imImage, amount: number, threshold: number) -> new_image: imImage [in Lua 5] \endverbatim
