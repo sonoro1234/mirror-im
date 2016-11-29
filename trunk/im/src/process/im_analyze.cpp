@@ -441,7 +441,7 @@ int imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count)
 #endif
   for (int i = 0; i < image->count; i++)
   {
-    if (i % image->height == 0)
+    if (i % image->width == 0)
     {
 #ifdef _OPENMP
 #pragma omp flush (processing)
@@ -458,7 +458,7 @@ int imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count)
       data_area[index]++;
     }
 
-    if (i % image->height == 0)
+    if (i % image->width == 0)
     {
       IM_COUNT_PROCESSING;
 #ifdef _OPENMP
@@ -1307,13 +1307,13 @@ int imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regio
           perim_data[index] += inc;
         }
       }
+    }
 
-      IM_COUNT_PROCESSING;
+    IM_COUNT_PROCESSING;
 #ifdef _OPENMP
 #pragma omp flush (processing)
 #endif
-      IM_END_PROCESSING;
-    }
+    IM_END_PROCESSING;
   }
 
   imProcessCounterEnd(counter);
@@ -1579,7 +1579,7 @@ int imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int conn
 #endif
   for (int i = 0; i < src_image->count; i++)
   {
-    if (i % src_image->height == 0)
+    if (i % src_image->width == 0)
     {
 #ifdef _OPENMP
 #pragma omp flush (processing)
@@ -1598,7 +1598,7 @@ int imProcessRemoveByArea(const imImage* src_image, imImage* dst_image, int conn
     else
       img_data[i] = 0;
 
-    if (i % src_image->height == 0)
+    if (i % src_image->width == 0)
     {
       IM_COUNT_PROCESSING;
 #ifdef _OPENMP
@@ -1652,7 +1652,7 @@ int imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect
 #endif
   for (int i = 0; i < src_image->count; i++)
   {
-    if (i % src_image->height == 0)
+    if (i % src_image->width == 0)
     {
 #ifdef _OPENMP
 #pragma omp flush (processing)
@@ -1665,7 +1665,7 @@ int imProcessFillHoles(const imImage* src_image, imImage* dst_image, int connect
     else
       dst_data[i] = !(dst_data[i]);  // Fix negative data.
 
-    if (i % src_image->height == 0)
+    if (i % src_image->width == 0)
     {
       IM_COUNT_PROCESSING;
 #ifdef _OPENMP
