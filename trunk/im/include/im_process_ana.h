@@ -97,7 +97,7 @@ unsigned long* imHistogramNew(int data_type, int *hcount);
  * \ingroup stats */
 void imHistogramRelease(unsigned long* histo);
 
-/** Short data type stores the histogram values of negative indices starting at 0.
+/** Short data type stores the histogram values of negative indexes starting at 0.
  * So the real level is obtained by shifting the zero based index. \n
  * Not available in Lua.
  * \ingroup stats */
