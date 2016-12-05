@@ -21,20 +21,39 @@
 
 
 template <class T>
-static void DoCalcHisto(T* map, int size, unsigned long* histo, int hcount, int cumulative, int shift)
+static int DoCalcHisto(T* map, int size, unsigned long* histo, int hcount, int cumulative, int shift, int counter, int width)
 {
   memset(histo, 0, hcount * sizeof(unsigned long));
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(size))
 #endif
   for (int i = 0; i < size; i++)
   {
+    if (i % width == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     int index = map[i] + shift;
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
     histo[index]++;
+
+    if (i % width == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
 
   if (cumulative)
@@ -43,49 +62,69 @@ static void DoCalcHisto(T* map, int size, unsigned long* histo, int hcount, int 
     for (int i = 1; i < hcount; i++)
       histo[i] += histo[i-1];
   }
+
+  return processing;
 }
 
 void imCalcByteHistogram(const imbyte* map, int size, unsigned long* histo, int cumulative)
 {
-  DoCalcHisto(map, size, histo, 256, cumulative, 0);
+  DoCalcHisto(map, size, histo, 256, cumulative, 0, -1, size);
 }
 
 void imCalcUShortHistogram(const imushort* map, int size, unsigned long* histo, int cumulative)
 {
-  DoCalcHisto(map, size, histo, 65536, cumulative, 0);
+  DoCalcHisto(map, size, histo, 65536, cumulative, 0, -1, size);
 }
 
 void imCalcShortHistogram(const short* map, int size, unsigned long* histo, int cumulative)
 {
-  DoCalcHisto(map, size, histo, 65536, cumulative, 32768);
+  DoCalcHisto(map, size, histo, 65536, cumulative, 32768, -1, size);
 }
 
-void imCalcHistogram(const imImage* src_image, unsigned long* histo, int plane, int cumulative)
+int imCalcHistogram(const imImage* src_image, unsigned long* histo, int plane, int cumulative)
 {
+  int ret = 0;
+  int counter = imProcessCounterBegin("Histogram");
+  imCounterTotal(counter, src_image->height, "Processing...");
+
   switch (src_image->data_type)
   {
   case IM_BYTE:
-    imCalcByteHistogram((imbyte*)src_image->data[plane], src_image->count, histo, cumulative);
+    ret = DoCalcHisto((imbyte*)src_image->data[plane], src_image->count, histo, 256, cumulative, 0, counter, src_image->width);
     break;
   case IM_SHORT:
-    imCalcShortHistogram((short*)src_image->data[plane], src_image->count, histo, cumulative);
+    ret = DoCalcHisto((short*)src_image->data[plane], src_image->count, histo, 65536, cumulative, 0, counter, src_image->width);
     break;
   case IM_USHORT:
-    imCalcUShortHistogram((imushort*)src_image->data[plane], src_image->count, histo, cumulative);
+    ret = DoCalcHisto((imushort*)src_image->data[plane], src_image->count, histo, 65536, cumulative, 32768, counter, src_image->width);
     break;
   }
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
-void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulative)
+int imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulative)
 {
+  int counter = imProcessCounterBegin("GrayHistogram");
+
   int hcount = imHistogramCount(image->data_type);
 
+  IM_INT_PROCESSING;
+
   if (image->color_space == IM_GRAY)
-    imCalcHistogram(image, histo, 0, cumulative);
+  {
+    if (!imCalcHistogram(image, histo, 0, cumulative))
+    {
+      imProcessCounterEnd(counter);
+      return 0;
+    }
+  }
   else 
   {
     int i;
     memset(histo, 0, hcount * sizeof(unsigned long));
+    imCounterTotal(counter, image->height, "Processing...");
 
     if (image->color_space == IM_MAP || image->color_space == IM_BINARY)
     {
@@ -103,11 +142,28 @@ void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulat
 #endif
       for (i = 0; i < image->count; i++)
       {
+        if (i % image->width == 0)
+        {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+        }
+        IM_BEGIN_PROCESSING;
+
         int index = gray_map[map[i]];
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
         histo[index]++;
+
+        if (i % image->width == 0)
+        {
+          IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+        }
+        IM_END_PROCESSING;
       }
     }
     else   // RGB
@@ -123,11 +179,28 @@ void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulat
 #endif
         for (i = 0; i < image->count; i++)
         {
+          if (i % image->width == 0)
+          {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+          }
+          IM_BEGIN_PROCESSING;
+
           imushort index = imColorRGB2Luma(*r++, *g++, *b++);
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
           histo[index]++;
+
+          if (i % image->width == 0)
+          {
+            IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+          }
+          IM_END_PROCESSING;
         }
       }
       else if (image->data_type == IM_SHORT)
@@ -141,11 +214,28 @@ void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulat
 #endif
         for (i = 0; i < image->count; i++)
         {
+          if (i % image->width == 0)
+          {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+          }
+          IM_BEGIN_PROCESSING;
+
           int index = imColorRGB2Luma(*r++, *g++, *b++) + 32768;
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
           histo[index]++;
+
+          if (i % image->width == 0)
+          {
+            IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+          }
+          IM_END_PROCESSING;
         }
       }
       else
@@ -159,11 +249,28 @@ void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulat
 #endif
         for (i = 0; i < image->count; i++)
         {
+          if (i % image->width == 0)
+          {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+          }
+          IM_BEGIN_PROCESSING;
+
           imbyte index = imColorRGB2Luma(*r++, *g++, *b++);
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
           histo[index]++;
+
+          if (i % image->width == 0)
+          {
+            IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+          }
+          IM_END_PROCESSING;
         }
       }
     }
@@ -175,14 +282,21 @@ void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulat
         histo[i] += histo[i-1];
     }
   }
+
+  imProcessCounterEnd(counter);
+  return processing;
 }
 
-static unsigned long count_map(const imImage* image)
+static int count_map(const imImage* image, unsigned long *total_count)
 {
   int hcount;
   unsigned long* histo = imHistogramNew(image->data_type, &hcount);
 
-  imCalcHistogram(image, histo, 0, 0);
+  if (!imCalcHistogram(image, histo, 0, 0))
+  {
+    imHistogramRelease(histo);
+    return 0;
+  }
 
   unsigned long numcolor = 0;
 
@@ -194,14 +308,15 @@ static unsigned long count_map(const imImage* image)
 
   imHistogramRelease(histo);
 
-  return numcolor;
+  *total_count = numcolor;
+  return 1;
 }
 
-static unsigned long count_comp(const imImage* image)
+static int count_comp(const imImage* image, int counter, int width, unsigned long *total_count)
 {
   imbyte *count = (imbyte*)calloc(sizeof(imbyte), 1 << 21); /* (2^24)/8=2^21 ~ 2Mb - using a bit array */
   if (!count)
-    return (unsigned long)-1;
+    return 0;
 
   imbyte *comp0 = (imbyte*)image->data[0];
   imbyte *comp1 = (imbyte*)image->data[1];
@@ -218,25 +333,43 @@ static unsigned long count_comp(const imImage* image)
       numcolor++;
 
     imDataBitSet(count, index, 1);
+
+    if (i % width == 0)
+    {
+      if (!imCounterInc(counter))
+        return 0;
+    }
   }
 
   free(count);
 
-  return numcolor;
+  *total_count = numcolor;
+  return 1;
 }
 
-unsigned long imCalcCountColors(const imImage* image)
+int imCalcCountColors(const imImage* image, unsigned long* count)
 {
+  int ret = 0;
+  int counter = imProcessCounterBegin("CountColors");
+
   if (imColorModeDepth(image->color_space) > 1)
-    return count_comp(image);
+  {
+    imCounterTotal(counter, image->height, "Processing...");
+    ret = count_comp(image, counter, image->width, count);
+  }
   else
-    return count_map(image);
+    ret = count_map(image, count);
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
 template <class T>
-static void DoStats(T* data, int count, imStats* stats)
+static int DoStats(T* data, int count, imStats* stats, int counter, int width)
 {
   memset(stats, 0, sizeof(imStats));
+
+  IM_INT_PROCESSING;
 
   unsigned long positive = 0;
   unsigned long negative = 0;
@@ -253,6 +386,14 @@ static void DoStats(T* data, int count, imStats* stats)
 #endif
   for (int i = 0; i < count; i++)
   {
+    if (i % width == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     if (data[i] > 0)
       positive++;
 
@@ -264,6 +405,15 @@ static void DoStats(T* data, int count, imStats* stats)
 
     mean += (double)data[i];
     stddev += ((double)data[i])*((double)data[i]);
+
+    if (i % width == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
 
   double dcount = (double)count;
@@ -277,53 +427,77 @@ static void DoStats(T* data, int count, imStats* stats)
   stats->zeros = zeros;
   stats->mean = (float)mean;
   stats->stddev = (float)stddev;
+
+  return processing;
 }
 
-void imCalcImageStatistics(const imImage* image, imStats* stats)
+int imCalcImageStatistics(const imImage* image, imStats* stats)
 {
+  int ret = 0;
+  int counter = imProcessCounterBegin("ImageStatistics");
+  imCounterTotal(counter, image->depth*image->height, "Processing...");
+
   for (int i = 0; i < image->depth; i++)
   {
     switch(image->data_type)
     {
     case IM_BYTE:
-      DoStats((imbyte*)image->data[i], image->count, &stats[i]);
+      ret = DoStats((imbyte*)image->data[i], image->count, &stats[i], counter, image->width);
       break;                                                                                
     case IM_SHORT:                                                                           
-      DoStats((short*)image->data[i], image->count, &stats[i]);
+      ret = DoStats((short*)image->data[i], image->count, &stats[i], counter, image->width);
       break;                                                                                
     case IM_USHORT:                                                                           
-      DoStats((imushort*)image->data[i], image->count, &stats[i]);
+      ret = DoStats((imushort*)image->data[i], image->count, &stats[i], counter, image->width);
       break;                                                                                
     case IM_INT:                                                                           
-      DoStats((int*)image->data[i], image->count, &stats[i]);
+      ret = DoStats((int*)image->data[i], image->count, &stats[i], counter, image->width);
       break;                                                                                
     case IM_FLOAT:                                                                           
-      DoStats((float*)image->data[i], image->count, &stats[i]);
+      ret = DoStats((float*)image->data[i], image->count, &stats[i], counter, image->width);
       break;                                                                                
     case IM_DOUBLE:
-      DoStats((double*)image->data[i], image->count, &stats[i]);
+      ret = DoStats((double*)image->data[i], image->count, &stats[i], counter, image->width);
       break;
     }
+
+    if (!ret)
+      break;
   }
+
+  imProcessCounterEnd(counter);
+  return ret;
 }
 
-void imCalcHistogramStatistics(const imImage* image, imStats* stats)
+int imCalcHistogramStatistics(const imImage* image, imStats* stats)
 {
+  int counter = imProcessCounterBegin("HistogramStatistics");
+
   int hcount;
   unsigned long* histo = imHistogramNew(image->data_type, &hcount);
 
   for (int d = 0; d < image->depth; d++)
   {
-    imCalcHistogram(image, histo, d, 0);
+    if (!imCalcHistogram(image, histo, d, 0))
+    {
+      imHistogramRelease(histo);
+      imProcessCounterEnd(counter);
+      return 0;
+    }
 
-    DoStats((unsigned long*)histo, hcount, &stats[d]);
+    DoStats((unsigned long*)histo, hcount, &stats[d], -1, hcount);
   }
 
   imHistogramRelease(histo);
+
+  imProcessCounterEnd(counter);
+  return 1;
 }
 
-void imCalcHistoImageStatistics(const imImage* image, int* median, int* mode)
+int imCalcHistoImageStatistics(const imImage* image, int* median, int* mode)
 {
+  int counter = imProcessCounterBegin("HistoImageStatistics");
+
   int hcount;
   unsigned long* histo = imHistogramNew(image->data_type, &hcount);
 
@@ -331,7 +505,12 @@ void imCalcHistoImageStatistics(const imImage* image, int* median, int* mode)
   {
     int i;
 
-    imCalcHistogram(image, histo, d, 0);
+    if (!imCalcHistogram(image, histo, d, 0))
+    {
+      imHistogramRelease(histo);
+      imProcessCounterEnd(counter);
+      return 0;
+    }
 
     unsigned long half = image->count/2;
     unsigned long count = histo[0];
@@ -373,15 +552,24 @@ void imCalcHistoImageStatistics(const imImage* image, int* median, int* mode)
   }
 
   imHistogramRelease(histo);
+
+  imProcessCounterEnd(counter);
+  return 1;
 }
 
-void imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max)
+int imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max)
 {
+  int counter = imProcessCounterBegin("PercentMinMax");
+
   int zero = -imHistogramShift(image->data_type);
   int hcount;
   unsigned long* histo = imHistogramNew(image->data_type, &hcount);
 
-  imCalcGrayHistogram(image, histo, 0);
+  if (!imCalcGrayHistogram(image, histo, 0))
+  {
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   unsigned long acum, cut = (unsigned long)((image->count * percent) / 100.0f);
 
@@ -423,15 +611,28 @@ void imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, i
   *max += imHistogramShift(image->data_type);
 
   imHistogramRelease(histo);
+
+  imProcessCounterEnd(counter);
+  return 1;
 }
 
-float imCalcSNR(const imImage* image, const imImage* noise_image)
+int imCalcSNR(const imImage* image, const imImage* noise_image, double *snr)
 {
+  int counter = imProcessCounterBegin("SNR");
+
   imStats stats[4];
-  imCalcImageStatistics((imImage*)image, stats);
+  if (!imCalcImageStatistics((imImage*)image, stats))
+  {
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   imStats noise_stats[4];
-  imCalcImageStatistics((imImage*)noise_image, noise_stats);
+  if (!imCalcImageStatistics((imImage*)noise_image, noise_stats))
+  {
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   if (image->color_space == IM_RGB)
   {
@@ -444,64 +645,92 @@ float imCalcSNR(const imImage* image, const imImage* noise_image)
   }
 
   if (noise_stats[0].stddev == 0)
-    return 0;
+    *snr = 0;
+  else
 
-  return float(20.*log10(stats[0].stddev / noise_stats[0].stddev));
+    *snr = 20.*log10(stats[0].stddev / noise_stats[0].stddev);
+
+  imProcessCounterEnd(counter);
+  return 1;
 }
 
 template <class T> 
-static double DoRMSOp(T *map1, T *map2, int count)
+static int DoRMSOp(T *map1, T *map2, int count, double *rms, int counter, int width)
 {
   double rmserror = 0;
+
+  IM_INT_PROCESSING;
 
 #ifdef _OPENMP
 #pragma omp parallel for reduction(+:rmserror) if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
+    if (i % width == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     double diff = double(map1[i] - map2[i]);
     rmserror += diff * diff;
+
+    if (i % width == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
 
-  return rmserror;
+  *rms = rmserror;
+  return processing;
 }
   
-float imCalcRMSError(const imImage* image1, const imImage* image2)
+int imCalcRMSError(const imImage* image1, const imImage* image2, double *rmserror)
 {
-  double rmserror = 0;
+  *rmserror = 0;
 
   int count = image1->count*image1->depth;
+
+  int ret = 0;
+  int counter = imProcessCounterBegin("RMSError");
+  imCounterTotal(counter, image1->depth*image1->height, "Processing...");
 
   switch(image1->data_type)
   {
   case IM_BYTE:
-    rmserror = DoRMSOp((imbyte*)image1->data[0], (imbyte*)image2->data[0], count);
+    ret = DoRMSOp((imbyte*)image1->data[0], (imbyte*)image2->data[0], count, rmserror, counter, image1->width);
     break;
   case IM_SHORT:
-    rmserror = DoRMSOp((short*)image1->data[0], (short*)image2->data[0], count);
+    ret = DoRMSOp((short*)image1->data[0], (short*)image2->data[0], count, rmserror, counter, image1->width);
     break;
   case IM_USHORT:
-    rmserror = DoRMSOp((imushort*)image1->data[0], (imushort*)image2->data[0], count);
+    ret = DoRMSOp((imushort*)image1->data[0], (imushort*)image2->data[0], count, rmserror, counter, image1->width);
     break;
   case IM_INT:
-    rmserror = DoRMSOp((int*)image1->data[0], (int*)image2->data[0], count);
+    ret = DoRMSOp((int*)image1->data[0], (int*)image2->data[0], count, rmserror, counter, image1->width);
     break;
   case IM_FLOAT:
-    rmserror = DoRMSOp((float*)image1->data[0], (float*)image2->data[0], count);
+    ret = DoRMSOp((float*)image1->data[0], (float*)image2->data[0], count, rmserror, counter, image1->width);
     break;
   case IM_CFLOAT:
-    rmserror = DoRMSOp((float*)image1->data[0], (float*)image2->data[0], 2*count);
+    ret = DoRMSOp((float*)image1->data[0], (float*)image2->data[0], 2 * count, rmserror, counter, image1->width);
     break;
   case IM_DOUBLE:
-    rmserror = DoRMSOp((double*)image1->data[0], (double*)image2->data[0], count);
+    ret = DoRMSOp((double*)image1->data[0], (double*)image2->data[0], count, rmserror, counter, image1->width);
     break;
   case IM_CDOUBLE:
-    rmserror = DoRMSOp((double*)image1->data[0], (double*)image2->data[0], 2 * count);
+    ret = DoRMSOp((double*)image1->data[0], (double*)image2->data[0], 2 * count, rmserror, counter, image1->width);
     break;
   }
 
-  rmserror = sqrt(rmserror / double((count * image1->depth)));
+  *rmserror = sqrt((*rmserror) / double((count * image1->depth)));
 
-  return (float)rmserror;
+  imProcessCounterEnd(counter);
+  return ret;
 }
-

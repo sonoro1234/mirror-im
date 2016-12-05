@@ -23,46 +23,51 @@ extern "C" {
  * \ingroup process */
 
 /** Calculates the RMS error between two images (Root Mean Square Error).
- *
- * \verbatim im.CalcRMSError(image1: imImage, image2: imImage) -> rms: number [in Lua 5] \endverbatim
+* Returns zero if the counter aborted.
+*
+ * \verbatim im.CalcRMSError(image1: imImage, image2: imImage) -> counter: boolean, rms: number [in Lua 5] \endverbatim
  * \ingroup stats */
-float imCalcRMSError(const imImage* image1, const imImage* image2);
+int imCalcRMSError(const imImage* image1, const imImage* image2, double *rmserror);
 
 /** Calculates the SNR of an image and its noise (Signal Noise Ratio).
- *
- * \verbatim im.CalcSNR(src_image: imImage, noise_image: imImage) -> snr: number [in Lua 5] \endverbatim
+* Returns zero if the counter aborted.
+*
+ * \verbatim im.CalcSNR(src_image: imImage, noise_image: imImage) -> counter: boolean, snr: number [in Lua 5] \endverbatim
  * \ingroup stats */
-float imCalcSNR(const imImage* src_image, const imImage* noise_image);
+int imCalcSNR(const imImage* src_image, const imImage* noise_image, double *snr);
 
 /** Count the number of different colors in an image. \n
  * Image must be IM_BYTE, but can has all color spaces except IM_CMYK.
  * Data type can be also IM_SHORT or IM_USHORT if color space is IM_GRAY, IM_BINARY or IM_MAP.
  * Not using OpenMP when enabled, when color space depth is greater than 1.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcCountColors(image: imImage) -> count: number [in Lua 5] \endverbatim
+ * \verbatim im.CalcCountColors(image: imImage) -> counter: boolean, count: number [in Lua 5] \endverbatim
  * \ingroup stats */
-unsigned long imCalcCountColors(const imImage* image);
+int imCalcCountColors(const imImage* image, unsigned long *count);
 
 /** Calculates the gray histogram of an image. \n
  * Image must be (IM_BYTE, IM_SHORT or IM_USHORT)/(IM_RGB, IM_GRAY, IM_BINARY or IM_MAP). \n
  * If the image is IM_RGB then the histogram of the luma component is calculated. \n
  * Histogram is always 256 or 65536 positions long. \n
  * When cumulative is different from zero it calculates the cumulative histogram.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcGrayHistogram(image: imImage, cumulative: boolean) -> histo: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.CalcGrayHistogram(image: imImage, cumulative: boolean) -> counter: boolean, histo: table of numbers [in Lua 5] \endverbatim
  * \ingroup stats */
-void imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulative);
+int imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulative);
 
 /** Calculates the histogram of an image plane. \n
  * Image can be IM_BYTE, IM_SHORT or IM_USHORT. \n
  * Histogram is always 256 or 65536 positions long. \n
  * Where plane is the depth plane to calculate the histogram. \n
  * When cumulative is different from zero it calculates the cumulative histogram.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcHistogram(image: imImage, plane: number, cumulative: boolean) -> histo: table of numbers [in Lua 5] \endverbatim
+ * \verbatim im.CalcHistogram(image: imImage, plane: number, cumulative: boolean) -> counter: boolean, histo: table of numbers [in Lua 5] \endverbatim
  * The returned table is zero indexed.
  * \ingroup stats */
-void imCalcHistogram(const imImage* image, unsigned long* histo, int plane, int cumulative);
+int imCalcHistogram(const imImage* image, unsigned long* histo, int plane, int cumulative);
 
 /** Calculates the histogram of a IM_BYTE data. \n
  * Histogram is always 256 positions long. \n
@@ -125,40 +130,44 @@ typedef struct _imStats
 /** Calculates the statistics about the image data. \n
  * There is one stats for each depth plane. For ex: stats[0]=red stats, stats[0]=green stats, ... \n
  * Supports all data types except complex. \n
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcImageStatistics(image: imImage) -> stats: table [in Lua 5] \endverbatim
+ * \verbatim im.CalcImageStatistics(image: imImage) -> counter: boolean, stats: table [in Lua 5] \endverbatim
  * Table contains the following fields: max, min, positive, negative, zeros, mean, stddev. 
  * If image depth > 1 then table contains several tables with the previous fields, one for each plane,
  * starting at 0.
  * The same as the \ref imStats structure.
  * \ingroup stats */
-void imCalcImageStatistics(const imImage* image, imStats* stats);
+int imCalcImageStatistics(const imImage* image, imStats* stats);
 
 /** Calculates the statistics about the image histogram data.\n
  * There is one stats for each depth plane. For ex: stats[0]=red stats, stats[0]=green stats, ... \n
  * Only IM_BYTE, IM_SHORT and IM_USHORT images are supported.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcHistogramStatistics(image: imImage) -> stats: table [in Lua 5] \endverbatim
+ * \verbatim im.CalcHistogramStatistics(image: imImage) -> counter: boolean, stats: table [in Lua 5] \endverbatim
  * \ingroup stats */
-void imCalcHistogramStatistics(const imImage* image, imStats* stats);
+int imCalcHistogramStatistics(const imImage* image, imStats* stats);
 
 /** Calculates some extra statistics about the image histogram data.\n
  * There is one stats for each depth plane. \n
  * Only IM_BYTE, IM_SHORT and IM_USHORT images are supported. \n
  * mode will be -1 if more than one max is found.
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcHistoImageStatistics(image: imImage) -> median: number, mode: number [in Lua 5] \endverbatim
+ * \verbatim im.CalcHistoImageStatistics(image: imImage) -> counter: boolean, median: number, mode: number [in Lua 5] \endverbatim
  * \ingroup stats */
-void imCalcHistoImageStatistics(const imImage* image, int* median, int* mode);
+int imCalcHistoImageStatistics(const imImage* image, int* median, int* mode);
 
 /** Calculates the minimum and maximum levels 
  * ignoring a given percentage of the histogram count.\n
  * Used by \ref imProcessExpandHistogram. \n
  * Only IM_BYTE, IM_SHORT and IM_USHORT images are supported. \n
+ * Returns zero if the counter aborted.
  *
- * \verbatim im.CalcPercentMinMax(image: imImage, percent: number, ignore_zero: boolean) -> min, max: number [in Lua 5] \endverbatim
+ * \verbatim im.CalcPercentMinMax(image: imImage, percent: number, ignore_zero: boolean) -> counter: boolean, min, max: number [in Lua 5] \endverbatim
  * \ingroup stats */
-void imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max);
+int imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max);
 
 
 /** \defgroup analyze Image Analysis
