@@ -1236,24 +1236,24 @@ namespace im
 
   namespace Calc
   {
-    inline float RMSError(const Image& image1, const Image& image2) {
-      return imCalcRMSError(image1.GetHandle(), image2.GetHandle()); }
-    inline float SNR(const Image& src_image, const Image& noise_image) {
-      return imCalcSNR(src_image.GetHandle(), noise_image.GetHandle()); }
-    inline unsigned long CountColors(const Image& image) {
-      return imCalcCountColors(image.GetHandle()); }
-    inline void GrayHistogram(const Image& image, im::Histogram& histogram, int cumulative) {
-      imCalcGrayHistogram(image.GetHandle(), histogram.GetData(), cumulative); }
-    inline void Histogram(const Image& image, im::Histogram& histogram, int plane, int cumulative) {
-      imCalcHistogram(image.GetHandle(), histogram.GetData(), plane, cumulative); }
-    inline void ImageStatistics(const Image& image, imStats& stats) {
-      imCalcImageStatistics(image.GetHandle(), &stats); }
-    inline void HistogramStatistics(const Image& image, imStats& stats) {
-      imCalcHistogramStatistics(image.GetHandle(), &stats); }
-    inline void HistoImageStatistics(const Image& image, int* median, int* mode) {
-      imCalcHistoImageStatistics(image.GetHandle(), median, mode); }
-    inline void PercentMinMax(const Image& image, float percent, int ignore_zero, int &min, int &max) {
-      imCalcPercentMinMax(image.GetHandle(), percent, ignore_zero, &min, &max); }
+    inline int RMSError(const Image& image1, const Image& image2, double& rmserror) {
+      return imCalcRMSError(image1.GetHandle(), image2.GetHandle(), &rmserror); }
+    inline int SNR(const Image& src_image, const Image& noise_image, double& snr) {
+      return imCalcSNR(src_image.GetHandle(), noise_image.GetHandle(), &snr); }
+    inline int CountColors(const Image& image, unsigned long &count) {
+      return imCalcCountColors(image.GetHandle(), &count); }
+    inline int GrayHistogram(const Image& image, im::Histogram& histogram, int cumulative) {
+      return imCalcGrayHistogram(image.GetHandle(), histogram.GetData(), cumulative); }
+    inline int Histogram(const Image& image, im::Histogram& histogram, int plane, int cumulative) {
+      return imCalcHistogram(image.GetHandle(), histogram.GetData(), plane, cumulative); }
+    inline int ImageStatistics(const Image& image, imStats& stats) {
+      return imCalcImageStatistics(image.GetHandle(), &stats); }
+    inline int HistogramStatistics(const Image& image, imStats& stats) {
+      return imCalcHistogramStatistics(image.GetHandle(), &stats); }
+    inline int HistoImageStatistics(const Image& image, int* median, int* mode) {
+      return imCalcHistoImageStatistics(image.GetHandle(), median, mode); }
+    inline int PercentMinMax(const Image& image, float percent, int ignore_zero, int &min, int &max) {
+      return imCalcPercentMinMax(image.GetHandle(), percent, ignore_zero, &min, &max); }
   }
 
   class MeasureTable : protected AttribTable

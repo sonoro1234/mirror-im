@@ -94,11 +94,13 @@ static int imluaCalcRMSError (lua_State *L)
 {
   imImage* image1 = imlua_checkimage(L, 1);
   imImage* image2 = imlua_checkimage(L, 2);
+  double rmserror;
 
   imlua_match(L, image1, image2);
 
-  lua_pushnumber(L, imCalcRMSError(image1, image2));
-  return 1;
+  lua_pushboolean(L, imCalcRMSError(image1, image2, &rmserror));
+  lua_pushnumber(L, rmserror);
+  return 2;
 }
 
 /*****************************************************************************\
@@ -108,11 +110,13 @@ static int imluaCalcSNR (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* noise_image = imlua_checkimage(L, 2);
+  double snr;
 
   imlua_match(L, src_image, noise_image);
 
-  lua_pushnumber(L, imCalcSNR(src_image, noise_image));
-  return 1;
+  lua_pushboolean(L, imCalcSNR(src_image, noise_image, &snr));
+  lua_pushnumber(L, snr);
+  return 2;
 }
 
 /*****************************************************************************\
@@ -121,6 +125,7 @@ static int imluaCalcSNR (lua_State *L)
 static int imluaCalcCountColors (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
+  unsigned long count;
 
   if (imColorModeDepth(src_image->color_space) > 1)
   {
@@ -132,8 +137,9 @@ static int imluaCalcCountColors (lua_State *L)
   else
     imlua_checkhistogramtype(L, 1, src_image);
 
-  lua_pushnumber(L, imCalcCountColors(src_image));
-  return 1;
+  lua_pushboolean(L, imCalcCountColors(src_image, &count));
+  lua_pushinteger(L, count);
+  return 2;
 }
 
 /*****************************************************************************\
@@ -151,11 +157,12 @@ static int imluaCalcHistogram (lua_State *L)
 
   histo = imHistogramNew(src_image->data_type, &hcount);
 
-  imCalcHistogram(src_image, histo, plane, cumulative);
+  lua_pushboolean(L, imCalcHistogram(src_image, histo, plane, cumulative));
 
   imlua_newarrayulong(L, histo, hcount, 0);
+
   imHistogramRelease(histo);
-  return 1;
+  return 2;
 }
 
 /*****************************************************************************\
@@ -175,12 +182,13 @@ static int imluaCalcGrayHistogram (lua_State *L)
 
   histo = imHistogramNew(src_image->data_type, &hcount);
 
-  imCalcGrayHistogram(src_image, histo, cumulative);
+  lua_pushboolean(L, imCalcGrayHistogram(src_image, histo, cumulative));
+
   imlua_newarrayulong(L, histo, hcount, 0);
 
   imHistogramRelease(histo);
 
-  return 1;
+  return 2;
 }
 
 static void imlua_pushStats(lua_State *L, imStats* stats, int depth)
@@ -220,10 +228,10 @@ static int imluaCalcImageStatistics (lua_State *L)
 
   imlua_checknotcomplex(L, 1, image);
 
-  imCalcImageStatistics(image, stats);
+  lua_pushboolean(L, imCalcImageStatistics(image, stats));
 
   imlua_pushStats(L, stats, image->depth);
-  return 1;
+  return 2;
 }
 
 /*****************************************************************************\
@@ -236,10 +244,10 @@ static int imluaCalcHistogramStatistics (lua_State *L)
 
   imlua_checkhistogramtype(L, 1, image);
 
-  imCalcHistogramStatistics(image, stats);
+  lua_pushboolean(L, imCalcHistogramStatistics(image, stats));
 
   imlua_pushStats(L, stats, image->depth);
-  return 1;
+  return 2;
 }
 
 /*****************************************************************************\
@@ -257,7 +265,7 @@ static int imluaCalcHistoImageStatistics (lua_State *L)
   median = (int*)malloc(sizeof(int)*image->depth);
   mode = (int*)malloc(sizeof(int)*image->depth);
 
-  imCalcHistoImageStatistics(image, median, mode);
+  lua_pushboolean(L, imCalcHistoImageStatistics(image, median, mode));
 
   imlua_newarrayint (L, median, image->depth, 0);
   imlua_newarrayint (L, mode, image->depth, 0);
@@ -265,7 +273,7 @@ static int imluaCalcHistoImageStatistics (lua_State *L)
   free(median);
   free(mode);
 
-  return 2;
+  return 3;
 }
 
 static int imluaCalcPercentMinMax(lua_State *L)
@@ -278,11 +286,11 @@ static int imluaCalcPercentMinMax(lua_State *L)
 
   imlua_checkhistogramtype(L, 1, image);
 
-  imCalcPercentMinMax(image, percent, ignore_zero, &min, &max);
+  lua_pushboolean(L, imCalcPercentMinMax(image, percent, ignore_zero, &min, &max));
 
   lua_pushinteger(L, min);
   lua_pushinteger(L, max);
-  return 2;
+  return 3;
 }
 
 
