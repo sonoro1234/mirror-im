@@ -297,7 +297,11 @@ int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, floa
 
   unsigned long cut = (unsigned long)((src_image->count * percent)/100.);
 
-  imCalcHistogram(src_image, histo, 0, 1); // cumulative
+  if (!imCalcHistogram(src_image, histo, 0, 1)) // cumulative
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
 
   int i;
   for (i = 0; i < hcount; i++)
@@ -353,7 +357,11 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image)
   int hcount;
   unsigned long* histo = imHistogramNew(src_image->data_type, &hcount);
 
-  imCalcHistogram(src_image, histo, 0, 0);
+  if (!imCalcHistogram(src_image, histo, 0, 0))
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
 
   double totalPixels = src_image->count;
   double* p = new double [hcount];
@@ -375,7 +383,11 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image)
 float imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image)
 {
   imStats stats;
-  imCalcImageStatistics(src_image, &stats);
+  if (!imCalcImageStatistics(src_image, &stats))
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
   float level = (stats.max - stats.min)/2.0f;
   imProcessThreshold(src_image, dst_image, level, 1);
   return level;
@@ -386,7 +398,11 @@ void imProcessHysteresisThresEstimate(const imImage* image, int *low_thres, int 
   int hcount;
   unsigned long* histo = imHistogramNew(image->data_type, &hcount);
 
-  imCalcHistogram(image, histo, 0, 0);
+  if (!imCalcHistogram(image, histo, 0, 0))
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
 
   /* The high threshold should be > 80 or 90% of the pixels */
   unsigned long cut = (int)(0.1*image->count);
@@ -506,7 +522,11 @@ void imProcessLocalMaxThresEstimate(const imImage* image, int *thres)
   int hcount;
   unsigned long* histo = imHistogramNew(image->data_type, &hcount);
 
-  imCalcHistogram(image, histo, 0, 0);
+  if (!imCalcHistogram(image, histo, 0, 0))
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
 
   int high_count = 0;
   int index = hcount-1;

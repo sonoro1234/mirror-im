@@ -387,7 +387,11 @@ float imProcessCalcAutoGamma(const imImage* image)
 {
   float mean, min, max;
   imStats stats[4];
-  imCalcImageStatistics(image, stats);
+  if (!imCalcImageStatistics(image, stats))
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
   mean = stats[0].mean;
   min = stats[0].min;
   max = stats[0].max;
