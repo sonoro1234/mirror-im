@@ -91,7 +91,7 @@ void imCalcUShortHistogram(const unsigned short* data, int count, unsigned long*
  * \ingroup stats */
 void imCalcShortHistogram(const short* data, int count, unsigned long* histo, int cumulative);
 
-/** Alocates an histogram data based on the image data type. \n
+/** Allocates an histogram data based on the image data type. \n
  * Data type can be IM_BYTE, IM_SHORT or IM_USHORT. \n
  * Not available in Lua.
  * \ingroup stats */
