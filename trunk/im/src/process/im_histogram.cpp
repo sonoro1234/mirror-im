@@ -124,7 +124,11 @@ void imProcessEqualizeHistogram(const imImage* src_image, imImage* dst_image)
   int hcount;
   unsigned long* histo = imHistogramNew(src_image->data_type, &hcount);
 
-  imCalcHistogram(src_image, histo, 0, 1); // cumulative
+  if (!imCalcHistogram(src_image, histo, 0, 1)) // cumulative
+  {
+    // imProcessCounterEnd(counter);
+    // return 0;
+  }
 
   if (src_image->data_type == IM_USHORT)
     DoEqualizeHistogram((imushort*)src_image->data[0], (imushort*)dst_image->data[0], src_image->count, src_image->depth, hcount, histo);
