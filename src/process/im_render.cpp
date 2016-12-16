@@ -177,6 +177,12 @@ int imProcessRenderOp(imImage* image, imRenderFunc render_func, const char* rend
   return ret;
 }
 
+static void rand_seed(void)
+{
+  /* srand((unsigned)time(NULL)); */
+  srand((unsigned int)clock());
+}
+
 static float do_add_specklenoise(int, int, int, int *cond, float* param)
 {
   float rnd = float(rand()) / RAND_MAX;
@@ -197,7 +203,7 @@ int imProcessRenderAddSpeckleNoise(const imImage* src_image, imImage* dst_image,
   float param[2];
   param[0] = (float)imColorMax(src_image->data_type);
   param[1] = percent / 100.0f;
-  srand((unsigned)time(NULL));
+  rand_seed();
   imImageCopyData(src_image, dst_image);
   return imProcessRenderCondOp(dst_image, do_add_specklenoise, "RenderAddSpeckleNoise", param);
 }
@@ -224,7 +230,7 @@ int imProcessRenderAddGaussianNoise(const imImage* src_image, imImage* dst_image
   float param[2];
   param[0] = mean;
   param[1] = stddev;
-  srand((unsigned)time(NULL));
+  rand_seed();
   imImageCopyData(src_image, dst_image);
   return imProcessRenderOp(dst_image, do_add_gaussiannoise, "RenderAddGaussianNoise", param, 1);
 }
@@ -241,7 +247,7 @@ int imProcessRenderAddUniformNoise(const imImage* src_image, imImage* dst_image,
   float param[2];
   param[0] = mean;
   param[1] = stddev;
-  srand((unsigned)time(NULL));
+  rand_seed();
   imImageCopyData(src_image, dst_image);
   return imProcessRenderOp(dst_image, do_add_uniformnoise, "RenderAddUniformNoise", param, 1);
 }
@@ -265,7 +271,7 @@ int imProcessRenderRandomNoise(imImage* image)
 {
   static float param[1];
   param[0] = (float)imColorMax(image->data_type);
-  srand((unsigned)time(NULL));
+  rand_seed();
   return imProcessRenderOp(image, do_noise, "RenderRandomNoise", param, 0);
 }
 
