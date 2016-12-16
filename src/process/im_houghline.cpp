@@ -174,7 +174,7 @@ static int houghLine(const imImage* input, imImage* output, int counter)
   IM_INT_PROCESSING;
 
 #ifdef _OPENMP
-#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#pragma omp parallel for if (IM_OMP_MINCOUNT(input->count))
 #endif
   for (y=0; y < iysize; y++)
   {

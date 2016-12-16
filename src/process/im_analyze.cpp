@@ -662,7 +662,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
 {
   int *local_data_area = 0;
   float *local_data_cx = 0, *local_data_cy = 0;
-  int ret;
+  int ret = 0;
 
   int counter = imProcessCounterBegin("PrincipalAxis");
 
@@ -719,11 +719,35 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
   double* cm11 = (double*)malloc(region_count*sizeof(double));
   
   ret = iCalcMoment(cm20, 2, 0, image, data_cx, data_cy, region_count, counter);
-  if (!ret) goto principal_axis_cleanup1;
+  if (!ret)
+  {
+    if (local_data_area) free(local_data_area);
+    if (local_data_cx) free(local_data_cx);
+    if (local_data_cy) free(local_data_cy);
+    if (cm20) free(cm20); if (cm02) free(cm02); if (cm11) free(cm11);
+    imProcessCounterEnd(counter);
+    return 0;
+  }
   ret = iCalcMoment(cm02, 0, 2, image, data_cx, data_cy, region_count, counter);
-  if (!ret) goto principal_axis_cleanup1;
+  if (!ret)
+  {
+    if (local_data_area) free(local_data_area);
+    if (local_data_cx) free(local_data_cx);
+    if (local_data_cy) free(local_data_cy);
+    if (cm20) free(cm20); if (cm02) free(cm02); if (cm11) free(cm11);
+    imProcessCounterEnd(counter);
+    return 0;
+  }
   ret = iCalcMoment(cm11, 1, 1, image, data_cx, data_cy, region_count, counter);
-  if (!ret) goto principal_axis_cleanup1;
+  if (!ret)
+  {
+    if (local_data_area) free(local_data_area);
+    if (local_data_cx) free(local_data_cx);
+    if (local_data_cy) free(local_data_cy);
+    if (cm20) free(cm20); if (cm02) free(cm02); if (cm11) free(cm11);
+    imProcessCounterEnd(counter);
+    return 0;
+  }
 
   float *local_major_slope = 0, *local_minor_slope = 0;
   if (!major_slope)
@@ -803,8 +827,20 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
 
     if (!imCounterInc(counter))
     {
-      ret = 0;
-      goto principal_axis_cleanup2;
+      if (local_major_slope) free(local_major_slope);
+      if (local_minor_slope) free(local_minor_slope);
+      free(A1);
+      free(A2);
+      free(C1);
+      free(C2);
+
+      if (local_data_area) free(local_data_area);
+      if (local_data_cx) free(local_data_cx);
+      if (local_data_cy) free(local_data_cy);
+      if (cm20) free(cm20); if (cm02) free(cm02); if (cm11) free(cm11);
+
+      imProcessCounterEnd(counter);
+      return 0;
     }
   }
 
@@ -877,11 +913,11 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
     if (!imCounterInc(counter))
     {
       ret = 0;
-      goto principal_axis_cleanup3;
+      break;
     }
   }
 
-  for (int i = 0; i < region_count; i++) 
+  for (int i = 0; i < region_count && ret != 0; i++) 
   {
     float AB1 = (float)sqrt(A1[i]*A1[i] + 1);
     float AB2 = (float)sqrt(A2[i]*A2[i] + 1);
@@ -911,17 +947,15 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
     if (!imCounterInc(counter))
     {
       ret = 0;
-      goto principal_axis_cleanup3;
+      break;
     }
   }
 
-principal_axis_cleanup3:
   free(D1b);
   free(D2b);
   free(D1a);
   free(D2a);
 
-principal_axis_cleanup2:
   if (local_major_slope) free(local_major_slope);
   if (local_minor_slope) free(local_minor_slope);
   free(A1);  
@@ -929,7 +963,6 @@ principal_axis_cleanup2:
   free(C1);  
   free(C2);
 
-principal_axis_cleanup1:
   if (local_data_area) free(local_data_area);
   if (local_data_cx) free(local_data_cx);
   if (local_data_cy) free(local_data_cy);
@@ -1139,7 +1172,7 @@ int imProcessPerimeterLine(const imImage* src_image, imImage* dst_image)
   }
 
   imProcessCounterEnd(counter);
-  return 1;
+  return ret;
 }
 
 /* Perimeter Templates idea based in
