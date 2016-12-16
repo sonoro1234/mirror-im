@@ -179,8 +179,12 @@ int imProcessRenderOp(imImage* image, imRenderFunc render_func, const char* rend
 
 static void rand_seed(void)
 {
-  /* srand((unsigned)time(NULL)); */
-  srand((unsigned int)clock());
+  static int first = 1;
+  if (first)
+  {
+    srand((unsigned)time(NULL));
+    first = 0;
+  }
 }
 
 static float do_add_specklenoise(int, int, int, int *cond, float* param)
