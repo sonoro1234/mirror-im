@@ -21,7 +21,7 @@
 #include <memory.h>
 
 #ifndef IM_PROCESS
-#define IM_INT_PROCESSING     
+#define IM_INT_PROCESSING     int processing = 1;
 #define IM_BEGIN_PROCESSING   
 #define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) break;
 #define IM_END_PROCESSING
@@ -271,7 +271,7 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
     return IM_ERR_DATA;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class T> 
@@ -407,7 +407,7 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
     return IM_ERR_DATA;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class T> 
@@ -454,7 +454,7 @@ IM_STATIC int iDoConvert2YCbCr(int count, int data_type,
     return IM_ERR_DATA;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class T> 
@@ -585,7 +585,7 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
     return IM_ERR_DATA;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class T> 
@@ -748,7 +748,7 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
     return IM_ERR_DATA;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class T> 
@@ -911,7 +911,7 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
     return IM_ERR_DATA;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class T> 
