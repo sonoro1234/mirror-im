@@ -493,8 +493,7 @@ void imImageCopyAttributes(const imImage* src_image, imImage* dst_image)
   assert(src_image);
   assert(dst_image);
 
-  if (src_image->palette && dst_image->palette &&
-      src_image->color_space == dst_image->color_space)
+  if (src_image->palette && dst_image->palette)
   {
     memcpy(dst_image->palette, src_image->palette, 256*sizeof(long));
     dst_image->palette_count = src_image->palette_count;
@@ -515,8 +514,7 @@ void imImageMergeAttributes(const imImage* src_image, imImage* dst_image)
   assert(src_image);
   assert(dst_image);
 
-  if (src_image->palette && dst_image->palette &&
-      src_image->color_space == dst_image->color_space)
+  if (src_image->palette && dst_image->palette)
   {
     memcpy(dst_image->palette, src_image->palette, 256*sizeof(long));
     dst_image->palette_count = src_image->palette_count;
