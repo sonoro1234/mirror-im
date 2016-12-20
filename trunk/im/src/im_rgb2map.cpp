@@ -19,7 +19,6 @@
 #include "im.h"
 #include "im_util.h"
 #include "im_convert.h"
-#include "im_counter.h"
 
 
 /* RANGE forces a to be in the range b..c (inclusive) */
