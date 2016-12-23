@@ -85,7 +85,7 @@ int imCalcHistogram(const imImage* src_image, unsigned long* histo, int plane, i
 {
   int ret = 0;
   int counter = imProcessCounterBegin("Histogram");
-  imCounterTotal(counter, src_image->height, "Processing...");
+  imCounterTotal(counter, src_image->height, "Calculating...");
 
   switch (src_image->data_type)
   {
@@ -124,7 +124,7 @@ int imCalcGrayHistogram(const imImage* image, unsigned long* histo, int cumulati
   {
     int i;
     memset(histo, 0, hcount * sizeof(unsigned long));
-    imCounterTotal(counter, image->height, "Processing...");
+    imCounterTotal(counter, image->height, "Calculating...");
 
     if (image->color_space == IM_MAP || image->color_space == IM_BINARY)
     {
@@ -354,7 +354,7 @@ int imCalcCountColors(const imImage* image, unsigned long* count)
 
   if (imColorModeDepth(image->color_space) > 1)
   {
-    imCounterTotal(counter, image->height, "Processing...");
+    imCounterTotal(counter, image->height, "Calculating...");
     ret = count_comp(image, counter, image->width, count);
   }
   else
@@ -435,7 +435,7 @@ int imCalcImageStatistics(const imImage* image, imStats* stats)
 {
   int ret = 0;
   int counter = imProcessCounterBegin("ImageStatistics");
-  imCounterTotal(counter, image->depth*image->height, "Processing...");
+  imCounterTotal(counter, image->depth*image->height, "Calculating...");
 
   for (int i = 0; i < image->depth; i++)
   {
@@ -699,7 +699,7 @@ int imCalcRMSError(const imImage* image1, const imImage* image2, double *rmserro
 
   int ret = 0;
   int counter = imProcessCounterBegin("RMSError");
-  imCounterTotal(counter, image1->depth*image1->height, "Processing...");
+  imCounterTotal(counter, image1->depth*image1->height, "Calculating...");
 
   switch(image1->data_type)
   {
