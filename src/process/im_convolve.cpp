@@ -1482,11 +1482,16 @@ float imGaussianKernelSize2StdDev(int kernel_size)
 
 int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev)
 {
+  int counter = imProcessCounterBegin("GaussianConvolve");
+
   int kernel_size = imGaussianStdDev2KernelSize(stddev);
 
   imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, IM_FLOAT);
   if (!kernel)
+  {
+    imProcessCounterEnd(counter);
     return 0;
+  }
 
   imImageSetAttribute(kernel, "Description", IM_BYTE, -1, (void*)"Gaussian");
   imProcessRenderGaussian(kernel, stddev);
@@ -1495,16 +1500,22 @@ int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, floa
 
   imImageDestroy(kernel);
 
+  imProcessCounterEnd(counter);
   return ret;
 }
 
 int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev)
 {
+  int counter = imProcessCounterBegin("LapOfGaussianConvolve");
+
   int kernel_size = imGaussianStdDev2KernelSize(stddev);
 
   imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, IM_FLOAT);
   if (!kernel)
+  {
+    imProcessCounterEnd(counter);
     return 0;
+  }
 
   imImageSetAttribute(kernel, "Description", IM_BYTE, -1, (void*)"Laplacian Of Gaussian");
   imProcessRenderLapOfGaussian(kernel, stddev);
@@ -1517,6 +1528,7 @@ int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image,
     if (!aux_image)
     {
       imImageDestroy(kernel);
+      imProcessCounterEnd(counter);
       return 0;
     }
 
@@ -1529,16 +1541,20 @@ int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image,
 
   imImageDestroy(kernel);
 
+  imProcessCounterEnd(counter);
   return ret;
 }
 
 int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev1, float stddev2)
 {
+  int counter = imProcessCounterBegin("DiffOfGaussianConvolve");
+
   imImage* aux_image1 = imImageClone(src_image);
   imImage* aux_image2 = imImageClone(src_image);
   if (!aux_image1 || !aux_image2)
   {
     if (aux_image1) imImageDestroy(aux_image1);
+    imProcessCounterEnd(counter);
     return 0;
   }
 
@@ -1555,6 +1571,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
     if (kernel2) imImageDestroy(kernel2);
     imImageDestroy(aux_image1);
     imImageDestroy(aux_image2);
+    imProcessCounterEnd(counter);
     return 0;
   }
 
@@ -1571,6 +1588,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
     imImageDestroy(kernel2);
     imImageDestroy(aux_image1);
     imImageDestroy(aux_image2);
+    imProcessCounterEnd(counter);
     return 0;
   }
 
@@ -1581,6 +1599,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
   imImageDestroy(aux_image1);
   imImageDestroy(aux_image2);
 
+  imProcessCounterEnd(counter);
   return 1;
 }
 
