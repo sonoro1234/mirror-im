@@ -488,16 +488,24 @@ static void iAttributeTableCopy(const void* src_attrib_table, void* dst_attrib_t
   dst_table->CopyFrom(*src_table);
 }
 
+static void iCopyPalette(const imImage* src_image, imImage* dst_image)
+{
+  // only for GRAY and MAP
+  // but only if color_space is the same, or copying from GRAY to MAP
+  if (src_image->palette && dst_image->palette && src_image->color_space != IM_BINARY && dst_image->color_space != IM_BINARY &&
+      ((src_image->color_space == dst_image->color_space) || (src_image->color_space == IM_GRAY && dst_image->color_space == IM_MAP)))
+  {
+    memcpy(dst_image->palette, src_image->palette, 256 * sizeof(long));
+    dst_image->palette_count = src_image->palette_count;
+  }
+}
+
 void imImageCopyAttributes(const imImage* src_image, imImage* dst_image)
 {
   assert(src_image);
   assert(dst_image);
 
-  if (src_image->palette && dst_image->palette)
-  {
-    memcpy(dst_image->palette, src_image->palette, 256*sizeof(long));
-    dst_image->palette_count = src_image->palette_count;
-  }
+  iCopyPalette(src_image, dst_image);
 
   iAttributeTableCopy(src_image->attrib_table, dst_image->attrib_table);
 }
@@ -514,11 +522,7 @@ void imImageMergeAttributes(const imImage* src_image, imImage* dst_image)
   assert(src_image);
   assert(dst_image);
 
-  if (src_image->palette && dst_image->palette)
-  {
-    memcpy(dst_image->palette, src_image->palette, 256*sizeof(long));
-    dst_image->palette_count = src_image->palette_count;
-  }
+  iCopyPalette(src_image, dst_image);
 
   iAttributeTableMerge(src_image->attrib_table, dst_image->attrib_table);
 }
