@@ -64,7 +64,7 @@ enum imCastMode
  * to scale the result according to the target range. \n
  * Except complex to real that will use only the complex2real conversion. \n
  * Images must be of the same size and color mode. If data type is the same nothing is done. \n
- * Returns IM_ERR_NONE, IM_ERR_DATA or IM_ERR_COUNTER, see also \ref imErrorCodes. \n
+ * Returns IM_ERR_NONE, IM_ERR_MEM, IM_ERR_DATA or IM_ERR_COUNTER, see also \ref imErrorCodes. \n
  * See also \ref imDataType, \ref datatypeutl, \ref imComplex2Real, \ref imGammaFactor and \ref imCastMode.
  *
  * \verbatim im.ConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
@@ -89,7 +89,7 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image);
 
 /** Converts the image to its bitmap equivalent, 
  * uses \ref imConvertColorSpace and \ref imConvertDataType. \n
- * Returns IM_ERR_NONE, IM_ERR_DATA or IM_ERR_COUNTER, see also \ref imErrorCodes.
+ * Returns IM_ERR_NONE, IM_ERR_MEM, IM_ERR_DATA or IM_ERR_COUNTER, see also \ref imErrorCodes.
  * See also \ref imImageIsBitmap, \ref imComplex2Real, \ref imGammaFactor and \ref imCastMode. \n
  * The function im.ConvertToBitmapNew uses the default conversion result from \ref imColorModeToBitmap if color_space is nil.
  *

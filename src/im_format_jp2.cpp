@@ -149,6 +149,7 @@ static int ijp2_counter = -1;
 
 static void iJP2ProgressProc(int done, int total, char *descr)
 {
+  //TODO: review this
   (void)descr;
   if (done == 0)
   {

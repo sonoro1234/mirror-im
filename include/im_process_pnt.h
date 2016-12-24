@@ -926,7 +926,6 @@ void imProcessAbnormalHyperionCorrection(const imImage* src_image, imImage* dst_
 
 
 /** Same as  \ref imConvertDataType.
- * But returns zero if the counter aborted.
  *
  * \verbatim im.ProcessConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
@@ -934,7 +933,6 @@ void imProcessAbnormalHyperionCorrection(const imImage* src_image, imImage* dst_
 int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
 
 /** Same as  \ref imConvertColorSpace.
- * But returns zero if the counter aborted.
  *
  * \verbatim im.ProcessConvertColorSpace(src_image: imImage, dst_image: imImage) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvertColorSpaceNew(image: imImage, color_space: number, has_alpha: boolean) -> error: number, new_image: imImage [in Lua 5] \endverbatim
@@ -942,7 +940,6 @@ int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int c
 int imProcessConvertColorSpace(const imImage* src_image, imImage* dst_image);
 
 /** Same as  \ref imConvertToBitmap.
- * But returns zero if the counter aborted.
  *
  * \verbatim im.ProcessConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
