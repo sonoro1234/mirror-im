@@ -92,10 +92,10 @@ int imCalcHistogram(const imImage* src_image, unsigned long* histo, int plane, i
   case IM_BYTE:
     ret = DoCalcHisto((imbyte*)src_image->data[plane], src_image->count, histo, 256, cumulative, 0, counter, src_image->width);
     break;
-  case IM_SHORT:
+  case IM_USHORT:
     ret = DoCalcHisto((short*)src_image->data[plane], src_image->count, histo, 65536, cumulative, 0, counter, src_image->width);
     break;
-  case IM_USHORT:
+  case IM_SHORT:
     ret = DoCalcHisto((imushort*)src_image->data[plane], src_image->count, histo, 65536, cumulative, 32768, counter, src_image->width);
     break;
   }
