@@ -76,16 +76,7 @@
     <ClCompile Include="..\src\im_compress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\im_convertbitmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\im_convertcolor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\im_convertopengl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\im_converttype.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\im_counter.cpp">
@@ -558,6 +549,15 @@
     </ClCompile>
     <ClCompile Include="..\src\im_format_pfm.cpp">
       <Filter>Source Files\formats</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\im_convertcolor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\im_converttype.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\im_convertbitmap.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
