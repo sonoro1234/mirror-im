@@ -19,6 +19,7 @@
 #include "im.h"
 #include "im_util.h"
 #include "im_convert.h"
+#include "im_counter.h"
 
 
 /* RANGE forces a to be in the range b..c (inclusive) */
@@ -50,20 +51,22 @@ static void xvbcopy(const imbyte* src, imbyte* dst, int len)
 }
 
 /****************************/
+
 static int quick_map(imbyte *red, imbyte *green, imbyte *blue, int w, int h, imbyte *map, 
-                     imbyte *rmap, imbyte *gmap, imbyte *bmap, int maxcol)
+                     imbyte *rmap, imbyte *gmap, imbyte *bmap, int maxcol, int *palette_count, int counter)
 {
-/* scans picture until it finds more than 'maxcol' different colors.  If it
-finds more than 'maxcol' colors, it returns '0'.  If it DOESN'T, it does
-the 24-to-8 conversion by simply sticking the colors it found into
-a colormap, and changing instances of a color in pic24 into colormap
+  /* scans picture until it finds more than 'maxcol' different colors.  If it
+  finds more than 'maxcol' colors, it returns '0'.  If it DOESN'T, it does
+  the 24-to-8 conversion by simply sticking the colors it found into
+  a colormap, and changing instances of a color in pic24 into colormap
   indicies (in pic8) */
   
   unsigned long colors[256],col;
   int           i, nc, low, high, mid, count;
   imbyte         *pred, *pgreen, *pblue, *pix;
   
-  if (maxcol>256) maxcol = 256;
+  if (maxcol > 256) 
+    maxcol = 256;
   
   /* put the first color in the table by hand */
   nc = 0;  mid = 0;  
@@ -87,17 +90,23 @@ a colormap, and changing instances of a color in pic24 into colormap
     
     if (high < low) 
     { /* didn't find color in list, add it. */
-      if (nc>=maxcol) 
-        return 0;
+      if (nc >= maxcol)
+      {
+        *palette_count = 0;
+        return IM_ERR_NONE;
+      }
 
       xvbcopy((const imbyte*)&colors[low], (imbyte*)&colors[low+1], (nc - low) * sizeof(unsigned long));
       colors[low] = col;
       nc++;
     }
+
+    if (i % w == 0 && !imCounterInc(counter))
+      return IM_ERR_COUNTER;
   }
   
   /* run through the data a second time, this time mapping pixel values in
-  pic24 into colormap offsets into 'colors' */
+     pic24 into colormap offsets into 'colors' */
   
   for (i=count,pred=red,pgreen=green,pblue=blue, pix=map; i; i--,pix++) 
   {
@@ -116,9 +125,15 @@ a colormap, and changing instances of a color in pic24 into colormap
     }
     
     if (high < low) 
-      return 0;
-    
+    {
+      *palette_count = 0;
+      return IM_ERR_NONE;
+    }
+
     *pix = (imbyte)mid;
+
+    if (i % w == 0 && !imCounterInc(counter))
+      return IM_ERR_COUNTER;
   }
   
   /* and load up the 'desired colormap' */
@@ -129,7 +144,8 @@ a colormap, and changing instances of a color in pic24 into colormap
     bmap[i] = (unsigned char)( colors[i]     & 0xff);
   }
   
-  return nc;
+  *palette_count = nc;
+  return IM_ERR_NONE;
 }
 
 #define MAXNUMCOLORS  256	/* maximum size of colormap */
@@ -188,7 +204,7 @@ static imbyte* sl_colormap[3];	/* selected colormap */
 static int sl_num_colors;	/* number of selected colors */
 
 
-static void   slow_fill_histogram (imbyte*, imbyte*, imbyte*, int);
+static int    slow_fill_histogram(imbyte*, imbyte*, imbyte*, int, int, int);
 static boxptr find_biggest_color_pop (boxptr, int);
 static boxptr find_biggest_volume (boxptr, int);
 static void   update_box (boxptr);
@@ -198,13 +214,13 @@ static void   slow_select_colors (int);
 static int    find_nearby_colors (int, int, int, imbyte []);
 static void   find_best_colors (int,int,int,int, imbyte [], imbyte []);
 static void   fill_inverse_cmap (int, int, int);
-static void   slow_map_pixels (imbyte*, imbyte*, imbyte*, int, int, imbyte*);
+static int    slow_map_pixels(imbyte*, imbyte*, imbyte*, int, int, imbyte*, int);
 static void   init_error_limit (void);
 
 
 /* Master control for slow quantizer. */
 static int slow_quant(imbyte *red, imbyte *green, imbyte *blue, int w, int h, imbyte *map, 
-                      imbyte *rm, imbyte *gm, imbyte *bm, int descols)
+                      imbyte *rm, imbyte *gm, imbyte *bm, int descols, int counter)
 {
   size_t fs_arraysize = (w + 2) * (3 * sizeof(FSERROR));
   
@@ -219,7 +235,7 @@ static int slow_quant(imbyte *red, imbyte *green, imbyte *blue, int w, int h, im
     if (sl_error_limiter) free(sl_error_limiter-255);
     if (sl_fserrors) free(sl_fserrors);
     if (sl_histogram) free(sl_histogram);
-    return 1;
+    return IM_ERR_MEM;
   }
   
   sl_colormap[0] = (imbyte*) rm;
@@ -227,7 +243,9 @@ static int slow_quant(imbyte *red, imbyte *green, imbyte *blue, int w, int h, im
   sl_colormap[2] = (imbyte*) bm;
   
   /* Compute the color histogram */
-  slow_fill_histogram(red, green, blue, w*h);
+  int ret = slow_fill_histogram(red, green, blue, w*h, counter, w);
+  if (ret != IM_ERR_NONE)
+    return ret;
   
   /* Select the colormap */
   slow_select_colors(descols);
@@ -240,28 +258,32 @@ static int slow_quant(imbyte *red, imbyte *green, imbyte *blue, int w, int h, im
   sl_on_odd_lin = 0;
   
   /* Map the image. */
-  slow_map_pixels(red, green, blue, w, h, map);
+  ret = slow_map_pixels(red, green, blue, w, h, map, counter);
   
   /* Release working memory. */
   free(sl_histogram);
   free(sl_error_limiter-255);
   free(sl_fserrors);
 
-  return 0;
+  return ret;
 }
 
 
-static void slow_fill_histogram (register imbyte *red, register imbyte *green, register imbyte *blue, int numpixels)
+static int slow_fill_histogram(register imbyte *red, register imbyte *green, register imbyte *blue, register int numpixels, int counter, int w)
 {
   register histptr histp;
   register hist2d * histogram = sl_histogram;
+  int r_index, g_index, b_index;
   
   memset(histogram, 0, sizeof(hist3d));
   
   while (numpixels-- > 0) 
   {
     /* get pixel value and index into the histogram */
-    histp = & histogram[*red >> C0_SHIFT] [*green >> C1_SHIFT] [*blue >> C2_SHIFT];
+    r_index = *red >> C0_SHIFT;
+    g_index = *green >> C1_SHIFT;
+    b_index = *blue >> C2_SHIFT;
+    histp = &histogram[r_index][g_index][b_index];
 
     /* increment, check for overflow and undo increment if so. */
     if (++(*histp) <= 0)
@@ -270,7 +292,12 @@ static void slow_fill_histogram (register imbyte *red, register imbyte *green, r
     red++;
     green++;
     blue++;
+
+    if (numpixels % w == 0 && !imCounterInc(counter))
+      return IM_ERR_COUNTER;
   }
+
+  return IM_ERR_NONE;
 }
 
 
@@ -748,7 +775,7 @@ static void fill_inverse_cmap (int c0, int c1, int c2)
 }
 
 
-static void slow_map_pixels (imbyte *red, imbyte *green, imbyte *blue, int width, int height, imbyte *map)
+static int slow_map_pixels (imbyte *red, imbyte *green, imbyte *blue, int width, int height, imbyte *map, int counter)
 {
   register LOCFSERROR cur0, cur1, cur2;	/* current error or pixel value */
   LOCFSERROR belowerr0, belowerr1, belowerr2; /* error for pixel below cur */
@@ -891,7 +918,12 @@ static void slow_map_pixels (imbyte *red, imbyte *green, imbyte *blue, int width
     errorptr[0] = (FSERROR) bpreverr0; /* unload prev errs into array */
     errorptr[1] = (FSERROR) bpreverr1;
     errorptr[2] = (FSERROR) bpreverr2;
+
+    if (!imCounterInc(counter))
+      return IM_ERR_COUNTER;
   }
+
+  return IM_ERR_NONE;
 }
 
 
@@ -934,29 +966,38 @@ static void init_error_limit (void)
 
 int imConvertRGB2Map(int width, int height, unsigned char *red, unsigned char *green, unsigned char *blue, unsigned char *map, long *palette, int *palette_count)
 {
-  int i, err, new_palette_count;
+  return imConvertRGB2MapCounter(width, height, red, green, blue, map, palette, palette_count, -1);
+}
+
+int imConvertRGB2MapCounter(int width, int height, unsigned char *red, unsigned char *green, unsigned char *blue, unsigned char *map, long *palette, int *palette_count, int counter)
+{
+  int i, new_palette_count;
   imbyte rm[256], gm[256], bm[256];
 
   if (*palette_count <= 0 || *palette_count > 256)
     *palette_count = 256;
-  
-  new_palette_count = quick_map(red, green, blue, width, height, map, rm, gm, bm, *palette_count);
-  if (new_palette_count)  
+
+  imCounterTotal(counter, 2 * height + 2 * height, "Converting...");
+
+  int ret = quick_map(red, green, blue, width, height, map, rm, gm, bm, *palette_count, &new_palette_count, counter);
+  if (ret != IM_ERR_NONE)
+    return ret;
+
+  if (new_palette_count)
   {
-    for (i=0; i < new_palette_count; i++)
+    for (i = 0; i < new_palette_count; i++)
       *palette++ = imColorEncode(rm[i], gm[i], bm[i]);
 
     *palette_count = new_palette_count;
     return IM_ERR_NONE;
   }
-  
-  err = slow_quant(red, green, blue, width, height, map, rm, gm, bm, *palette_count);
-  if (err)
-    return IM_ERR_MEM;
 
-  for (i=0; i < *palette_count; i++)
+  ret = slow_quant(red, green, blue, width, height, map, rm, gm, bm, *palette_count, counter);
+  if (ret != IM_ERR_NONE)
+    return ret;
+
+  for (i = 0; i < *palette_count; i++)
     *palette++ = imColorEncode(rm[i], gm[i], bm[i]);
 
   return IM_ERR_NONE;
 }
-
