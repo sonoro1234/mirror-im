@@ -21,10 +21,6 @@
 #include "fftw.h"
 #endif
 
-#ifdef IM_PROCESS
-#define imConvertDataType imProcessConvertDataType
-#endif
-
 /* FFTW 2.x can have float or double functions, not both.
    FFTW 3.x can have both, but we use only one to keep the
    code compatible with version 2. */
@@ -167,7 +163,7 @@ void imProcessFFTraw(imImage* image, int inverse, int center, int normalize)
 void imProcessFFT(const imImage* src_image, imImage* dst_image)
 {
   if (src_image->data_type != IM_COMPLEX)
-    imConvertDataType(src_image, dst_image, 0, 0, 0, 0);
+    imProcessConvertDataType(src_image, dst_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image, dst_image);
 
@@ -188,12 +184,12 @@ void imProcessCrossCorrelation(const imImage* src_image1, const imImage* src_ima
     return;
 
   if (src_image2->data_type != IM_COMPLEX)
-    imConvertDataType(src_image2, tmp_image, 0, 0, 0, 0);
+    imProcessConvertDataType(src_image2, tmp_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image2, tmp_image);
 
   if (src_image1->data_type != IM_COMPLEX)
-    imConvertDataType(src_image1, dst_image, 0, 0, 0, 0);
+    imProcessConvertDataType(src_image1, dst_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image1, dst_image);
 
@@ -211,7 +207,7 @@ void imProcessCrossCorrelation(const imImage* src_image1, const imImage* src_ima
 void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image)
 {
   if (src_image->data_type != IM_COMPLEX)
-    imConvertDataType(src_image, dst_image, 0, 0, 0, 0);
+    imProcessConvertDataType(src_image, dst_image, 0, 0, 0, 0);
   else
     imImageCopy(src_image, dst_image);
 
