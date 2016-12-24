@@ -125,12 +125,14 @@ imImage* imImageCreateFromOpenGLData(int width, int height, int glformat, const 
 
 
 /** Changes the packing of the data buffer. Both must have the same width, height and data_type. \n
- * It can be used to copy data even if depth=1.
+ * It can be used to copy data even if depth=1. \n
+ * Unsed in OpenGL data conversions. 
  * \ingroup cnvutil */
 void imConvertPacking(const void* src_data, void* dst_data, int width, int height, int src_depth, int dst_depth, int data_type, int src_is_packed);
 
 /** Changes in-place a MAP data into a RGB data. The data must have room for the RGB image. \n
  * depth can be 3 or 4. count=width*height. \n
+ * Unsed in OpenGL data conversions.
  * \ingroup cnvutil */
 void imConvertMapToRGB(unsigned char* data, int count, int depth, int packed, long* palette, int palette_count);
                        
@@ -141,8 +143,12 @@ void imConvertMapToRGB(unsigned char* data, int count, int depth, int packed, lo
  * Internal function kept here because of the compatibility module. 
  * Will not be at the documentation. */
 int imConvertRGB2Map(int width, int height, 
-              unsigned char *red, unsigned char *green, unsigned char *blue, 
-              unsigned char *map, long *palette, int *palette_count);
+                     unsigned char *red, unsigned char *green, unsigned char *blue, 
+                     unsigned char *map, long *palette, int *palette_count);
+int imConvertRGB2MapCounter(int width, int height, 
+                            unsigned char *red, unsigned char *green, unsigned char *blue, 
+                            unsigned char *map, long *palette, int *palette_count, 
+                            int counter);
 
 
 #if defined(__cplusplus)

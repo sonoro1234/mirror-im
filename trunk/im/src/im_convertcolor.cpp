@@ -10,6 +10,8 @@
 #include "im_convert.h"
 #include "im_color.h"
 #ifdef IM_PROCESS
+#define IM_PROCESS_OK IM_ERR_NONE
+#define IM_PROCESS_ABORT IM_ERR_COUNTER
 #include "process/im_process_counter.h"
 #include "im_process_pnt.h"
 #else
@@ -21,9 +23,9 @@
 #include <memory.h>
 
 #ifndef IM_PROCESS
-#define IM_INT_PROCESSING     int processing = 1;
+#define IM_INT_PROCESSING     int processing = IM_ERR_NONE;
 #define IM_BEGIN_PROCESSING   
-#define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) break;
+#define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) { processing = IM_ERR_COUNTER; break; }
 #define IM_END_PROCESSING
 #endif
 
@@ -88,8 +90,12 @@ static void iConvertSetTranspColor(imbyte **dst_data, int count, imbyte r, imbyt
   }
 }
 
+
+/*****************************************************************************************/
+
+
 // convert bin2gray and gray2bin
-static void iConvertBinary(imbyte* map, int count, imbyte value)
+static int iConvertBinary(imbyte* map, int count, imbyte value, int counter, int width)
 {
   imbyte thres = (value == 255)? 1: 128;
 
@@ -105,19 +111,40 @@ static void iConvertBinary(imbyte* map, int count, imbyte value)
       thres = max / 2;
   }
 
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
+    if (i % width == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     if (map[i] >= thres)
       map[i] = value;
     else
       map[i] = 0;
+
+    if (i % width == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
-static void iConvertMap2Gray(const imbyte* src_map, imbyte* dst_map, int count, const long* palette, const int palette_count)
+static int iConvertMap2Gray(const imbyte* src_map, imbyte* dst_map, int count, const long* palette, const int palette_count, int counter, int width)
 {
   imbyte r, g, b;
   imbyte remap[256];
@@ -128,36 +155,78 @@ static void iConvertMap2Gray(const imbyte* src_map, imbyte* dst_map, int count, 
     remap[c] = imColorRGB2Luma(r, g, b);
   }
 
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
+    if (i % width == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     dst_map[i] = remap[src_map[i]];
+
+    if (i % width == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
-static void iConvertMapToRGB(const imbyte* src_map, imbyte* red, imbyte* green, imbyte* blue, int count, const long* palette, const int palette_count)
+static int iConvertMapToRGB(const imbyte* src_map, imbyte* red, imbyte* green, imbyte* blue, int count, const long* palette, const int palette_count, int counter, int width)
 {
   imbyte r[256], g[256], b[256];
   for (int c = 0; c < palette_count; c++)
     imColorDecode(&r[c], &g[c], &b[c], palette[c]);
 
+  IM_INT_PROCESSING;
+
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
+    if (i % width == 0)
+    {
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_BEGIN_PROCESSING;
+
     int index = src_map[i];
     red[i] = r[index];
     green[i] = g[index];
     blue[i] = b[index];
+
+    if (i % width == 0)
+    {
+      IM_COUNT_PROCESSING;
+#ifdef _OPENMP
+#pragma omp flush (processing)
+#endif
+    }
+    IM_END_PROCESSING;
   }
+
+  return processing;
 }
 
 template <class T> 
 IM_STATIC int iDoConvert2Gray(int count, int data_type, 
-                    const T** src_data, int src_color_space, T** dst_data, int counter)
+                              const T** src_data, int src_color_space, T** dst_data, int counter, int width)
 {
   int i;
   T type_max = (T)imColorMax(data_type);
@@ -179,9 +248,12 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
@@ -190,10 +262,13 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
       // do gamma correction then scale back to 0-type_max
       dst_map[i] = imColorQuantize(imColorTransfer2Nonlinear(c1), type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+       }
       IM_END_PROCESSING;
     }
     break;
@@ -203,9 +278,12 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       T r, g, b;
@@ -213,10 +291,13 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
       imColorCMYK2RGB(src_map0[i], src_map1[i], src_map2[i], src_map3[i], r, g, b, type_max);
       dst_map[i] = imColorRGB2Luma(r, g, b);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -226,17 +307,23 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       dst_map[i] = imColorRGB2Luma(src_map0[i], src_map1[i], src_map2[i]);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+    }
       IM_END_PROCESSING;
     }
     break;
@@ -247,9 +334,12 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -260,10 +350,13 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
       // do gamma correction then scale back to 0-type_max
       dst_map[i] = imColorQuantize(imColorTransfer2Nonlinear(c0), type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -276,7 +369,7 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
 
 template <class T> 
 IM_STATIC int iDoConvert2RGB(int count, int data_type, 
-                   const T** src_data, int src_color_space, T** dst_data, int counter)
+                             const T** src_data, int src_color_space, T** dst_data, int counter, int width)
 {
   int i;
   T zero;
@@ -301,9 +394,12 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -322,10 +418,13 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
       dst_map1[i] = imColorQuantize(imColorTransfer2Nonlinear(c1), type_min, type_max);
       dst_map2[i] = imColorQuantize(imColorTransfer2Nonlinear(c2), type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -346,19 +445,25 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // result is still 0-type_max
       imColorCMYK2RGB(src_map0[i], src_map1[i], src_map2[i], src_map3[i], 
                       dst_map0[i], dst_map1[i], dst_map2[i], type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -369,9 +474,12 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -396,10 +504,13 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
       dst_map1[i] = imColorQuantize(imColorTransfer2Nonlinear(c1), type_min, type_max);
       dst_map2[i] = imColorQuantize(imColorTransfer2Nonlinear(c2), type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -412,7 +523,7 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
 
 template <class T> 
 IM_STATIC int iDoConvert2YCbCr(int count, int data_type, 
-                     const T** src_data, int src_color_space, T** dst_data, int counter)
+                               const T** src_data, int src_color_space, T** dst_data, int counter, int width)
 {
   int i;
   T zero;
@@ -435,18 +546,24 @@ IM_STATIC int iDoConvert2YCbCr(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       imColorRGB2YCbCr(src_map0[i], src_map1[i], src_map2[i], 
                        dst_map0[i], dst_map1[i], dst_map2[i], zero);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -459,7 +576,7 @@ IM_STATIC int iDoConvert2YCbCr(int count, int data_type,
 
 template <class T> 
 IM_STATIC int iDoConvert2XYZ(int count, int data_type, 
-                   const T** src_data, int src_color_space, T** dst_data, int counter)
+                             const T** src_data, int src_color_space, T** dst_data, int counter, int width)
 {
   int i;
   T type_max = (T)imColorMax(data_type);
@@ -482,9 +599,12 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
@@ -498,10 +618,13 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
       dst_map1[i] = imColorQuantize(c0, type_min, type_max);
       dst_map2[i] = imColorQuantize(c0*1.0890f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -511,9 +634,12 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -537,10 +663,13 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -551,9 +680,12 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -574,10 +706,13 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -590,7 +725,7 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
 
 template <class T> 
 IM_STATIC int iDoConvert2Lab(int count, int data_type, 
-                   const T** src_data, int src_color_space, T** dst_data, int counter)
+                             const T** src_data, int src_color_space, T** dst_data, int counter, int width)
 {
   int i;
   T type_max = (T)imColorMax(data_type);
@@ -613,9 +748,12 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
@@ -630,10 +768,13 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       // then scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);  // update only the L component
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -643,9 +784,12 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -671,10 +815,13 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -684,9 +831,12 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -703,10 +853,13 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -716,9 +869,12 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -737,10 +893,13 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -753,7 +912,7 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 
 template <class T> 
 IM_STATIC int iDoConvert2Luv(int count, int data_type, 
-                   const T** src_data, int src_color_space, T** dst_data, int counter)
+                             const T** src_data, int src_color_space, T** dst_data, int counter, int width)
 {
   int i;
   T type_max = (T)imColorMax(data_type);
@@ -776,9 +935,12 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
@@ -793,10 +955,13 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       // then scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);  // update only the L component
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -806,9 +971,12 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -834,10 +1002,13 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -847,9 +1018,12 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -866,10 +1040,13 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -879,9 +1056,12 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 #endif
     for (i = 0; i < count; i++)
     {
+      if (i % width == 0)
+      {
 #ifdef _OPENMP
       #pragma omp flush (processing)
 #endif
+      }
       IM_BEGIN_PROCESSING;
 
       // to increase precision do intermediate conversions in float
@@ -900,10 +1080,13 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
       dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
 
-      IM_COUNT_PROCESSING;
+      if (i % width == 0)
+      {
+        IM_COUNT_PROCESSING;
 #ifdef _OPENMP
-      #pragma omp flush (processing)
+#pragma omp flush (processing)
 #endif
+      }
       IM_END_PROCESSING;
     }
     break;
@@ -915,50 +1098,17 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 }
 
 template <class T> 
-IM_STATIC int iDoConvertColorSpace(int count, int data_type, 
+IM_STATIC int iDoConvertColorSpace(int count, int width, int data_type, 
                                  const T** src_data, int src_color_space, 
-                                       T** dst_data, int dst_color_space)
+                                 T** dst_data, int dst_color_space, int convert2rgb, int counter)
 {
-  int ret = IM_ERR_DATA, 
-      convert2rgb = 0;
-  int total_counter = count;
-
-  if ((dst_color_space == IM_XYZ ||
-       dst_color_space == IM_LAB ||
-       dst_color_space == IM_LUV) && 
-      (src_color_space == IM_CMYK ||
-       src_color_space == IM_YCBCR))
-  {
-    convert2rgb = 1;
-  }    
-
-  if (dst_color_space == IM_YCBCR && src_color_space != IM_RGB)
-  {
-    convert2rgb = 1;
-    total_counter *= 2;
-  }
-
-#ifdef IM_PROCESS
-  int counter = imProcessCounterBegin("ConvertColorSpace");
-#else
-  int counter = imCounterBegin("ConvertColorSpace");
-#endif
-
-  imCounterTotal(counter, total_counter, "Converting...");
+  int ret;
 
   if (convert2rgb)
   {
-    ret = iDoConvert2RGB(count, data_type, src_data, src_color_space, dst_data, counter);
-
+    ret = iDoConvert2RGB(count, data_type, src_data, src_color_space, dst_data, counter, width);
     if (ret != IM_ERR_NONE) 
-    {
-#ifdef IM_PROCESS
-      imProcessCounterEnd(counter);
-#else
-      imCounterEnd(counter);
-#endif
       return ret;
-    }
 
     src_data = (const T**)dst_data;
     src_color_space = IM_RGB;
@@ -967,75 +1117,89 @@ IM_STATIC int iDoConvertColorSpace(int count, int data_type,
   switch(dst_color_space)
   {
   case IM_GRAY: 
-    ret = iDoConvert2Gray(count, data_type, src_data, src_color_space, dst_data, counter);
+    ret = iDoConvert2Gray(count, data_type, src_data, src_color_space, dst_data, counter, width);
     break;
   case IM_RGB: 
-    ret = iDoConvert2RGB(count, data_type, src_data, src_color_space, dst_data, counter);
+    ret = iDoConvert2RGB(count, data_type, src_data, src_color_space, dst_data, counter, width);
     break;
   case IM_YCBCR: 
-    ret = iDoConvert2YCbCr(count, data_type, src_data, src_color_space, dst_data, counter); 
+    ret = iDoConvert2YCbCr(count, data_type, src_data, src_color_space, dst_data, counter, width);
     break;
   case IM_XYZ: 
-    ret = iDoConvert2XYZ(count, data_type, src_data, src_color_space, dst_data, counter);
+    ret = iDoConvert2XYZ(count, data_type, src_data, src_color_space, dst_data, counter, width);
     break;
   case IM_LAB: 
-    ret = iDoConvert2Lab(count, data_type, src_data, src_color_space, dst_data, counter);
+    ret = iDoConvert2Lab(count, data_type, src_data, src_color_space, dst_data, counter, width);
     break;
   case IM_LUV: 
-    ret = iDoConvert2Luv(count, data_type, src_data, src_color_space, dst_data, counter);
+    ret = iDoConvert2Luv(count, data_type, src_data, src_color_space, dst_data, counter, width);
     break;
   default:
     ret = IM_ERR_DATA;
     break;
   }
 
-#ifdef IM_PROCESS
-  imProcessCounterEnd(counter);
-#else
-  imCounterEnd(counter);
-#endif
-
   return ret;
 }
 
-static int iConvertColorSpace(const imImage* src_image, imImage* dst_image)
+static int iConvertColorSpace(const imImage* src_image, imImage* dst_image, int counter)
 {
+  int convert2rgb = 0;
+  int total_counter = src_image->height;
+
+  if ((dst_image->color_space == IM_XYZ ||
+    dst_image->color_space == IM_LAB ||
+    dst_image->color_space == IM_LUV) &&
+    (src_image->color_space == IM_CMYK ||
+    src_image->color_space == IM_YCBCR))
+  {
+    convert2rgb = 1;
+  }
+
+  if (dst_image->color_space == IM_YCBCR && src_image->color_space != IM_RGB)
+  {
+    convert2rgb = 1;
+    total_counter *= 2;
+  }
+
+  imCounterTotal(counter, total_counter, "Converting...");
+
   switch(src_image->data_type)
   {
   case IM_BYTE:
-    return iDoConvertColorSpace(src_image->count, src_image->data_type,
+    return iDoConvertColorSpace(src_image->count, src_image->width, src_image->data_type,
                          (const imbyte**)src_image->data, src_image->color_space, 
-                               (imbyte**)dst_image->data, dst_image->color_space);
+                         (imbyte**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_SHORT:
-    return iDoConvertColorSpace(src_image->count, src_image->data_type, 
+    return iDoConvertColorSpace(src_image->count, src_image->width, src_image->data_type,
                          (const short**)src_image->data, src_image->color_space, 
-                               (short**)dst_image->data, dst_image->color_space);
+                         (short**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_USHORT:
-    return iDoConvertColorSpace(src_image->count, src_image->data_type, 
+    return iDoConvertColorSpace(src_image->count, src_image->width, src_image->data_type,
                          (const imushort**)src_image->data, src_image->color_space, 
-                               (imushort**)dst_image->data, dst_image->color_space);
+                         (imushort**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_INT:
-    return iDoConvertColorSpace(src_image->count, src_image->data_type,
+    return iDoConvertColorSpace(src_image->count, src_image->width, src_image->data_type,
                          (const int**)src_image->data, src_image->color_space, 
-                               (int**)dst_image->data, dst_image->color_space);
+                         (int**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_FLOAT:
-    return iDoConvertColorSpace(src_image->count, src_image->data_type, 
+    return iDoConvertColorSpace(src_image->count, src_image->width, src_image->data_type,
                          (const float**)src_image->data, src_image->color_space, 
-                               (float**)dst_image->data, dst_image->color_space);
+                         (float**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_CFLOAT:
     /* treat complex as two real values */
-    return iDoConvertColorSpace(2*src_image->count, src_image->data_type,
+    return iDoConvertColorSpace(2 * src_image->count, src_image->width, src_image->data_type,
                          (const float**)src_image->data, src_image->color_space, 
-                               (float**)dst_image->data, dst_image->color_space);
+                         (float**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_DOUBLE:
-    return iDoConvertColorSpace(src_image->count, src_image->data_type, 
+    return iDoConvertColorSpace(src_image->count, src_image->width, src_image->data_type,
                          (const double**)src_image->data, src_image->color_space, 
-                               (double**)dst_image->data, dst_image->color_space);
+                         (double**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   case IM_CDOUBLE:
     /* treat complex as two real values */
-    return iDoConvertColorSpace(2*src_image->count, src_image->data_type,
+    return iDoConvertColorSpace(2 * src_image->count, src_image->width, src_image->data_type,
                          (const double**)src_image->data, src_image->color_space, 
-                               (double**)dst_image->data, dst_image->color_space);
+                         (double**)dst_image->data, dst_image->color_space, convert2rgb, counter);
   }
 
   return IM_ERR_DATA;
@@ -1056,30 +1220,35 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image)
 
   if (src_image->color_space != dst_image->color_space)
   {
+#ifdef IM_PROCESS
+    int counter = imProcessCounterBegin("ConvertColorSpace");
+#else
+    int counter = imCounterBegin("ConvertColorSpace");
+#endif
+    imCounterTotal(counter, src_image->height, "Converting...");
+
     switch(dst_image->color_space)
     {
     case IM_RGB:
       switch(src_image->color_space)
       {
       case IM_BINARY:
-          memcpy(dst_image->data[0], src_image->data[0], dst_image->plane_size);
-          iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 255);
-          memcpy(dst_image->data[1], dst_image->data[0], dst_image->plane_size);
-          memcpy(dst_image->data[2], dst_image->data[0], dst_image->plane_size);
-        ret = IM_ERR_NONE;
+        memcpy(dst_image->data[0], src_image->data[0], dst_image->plane_size);
+        ret = iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 255, counter, dst_image->width);
+        memcpy(dst_image->data[1], dst_image->data[0], dst_image->plane_size);
+        memcpy(dst_image->data[2], dst_image->data[0], dst_image->plane_size);
         break;
       case IM_MAP:
-        iConvertMapToRGB((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], (imbyte*)dst_image->data[1], (imbyte*)dst_image->data[2], dst_image->count, src_image->palette, src_image->palette_count);
-        ret = IM_ERR_NONE;
+        ret = iConvertMapToRGB((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], (imbyte*)dst_image->data[1], (imbyte*)dst_image->data[2], dst_image->count, src_image->palette, src_image->palette_count, counter, dst_image->width);
         break;
       case IM_GRAY:
-          memcpy(dst_image->data[0], src_image->data[0], dst_image->plane_size);
-          memcpy(dst_image->data[1], src_image->data[0], dst_image->plane_size);
-          memcpy(dst_image->data[2], src_image->data[0], dst_image->plane_size);
+        memcpy(dst_image->data[0], src_image->data[0], dst_image->plane_size);
+        memcpy(dst_image->data[1], src_image->data[0], dst_image->plane_size);
+        memcpy(dst_image->data[2], src_image->data[0], dst_image->plane_size);
         ret = IM_ERR_NONE;
         break;
       default: 
-        ret = iConvertColorSpace(src_image, dst_image);
+        ret = iConvertColorSpace(src_image, dst_image, counter);
         break;
       }
       break;
@@ -1088,19 +1257,17 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image)
       {
       case IM_BINARY:
         memcpy(dst_image->data[0], src_image->data[0], dst_image->size);
-        iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 255);
-        ret = IM_ERR_NONE;
+        ret = iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 255, counter, dst_image->width);
         break;
       case IM_MAP:
-        iConvertMap2Gray((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], dst_image->count, src_image->palette, src_image->palette_count);
-        ret = IM_ERR_NONE;
+        ret = iConvertMap2Gray((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], dst_image->count, src_image->palette, src_image->palette_count, counter, dst_image->width);
         break;
       case IM_YCBCR: 
         memcpy(dst_image->data[0], src_image->data[0], dst_image->plane_size);
         ret = IM_ERR_NONE;
         break;
       default:
-        ret = iConvertColorSpace(src_image, dst_image);
+        ret = iConvertColorSpace(src_image, dst_image, counter);
         break;
       }
       break;
@@ -1116,9 +1283,9 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image)
         break;
       case IM_RGB:
         dst_image->palette_count = 256;
-        ret = imConvertRGB2Map(src_image->width, src_image->height, 
+        ret = imConvertRGB2MapCounter(src_image->width, src_image->height,
                                (imbyte*)src_image->data[0], (imbyte*)src_image->data[1], (imbyte*)src_image->data[2], 
-                               (imbyte*)dst_image->data[0], dst_image->palette, &dst_image->palette_count);
+                               (imbyte*)dst_image->data[0], dst_image->palette, &dst_image->palette_count, counter);
         break;
       default:
         ret = IM_ERR_DATA;
@@ -1130,26 +1297,23 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image)
       {
       case IM_GRAY:
         memcpy(dst_image->data[0], src_image->data[0], dst_image->size);
-        iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1);
-        ret = IM_ERR_NONE;
+        ret = iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1, counter, dst_image->width);
         break;
       case IM_MAP:           // convert to gray, then convert to binary
-        iConvertMap2Gray((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], dst_image->count, src_image->palette, src_image->palette_count);
-        iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1);
-        ret = IM_ERR_NONE;
+        ret = iConvertMap2Gray((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], dst_image->count, src_image->palette, src_image->palette_count, counter, dst_image->width);
+        if (ret == IM_ERR_NONE)
+          ret = iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1, counter, dst_image->width);
         break;
       case IM_YCBCR:         // convert to gray, then convert to binary
         memcpy(dst_image->data[0], src_image->data[0], dst_image->plane_size);
-        iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1);
-        ret = IM_ERR_NONE;
+        ret = iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1, counter, dst_image->width);
         break;
       default:               // convert to gray, then convert to binary
         dst_image->color_space = IM_GRAY;
-        ret = iConvertColorSpace(src_image, dst_image);
+        ret = iConvertColorSpace(src_image, dst_image, counter);
         dst_image->color_space = IM_BINARY;
         if (ret == IM_ERR_NONE)
-          iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1);
-        ret = IM_ERR_NONE;
+          ret = iConvertBinary((imbyte*)dst_image->data[0], dst_image->count, 1, counter, dst_image->width);
         break;
       }
       break;
@@ -1161,14 +1325,20 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image)
         ret = IM_ERR_NONE;
         break;
       default:
-        ret = iConvertColorSpace(src_image, dst_image);
+        ret = iConvertColorSpace(src_image, dst_image, counter);
         break;
       }
       break;
     default: 
-      ret = iConvertColorSpace(src_image, dst_image);
+      ret = iConvertColorSpace(src_image, dst_image, counter);
       break;
     }
+
+#ifdef IM_PROCESS
+    imProcessCounterEnd(counter);
+#else
+    imCounterEnd(counter);
+#endif
   }
 
   if (src_image->has_alpha && dst_image->has_alpha)

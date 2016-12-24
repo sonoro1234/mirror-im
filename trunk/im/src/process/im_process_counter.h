@@ -17,6 +17,11 @@
 extern "C" {
 #endif
 
+#ifndef IM_PROCESS_OK
+#define IM_PROCESS_OK 1
+#define IM_PROCESS_ABORT 0
+#endif
+
 /* Used inside "pragma omp parallel for if()" */
 extern int im_process_mincount;
 #define IM_OMP_MINCOUNT(_c)  (_c)>im_process_mincount
@@ -25,12 +30,12 @@ extern int im_process_mincount;
 int imProcessOpenMPSetMinCount(int min_count);
 int imProcessOpenMPSetNumThreads(int count);
 
-#define IM_INT_PROCESSING     int processing = 1;
+#define IM_INT_PROCESSING     int processing = IM_PROCESS_OK;
 
 #ifdef _OPENMP
 
-#define IM_BEGIN_PROCESSING   if (processing) {
-#define IM_COUNT_PROCESSING   if (!imCounterInc_OMP(counter)) { processing = 0;
+#define IM_BEGIN_PROCESSING   if (processing == IM_PROCESS_OK) {
+#define IM_COUNT_PROCESSING   if (!imCounterInc_OMP(counter)) { processing = IM_PROCESS_ABORT;
 #define IM_END_PROCESSING     }}
 #define IM_MAX_THREADS        omp_get_max_threads()
 #define IM_THREAD_NUM         omp_get_thread_num()
@@ -48,7 +53,7 @@ int  imCounterInc_OMP(int counter);
 #pragma warning (disable : 4068) */ /* disable unknown pragma warnings */
 
 #define IM_BEGIN_PROCESSING   
-#define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) { processing = 0; break; }
+#define IM_COUNT_PROCESSING   if (!imCounterInc(counter)) { processing = IM_PROCESS_ABORT; break; }
 #define IM_END_PROCESSING
 
 #define IM_MAX_THREADS 1
