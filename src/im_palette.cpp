@@ -9,6 +9,7 @@
 #include "im_util.h"
 #include "im_palette.h"
 #include "im_colorhsi.h"
+#include "im_color.h"
 
 #include <stdlib.h>
 #include <memory.h>
@@ -481,16 +482,16 @@ long* imPaletteLinear(void)
 {
   long* palette = imPaletteNew(256);
   long* ct = palette;
-  int lIndex, lHue;
+  int lIntensity, lHue;
   unsigned char r, g, b;
 
-  for (lIndex = 0; lIndex < 256; lIndex += 8)
+  for (lIntensity = 0; lIntensity < 32; lIntensity++)
   {
-    float intensity = lIndex / 256.0f;
+    float intensity = imColorReconstruct((imbyte)(lIntensity * 8), (imbyte)0, (imbyte)255);  // 8 = 256 / 32         
 
     for (lHue = 0; lHue < 8; lHue++)
     {
-      float hue = (lHue * 360.0f) / 8.0f;
+      float hue = (float)lHue * 45.0f;   // 45 = 360 / 8
 
       imColorHSI2RGBbyte(hue, 1.0f, intensity, &r, &g, &b);
 
