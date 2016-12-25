@@ -109,6 +109,8 @@ void imHistogramRelease(unsigned long* histo);
 int imHistogramShift(int data_type);
 
 /** Returns the histogram size based on the image data type. \n
+ * For IM_IM_USHORT and IM_SHORT returns 65536
+ * for others returns 256.\n
  * Not available in Lua.
  * \ingroup stats */
 int imHistogramCount(int data_type);
