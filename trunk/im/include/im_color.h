@@ -128,29 +128,39 @@ inline int imColorMin(int data_type)
  * but the dummy quantizer uses real values.
  * See also \ref math.
  * \ingroup color */
-template <class T> 
-inline T imColorQuantize(const float& value, const T& min, const T& max)
+template <class T, class R> 
+inline T imColorQuantize(const R& value, const T& min, const T& max)
 {
   if (max == 1) return (T)value; // to allow a dummy quantizer
   if (value >= 1) return max;
   if (value <= 0) return min;
-  float range = (float)max - (float)min + 1.0f;
-  return (T)imRound(value*range - 0.5f) + min;
+  R range = (R)max - (R)min + (R)1;
+  return (T)imRound(value*range - (R)0.5) + min;
 }                               
 
 /** Reconstruct min-max values into 0-1. \n
  * Values are usually integers,
- * but the dummy reconstructor uses real values.
+ * but the dummy re-constructor uses real values.
  * See also \ref math.
  * \ingroup color */
 template <class T> 
 inline float imColorReconstruct(const T& value, const T& min, const T& max)
 {
-  if (max == 1) return (float)value;  // to allow a dummy reconstructor
+  if (max == 1) return (float)value;  // to allow a dummy re-constructor
   if (value <= min) return 0;
   if (value >= max) return 1;
   float range = (float)max - (float)min + 1.0f;
   return (((float)value - (float)min + 0.5f)/range);
+}
+
+template <class T>
+inline double imColorReconstructDouble(const T& value, const T& min, const T& max)
+{
+  if (max == 1) return (double)value;  // to allow a dummy re-constructor
+  if (value <= min) return 0;
+  if (value >= max) return 1;
+  double range = (double)max - (double)min + 1.0f;
+  return (((double)value - (double)min + 0.5) / range);
 }
 
 /** Converts Y'CbCr to R'G'B' (all nonlinear). \n

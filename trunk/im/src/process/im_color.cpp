@@ -66,18 +66,24 @@ void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* 
   }
 }
 
-static void DoSplitHSIFloat(float** data, float* hue, float* saturation, float* intensity, int count)
+template <class T>
+static void DoSplitHSIReal(T** data, T* hue, T* saturation, T* intensity, int count)
 {
-  float *red=data[0],
+  T *red = data[0],
       *green=data[1],
        *blue=data[2];
+  double h, s, i;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
-  for (int i = 0; i < count; i++)
+  for (int ii = 0; ii < count; ii++)
   {
-    imColorRGB2HSI(red[i], green[i], blue[i], &hue[i], &saturation[i], &intensity[i]);
+    imColorRGB2HSI(red[ii], green[ii], blue[ii], &h, &s, &i);
+
+    hue[ii] = (T)h;
+    saturation[ii] = (T)s;
+    intensity[ii] = (T)i;
   }
 }
 
@@ -86,13 +92,18 @@ static void DoSplitHSIByte(imbyte** data, float* hue, float* saturation, float* 
   imbyte *red=data[0],
        *green=data[1],
         *blue=data[2];
+  double h, s, i;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
-  for (int i = 0; i < count; i++)
+  for (int ii = 0; ii < count; ii++)
   {
-    imColorRGB2HSIbyte(red[i], green[i], blue[i], &hue[i], &saturation[i], &intensity[i]);
+    imColorRGB2HSIbyte(red[ii], green[ii], blue[ii], &h, &s, &i);
+
+    hue[ii] = (float)h;
+    saturation[ii] = (float)s;
+    intensity[ii] = (float)i;
   }
 }
 
@@ -104,25 +115,34 @@ void imProcessSplitHSI(const imImage* src_image, imImage* dst_image1, imImage* d
     DoSplitHSIByte((imbyte**)src_image->data, (float*)dst_image1->data[0], (float*)dst_image2->data[0], (float*)dst_image3->data[0], src_image->count);
     break;                                                                                                                                    
   case IM_FLOAT:                                                                                                                               
-    DoSplitHSIFloat((float**)src_image->data, (float*)dst_image1->data[0], (float*)dst_image2->data[0], (float*)dst_image3->data[0], src_image->count);
+    DoSplitHSIReal((float**)src_image->data, (float*)dst_image1->data[0], (float*)dst_image2->data[0], (float*)dst_image3->data[0], src_image->count);
     break;                                                                                
+  case IM_DOUBLE:
+    DoSplitHSIReal((double**)src_image->data, (double*)dst_image1->data[0], (double*)dst_image2->data[0], (double*)dst_image3->data[0], src_image->count);
+    break;
   }
 
   imImageSetPalette(dst_image1, imPaletteHues(), 256);
 }
 
-static void DoMergeHSIFloat(float** data, float* hue, float* saturation, float* intensity, int count)
+template <class T>
+static void DoMergeHSIReal(T** data, T* hue, T* saturation, T* intensity, int count)
 {
-  float *red=data[0],
+  T *red = data[0],
       *green=data[1],
        *blue=data[2];
+  double R, G, B;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
   {
-    imColorHSI2RGB(hue[i], saturation[i], intensity[i], &red[i], &green[i], &blue[i]);
+    imColorHSI2RGB(hue[i], saturation[i], intensity[i], &R, &G, &B);
+
+    red[i] = (T)R;
+    green[i] = (T)G;
+    blue[i] = (T)B;
   }
 }
 
@@ -149,8 +169,11 @@ void imProcessMergeHSI(const imImage* src_image1, const imImage* src_image2, con
     DoMergeHSIByte((imbyte**)dst_image->data, (float*)src_image1->data[0], (float*)src_image2->data[0], (float*)src_image3->data[0], dst_image->count);
     break;                                                                                                                                    
   case IM_FLOAT:                                                                                                                               
-    DoMergeHSIFloat((float**)dst_image->data, (float*)src_image1->data[0], (float*)src_image2->data[0], (float*)src_image3->data[0], dst_image->count);
+    DoMergeHSIReal((float**)dst_image->data, (float*)src_image1->data[0], (float*)src_image2->data[0], (float*)src_image3->data[0], dst_image->count);
     break;                                                                                
+  case IM_DOUBLE:
+    DoMergeHSIReal((double**)dst_image->data, (double*)src_image1->data[0], (double*)src_image2->data[0], (double*)src_image3->data[0], dst_image->count);
+    break;
   }
 }
 

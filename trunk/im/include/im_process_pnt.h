@@ -366,8 +366,8 @@ void imProcessEqualizeHistogram(const imImage* src_image, imImage* dst_image);
 void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* chroma_image);
 
 /** Split a RGB image into HSI planes. \n
- * Source image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. Target images are all IM_GRAY/IM_FLOAT. \n
- * Source images must normalized to 0-1 if type is IM_FLOAT (\ref imProcessToneGamut can be used). 
+ * Source image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT/IM_DOUBLE only. Target images are all IM_GRAY/IM_FLOAT/IM_DOUBLE. \n
+ * Source images must normalized to 0-1 if type is IM_FLOAT/IM_DOUBLE (\ref imProcessToneGamut can be used). 
  * See \ref hsi for a definition of the color conversion.\n
  * Source and target must have the same size. 
  *
@@ -377,7 +377,7 @@ void imProcessSplitYChroma(const imImage* src_image, imImage* y_image, imImage* 
 void imProcessSplitHSI(const imImage* src_image, imImage* h_image, imImage* s_image, imImage* i_image);
 
 /** Merge HSI planes into a RGB image. \n
- * Source images must be IM_GRAY/IM_FLOAT. Target image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT only. \n
+ * Source images must be IM_GRAY/IM_FLOAT/IM_DOUBLE. Target image can be IM_RGB/IM_BYTE or IM_RGB/IM_FLOAT/IM_DOUBLE only. \n
  * Source and target must have the same size. See \ref hsi for a definition of the color conversion.
  *
  * \verbatim im.ProcessMergeHSI(h_image: imImage, s_image: imImage, i_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim

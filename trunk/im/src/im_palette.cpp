@@ -302,17 +302,17 @@ long* imPaletteRainbow(void)
   long* ct = palette;
   int hue;
   unsigned char r, g, b;
-  float h, s, i, factor, H;
+  double h, s, i, factor, H;
 
-  s = 1.0f;
-  factor = 360.0f / 256.0f;
+  s = 1.0;
+  factor = 360.0 / 255.0;
 
   for (hue = 0; hue < 256; hue++)
   {
     h = hue * factor;
-    h = 300-h;
+    h = 300.0 - h;
     if (h < 0) h += 360;
-    H = h/57.2957795131f;
+    H = h / 57.2957795131;
 
     i = imColorHSI_ImaxS(H, cos(H), sin(H));
 
@@ -487,27 +487,17 @@ long* imPaletteLinear(void)
 
   for (lIntensity = 0; lIntensity < 32; lIntensity++)
   {
-    float intensity = imColorReconstruct((imbyte)(lIntensity * 8), (imbyte)0, (imbyte)255);  // 8 = 256 / 32         
+    double intensity = imColorReconstructDouble((int)(lIntensity * 8), (int)0, (int)255);  // 8 = 256 / 32         
 
     for (lHue = 0; lHue < 8; lHue++)
     {
-      float hue = (float)lHue * 45.0f;   // 45 = 360 / 8
+      double hue = imColorReconstructDouble((int)(lHue * 45), (int)0, (int)360) * 360;  // 45 = 360 / 8
 
-      imColorHSI2RGBbyte(hue, 1.0f, intensity, &r, &g, &b);
+      imColorHSI2RGBbyte(hue, 1.0, intensity, &r, &g, &b);
 
       *(ct++) = imColorEncode(r, g, b);
     }
   }
-
-#if 0
-  for (lIndex = 0; lIndex < 256; lIndex++)
-  {
-    float norm = (float)lIndex / 256.0f;
-    imColorHSI2RGBbyte(norm * 360, 1.0f, norm, &r, &g, &b);
-
-    *(ct++) = imColorEncode(r, g, b);
-  }
-#endif
 
   return palette;
 }
