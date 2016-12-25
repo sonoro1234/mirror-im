@@ -299,13 +299,13 @@ static void DoShiftHSI(T **map, T **new_map, int count, float h_shift, float s_s
 #endif
   for (int j = 0; j < count; j++)
   {
-    float h, s, i;
-    float r, g, b;
+    double h, s, i;
+    double r, g, b;
 
     // Normalize to 0-1
-    r = normal_op((float)map[0][j], min, range);
-    g = normal_op((float)map[1][j], min, range);
-    b = normal_op((float)map[2][j], min, range);
+    r = normal_op((double)map[0][j], (double)min, (double)range);
+    g = normal_op((double)map[1][j], (double)min, (double)range);
+    b = normal_op((double)map[2][j], (double)min, (double)range);
 
     imColorRGB2HSI(r, g, b, &h, &s, &i);
 
@@ -333,7 +333,7 @@ static void DoShiftHSIByte(imbyte **map, imbyte **new_map, int count, float h_sh
 #endif
   for (int j = 0; j < count; j++)
   {
-    float h, s, i;
+    double h, s, i;
     imbyte r, g, b;
 
     r = map[0][j];

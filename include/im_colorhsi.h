@@ -30,23 +30,23 @@ extern "C" {
 
 /** Returns I where S is maximum given H (here in radians).
  * \ingroup hsi */
-float imColorHSI_ImaxS(float h, double cosh, double sinh);
+double imColorHSI_ImaxS(double H, double cosh, double sinh);
 
 /** Converts from RGB to HSI.
  * \ingroup hsi */
-void imColorRGB2HSI(float r, float g, float b, float *h, float *s, float *i);
+void imColorRGB2HSI(double r, double g, double b, double *h, double *s, double *i);
 
 /** Converts from RGB (byte) to HSI.
  * \ingroup hsi */
-void imColorRGB2HSIbyte(unsigned char r, unsigned char g, unsigned char b, float *h, float *s, float *i);
+void imColorRGB2HSIbyte(unsigned char r, unsigned char g, unsigned char b, double *h, double *s, double *i);
 
 /** Converts from HSI to RGB.
  * \ingroup hsi */
-void imColorHSI2RGB(float h, float s, float i, float *r, float *g, float *b);
+void imColorHSI2RGB(double h, double s, double i, double *r, double *g, double *b);
 
 /** Converts from HSI to RGB (byte).
  * \ingroup hsi */
-void imColorHSI2RGBbyte(float h, float s, float i, unsigned char *r, unsigned char *g, unsigned char *b);
+void imColorHSI2RGBbyte(double h, double s, double i, unsigned char *r, unsigned char *g, unsigned char *b);
 
 
 #if defined(__cplusplus)

@@ -133,17 +133,16 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
     return (1-i)/h1;
 }
 
-float imColorHSI_ImaxS(float fh, double cosH, double sinH)
+double imColorHSI_ImaxS(double h, double cosH, double sinH)
 {
   double i, h0, h1;
   double hr, hb, hg;
-  double h = (double)fh;
 
   if (h == 0 || h == rad120 || h == rad240)
-    return (float)(1.0 / 3.0);
+    return 1.0 / 3.0;
 
   if (h == rad60 || h == rad180 || h == rad300)
-    return (float)(2.0/3.0);
+    return 2.0/3.0;
 
   hr = cosH / 1.5;
   hg = (-cosH + sinH*sqrt3)/ 3.0;
@@ -153,18 +152,17 @@ float imColorHSI_ImaxS(float fh, double cosH, double sinH)
 
   i = h0 / (h0 - h1);
 
-  return (float)i;
+  return i;
 }
 
 /**********************************/               
 /*         RGB 2 HSI              */
 /**********************************/               
 
-void imColorRGB2HSI(float fr, float fg, float fb, float *fh, float *fs, float *fi)
+void imColorRGB2HSI(double R, double G, double B, double *fh, double *fs, double *fi)
 {            
   double v, u;
   double I, S, H;
-  double R = (double)fr, G = (double)fg, B = (double)fb;
 
   /* Parametric equations */
   v = R - (G + B)/2;
@@ -193,16 +191,16 @@ void imColorRGB2HSI(float fr, float fg, float fb, float *fh, float *fs, float *f
     }
   }
 
-  *fi = (float)I;
-  *fs = (float)S;
-  *fh = (float)H;
+  *fi = I;
+  *fs = S;
+  *fh = H;
 }
 
-void imColorRGB2HSIbyte(unsigned char r, unsigned char g, unsigned char b, float *fh, float *fs, float *fi)
+void imColorRGB2HSIbyte(unsigned char r, unsigned char g, unsigned char b, double *fh, double *fs, double *fi)
 {
-  float fr = imColorReconstruct(r, (imbyte)0, (imbyte)255);
-  float fg = imColorReconstruct(g, (imbyte)0, (imbyte)255);
-  float fb = imColorReconstruct(b, (imbyte)0, (imbyte)255);
+  double fr = imColorReconstructDouble(r, (imbyte)0, (imbyte)255);
+  double fg = imColorReconstructDouble(g, (imbyte)0, (imbyte)255);
+  double fb = imColorReconstructDouble(b, (imbyte)0, (imbyte)255);
   
   imColorRGB2HSI(fr, fg, fb, fh, fs, fi);
 }
@@ -211,10 +209,9 @@ void imColorRGB2HSIbyte(unsigned char r, unsigned char g, unsigned char b, float
 /*         HSI 2 RGB              */
 /**********************************/               
 
-void imColorHSI2RGB(float fh, float fs, float fi, float *fr, float *fg, float *fb)
+void imColorHSI2RGB(double H, double S, double I, double *r, double *g, double *b)
 {
-  double cosH, sinH, v, u, R, G, B, 
-    H = (double)fh, S = (double)fs, I = (double)fi;
+  double cosH, sinH, v, u, R, G, B;
 
   if (I < 0) I = 0;
   else if (I > 1) I = 1;
@@ -224,9 +221,9 @@ void imColorHSI2RGB(float fh, float fs, float fi, float *fr, float *fg, float *f
 
   if (S == 0.0 || I == 1.0 || I == 0.0 || H == 360.0)
   {
-    *fr = (float)I;
-    *fg = (float)I;
-    *fb = (float)I;
+    *r = I;
+    *g = I;
+    *b = I;
     return;
   }
 
@@ -259,14 +256,14 @@ void imColorHSI2RGB(float fh, float fs, float fi, float *fr, float *fg, float *f
   if (G > 1) G = 1.0;
   if (B > 1) B = 1.0;
 
-  *fr = (float)R;
-  *fg = (float)G;
-  *fb = (float)B;
+  *r = R;
+  *g = G;
+  *b = B;
 }
 
-void imColorHSI2RGBbyte(float h, float s, float i, unsigned char *r, unsigned char *g, unsigned char *b)
+void imColorHSI2RGBbyte(double h, double s, double i, unsigned char *r, unsigned char *g, unsigned char *b)
 {
-  float fr, fg, fb;
+  double fr, fg, fb;
   
   imColorHSI2RGB(h, s, i, &fr, &fg, &fb);
   
