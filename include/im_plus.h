@@ -1153,7 +1153,7 @@ namespace im
       return imProcessRemoveByArea(src_image.GetHandle(), dst_image.GetHandle(), connect, start_size, end_size, inside); }
     inline int FillHoles(const Image& src_image, Image& dst_image, int connect) {
       return imProcessFillHoles(src_image.GetHandle(), dst_image.GetHandle(), connect); }
-    inline int RotateKernel(Image& kernel) {
+    inline void RotateKernel(Image& kernel) {
       imProcessRotateKernel(kernel.GetHandle()); }
     inline void FFTraw(Image& image, int inverse, int center, int normalize) {
       imProcessFFTraw(image.GetHandle(), inverse, center, normalize); }
