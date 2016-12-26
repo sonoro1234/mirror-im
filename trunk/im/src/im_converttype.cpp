@@ -186,7 +186,7 @@ IM_STATIC int iCopyDirect(int count, int width, const SRCT *src_map, DSTT *dst_m
     IM_END_PROCESSING;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
   
 template <class SRCT, class DSTT> 
@@ -236,7 +236,7 @@ IM_STATIC int iDemoteIntToIntDirect(int count, int width, const SRCT *src_map, D
     IM_END_PROCESSING;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class SRCT, class DSTT> 
@@ -291,7 +291,7 @@ IM_STATIC int iPromoteIntToInt(int count, int width, const SRCT *src_map, DSTT *
     IM_END_PROCESSING;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class SRCT, class DSTT> 
@@ -565,7 +565,7 @@ static int iCopyCpxDirect(int count, int width, const imComplex<SRCT>* src_map, 
     IM_END_PROCESSING;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class SRCT, class DSTT>
@@ -608,7 +608,7 @@ static int iDemoteCpxToReal(int count, int width, const imComplex<SRCT>* src_map
     IM_END_PROCESSING;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
                                                                      
 template <class SRCT, class DSTT>
@@ -618,17 +618,18 @@ IM_STATIC int iDemoteCpxToInt(int count, int width, const imComplex<SRCT>* src_m
   if (!real_map) return IM_ERR_MEM;
 
   // complex to real
-  iDemoteCpxToReal(count, width, src_map, real_map, cpx2real, counter);
-
-  // real to integer
-  if (iDemoteRealToInt(count, width, real_map, dst_map, gamma, absolute, cast_mode, counter, attrib_table) != IM_ERR_NONE)
+  int ret = iDemoteCpxToReal(count, width, src_map, real_map, cpx2real, counter);
+  if (ret != IM_ERR_NONE)
   {
     free(real_map);
-    return IM_ERR_COUNTER;
+    return ret;
   }
 
+  // real to integer
+  ret = iDemoteRealToInt(count, width, real_map, dst_map, gamma, absolute, cast_mode, counter, attrib_table);
+
   free(real_map);
-  return IM_ERR_NONE;
+  return ret;
 }
 
 template <class SRCT, class DSTT>
@@ -661,7 +662,7 @@ IM_STATIC int iPromoteToCpxDirect(int count, int width, const SRCT *src_map, imC
     IM_END_PROCESSING;
   }
 
-  return IM_ERR_NONE;
+  return processing;
 }
 
 template <class SRCT, class DSTT> 
@@ -671,17 +672,18 @@ IM_STATIC int iPromoteIntToCpx(int count, int width, const SRCT* src_map, imComp
   if (!real_map) return IM_ERR_MEM;
 
   // integer to real
-  if (iPromoteIntToReal(count, width, src_map, real_map, gamma, absolute, cast_mode, counter, attrib_table) != IM_ERR_NONE)
+  int ret = iPromoteIntToReal(count, width, src_map, real_map, gamma, absolute, cast_mode, counter, attrib_table);
+  if (ret != IM_ERR_NONE)
   {
     free(real_map);
-    return IM_ERR_COUNTER;
+    return ret;
   }
 
   // real to complex
-  iPromoteToCpxDirect(count, width, real_map, dst_map, counter);
+  ret = iPromoteToCpxDirect(count, width, real_map, dst_map, counter);
 
   free(real_map);
-  return IM_ERR_NONE;
+  return ret;
 }
 
 
