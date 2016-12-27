@@ -524,11 +524,11 @@ namespace im
 
 
     /* conversion */
-    int ConvertDataType(Image& dst_image, int cpx2real, float gamma, bool absolute, int cast_mode) const {
+    int ConvertDataType(Image& dst_image, int cpx2real, double gamma, bool absolute, int cast_mode) const {
       return imConvertDataType(im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode); }
     int ConvertColorSpace(Image& dst_image) const {
       return imConvertColorSpace(im_image, dst_image.im_image); }
-    int ConvertToBitmap(Image& dst_image, int cpx2real, float gamma, bool absolute, int cast_mode) {
+    int ConvertToBitmap(Image& dst_image, int cpx2real, double gamma, bool absolute, int cast_mode) {
       return imConvertToBitmap(im_image, dst_image.im_image, cpx2real, gamma, absolute, cast_mode); }
 
   };
@@ -1031,7 +1031,7 @@ namespace im
       imProcessNormDiffRatio(image1.GetHandle(), image2.GetHandle(), dst_image.GetHandle()); }
     inline void AbnormalHyperionCorrection(const Image& src_image, Image& dst_image, int threshold_consecutive, int threshold_percent, Image& image_abnormal) {
       imProcessAbnormalHyperionCorrection(src_image.GetHandle(), dst_image.GetHandle(), threshold_consecutive, threshold_percent, image_abnormal.GetHandle()); }
-    inline int ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode) {
+    inline int ConvertDataType(const Image& src_image, Image& dst_image, int cpx2real, double gamma, int absolute, int cast_mode) {
       return imProcessConvertDataType(src_image.GetHandle(), dst_image.GetHandle(), cpx2real, gamma, absolute, cast_mode); }
     inline int ConvertColorSpace(const Image& src_image, Image& dst_image) {
       return imProcessConvertColorSpace(src_image.GetHandle(), dst_image.GetHandle()); }

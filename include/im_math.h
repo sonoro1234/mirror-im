@@ -71,10 +71,10 @@ inline T imAbs(const T& v)
 /** Converts between two discrete grids.
  * factor is "dst_size/src_size".
  * \ingroup math */
-inline int imResampleInt(int x, float factor)
+inline int imResampleInt(int x, double factor)
 {
-  float xr = factor*(x + 0.5f) - 0.5f;
-  return (int)(xr < 0? xr-0.5f: xr+0.5f);  /* Round */
+  double xr = factor*(x + 0.5) - 0.5;
+  return (int)(xr < 0? xr-0.5: xr+0.5);  /* Round */
 }
 
 /** Does Zero Order Decimation (Mean).

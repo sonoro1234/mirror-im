@@ -930,7 +930,7 @@ void imProcessAbnormalHyperionCorrection(const imImage* src_image, imImage* dst_
  * \verbatim im.ProcessConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
  * \ingroup procconvert */
-int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
+int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode);
 
 /** Same as  \ref imConvertColorSpace.
  *
@@ -944,7 +944,7 @@ int imProcessConvertColorSpace(const imImage* src_image, imImage* dst_image);
  * \verbatim im.ProcessConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup procconvert */
-int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
+int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode);
 
 
 /** \defgroup imageenhance Image Enhance Utilities in Lua

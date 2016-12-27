@@ -55,7 +55,7 @@ enum imCastMode
   IM_CAST_MINMAX, /**< scan for min and max values.  */
   IM_CAST_FIXED,  /**< use predefined min-max values. */
   IM_CAST_DIRECT, /**< direct type cast the value.   */
-  IM_CAST_USER    /**< user attributes called "UserMin" and "UserMax", both float values. */
+  IM_CAST_USER    /**< user attributes called "UserMin" and "UserMax", both double values. */
 };
 
 /** Changes the image data type, using a complex2real conversion, 
@@ -70,7 +70,7 @@ enum imCastMode
  * \verbatim im.ConvertDataType(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ConvertDataTypeNew(image: imImage, data_type: number, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage  [in Lua 5] \endverbatim
  * \ingroup convert */
-int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
+int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode);
 
 /** Converts one color space to another. \n
  * Images must be of the same size and data type. If color mode is the same nothing is done. \n
@@ -96,7 +96,7 @@ int imConvertColorSpace(const imImage* src_image, imImage* dst_image);
  * \verbatim im.ConvertToBitmap(src_image: imImage, dst_image: imImage, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number [in Lua 5] \endverbatim
  * \verbatim im.ConvertToBitmapNew(image: imImage, color_space: number, has_alpha: boolean, cpx2real: number, gamma: number, absolute: boolean, cast_mode: number) -> error: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convert */
-int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode);
+int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode);
 
 /** Returns an OpenGL compatible data buffer. Also returns the correspondent pixel format. \n
  * The memory allocated is stored in the attribute "GLDATA" with BYTE type. And it will exists while the image exists. \n

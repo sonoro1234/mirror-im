@@ -21,9 +21,9 @@
 
 
 #ifdef IM_PROCESS
-int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode)
 #else
-int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+int imConvertToBitmap(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode)
 #endif
 {
   assert(src_image);
