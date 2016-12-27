@@ -466,7 +466,7 @@ namespace im
     /* alpha */
     void AddAlpha() {
       imImageAddAlpha(im_image); }
-    void SetAlpha(float alpha) {
+    void SetAlpha(double alpha) {
       imImageSetAlpha(im_image, alpha); }
     void RemoveAlpha() {
       imImageRemoveAlpha(im_image); }
@@ -794,9 +794,9 @@ namespace im
     /* attributes */
     bool ResetAttribute(const char* attrib, int fauto) {
       return imVideoCaptureResetAttribute(im_vc, attrib, fauto) != 0; }
-    bool GetAttribute(const char* attrib, float &percent) const {
+    bool GetAttribute(const char* attrib, double &percent) const {
       return imVideoCaptureGetAttribute(im_vc, attrib, &percent) != 0; }
-    bool SetAttribute(const char* attrib, float percent) {
+    bool SetAttribute(const char* attrib, double percent) {
       return imVideoCaptureSetAttribute(im_vc, attrib, percent) != 0; }
     const char** GetAttributeList(int &num_attrib) const {
       return imVideoCaptureGetAttributeList(im_vc, &num_attrib); }

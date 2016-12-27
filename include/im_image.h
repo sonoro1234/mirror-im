@@ -118,7 +118,7 @@ void imImageAddAlpha(imImage* image);
  *
  * \verbatim image:SetAlpha(alpha: number) [in Lua 5] \endverbatim
  * \ingroup imgclass */
-void imImageSetAlpha(imImage* image, float alpha);
+void imImageSetAlpha(imImage* image, double alpha);
 
 /** Removes the alpha channel plane if any.
  *
