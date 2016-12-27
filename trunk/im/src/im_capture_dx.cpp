@@ -286,9 +286,9 @@ static char* vc_Wide2Char(WCHAR* wstr)
 {
   if (wstr)
   {
-    int n = wcslen(wstr)+1;
+    size_t n = wcslen(wstr)+1;
     char* str = (char*)malloc(n);
-    WideCharToMultiByte(CP_ACP, 0, wstr, -1, str, n, NULL, NULL);
+    WideCharToMultiByte(CP_ACP, 0, wstr, -1, str, (int)n, NULL, NULL);
     return str;
   }
 
@@ -1805,14 +1805,14 @@ int imVideoCaptureSetInOut(imVideoCapture* vc, int input, int output, int cross)
 ***************************************************************************/
 
 
-static float vc_Value2Percent(long Min, long Max, long Val)
+static double vc_Value2Percent(long Min, long Max, long Val)
 {
-  return ((Val - Min)*100.0f)/((float)(Max - Min));
+  return ((Val - Min)*100.0)/((double)(Max - Min));
 }
 
-static long vc_Percent2Value(long Min, long Max, long Step, float Per)
+static long vc_Percent2Value(long Min, long Max, long Step, double Per)
 {
-  long Val = (long)((Per/100.)*(Max - Min) + Min);
+  long Val = (long)((Per/100.0)*(Max - Min) + Min);
   if (Step == 1)
     return Val;
 
@@ -1832,7 +1832,7 @@ static IAMVideoProcAmp* vc_InitVideoProcAmp(IBaseFilter* capture_filter, IAMVide
   return *video_prop;
 }
 
-static int vc_SetVideoProcAmpProperty(IBaseFilter* capture_filter, IAMVideoProcAmp* *video_prop, long property, float percent)
+static int vc_SetVideoProcAmpProperty(IBaseFilter* capture_filter, IAMVideoProcAmp* *video_prop, long property, double percent)
 {
   IAMVideoProcAmp *pProp = vc_InitVideoProcAmp(capture_filter, video_prop);
   if (!pProp) return 0;
@@ -1845,7 +1845,7 @@ static int vc_SetVideoProcAmpProperty(IBaseFilter* capture_filter, IAMVideoProcA
   return 1;
 }
 
-static int vc_GetVideoProcAmpProperty(IBaseFilter* capture_filter, IAMVideoProcAmp* *video_prop, long property, float *percent)
+static int vc_GetVideoProcAmpProperty(IBaseFilter* capture_filter, IAMVideoProcAmp* *video_prop, long property, double *percent)
 {
   IAMVideoProcAmp *pProp = vc_InitVideoProcAmp(capture_filter, video_prop);
   if (!pProp) return 0;
@@ -1892,7 +1892,7 @@ static IAMCameraControl* vc_InitCameraControl(IBaseFilter* capture_filter, IAMCa
   return *camera_prop;
 }
 
-static int vc_SetCameraControlProperty(IBaseFilter* capture_filter, IAMCameraControl* *camera_prop, long property, float percent)
+static int vc_SetCameraControlProperty(IBaseFilter* capture_filter, IAMCameraControl* *camera_prop, long property, double percent)
 {
   IAMCameraControl *pProp = vc_InitCameraControl(capture_filter, camera_prop);
   if (!pProp) return 0;
@@ -1907,7 +1907,7 @@ static int vc_SetCameraControlProperty(IBaseFilter* capture_filter, IAMCameraCon
   return 1;
 }
 
-static int vc_GetCameraControlProperty(IBaseFilter* capture_filter, IAMCameraControl* *camera_prop, long property, float *percent)
+static int vc_GetCameraControlProperty(IBaseFilter* capture_filter, IAMCameraControl* *camera_prop, long property, double *percent)
 {
   IAMCameraControl *pProp = vc_InitCameraControl(capture_filter, camera_prop);
   if (!pProp) return 0;
@@ -1954,7 +1954,7 @@ static IAMVideoControl* vc_InitVideoControl(IBaseFilter* capture_filter, IAMVide
   return *video_prop;
 }
 
-static int vc_SetVideoControlProperty(IBaseFilter* capture_filter, IAMVideoControl* *video_prop, long property, float percent)
+static int vc_SetVideoControlProperty(IBaseFilter* capture_filter, IAMVideoControl* *video_prop, long property, double percent)
 {
   IAMVideoControl *pProp = vc_InitVideoControl(capture_filter, video_prop);
   if (!pProp) return 0;
@@ -1974,7 +1974,7 @@ static int vc_SetVideoControlProperty(IBaseFilter* capture_filter, IAMVideoContr
   return 1;
 }
 
-static int vc_GetVideoControlProperty(IBaseFilter* capture_filter, IAMVideoControl* *video_prop, long property, float *percent)
+static int vc_GetVideoControlProperty(IBaseFilter* capture_filter, IAMVideoControl* *video_prop, long property, double *percent)
 {
   IAMVideoControl *pProp = vc_InitVideoControl(capture_filter, video_prop);
   if (!pProp) return 0;
@@ -2036,7 +2036,7 @@ static long vc_AnalogFormat[19] =
   AnalogVideo_PAL_N_COMBO
 };
 
-static int vc_SetAnalogFormat(IBaseFilter* capture_filter, float percent)
+static int vc_SetAnalogFormat(IBaseFilter* capture_filter, double percent)
 {
   IAMAnalogVideoDecoder* video_decoder = NULL;
   HRESULT hr = capture_filter->QueryInterface(IID_IAMAnalogVideoDecoder, (void**)video_decoder);
@@ -2050,7 +2050,7 @@ static int vc_SetAnalogFormat(IBaseFilter* capture_filter, float percent)
   return 1;
 }
 
-static int vc_GetAnalogFormat(IBaseFilter* capture_filter, float *percent)
+static int vc_GetAnalogFormat(IBaseFilter* capture_filter, double *percent)
 {
   IAMAnalogVideoDecoder* video_decoder = NULL;
   HRESULT hr = capture_filter->QueryInterface(IID_IAMAnalogVideoDecoder, (void**)video_decoder);
@@ -2066,7 +2066,7 @@ static int vc_GetAnalogFormat(IBaseFilter* capture_filter, float *percent)
   {
     if (vc_AnalogFormat[i] == format)
     {
-      *percent = (float)i;
+      *percent = (double)i;
       return 1;
     }
   }
@@ -2128,7 +2128,7 @@ static long vc_Attrib2Property(const char* attrib)
   return prop-1;
 }
 
-int imVideoCaptureSetAttribute(imVideoCapture* vc, const char* attrib, float percent)
+int imVideoCaptureSetAttribute(imVideoCapture* vc, const char* attrib, double percent)
 {
   assert(vc);
   assert(vc->device != -1);
@@ -2145,7 +2145,7 @@ int imVideoCaptureSetAttribute(imVideoCapture* vc, const char* attrib, float per
     return vc_SetAnalogFormat(vc->capture_filter, percent);
 }
 
-int imVideoCaptureGetAttribute(imVideoCapture* vc, const char* attrib, float *percent)
+int imVideoCaptureGetAttribute(imVideoCapture* vc, const char* attrib, double *percent)
 {
   assert(vc);
   assert(vc->device != -1);
