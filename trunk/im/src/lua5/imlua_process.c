@@ -953,7 +953,7 @@ static int imluaProcessRadial (lua_State *L)
 {
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
-  float k1 = (float) luaL_checknumber(L, 3);
+  double k1 = luaL_checknumber(L, 3);
   int order = imlua_getorder(L, src_image, 4);
 
   imlua_match(L, src_image, dst_image);
@@ -969,7 +969,7 @@ static int imluaProcessSwirl(lua_State *L)
 {
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
-  float k1 = (float) luaL_checknumber(L, 3);
+  double k1 = luaL_checknumber(L, 3);
   int order = imlua_getorder(L, src_image, 4);
 
   imlua_match(L, src_image, dst_image);

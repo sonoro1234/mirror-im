@@ -1061,9 +1061,9 @@ namespace im
       return imProcessMirror(src_image.GetHandle(), dst_image.GetHandle()); }
     inline int Flip(const Image& src_image, Image& dst_image) {
       return imProcessFlip(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline int Radial(const Image& src_image, Image& dst_image, float k1, int order) {
+    inline int Radial(const Image& src_image, Image& dst_image, double k1, int order) {
       return imProcessRadial(src_image.GetHandle(), dst_image.GetHandle(), k1, order); }
-    inline int Swirl(const Image& src_image, Image& dst_image, float k1, int order) {
+    inline int Swirl(const Image& src_image, Image& dst_image, double k1, int order) {
       return imProcessSwirl(src_image.GetHandle(), dst_image.GetHandle(), k1, order); }
     inline int InterlaceSplit(const Image& src_image, Image& dst_image1, Image& dst_image2) {
       return imProcessInterlaceSplit(src_image.GetHandle(), dst_image1.GetHandle(), dst_image2.GetHandle()); }
