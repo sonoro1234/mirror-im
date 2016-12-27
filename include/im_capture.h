@@ -231,14 +231,14 @@ int IM_DECL imVideoCaptureResetAttribute(imVideoCapture* vc, const char* attrib,
  *
  * \verbatim vc:GetAttribute(attrib: string) -> error: boolean, percent: number [in Lua 5] \endverbatim
  * \ingroup capture */
-int IM_DECL imVideoCaptureGetAttribute(imVideoCapture* vc, const char* attrib, float *percent);
+int IM_DECL imVideoCaptureGetAttribute(imVideoCapture* vc, const char* attrib, double *percent);
 
 /** Changes a camera or video attribute in percentage of the valid range value. \n
  * Returns zero if failed or attribute not supported.
  *
  * \verbatim vc:SetAttribute(attrib: string, percent: number) -> error: boolean [in Lua 5] \endverbatim
  * \ingroup capture */
-int IM_DECL imVideoCaptureSetAttribute(imVideoCapture* vc, const char* attrib, float percent);
+int IM_DECL imVideoCaptureSetAttribute(imVideoCapture* vc, const char* attrib, double percent);
 
 /** Returns a list of the description of the valid attributes for the device class. \n
  * But each device may still not support some of the returned attributes. \n
@@ -358,10 +358,10 @@ public:
   int ResetAttribute(const char* attrib, int fauto) 
     { return imVideoCaptureResetAttribute(vc, attrib, fauto); }
   
-  int GetAttribute(const char* attrib, float *percent) 
+  int GetAttribute(const char* attrib, double *percent) 
     { return imVideoCaptureGetAttribute(vc, attrib, percent); }
   
-  int SetAttribute(const char* attrib, float percent) 
+  int SetAttribute(const char* attrib, double percent) 
     { return imVideoCaptureSetAttribute(vc, attrib, percent); }
   
   const char** GetAttributeList(int *num_attrib) 
