@@ -17,7 +17,7 @@
 #include <memory.h>
 
 
-static inline void iResizeInverse(int x, int y, float *xl, float *yl, float x_invfactor, float y_invfactor)
+static inline void iResizeInverse(int x, int y, double *xl, double *yl, double x_invfactor, double y_invfactor)
 {
   *xl = (x + 0.5f) * x_invfactor;
   *yl = (y + 0.5f) * y_invfactor;
@@ -28,8 +28,8 @@ static int iResize(int src_width, int src_height, const DT *src_map,
                          int dst_width, int dst_height, DT *dst_map, 
                          DTU Dummy, int order, int counter)
 {
-  float x_invfactor = float(src_width)/float(dst_width);
-  float y_invfactor = float(src_height)/float(dst_height);
+  double x_invfactor = double(src_width)/double(dst_width);
+  double y_invfactor = double(src_height)/double(dst_height);
 
   IM_INT_PROCESSING;
 
@@ -47,7 +47,7 @@ static int iResize(int src_width, int src_height, const DT *src_map,
 
     for (int x = 0; x < dst_width; x++)
     {
-      float xl, yl;
+      double xl, yl;
       iResizeInverse(x, y, &xl, &yl, x_invfactor, y_invfactor);
                    
       // if inside the original image
@@ -77,16 +77,16 @@ static int iReduce(int src_width, int src_height, const DT *src_map,
                          int dst_width, int dst_height, DT *dst_map, 
                          DTU Dummy, int order, int counter)
 {
-  float x_invfactor = float(src_width)/float(dst_width);
-  float y_invfactor = float(src_height)/float(dst_height);
+  double x_invfactor = double(src_width)/double(dst_width);
+  double y_invfactor = double(src_height)/double(dst_height);
 
-  float xl0, yl0;
+  double xl0, yl0;
   iResizeInverse(1, 1, &xl0, &yl0, x_invfactor, y_invfactor);
-  float xl1, yl1;
+  double xl1, yl1;
   iResizeInverse(2, 2, &xl1, &yl1, x_invfactor, y_invfactor);
   
-  float box_width = xl1 - xl0;
-  float box_height = yl1 - yl0;
+  double box_width = xl1 - xl0;
+  double box_height = yl1 - yl0;
 
   IM_INT_PROCESSING;
 
@@ -104,7 +104,7 @@ static int iReduce(int src_width, int src_height, const DT *src_map,
 
     for (int x = 0; x < dst_width; x++)
     {
-      float xl, yl;
+      double xl, yl;
       iResizeInverse(x, y, &xl, &yl, x_invfactor, y_invfactor);
                    
       // if inside the original image
@@ -141,27 +141,27 @@ int imProcessReduce(const imImage* src_image, imImage* dst_image, int order)
     case IM_BYTE:
       ret = iReduce(src_image->width, src_image->height, (const imbyte*)src_image->data[i],  
                     dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_SHORT:
       ret = iReduce(src_image->width, src_image->height, (const short*)src_image->data[i],  
                     dst_image->width, dst_image->height, (short*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_USHORT:
       ret = iReduce(src_image->width, src_image->height, (const imushort*)src_image->data[i],  
                     dst_image->width, dst_image->height, (imushort*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_INT:
       ret = iReduce(src_image->width, src_image->height, (const int*)src_image->data[i],  
                     dst_image->width, dst_image->height, (int*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_FLOAT:
       ret = iReduce(src_image->width, src_image->height, (const float*)src_image->data[i],  
                     dst_image->width, dst_image->height, (float*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_CFLOAT:
       ret = iReduce(src_image->width, src_image->height, (const imcfloat*)src_image->data[i],  
@@ -199,27 +199,27 @@ int imProcessResize(const imImage* src_image, imImage* dst_image, int order)
     case IM_BYTE:
       ret = iResize(src_image->width, src_image->height, (const imbyte*)src_image->data[i],  
                     dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_SHORT:
       ret = iResize(src_image->width, src_image->height, (const short*)src_image->data[i],  
                     dst_image->width, dst_image->height, (short*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_USHORT:
       ret = iResize(src_image->width, src_image->height, (const imushort*)src_image->data[i],  
                     dst_image->width, dst_image->height, (imushort*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_INT:
       ret = iResize(src_image->width, src_image->height, (const int*)src_image->data[i],  
                     dst_image->width, dst_image->height, (int*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_FLOAT:
       ret = iResize(src_image->width, src_image->height, (const float*)src_image->data[i],  
                     dst_image->width, dst_image->height, (float*)dst_image->data[i], 
-                    float(0), order, counter);
+                    double(0), order, counter);
       break;
     case IM_CFLOAT:
       ret = iResize(src_image->width, src_image->height, (const imcfloat*)src_image->data[i],  

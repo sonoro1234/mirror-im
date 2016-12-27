@@ -16,25 +16,25 @@
 #include <memory.h>
 
 
-static inline void imRect2Polar(float x, float y, float *radius, float *theta)
+static inline void imRect2Polar(double x, double y, double *radius, double *theta)
 {
-  *radius = sqrtf(x*x + y*y);
-  *theta = atan2f(y, x);
+  *radius = sqrt(x*x + y*y);
+  *theta = atan2(y, x);
 }
 
-static inline void imPolar2Rect(float radius, float theta, float *x, float *y)
+static inline void imPolar2Rect(double radius, double theta, double *x, double *y)
 {
-  *x = radius * cosf(theta);
-  *y = radius * sinf(theta);
+  *x = radius * cos(theta);
+  *y = radius * sin(theta);
 }
 
-static inline void swirl_invtransf(int x, int y, float *xl, float *yl, float k, float xc, float yc)
+static inline void swirl_invtransf(int x, int y, double *xl, double *yl, double k, double xc, double yc)
 {
-  float radius, theta;
+  double radius, theta;
   x -= (int)xc;
   y -= (int)yc;
 
-  imRect2Polar((float)x, (float)y, &radius, &theta);
+  imRect2Polar((double)x, (double)y, &radius, &theta);
 
   theta += k * radius;
 
@@ -46,10 +46,10 @@ static inline void swirl_invtransf(int x, int y, float *xl, float *yl, float k, 
 
 template <class DT, class DTU> 
 static int Swirl(int width, int height, DT *src_map, DT *dst_map, 
-                         float k, int counter, DTU Dummy, int order)
+                         double k, int counter, DTU Dummy, int order)
 {
-  float xc = float(width/2.);
-  float yc = float(height/2.);
+  double xc = double(width/2.0);
+  double yc = double(height/2.0);
 
   IM_INT_PROCESSING;
 
@@ -67,7 +67,7 @@ static int Swirl(int width, int height, DT *src_map, DT *dst_map,
 
     for (int x = 0; x < width; x++)
     {
-      float xl, yl;
+      double xl, yl;
       swirl_invtransf(x, y, &xl, &yl, k, xc, yc);
                    
       // if inside the original image broad area
@@ -92,23 +92,23 @@ static int Swirl(int width, int height, DT *src_map, DT *dst_map,
   return processing;
 }
 
-static inline void radial_invtransf(int x, int y, float *xl, float *yl, float k1, float xc, float yc)
+static inline void radial_invtransf(int x, int y, double *xl, double *yl, double k1, double xc, double yc)
 {
-  float aux;
+  double aux;
   x -= (int)xc;
   y -= (int)yc;
-  aux = 1.0f + k1*(x*x + y*y);
+  aux = 1.0 + k1*(x*x + y*y);
   *xl = x*aux + xc;
   *yl = y*aux + yc;
 }
 
 template <class DT, class DTU> 
 static int Radial(int width, int height, DT *src_map, DT *dst_map, 
-                         float k1, int counter, DTU Dummy, int order)
+                         double k1, int counter, DTU Dummy, int order)
 {
-  float xc = float(width/2.);
-  float yc = float(height/2.);
-  int diag = (int)sqrt(float(width*width + height*height));
+  double xc = double(width/2.0);
+  double yc = double(height/2.0);
+  int diag = (int)sqrt(double(width*width + height*height));
 
   k1 /= (diag * diag);
          
@@ -128,7 +128,7 @@ static int Radial(int width, int height, DT *src_map, DT *dst_map,
 
     for (int x = 0; x < width; x++)
     {
-      float xl, yl;
+      double xl, yl;
       radial_invtransf(x, y, &xl, &yl, k1, xc, yc);
                    
       // if inside the original image broad area
@@ -160,12 +160,12 @@ static int Radial(int width, int height, DT *src_map, DT *dst_map,
 //   shift the origin back to the center of the original image
 //*******************************************************************************************
 
-inline void rotate_invtransf(int x, int y, float *xl, float *yl, double cos0, double sin0, float dcx, float dcy, float scx, float scy)
+inline void rotate_invtransf(int x, int y, double *xl, double *yl, double cos0, double sin0, double dcx, double dcy, double scx, double scy)
 {
   double xr = x+0.5 - dcx;
   double yr = y+0.5 - dcy;
-  *xl = float(xr * cos0 - yr * sin0 + scx);
-  *yl = float(xr * sin0 + yr * cos0 + scy);
+  *xl = double(xr * cos0 - yr * sin0 + scx);
+  *yl = double(xr * sin0 + yr * cos0 + scy);
 }
 
 template <class DT, class DTU> 
@@ -173,10 +173,10 @@ static int RotateCenter(int src_width, int src_height, DT *src_map,
                         int dst_width, int dst_height, DT *dst_map, 
                         double cos0, double sin0, int counter, DTU Dummy, int order)
 {
-  float dcx = float(dst_width/2.);
-  float dcy = float(dst_height/2.);
-  float scx = float(src_width/2.);
-  float scy = float(src_height/2.);
+  double dcx = double(dst_width/2.0);
+  double dcy = double(dst_height/2.0);
+  double scx = double(src_width/2.0);
+  double scy = double(src_height/2.0);
 
   IM_INT_PROCESSING;
 
@@ -194,7 +194,7 @@ static int RotateCenter(int src_width, int src_height, DT *src_map,
 
     for (int x = 0; x < dst_width; x++)
     {
-      float xl, yl;
+      double xl, yl;
       rotate_invtransf(x, y, &xl, &yl, cos0, sin0, dcx, dcy, scx, scy);
                    
       // if inside the original image broad area
@@ -225,10 +225,10 @@ static int Rotate(int src_width, int src_height, DT *src_map,
                   double cos0, double sin0, int ref_x, int ref_y, int to_origin, 
                   int counter, DTU Dummy, int order)
 {
-  float sx = float(ref_x);
-  float sy = float(ref_y);
-  float dx = sx;
-  float dy = sy;
+  double sx = double(ref_x);
+  double sy = double(ref_y);
+  double dx = sx;
+  double dy = sy;
   if (to_origin)
   {
     dx = 0;
@@ -251,7 +251,7 @@ static int Rotate(int src_width, int src_height, DT *src_map,
 
     for (int x = 0; x < dst_width; x++)
     {
-      float xl, yl;
+      double xl, yl;
       rotate_invtransf(x, y, &xl, &yl, cos0, sin0, dx, dy, sx, sy);
                    
       // if inside the original image broad area
@@ -641,7 +641,7 @@ int imProcessRotate180(const imImage* src_image, imImage* dst_image)
   return ret;
 }
 
-int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int order)
+int imProcessRadial(const imImage* src_image, imImage* dst_image, double k1, int order)
 {
   int ret = 0;
 
@@ -654,19 +654,19 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      ret = Radial(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], k1, counter, float(0), order);
+      ret = Radial(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], k1, counter, double(0), order);
       break;
     case IM_SHORT:
-      ret = Radial(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], k1, counter, float(0), order);
+      ret = Radial(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], k1, counter, double(0), order);
       break;
     case IM_USHORT:
-      ret = Radial(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], k1, counter, float(0), order);
+      ret = Radial(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], k1, counter, double(0), order);
       break;
     case IM_INT:
-      ret = Radial(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], k1, counter, float(0), order);
+      ret = Radial(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], k1, counter, double(0), order);
       break;
     case IM_FLOAT:
-      ret = Radial(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], k1, counter, float(0), order);
+      ret = Radial(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], k1, counter, double(0), order);
       break;
     case IM_CFLOAT:
       ret = Radial(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], k1, counter, imcfloat(0,0), order);
@@ -688,7 +688,7 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
   return ret;
 }
 
-int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int order)
+int imProcessSwirl(const imImage* src_image, imImage* dst_image, double k, int order)
 {
   int ret = 0;
 
@@ -701,19 +701,19 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int or
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      ret = Swirl(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], k, counter, float(0), order);
+      ret = Swirl(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)dst_image->data[i], k, counter, double(0), order);
       break;
     case IM_SHORT:
-      ret = Swirl(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], k, counter, float(0), order);
+      ret = Swirl(src_image->width, src_image->height, (short*)src_image->data[i], (short*)dst_image->data[i], k, counter, double(0), order);
       break;
     case IM_USHORT:
-      ret = Swirl(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], k, counter, float(0), order);
+      ret = Swirl(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)dst_image->data[i], k, counter, double(0), order);
       break;
     case IM_INT:
-      ret = Swirl(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], k, counter, float(0), order);
+      ret = Swirl(src_image->width, src_image->height, (int*)src_image->data[i], (int*)dst_image->data[i], k, counter, double(0), order);
       break;
     case IM_FLOAT:
-      ret = Swirl(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], k, counter, float(0), order);
+      ret = Swirl(src_image->width, src_image->height, (float*)src_image->data[i], (float*)dst_image->data[i], k, counter, double(0), order);
       break;
     case IM_CFLOAT:
       ret = Swirl(src_image->width, src_image->height, (imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], k, counter, imcfloat(0,0), order);
@@ -740,19 +740,19 @@ int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k, int or
 //   In this case shift to the origin, rotate, but do NOT shift back
 //*******************************************************************************************
 
-static void rotate_transf(float cx, float cy, int x, int y, float *xl, float *yl, double cos0, double sin0)
+static void rotate_transf(double cx, double cy, int x, int y, double *xl, double *yl, double cos0, double sin0)
 {
   double xr = x+0.5 - cx;
   double yr = y+0.5 - cy;
-  *xl = float( xr*cos0 + yr*sin0);
-  *yl = float(-xr*sin0 + yr*cos0);
+  *xl = double( xr*cos0 + yr*sin0);
+  *yl = double(-xr*sin0 + yr*cos0);
 }
 
 void imProcessCalcRotateSize(int width, int height, int *new_width, int *new_height, double cos0, double sin0)
 {
-  float xl, yl, xmin, xmax, ymin, ymax;
-  float wd2 = float(width)/2;
-  float hd2 = float(height)/2;
+  double xl, yl, xmin, xmax, ymin, ymax;
+  double wd2 = double(width)/2.0;
+  double hd2 = double(height)/2.0;
 
   rotate_transf(wd2, hd2, 0, 0, &xl, &yl, cos0, sin0);
   xmin = xl; ymin = yl;
@@ -784,7 +784,7 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
 
   if (src_image->color_space == IM_MAP)
   {
-    ret = RotateCenter(src_image->width, src_image->height, (imbyte*)src_image->data[0],  dst_image->width, dst_image->height, (imbyte*)dst_image->data[0], cos0, sin0, counter, float(0), 0);
+    ret = RotateCenter(src_image->width, src_image->height, (imbyte*)src_image->data[0], dst_image->width, dst_image->height, (imbyte*)dst_image->data[0], cos0, sin0, counter, double(0), 0);
   }
   else
   {
@@ -793,19 +793,19 @@ int imProcessRotate(const imImage* src_image, imImage* dst_image, double cos0, d
       switch(src_image->data_type)
       {
       case IM_BYTE:
-        ret = RotateCenter(src_image->width, src_image->height, (imbyte*)src_image->data[i], dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], cos0, sin0, counter, float(0), order);
+        ret = RotateCenter(src_image->width, src_image->height, (imbyte*)src_image->data[i], dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], cos0, sin0, counter, double(0), order);
         break;
       case IM_SHORT:
-        ret = RotateCenter(src_image->width, src_image->height, (short*)src_image->data[i], dst_image->width, dst_image->height, (short*)dst_image->data[i], cos0, sin0, counter, float(0), order);
+        ret = RotateCenter(src_image->width, src_image->height, (short*)src_image->data[i], dst_image->width, dst_image->height, (short*)dst_image->data[i], cos0, sin0, counter, double(0), order);
         break;
       case IM_USHORT:
-        ret = RotateCenter(src_image->width, src_image->height, (imushort*)src_image->data[i], dst_image->width, dst_image->height, (imushort*)dst_image->data[i], cos0, sin0, counter, float(0), order);
+        ret = RotateCenter(src_image->width, src_image->height, (imushort*)src_image->data[i], dst_image->width, dst_image->height, (imushort*)dst_image->data[i], cos0, sin0, counter, double(0), order);
         break;
       case IM_INT:
-        ret = RotateCenter(src_image->width, src_image->height, (int*)src_image->data[i], dst_image->width, dst_image->height, (int*)dst_image->data[i], cos0, sin0, counter, float(0), order);
+        ret = RotateCenter(src_image->width, src_image->height, (int*)src_image->data[i], dst_image->width, dst_image->height, (int*)dst_image->data[i], cos0, sin0, counter, double(0), order);
         break;
       case IM_FLOAT:
-        ret = RotateCenter(src_image->width, src_image->height, (float*)src_image->data[i], dst_image->width, dst_image->height, (float*)dst_image->data[i], cos0, sin0, counter, float(0), order);
+        ret = RotateCenter(src_image->width, src_image->height, (float*)src_image->data[i], dst_image->width, dst_image->height, (float*)dst_image->data[i], cos0, sin0, counter, double(0), order);
         break;
       case IM_CFLOAT:
         ret = RotateCenter(src_image->width, src_image->height, (imcfloat*)src_image->data[i], dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], cos0, sin0, counter, imcfloat(0,0), order);
@@ -838,7 +838,7 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
 
   if (src_image->color_space == IM_MAP)
   {
-    ret = Rotate(src_image->width, src_image->height, (imbyte*)src_image->data[0],  dst_image->width, dst_image->height, (imbyte*)dst_image->data[0], cos0, sin0, x, y, to_origin, counter, float(0), 0);
+    ret = Rotate(src_image->width, src_image->height, (imbyte*)src_image->data[0], dst_image->width, dst_image->height, (imbyte*)dst_image->data[0], cos0, sin0, x, y, to_origin, counter, double(0), 0);
   }
   else
   {
@@ -847,19 +847,19 @@ int imProcessRotateRef(const imImage* src_image, imImage* dst_image, double cos0
       switch(src_image->data_type)
       {
       case IM_BYTE:
-        ret = Rotate(src_image->width, src_image->height, (imbyte*)src_image->data[i], dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, float(0), order);
+        ret = Rotate(src_image->width, src_image->height, (imbyte*)src_image->data[i], dst_image->width, dst_image->height, (imbyte*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, double(0), order);
         break;
       case IM_SHORT:
-        ret = Rotate(src_image->width, src_image->height, (short*)src_image->data[i], dst_image->width, dst_image->height, (short*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, float(0), order);
+        ret = Rotate(src_image->width, src_image->height, (short*)src_image->data[i], dst_image->width, dst_image->height, (short*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, double(0), order);
         break;
       case IM_USHORT:
-        ret = Rotate(src_image->width, src_image->height, (imushort*)src_image->data[i], dst_image->width, dst_image->height, (imushort*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, float(0), order);
+        ret = Rotate(src_image->width, src_image->height, (imushort*)src_image->data[i], dst_image->width, dst_image->height, (imushort*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, double(0), order);
         break;
       case IM_INT:
-        ret = Rotate(src_image->width, src_image->height, (int*)src_image->data[i], dst_image->width, dst_image->height, (int*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, float(0), order);
+        ret = Rotate(src_image->width, src_image->height, (int*)src_image->data[i], dst_image->width, dst_image->height, (int*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, double(0), order);
         break;
       case IM_FLOAT:
-        ret = Rotate(src_image->width, src_image->height, (float*)src_image->data[i], dst_image->width, dst_image->height, (float*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, float(0), order);
+        ret = Rotate(src_image->width, src_image->height, (float*)src_image->data[i], dst_image->width, dst_image->height, (float*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, double(0), order);
         break;
       case IM_CFLOAT:
         ret = Rotate(src_image->width, src_image->height, (imcfloat*)src_image->data[i], dst_image->width, dst_image->height, (imcfloat*)dst_image->data[i], cos0, sin0, x, y, to_origin, counter, imcfloat(0,0), order);
@@ -1025,3 +1025,4 @@ int imProcessInterlaceSplit(const imImage* src_image, imImage* dst_image1, imIma
 
   return ret;
 }
+

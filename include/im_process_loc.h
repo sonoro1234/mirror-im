@@ -171,7 +171,7 @@ int imProcessFlip(const imImage* src_image, imImage* dst_image);
  * \verbatim im.ProcessRadial(src_image: imImage, dst_image: imImage, k1: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRadialNew(image: imImage, k1: number[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int order);
+int imProcessRadial(const imImage* src_image, imImage* dst_image, double k1, int order);
 
 /** Apply a swirl distortion using the given interpolation order (see imProcessResize). \n
  * Images must be of the same type and size.
@@ -180,7 +180,7 @@ int imProcessRadial(const imImage* src_image, imImage* dst_image, float k1, int 
  * \verbatim im.ProcessSwirl(src_image: imImage, dst_image: imImage, k: number, order: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessSwirlNew(image: imImage, k: number[, order]: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup geom */
-int imProcessSwirl(const imImage* src_image, imImage* dst_image, float k1, int order);
+int imProcessSwirl(const imImage* src_image, imImage* dst_image, double k1, int order);
 
 /** Split the image in two images, one containing the odd lines and other containing the even lines. \n
  * Images must be of the same type. Height of the output images must be half the height of the input image.

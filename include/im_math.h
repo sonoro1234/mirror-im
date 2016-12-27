@@ -80,7 +80,7 @@ inline int imResampleInt(int x, double factor)
 /** Does Zero Order Decimation (Mean).
  * \ingroup math */
 template <class T, class TU>
-inline T imZeroOrderDecimation(int width, int height, T *map, float xl, float yl, float box_width, float box_height, TU Dummy)
+inline T imZeroOrderDecimation(int width, int height, T *map, double xl, double yl, double box_width, double box_height, TU Dummy)
 {
   int x0,x1,y0,y1;
   (void)Dummy;
@@ -124,7 +124,7 @@ inline T imZeroOrderDecimation(int width, int height, T *map, float xl, float yl
 /** Does Bilinear Decimation.
  * \ingroup math */
 template <class T, class TU>
-inline T imBilinearDecimation(int width, int height, T *map, float xl, float yl, float box_width, float box_height, TU Dummy)
+inline T imBilinearDecimation(int width, int height, T *map, double xl, double yl, double box_width, double box_height, TU Dummy)
 {
   int x0,x1,y0,y1;
   (void)Dummy;
@@ -143,7 +143,7 @@ inline T imBilinearDecimation(int width, int height, T *map, float xl, float yl,
   y1 = y1<0? 0: y1>height-1? height-1: y1;
 
   TU Value, LineValue;
-  float dxr, dyr;
+  double dxr, dyr;
   double LineNorm, Norm;
 
   Value = 0;
@@ -151,7 +151,7 @@ inline T imBilinearDecimation(int width, int height, T *map, float xl, float yl,
 
   for (int y = y0; y <= y1; y++)
   {
-    dyr = yl - (y+0.5f);
+    dyr = yl - (y+0.5);
     if (dyr < 0) dyr *= -1;
 
     LineValue = 0;
@@ -159,7 +159,7 @@ inline T imBilinearDecimation(int width, int height, T *map, float xl, float yl,
 
     for (int x = x0; x <= x1; x++)
     {
-      dxr = xl - (x+0.5f);
+      dxr = xl - (x+0.5);
       if (dxr < 0) dxr *= -1;
 
       LineValue += map[y*width+x] * dxr;
@@ -182,10 +182,10 @@ inline T imBilinearDecimation(int width, int height, T *map, float xl, float yl,
 /** Does Zero Order Interpolation (Nearest Neighborhood).
  * \ingroup math */
 template <class T>
-inline T imZeroOrderInterpolation(int width, int height, T *map, float xl, float yl)
+inline T imZeroOrderInterpolation(int width, int height, T *map, double xl, double yl)
 {
-  int x0 = imRound(xl-0.5f);
-  int y0 = imRound(yl-0.5f);
+  int x0 = imRound(xl-0.5);
+  int y0 = imRound(yl-0.5);
   x0 = x0<0? 0: x0>width-1? width-1: x0;
   y0 = y0<0? 0: y0>height-1? height-1: y0;
   return map[y0*width + x0];
@@ -194,10 +194,10 @@ inline T imZeroOrderInterpolation(int width, int height, T *map, float xl, float
 /** Does Bilinear Interpolation.
  * \ingroup math */
 template <class T>
-inline T imBilinearInterpolation(int width, int height, T *map, float xl, float yl)
+inline T imBilinearInterpolation(int width, int height, T *map, double xl, double yl)
 {
   int x0, y0, x1, y1;
-  float t, u;
+  double t, u;
 
   if (xl < 0.5)
   {
@@ -211,9 +211,9 @@ inline T imBilinearInterpolation(int width, int height, T *map, float xl, float 
   }
   else
   {
-    x0 = (int)(xl-0.5f);
+    x0 = (int)(xl-0.5);
     x1 = x0+1;
-    t = xl - (x0+0.5f);
+    t = xl - (x0+0.5);
   }
 
   if (yl < 0.5)
@@ -228,9 +228,9 @@ inline T imBilinearInterpolation(int width, int height, T *map, float xl, float 
   }
   else
   {
-    y0 = (int)(yl-0.5f);
+    y0 = (int)(yl-0.5);
     y1 = y0+1;
-    u = yl - (y0+0.5f);
+    u = yl - (y0+0.5);
   }
 
   T fll = map[y0*width + x0];
@@ -247,10 +247,10 @@ inline T imBilinearInterpolation(int width, int height, T *map, float xl, float 
 /** Does Bicubic Interpolation.
  * \ingroup math */
 template <class T, class TU>
-inline T imBicubicInterpolation(int width, int height, T *map, float xl, float yl, TU Dummy)
+inline T imBicubicInterpolation(int width, int height, T *map, double xl, double yl, TU Dummy)
 {
   int X[4], Y[4];
-  float t, u;
+  double t, u;
   (void)Dummy;
 
   if (xl >= width-0.5)
@@ -261,7 +261,7 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
   }
   else
   {
-    X[1] = (int)(xl-0.5f);
+    X[1] = (int)(xl-0.5);
     if (X[1] < 0) X[1] = 0;
 
     X[0] = X[1]-1;
@@ -271,7 +271,7 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
     if (X[0] < 0) X[0] = 0;
     if (X[3] > width-1) X[3] = width-1;
 
-    t = xl - (X[1]+0.5f);
+    t = xl - (X[1]+0.5);
   }
 
   if (yl >= height-0.5)
@@ -282,7 +282,7 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
   }
   else
   {
-    Y[1] = (int)(yl-0.5f);
+    Y[1] = (int)(yl-0.5);
     if (Y[1] < 0) Y[1] = 0;
 
     Y[0] = Y[1]-1;
@@ -292,17 +292,17 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
     if (Y[0] < 0) Y[0] = 0;
     if (Y[3] > height-1) Y[3] = height-1;
 
-    u = yl - (Y[1]+0.5f);
+    u = yl - (Y[1]+0.5);
   }
 
-  float CX[4], CY[4];
+  double CX[4], CY[4];
 
   // Optimize calculations
   {
-    float c, c2, c3;
+    double c, c2, c3;
 
 #define C0 (-c3 + 2.0f*c2 - c)
-#define C1 ( c3 - 2.0f*c2 + 1.0f)
+#define C1 ( c3 - 2.0f*c2 + 1.0)
 #define C2 (-c3 + c2 + c)
 #define C3 ( c3 - c2)
 
@@ -321,7 +321,7 @@ inline T imBicubicInterpolation(int width, int height, T *map, float xl, float y
   }
 
   TU LineValue, Value;
-  float LineNorm, Norm;
+  double LineNorm, Norm;
 
   Value = 0;
   Norm = 0;
