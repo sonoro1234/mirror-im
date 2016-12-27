@@ -256,7 +256,7 @@ static int imluaVideoCaptureSetAttribute (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  float percent = (float) luaL_checknumber(L, 3);
+  double percent = luaL_checknumber(L, 3);
 
   lua_pushboolean(L, imVideoCaptureSetAttribute(vc, attrib, percent));
   return 1;
@@ -269,7 +269,7 @@ static int imluaVideoCaptureGetAttribute (lua_State *L)
 {
   imVideoCapture *vc = imlua_checkvideocapture(L, 1);
   const char *attrib = luaL_checkstring(L, 2);
-  float percent;
+  double percent;
 
   lua_pushboolean(L, imVideoCaptureGetAttribute(vc, attrib, &percent));
   lua_pushnumber(L, percent);

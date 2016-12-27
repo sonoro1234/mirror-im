@@ -307,7 +307,7 @@ inline void iSet(T *map, T value, int count)
   }
 }
   
-void imImageSetAlpha(imImage* image, float alpha)
+void imImageSetAlpha(imImage* image, double alpha)
 {
   assert(image);
 

@@ -292,7 +292,7 @@ static int imluaImageRemoveAlpha (lua_State *L)
 \*****************************************************************************/
 static int imluaImageSetAlpha (lua_State *L)
 {
-  imImageSetAlpha(imlua_checkimage(L, 1), (float)luaL_checknumber(L, 2));
+  imImageSetAlpha(imlua_checkimage(L, 1), luaL_checknumber(L, 2));
   return 0;
 }
 
