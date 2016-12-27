@@ -203,7 +203,7 @@ inline T sqrt_op(const T& v)
 
 inline int exp(const int& v)
 {
-  return (int)exp((float)v);
+  return (int)exp((double)v);
 }
 
 /// Generic Exponential
@@ -217,7 +217,7 @@ inline T exp_op(const T& v)
 
 inline int log(const int& v)
 {
-  return (int)log((float)v);
+  return (int)log((double)v);
 }
 
 /// Generic Logarithm
@@ -241,7 +241,7 @@ inline imcdouble sin(const imcdouble& v)
 
 inline int sin(const int& v)
 {
-  return (int)sin((float)v);
+  return (int)sin((double)v);
 }
 
 /// Generic Sine
@@ -265,7 +265,7 @@ inline imcdouble cos(const imcdouble& v)
 
 inline int cos(const int& v)
 {
-  return (int)cos((float)v);
+  return (int)cos((double)v);
 }
 
 /// Generic Cosine
