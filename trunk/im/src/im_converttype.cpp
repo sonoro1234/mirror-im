@@ -61,7 +61,7 @@
 */
 
 template <class T>
-inline T iGammaFactor(T range, float gamma)
+inline T iGammaFactor(T range, double gamma)
 {
   if (gamma == 0)
     return range;
@@ -72,7 +72,7 @@ inline T iGammaFactor(T range, float gamma)
 }
 
 template <class T>
-inline T iGammaFunc(T factor, T min, float gamma, T value)
+inline T iGammaFunc(T factor, T min, double gamma, T value)
 {
   // Here  0<value<1   (always)
   if (gamma != 0)
@@ -310,9 +310,9 @@ IM_STATIC int iDemoteIntToInt(int count, int width, const SRCT *src_map, DSTT *d
 
     if (cast_mode == IM_CAST_USER)  // get min,max from atributes
     {
-      float* amin = (float*)attrib_table->Get("UserMin");
+      double* amin = (double*)attrib_table->Get("UserMin");
       if (amin) min = (SRCT)(*amin);
-      float* amax = (float*)attrib_table->Get("UserMax");
+      double* amax = (double*)attrib_table->Get("UserMax");
       if (amax) max = (SRCT)(*amax);
     }
   }
@@ -323,7 +323,7 @@ IM_STATIC int iDemoteIntToInt(int count, int width, const SRCT *src_map, DSTT *d
   if (min >= dst_type_min && max <= dst_type_max)
     direct = 1; // no need for conversion
 
-  float factor = ((float)dst_type_max - (float)dst_type_min + 1.0f) / ((float)max - (float)min + 1.0f);
+  double factor = ((double)dst_type_max - (double)dst_type_min + 1.0f) / ((double)max - (double)min + 1.0);
 
   IM_INT_PROCESSING;
 
@@ -376,7 +376,7 @@ IM_STATIC int iDemoteIntToInt(int count, int width, const SRCT *src_map, DSTT *d
 
 
 template <class SRCT, class DSTT>
-IM_STATIC int iPromoteIntToReal(int count, int width, const SRCT *src_map, DSTT *dst_map, float gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
+IM_STATIC int iPromoteIntToReal(int count, int width, const SRCT *src_map, DSTT *dst_map, double gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   // integer to real, always have to scale to 0:1 or -0.5:+0.5
   SRCT min, max;
@@ -391,9 +391,9 @@ IM_STATIC int iPromoteIntToReal(int count, int width, const SRCT *src_map, DSTT 
 
     if (cast_mode == IM_CAST_USER)  // get min,max from atributes
     {
-      float* amin = (float*)attrib_table->Get("UserMin");
+      double* amin = (double*)attrib_table->Get("UserMin");
       if (amin) min = (SRCT)(*amin);
-      float* amax = (float*)attrib_table->Get("UserMax");
+      double* amax = (double*)attrib_table->Get("UserMax");
       if (amax) max = (SRCT)(*amax);
     }
   }
@@ -450,7 +450,7 @@ IM_STATIC int iPromoteIntToReal(int count, int width, const SRCT *src_map, DSTT 
 }
 
 template <class SRCT, class DSTT>
-IM_STATIC int iDemoteRealToInt(int count, int width, const SRCT *src_map, DSTT *dst_map, float gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
+IM_STATIC int iDemoteRealToInt(int count, int width, const SRCT *src_map, DSTT *dst_map, double gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   // real to integer, always have to scale from 0:1 or -0.5:+0.5
   SRCT min, max;
@@ -465,9 +465,9 @@ IM_STATIC int iDemoteRealToInt(int count, int width, const SRCT *src_map, DSTT *
 
     if (cast_mode == IM_CAST_USER)  // get min,max from atributes
     {
-      float* amin = (float*)attrib_table->Get("UserMin");
+      double* amin = (double*)attrib_table->Get("UserMin");
       if (amin) min = (SRCT)*amin;
-      float* amax = (float*)attrib_table->Get("UserMax");
+      double* amax = (double*)attrib_table->Get("UserMax");
       if (amax) max = (SRCT)*amax;
     }
   }
@@ -612,7 +612,7 @@ static int iDemoteCpxToReal(int count, int width, const imComplex<SRCT>* src_map
 }
                                                                      
 template <class SRCT, class DSTT>
-IM_STATIC int iDemoteCpxToInt(int count, int width, const imComplex<SRCT>* src_map, DSTT *dst_map, int cpx2real, float gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
+IM_STATIC int iDemoteCpxToInt(int count, int width, const imComplex<SRCT>* src_map, DSTT *dst_map, int cpx2real, double gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   SRCT* real_map = (SRCT*)malloc(count*sizeof(SRCT));
   if (!real_map) return IM_ERR_MEM;
@@ -666,7 +666,7 @@ IM_STATIC int iPromoteToCpxDirect(int count, int width, const SRCT *src_map, imC
 }
 
 template <class SRCT, class DSTT> 
-IM_STATIC int iPromoteIntToCpx(int count, int width, const SRCT* src_map, imComplex<DSTT> *dst_map, float gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
+IM_STATIC int iPromoteIntToCpx(int count, int width, const SRCT* src_map, imComplex<DSTT> *dst_map, double gamma, int absolute, int cast_mode, int counter, imAttribTable* attrib_table)
 {
   DSTT* real_map = (DSTT*)malloc(count*sizeof(DSTT));
   if (!real_map) return IM_ERR_MEM;
@@ -691,9 +691,9 @@ IM_STATIC int iPromoteIntToCpx(int count, int width, const SRCT* src_map, imComp
 
 
 #ifdef IM_PROCESS
-int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+int imProcessConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode)
 #else
-int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, float gamma, int absolute, int cast_mode)
+int imConvertDataType(const imImage* src_image, imImage* dst_image, int cpx2real, double gamma, int absolute, int cast_mode)
 #endif
 {
   assert(src_image);
