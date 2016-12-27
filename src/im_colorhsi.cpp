@@ -198,9 +198,9 @@ void imColorRGB2HSI(double R, double G, double B, double *fh, double *fs, double
 
 void imColorRGB2HSIbyte(unsigned char r, unsigned char g, unsigned char b, double *fh, double *fs, double *fi)
 {
-  double fr = imColorReconstructDouble(r, (imbyte)0, (imbyte)255);
-  double fg = imColorReconstructDouble(g, (imbyte)0, (imbyte)255);
-  double fb = imColorReconstructDouble(b, (imbyte)0, (imbyte)255);
+  double fr = imColorReconstruct(r, (imbyte)0, (imbyte)255);
+  double fg = imColorReconstruct(g, (imbyte)0, (imbyte)255);
+  double fb = imColorReconstruct(b, (imbyte)0, (imbyte)255);
   
   imColorRGB2HSI(fr, fg, fb, fh, fs, fi);
 }

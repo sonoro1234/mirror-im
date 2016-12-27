@@ -487,11 +487,11 @@ long* imPaletteLinear(void)
 
   for (lIntensity = 0; lIntensity < 32; lIntensity++)
   {
-    double intensity = imColorReconstructDouble((int)(lIntensity * 8), (int)0, (int)255);  // 8 = 256 / 32         
+    double intensity = imColorReconstruct((int)(lIntensity * 8), (int)0, (int)255);  // 8 = 256 / 32         
 
     for (lHue = 0; lHue < 8; lHue++)
     {
-      double hue = imColorReconstructDouble((int)(lHue * 45), (int)0, (int)360) * 360;  // 45 = 360 / 8
+      double hue = imColorReconstruct((int)(lHue * 45), (int)0, (int)360) * 360;  // 45 = 360 / 8
 
       imColorHSI2RGBbyte(hue, 1.0, intensity, &r, &g, &b);
 

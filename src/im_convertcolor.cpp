@@ -257,7 +257,7 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);  // use only Y component
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);  // use only Y component
 
       // do gamma correction then scale back to 0-type_max
       dst_map[i] = imColorQuantize(imColorTransfer2Nonlinear(c1), type_min, type_max);
@@ -342,9 +342,9 @@ IM_STATIC int iDoConvert2Gray(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max); // scale to 0-1
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max); // scale to 0-1
       c0 = imColorLightness2Luminance(c0);             // do the conversion
 
       // do gamma correction then scale back to 0-type_max
@@ -402,12 +402,12 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max);
 
       // result is still 0-1
       imColorXYZ2RGB(c0, c1, c2, 
@@ -482,12 +482,12 @@ IM_STATIC int iDoConvert2RGB(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
 
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5f;
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5f;
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5;
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5;
 
       if (src_color_space == IM_LUV)
         imColorLuv2XYZ(c0, c1, c2,  // conversion in-place
@@ -608,7 +608,7 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
 
       // do gamma correction
       c0 = imColorTransfer2Linear(c0);
@@ -642,12 +642,12 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max);
 
       // do gamma correction
       c0 = imColorTransfer2Linear(c0);
@@ -688,11 +688,11 @@ IM_STATIC int iDoConvert2XYZ(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5f;
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5f;
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5;
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5;
 
       if (src_color_space == IM_LUV)
         imColorLuv2XYZ(c0, c1, c2,  // conversion in-place
@@ -757,7 +757,7 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
 
       // do gamma correction
       c0 = imColorTransfer2Linear(c0);
@@ -792,12 +792,12 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max);
 
       // do gamma correction
       c0 = imColorTransfer2Linear(c0);
@@ -812,8 +812,8 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 
       // then scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);
-      dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
-      dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
+      dst_map1[i] = imColorQuantize(c1 + 0.5, type_min, type_max);
+      dst_map2[i] = imColorQuantize(c2 + 0.5, type_min, type_max);
 
       if (i % width == 0)
       {
@@ -839,19 +839,19 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max);
 
       imColorXYZ2Lab(c0, c1, c2,  // conversion in-place
                      c0, c1, c2);
 
       // scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);
-      dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
-      dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
+      dst_map1[i] = imColorQuantize(c1 + 0.5, type_min, type_max);
+      dst_map2[i] = imColorQuantize(c2 + 0.5, type_min, type_max);
 
       if (i % width == 0)
       {
@@ -877,11 +877,11 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5f;
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5f;
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5;
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5;
 
       imColorLuv2XYZ(c0, c1, c2,  // conversion in-place
                      c0, c1, c2);
@@ -890,8 +890,8 @@ IM_STATIC int iDoConvert2Lab(int count, int data_type,
 
       // scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);
-      dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
-      dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
+      dst_map1[i] = imColorQuantize(c1 + 0.5, type_min, type_max);
+      dst_map2[i] = imColorQuantize(c2 + 0.5, type_min, type_max);
 
       if (i % width == 0)
       {
@@ -944,7 +944,7 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       IM_BEGIN_PROCESSING;
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
 
       // do gamma correction
       c0 = imColorTransfer2Linear(c0);
@@ -979,12 +979,12 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
 
       // scale to 0-1
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max);
 
       // do gamma correction
       c0 = imColorTransfer2Linear(c0);
@@ -999,8 +999,8 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 
       // then scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);
-      dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
-      dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
+      dst_map1[i] = imColorQuantize(c1 + 0.5, type_min, type_max);
+      dst_map2[i] = imColorQuantize(c2 + 0.5, type_min, type_max);
 
       if (i % width == 0)
       {
@@ -1026,19 +1026,19 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max);
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max);
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max);
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max);
 
       imColorXYZ2Luv(c0, c1, c2,  // conversion in-place
                      c0, c1, c2);
 
       // scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);
-      dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
-      dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
+      dst_map1[i] = imColorQuantize(c1 + 0.5, type_min, type_max);
+      dst_map2[i] = imColorQuantize(c2 + 0.5, type_min, type_max);
 
       if (i % width == 0)
       {
@@ -1064,11 +1064,11 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
       }
       IM_BEGIN_PROCESSING;
 
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(src_map0[i], type_min, type_max);
-      float c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5f;
-      float c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5f;
+      double c0 = imColorReconstruct(src_map0[i], type_min, type_max);
+      double c1 = imColorReconstruct(src_map1[i], type_min, type_max) - 0.5;
+      double c2 = imColorReconstruct(src_map2[i], type_min, type_max) - 0.5;
 
       imColorLab2XYZ(c0, c1, c2,  // conversion in-place
                      c0, c1, c2);
@@ -1077,8 +1077,8 @@ IM_STATIC int iDoConvert2Luv(int count, int data_type,
 
       // scale back to 0-type_max
       dst_map0[i] = imColorQuantize(c0, type_min, type_max);
-      dst_map1[i] = imColorQuantize(c1 + 0.5f, type_min, type_max);
-      dst_map2[i] = imColorQuantize(c2 + 0.5f, type_min, type_max);
+      dst_map1[i] = imColorQuantize(c1 + 0.5, type_min, type_max);
+      dst_map2[i] = imColorQuantize(c2 + 0.5, type_min, type_max);
 
       if (i % width == 0)
       {
