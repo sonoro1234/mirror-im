@@ -78,16 +78,16 @@
  * So before they can be used in conversion equations 
  * Cb and Cr values must be shifted back to fix the zero position.
  * \ingroup color */
-inline float imColorZeroShift(int data_type)
+inline double imColorZeroShift(int data_type)
 {
-  float zero[] = {128.0f,     // [-128,+127]
-                  0,      
-                  32768.0f,   // [-32768,+32767]
-                  0, 
-                  0, 
-                  0,
-                  0,
-                  0 };
+  double zero[] = { 128.0,     // [-128,+127]
+                    0,      
+                    32768.0,   // [-32768,+32767]
+                    0, 
+                    0, 
+                    0,
+                    0,
+                    0 };
   return zero[data_type];
 }
 
@@ -143,23 +143,13 @@ inline T imColorQuantize(const R& value, const T& min, const T& max)
  * but the dummy re-constructor uses real values.
  * See also \ref math.
  * \ingroup color */
-template <class T> 
-inline float imColorReconstruct(const T& value, const T& min, const T& max)
-{
-  if (max == 1) return (float)value;  // to allow a dummy re-constructor
-  if (value <= min) return 0;
-  if (value >= max) return 1;
-  float range = (float)max - (float)min + 1.0f;
-  return (((float)value - (float)min + 0.5f)/range);
-}
-
 template <class T>
-inline double imColorReconstructDouble(const T& value, const T& min, const T& max)
+inline double imColorReconstruct(const T& value, const T& min, const T& max)
 {
   if (max == 1) return (double)value;  // to allow a dummy re-constructor
   if (value <= min) return 0;
   if (value >= max) return 1;
-  double range = (double)max - (double)min + 1.0f;
+  double range = (double)max - (double)min + 1.0;
   return (((double)value - (double)min + 0.5) / range);
 }
 
@@ -178,9 +168,9 @@ inline void imColorYCbCr2RGB(const T Y, const T Cb, const T Cr,
                              T& R, T& G, T& B,
                              const T& zero, const T& min, const T& max)
 {
-  float r = float(Y                        + 1.402f * (Cr - zero));
-  float g = float(Y - 0.344f * (Cb - zero) - 0.714f * (Cr - zero));
-  float b = float(Y + 1.772f * (Cb - zero));
+  double r = double(Y                        + 1.402 * (Cr - zero));
+  double g = double(Y - 0.344 * (Cb - zero) - 0.714 * (Cr - zero));
+  double b = double(Y + 1.772 * (Cb - zero));
 
   // now we should enforce min <= rgb <= max
   R = (T)IM_CROPMINMAX(r, min, max);
@@ -203,9 +193,9 @@ inline void imColorRGB2YCbCr(const T R, const T G, const T B,
                              T& Y, T& Cb, T& Cr,
                              const T& zero)
 {
-  Y  = (T)( 0.299f *R + 0.587f *G + 0.114f *B);
-  Cb = (T)(-0.169f *R - 0.331f *G + 0.500f *B + (float)zero);
-  Cr = (T)( 0.500f *R - 0.419f *G - 0.081f *B + (float)zero);
+  Y  = (T)( 0.299 *R + 0.587 *G + 0.114 *B);
+  Cb = (T)(-0.169 *R - 0.331 *G + 0.500 *B + (double)zero);
+  Cr = (T)( 0.500 *R - 0.419 *G - 0.081 *B + (double)zero);
 }
 
 /** Converts C'M'Y'K' to R'G'B' (all nonlinear). \n
@@ -242,9 +232,9 @@ template <class T>
 inline void imColorXYZ2RGB(const T X, const T Y, const T Z, 
                            T& R, T& G, T& B)
 {
-  float r =  3.2406f *X - 1.5372f *Y - 0.4986f *Z;
-  float g = -0.9689f *X + 1.8758f *Y + 0.0415f *Z;
-  float b =  0.0557f *X - 0.2040f *Y + 1.0570f *Z;
+  double r =  3.2406 *X - 1.5372 *Y - 0.4986 *Z;
+  double g = -0.9689 *X + 1.8758 *Y + 0.0415 *Z;
+  double b =  0.0557 *X - 0.2040 *Y + 1.0570 *Z;
 
   // we need to crop because not all XYZ colors are visible
   R = (T)IM_FLOATCROP(r);
@@ -266,14 +256,14 @@ template <class T>
 inline void imColorRGB2XYZ(const T R, const T G, const T B, 
                            T& X, T& Y, T& Z)
 {
-  X = (T)(0.4124f *R + 0.3576f *G + 0.1805f *B);
-  Y = (T)(0.2126f *R + 0.7152f *G + 0.0722f *B);
-  Z = (T)(0.0193f *R + 0.1192f *G + 0.9505f *B);
+  X = (T)(0.4124 *R + 0.3576 *G + 0.1805 *B);
+  Y = (T)(0.2126 *R + 0.7152 *G + 0.0722 *B);
+  Z = (T)(0.0193 *R + 0.1192 *G + 0.9505 *B);
 }
 
-#define IM_FWLAB(_w) (_w > 0.008856f?               \
-                        powf(_w, 1.0f/3.0f):        \
-                        7.787f * _w + 0.16f/1.16f)
+#define IM_FWLAB(_w) (_w > 0.008856?               \
+                        pow(_w, 1.0/3.0):        \
+                        7.787 * _w + 0.16/1.16)
 
 /** Converts CIE XYZ (linear) to CIE L*a*b* (nonlinear). \n
  * The white point is D65. \n
@@ -293,46 +283,46 @@ inline void imColorRGB2XYZ(const T R, const T G, const T B,
 
 \endverbatim
  * \ingroup color */
-inline void imColorXYZ2Lab(const float X, const float Y, const float Z, 
-                           float& L, float& a, float& b)
+inline void imColorXYZ2Lab(const double X, const double Y, const double Z, 
+                           double& L, double& a, double& b)
 {
-  float fX = X / 0.9505f;  // white point D65
-  float fY = Y / 1.0f;
-  float fZ = Z / 1.0890f;
+  double fX = X / 0.9505;  // white point D65
+  double fY = Y / 1.0;
+  double fZ = Z / 1.0890;
 
   fX = IM_FWLAB(fX);
   fY = IM_FWLAB(fY);
   fZ = IM_FWLAB(fZ);
 
-  L = 1.16f * fY - 0.16f;
-  a = 2.5f * (fX - fY);
+  L = 1.16 * fY - 0.16;
+  a = 2.5 * (fX - fY);
   b = (fY - fZ);
 }
 
-#define IM_GWLAB(_w)  (_w > 0.20689f?                     \
-                         powf(_w, 3.0f):                  \
-                         0.1284f * (_w - 0.16f/1.16f))
+#define IM_GWLAB(_w)  (_w > 0.20689?                     \
+                         pow(_w, 3.0):                  \
+                         0.1284 * (_w - 0.16/1.16))
 
 /** Converts CIE L*a*b* (nonlinear) to CIE XYZ (linear). \n
  * The white point is D65. \n
  * 0 <= L <= 1 ; -0.5 <= ab <= +0.5 ; 0 <= XYZ <= 1 
  * \ingroup color */
-inline void imColorLab2XYZ(const float L, const float a, const float b, 
-                           float& X, float& Y, float& Z)
+inline void imColorLab2XYZ(const double L, const double a, const double b, 
+                           double& X, double& Y, double& Z)
 
 {
-  float fY = (L + 0.16f) / 1.16f;
-  float gY = IM_GWLAB(fY);
+  double fY = (L + 0.16) / 1.16;
+  double gY = IM_GWLAB(fY);
 
-  float fgY = IM_FWLAB(gY);
-  float gX = fgY + a / 2.5f;
-  float gZ = fgY - b;
+  double fgY = IM_FWLAB(gY);
+  double gX = fgY + a / 2.5;
+  double gZ = fgY - b;
   gX = IM_GWLAB(gX);
   gZ = IM_GWLAB(gZ);
 
-  X = gX * 0.9505f;     // white point D65
-  Y = gY * 1.0f;
-  Z = gZ * 1.0890f;
+  X = gX * 0.9505;     // white point D65
+  Y = gY * 1.0;
+  Z = gZ * 1.0890;
 }
 
 /** Converts CIE XYZ (linear) to CIE L*u*v* (nonlinear). \n
@@ -358,17 +348,17 @@ inline void imColorLab2XYZ(const float L, const float a, const float b,
   v = 13 * L * (fv - vn)
 \endverbatim
  * \ingroup color */
-inline void imColorXYZ2Luv(const float X, const float Y, const float Z, 
-                           float& L, float& u, float& v)
+inline void imColorXYZ2Luv(const double X, const double Y, const double Z, 
+                           double& L, double& u, double& v)
 {
-  float XYZ = (float)(X + 15 * Y + 3 * Z);
-  float fY = Y / 1.0f;
+  double XYZ = (double)(X + 15 * Y + 3 * Z);
+  double fY = Y / 1.0;
 
   if (XYZ != 0)
   {
-    L = 1.16f * IM_FWLAB(fY) - 0.16f;
-    u = 6.5f * L * ((4 * X)/XYZ - 0.1978f);
-    v = 6.5f * L * ((9 * Y)/XYZ - 0.4683f);
+    L = 1.16 * IM_FWLAB(fY) - 0.16;
+    u = 6.5 * L * ((4 * X)/XYZ - 0.1978);
+    v = 6.5 * L * ((9 * Y)/XYZ - 0.4683);
   }
   else
   {
@@ -380,18 +370,18 @@ inline void imColorXYZ2Luv(const float X, const float Y, const float Z,
  * The white point is D65.
  * 0 <= L <= 1 ; -0.5 <= uv <= +0.5 ; 0 <= XYZ <= 1 \n
  * \ingroup color */
-inline void imColorLuv2XYZ(const float L, const float u, const float v, 
-                           float& X, float& Y, float& Z)
+inline void imColorLuv2XYZ(const double L, const double u, const double v, 
+                           double& X, double& Y, double& Z)
 
 {
-  float fY = (L + 0.16f) / 1.16f;
-  Y = IM_GWLAB(fY) * 1.0f;
+  double fY = (L + 0.16) / 1.16;
+  Y = IM_GWLAB(fY) * 1.0;
 
-  float ul = 0.1978f, vl = 0.4683f;
+  double ul = 0.1978, vl = 0.4683;
   if (L != 0)
   {
-    ul = u / (6.5f * L) + 0.1978f;
-    vl = v / (6.5f * L) + 0.4683f;
+    ul = u / (6.5 * L) + 0.1978;
+    vl = v / (6.5 * L) + 0.4683;
   }
 
   X = ((9 * ul) / (4 * vl)) * Y;
@@ -409,12 +399,12 @@ inline void imColorLuv2XYZ(const float L, const float u, const float v,
     l = pow((v + 0.055) / 1.055, 2.4)
 \endverbatim
  * \ingroup color */                           
-inline float imColorTransfer2Linear(const float& nonlinear_value)
+inline double imColorTransfer2Linear(const double& nonlinear_value)
 {
-  if (nonlinear_value < 0.03928f)
-    return nonlinear_value / 12.92f;
+  if (nonlinear_value < 0.03928)
+    return nonlinear_value / 12.92;
   else
-    return powf((nonlinear_value + 0.055f) / 1.055f, 2.4f);
+    return pow((nonlinear_value + 0.055) / 1.055, 2.4);
 }
 
 /** Converts linear values to nonlinear values. \n
@@ -428,18 +418,18 @@ inline float imColorTransfer2Linear(const float& nonlinear_value)
     v = 1.055 * pow(l, 1/2.4) - 0.055
 \endverbatim
  * \ingroup color */                           
-inline float imColorTransfer2Nonlinear(const float& value)
+inline double imColorTransfer2Nonlinear(const double& value)
 {
-  if (value < 0.0031308f)
-    return 12.92f * value;
+  if (value < 0.0031308)
+    return 12.92 * value;
   else
-    return 1.055f * powf(value, 1.0f/2.4f) - 0.055f;
+    return 1.055 * pow(value, 1.0/2.4) - 0.055;
 }
 
 /** Converts RGB (linear) to R'G'B' (nonlinear).
  * \ingroup color */
-inline void imColorRGB2RGBNonlinear(const float RL, const float GL, const float BL,
-                                    float& R, float& G, float& B)
+inline void imColorRGB2RGBNonlinear(const double RL, const double GL, const double BL,
+                                    double& R, double& G, double& B)
 {
   R = imColorTransfer2Nonlinear(RL);
   G = imColorTransfer2Nonlinear(GL);
@@ -470,9 +460,9 @@ inline T imColorRGB2Luma(const T R, const T G, const T B)
   L = 1.16 * fY - 0.16
 \endverbatim
  * \ingroup color */
-inline float imColorLuminance2Lightness(const float& Y)
+inline double imColorLuminance2Lightness(const double& Y)
 {
-  return 1.16f * IM_FWLAB(Y) - 0.16f;
+  return 1.16 * IM_FWLAB(Y) - 0.16;
 }
 
 /** Converts Lightness (CIE L*) to Luminance (CIE Y) (all linear). \n
@@ -488,9 +478,9 @@ inline float imColorLuminance2Lightness(const float& Y)
   Y = Y * 1.0      (for D65)
 \endverbatim
  * \ingroup color */
-inline float imColorLightness2Luminance(const float& L)
+inline double imColorLightness2Luminance(const double& L)
 {
-  float fY = (L + 0.16f) / 1.16f;
+  double fY = (L + 0.16) / 1.16;
   return IM_GWLAB(fY);
 }
 

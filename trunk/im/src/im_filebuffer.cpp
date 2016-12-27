@@ -143,12 +143,12 @@ inline void iConvertColor2RGB(T* data, int color_space, int data_type)
   {
   case IM_XYZ: 
     {
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
 
       // scale to 0-1
-      float c0 = imColorReconstruct(data[0], type_min, type_max);
-      float c1 = imColorReconstruct(data[1], type_min, type_max);
-      float c2 = imColorReconstruct(data[2], type_min, type_max);
+      double c0 = imColorReconstruct(data[0], type_min, type_max);
+      double c1 = imColorReconstruct(data[1], type_min, type_max);
+      double c2 = imColorReconstruct(data[2], type_min, type_max);
 
       // result is still 0-1
       imColorXYZ2RGB(c0, c1, c2, 
@@ -174,11 +174,11 @@ inline void iConvertColor2RGB(T* data, int color_space, int data_type)
   case IM_LUV:
   case IM_LAB:
     {
-      // to increase precision do intermediate conversions in float
+      // to increase precision do intermediate conversions in double
       // scale to 0-1 and -0.5/+0.5
-      float c0 = imColorReconstruct(data[0], type_min, type_max);
-      float c1 = imColorReconstruct(data[1], type_min, type_max) - 0.5f;
-      float c2 = imColorReconstruct(data[2], type_min, type_max) - 0.5f;
+      double c0 = imColorReconstruct(data[0], type_min, type_max);
+      double c1 = imColorReconstruct(data[1], type_min, type_max) - 0.5;
+      double c2 = imColorReconstruct(data[2], type_min, type_max) - 0.5;
 
       if (color_space == IM_LUV)
         imColorLuv2XYZ(c0, c1, c2,  // conversion in-place
@@ -204,7 +204,7 @@ inline imbyte iConvertType2Byte(const T& data, const T& type_min, const T& type_
 {
   // min-max to 0-1
   // 0-1 to 0-255
-  float value = imColorReconstruct(data, type_min, type_max);
+  double value = imColorReconstruct(data, type_min, type_max);
   return imColorQuantize(value, (imbyte)0, (imbyte)255);
 }
 
