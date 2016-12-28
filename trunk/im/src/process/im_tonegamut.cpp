@@ -22,18 +22,18 @@
 
 
 template <class T>
-static inline T line_op(const T& v, const T& min, const T& max, const float& a, const float& b)
+static inline T line_op(const T& v, const T& min, const T& max, const double& a, const double& b)
 {
-  float r = (float)(v * a + b);
-  if (r > (float)max) return max;
-  if (r < (float)min) return min;
+  double r = (double)(v * a + b);
+  if (r > (double)max) return max;
+  if (r < (double)min) return min;
   return (T)r;
 }
 
 template <class T>
 static inline T normal_op(const T& v, const T& min, const T& range)
 {
-  return (T)(float(v - min) / float(range));
+  return (T)(double(v - min) / double(range));
 }
 
 template <class T>
@@ -43,13 +43,13 @@ static inline T zerostart_op(const T& v, const T& min)
 }
 
 template <class T>
-static inline float invert_op(const T& v, const T& min, const T& range)
+static inline double invert_op(const T& v, const T& min, const T& range)
 {
-  return 1.0f - float(v - min) / float(range);
+  return 1.0f - double(v - min) / double(range);
 }
 
 template <class T>
-static inline T solarize_op(const T& v, const T& level, const float& A, const float& B)
+static inline T solarize_op(const T& v, const T& level, const double& A, const double& B)
 {
   if (v > level)
     return (T)(v * A + B);
@@ -83,34 +83,34 @@ static inline T tonecrop_op(const T& v, const T& start, const T& end)
 }
 
 template <class T>
-static inline T expand_op(const T& v, const T& min, const T& max, const T& start, const float& norm)
+static inline T expand_op(const T& v, const T& min, const T& max, const T& start, const double& norm)
 {
-  float r = (float)((v - start)*norm + min);
-  if (r > (float)max) return max;
-  if (r < (float)min) return min;
+  double r = (double)((v - start)*norm + min);
+  if (r > (double)max) return max;
+  if (r < (double)min) return min;
   return (T)r;
 }
 
 template <class T>
-static inline float norm_pow_op(const T& v, const T& min, const T& range, const float& gamma)
+static inline double norm_pow_op(const T& v, const T& min, const T& range, const double& gamma)
 {
-  return (float)pow(float(v - min) / float(range), gamma);
+  return (double)pow(double(v - min) / double(range), gamma);
 }
 
 template <class T>
-static inline float norm_log_op(const T& v, const T& min, const T& range, const float& norm, const float& K)
+static inline double norm_log_op(const T& v, const T& min, const T& range, const double& norm, const double& K)
 {
-  return (float)(log(K * float(v - min) / float(range) + 1) / norm);
+  return (double)(log(K * double(v - min) / double(range) + 1) / norm);
 }
 
 template <class T>
-static inline float norm_exp_op(const T& v, const T& min, const T& range, const float& norm, const float& K)
+static inline double norm_exp_op(const T& v, const T& min, const T& range, const double& norm, const double& K)
 {
-  return (float)((exp(K * float(v - min) / float(range)) - 1) / norm);
+  return (double)((exp(K * double(v - min) / double(range)) - 1) / norm);
 }
 
 template <class T> 
-static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *args)
+static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, double *args)
 {
   int i;
   T min, max, range;
@@ -165,8 +165,8 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
   case IM_GAMUT_SOLARIZE:
     {
       T level =  (T)(((100 - args[0]) * range) / 100.0f + min);
-      float A = float(level - min) / float(level - max);
-      float B = float(level * range) / float(max - level);
+      double A = double(level - min) / double(level - max);
+      double B = double(level * range) / double(max - level);
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -183,7 +183,7 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     break;
   case IM_GAMUT_LOG:
     {
-      float norm = float(log(args[0] + 1));
+      double norm = double(log(args[0] + 1));
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -193,7 +193,7 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     }
   case IM_GAMUT_EXP:
     {
-      float norm = float(exp(args[0]) - 1);
+      double norm = double(exp(args[0]) - 1);
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -203,9 +203,9 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     }
   case IM_GAMUT_SLICE:
     {
-      if (args[0] > args[1]) { float tmp = args[1]; args[1] = args[0]; args[0] = tmp; }
-      if (args[1] > max) args[1] = (float)max;
-      if (args[0] < min) args[0] = (float)min;
+      if (args[0] > args[1]) { double tmp = args[1]; args[1] = args[0]; args[0] = tmp; }
+      if (args[1] > max) args[1] = (double)max;
+      if (args[0] < min) args[0] = (double)min;
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -215,9 +215,9 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     }
   case IM_GAMUT_CROP:
     {
-      if (args[0] > args[1]) { float tmp = args[1]; args[1] = args[0]; args[0] = tmp; }
-      if (args[1] > max) args[1] = (float)max;
-      if (args[0] < min) args[0] = (float)min;
+      if (args[0] > args[1]) { double tmp = args[1]; args[1] = args[0]; args[0] = tmp; }
+      if (args[1] > max) args[1] = (double)max;
+      if (args[0] < min) args[0] = (double)min;
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -227,10 +227,10 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     }
   case IM_GAMUT_EXPAND:
     {
-      if (args[0] > args[1]) { float tmp = args[1]; args[1] = args[0]; args[0] = tmp; }
-      if (args[1] > max) args[1] = (float)max;
-      if (args[0] < min) args[0] = (float)min;
-      float norm = float(max - min)/(args[1] - args[0]);
+      if (args[0] > args[1]) { double tmp = args[1]; args[1] = args[0]; args[0] = tmp; }
+      if (args[1] > max) args[1] = (double)max;
+      if (args[0] < min) args[0] = (double)min;
+      double norm = double(max - min)/(args[1] - args[0]);
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -240,9 +240,9 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
     }
   case IM_GAMUT_BRIGHTCONT:
     {
-      float bs = (args[0] * (float)range) / 100.0f;
-      float a = (float)tan((45+args[1]*0.449999)/57.2957795);
-      float b = bs + (float)range*(1.0f - a)/2.0f;
+      double bs = (args[0] * (double)range) / 100.0f;
+      double a = (double)tan((45+args[1]*0.449999)/57.2957795);
+      double b = bs + (double)range*(1.0f - a)/2.0f;
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
@@ -253,7 +253,7 @@ static void DoNormalizedUnaryOp(T *map, T *new_map, int count, int op, float *ar
   }
 }
 
-void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, float *args)
+void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, double *args)
 {
   int count = src_image->count*src_image->depth;
 
@@ -281,16 +281,16 @@ void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, fl
 }
 
 template <class T> 
-static void DoShiftHSI(T **map, T **new_map, int count, float h_shift, float s_shift, float i_shift)
+static void DoShiftHSI(T **map, T **new_map, int count, double h_shift, double s_shift, double i_shift)
 {
-  float min, max, range;
+  double min, max, range;
   T tmin, tmax;
   int tcount = count*3;
 
   imMinMaxType(map[0], tcount, tmin, tmax);
 
-  min = (float)tmin;
-  max = (float)tmax;
+  min = (double)tmin;
+  max = (double)tmax;
 
   range = max-min;
 
@@ -326,7 +326,7 @@ static void DoShiftHSI(T **map, T **new_map, int count, float h_shift, float s_s
   }
 }
 
-static void DoShiftHSIByte(imbyte **map, imbyte **new_map, int count, float h_shift, float s_shift, float i_shift)
+static void DoShiftHSIByte(imbyte **map, imbyte **new_map, int count, double h_shift, double s_shift, double i_shift)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
@@ -358,7 +358,7 @@ static void DoShiftHSIByte(imbyte **map, imbyte **new_map, int count, float h_sh
   }
 }
 
-void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shift, float s_shift, float i_shift)
+void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, double h_shift, double s_shift, double i_shift)
 {
   switch(src_image->data_type)
   {
@@ -383,9 +383,9 @@ void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shi
   }
 }
 
-float imProcessCalcAutoGamma(const imImage* image)
+double imProcessCalcAutoGamma(const imImage* image)
 {
-  float mean, min, max;
+  double mean, min, max;
   imStats stats[4];
   if (!imCalcImageStatistics(image, stats))
   {
@@ -405,9 +405,9 @@ float imProcessCalcAutoGamma(const imImage* image)
     mean += stats[i].mean;
   }
 
-  mean /= (float)image->depth;
+  mean /= (double)image->depth;
 
-  return (float)(log((double)((mean-min)/(max-min)))/log(0.5));
+  return log(((mean-min)/(max-min)))/log(0.5);
 }
 
 template <class T>

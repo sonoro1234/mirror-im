@@ -120,13 +120,13 @@ int imHistogramCount(int data_type);
  * \ingroup stats */
 typedef struct _imStats
 {
-  float max;                /**< Maximum value              */
-  float min;                /**< Minimum value              */
+  double max;                /**< Maximum value              */
+  double min;                /**< Minimum value              */
   unsigned long positive;   /**< Number of Positive Values  */
   unsigned long negative;   /**< Number of Negative Values  */
   unsigned long zeros;      /**< Number of Zeros            */
-  float mean;               /**< Mean                       */
-  float stddev;             /**< Standard Deviation         */
+  double mean;               /**< Mean                       */
+  double stddev;             /**< Standard Deviation         */
 } imStats;
 
 /** Calculates the statistics about the image data. \n
@@ -169,7 +169,7 @@ int imCalcHistoImageStatistics(const imImage* image, int* median, int* mode);
  *
  * \verbatim im.CalcPercentMinMax(image: imImage, percent: number, ignore_zero: boolean) -> counter: boolean, min, max: number [in Lua 5] \endverbatim
  * \ingroup stats */
-int imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max);
+int imCalcPercentMinMax(const imImage* image, double percent, int ignore_zero, int *min, int *max);
 
 
 /** \defgroup analyze Image Analysis
@@ -209,7 +209,7 @@ int imAnalyzeMeasureArea(const imImage* image, int* area, int region_count);
  * \verbatim im.AnalyzeMeasurePerimArea(image: imImage, [region_count: number]) -> counter: boolean, perimarea: table of numbers [in Lua 5] \endverbatim
  * The returned table is zero indexed. 
  * \ingroup analyze */
-int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea, int region_count);
+int imAnalyzeMeasurePerimArea(const imImage* image, double* perimarea, int region_count);
 
 /** Calculate the centroid position of all regions. Holes are not included. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
@@ -219,7 +219,7 @@ int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea, int region
  * \verbatim im.AnalyzeMeasureCentroid(image: imImage, [area: table of numbers], [region_count: number]) -> counter: boolean, cx: table of numbers, cy: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-int imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_count, float* cx, float* cy);
+int imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_count, double* cx, double* cy);
 
 /** Calculate the principal major axis slope of all regions. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
@@ -233,9 +233,9 @@ int imAnalyzeMeasureCentroid(const imImage* image, const int* area, int region_c
                               -> major_slope: table of numbers, major_length: table of numbers, minor_slope: table of numbers, minor_length: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const float* cx, const float* cy,
-                                   const int region_count, float* major_slope, float* major_length, 
-                                                           float* minor_slope, float* minor_length);
+int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const double* cx, const double* cy,
+                                   const int region_count, double* major_slope, double* major_length, 
+                                                           double* minor_slope, double* minor_length);
 
 /** Measure the number of holes of all regions. Optionally computes the holes area and holes perimeter of all regions. \n
  * Source image is IM_GRAY/IM_USHORT type (the result of \ref imAnalyzeFindRegions). \n
@@ -246,7 +246,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* area, const f
  * \verbatim im.AnalyzeMeasureHoles(image: imImage, connect: number, [region_count: number])-> counter: boolean, holes_count: number, holes_area: table of numbers, holes_perim: table of numbers [in Lua 5] \endverbatim
  * The returned tables are zero indexed. 
  * \ingroup analyze */
-int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int *holes_count, int* holes_area, float* holes_perim);
+int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int *holes_count, int* holes_area, double* holes_perim);
 
 /** Measure the total perimeter of all regions (external and internal). \n
  * Source image is IM_GRAY/IM_USHORT type (the result of imAnalyzeFindRegions). \n
@@ -257,7 +257,7 @@ int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, i
  *
  * \verbatim im.AnalyzeMeasurePerimeter(image: imImage)-> counter: boolean, perim: table of numbers [in Lua 5] \endverbatim
  * \ingroup analyze */
-int imAnalyzeMeasurePerimeter(const imImage* image, float* perim, int region_count);
+int imAnalyzeMeasurePerimeter(const imImage* image, double* perim, int region_count);
 
 /** Isolates the perimeter line of gray integer images. Background is defined as being black (0). \n
  * It just checks if at least one of the 4 connected neighbors is non zero. Image borders are extended with zeros.

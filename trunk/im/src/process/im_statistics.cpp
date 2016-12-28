@@ -420,13 +420,13 @@ static int DoStats(T* data, int count, imStats* stats, int counter, int width)
   mean /= dcount;
   stddev = sqrt((stddev - dcount*mean*mean)/(dcount-1.0));
 
-  stats->max = (float)max;
-  stats->min = (float)min;
+  stats->max = max;
+  stats->min = min;
   stats->positive = positive;
   stats->negative = negative;
   stats->zeros = zeros;
-  stats->mean = (float)mean;
-  stats->stddev = (float)stddev;
+  stats->mean = mean;
+  stats->stddev = stddev;
 
   return processing;
 }
@@ -557,7 +557,7 @@ int imCalcHistoImageStatistics(const imImage* image, int* median, int* mode)
   return 1;
 }
 
-int imCalcPercentMinMax(const imImage* image, float percent, int ignore_zero, int *min, int *max)
+int imCalcPercentMinMax(const imImage* image, double percent, int ignore_zero, int *min, int *max)
 {
   int counter = imProcessCounterBegin("PercentMinMax");
 

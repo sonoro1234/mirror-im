@@ -53,7 +53,7 @@ static void DoExpandHistogram(T* src_map, T* dst_map, int size, int depth, int h
   memset(re_map, 0, hcount*sizeof(T));
 
   int range = high_level-low_level+1;
-  float factor = (float)hcount / (float)range;
+  double factor = (double)hcount / (double)range;
 
   for (i = 0; i < hcount; i++)
   {             
@@ -78,7 +78,7 @@ static void DoExpandHistogram(T* src_map, T* dst_map, int size, int depth, int h
   delete [] re_map;
 }
 
-void imProcessExpandHistogram(const imImage* src_image, imImage* dst_image, float percent)
+void imProcessExpandHistogram(const imImage* src_image, imImage* dst_image, double percent)
 {
   int low_level, high_level;
   imCalcPercentMinMax(src_image, percent, 0, &low_level, &high_level);
@@ -101,7 +101,7 @@ static void DoEqualizeHistogram(T* src_map, T* dst_map, int size, int depth, int
   T* re_map = new T [hcount];
   memset(re_map, 0, hcount*sizeof(T));
 
-  float factor = (float)hcount / (float)size;
+  double factor = (double)hcount / (double)size;
 
   for (i = 0; i < hcount; i++)
   {             

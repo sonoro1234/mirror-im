@@ -41,20 +41,32 @@ void imProcessNormDiffRatio(const imImage* image1, const imImage* image2, imImag
   switch(image1->data_type)
   {
   case IM_BYTE:
-    DoNormDiffRatio((imbyte*)image1->data[0], (imbyte*)image2->data[0], (float*)dst_image->data[0], count);
-    break;                                                                                
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormDiffRatio((imbyte*)image1->data[0], (imbyte*)image2->data[0], (float*)dst_image->data[0], count);
+    else
+      DoNormDiffRatio((imbyte*)image1->data[0], (imbyte*)image2->data[0], (double*)dst_image->data[0], count);
+    break;
   case IM_SHORT:                                                                           
-    DoNormDiffRatio((short*)image1->data[0], (short*)image2->data[0], (float*)dst_image->data[0], count);
-    break;                                                                                
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormDiffRatio((short*)image1->data[0], (short*)image2->data[0], (float*)dst_image->data[0], count);
+    else
+      DoNormDiffRatio((short*)image1->data[0], (short*)image2->data[0], (double*)dst_image->data[0], count);
+    break;
   case IM_USHORT:                                                                           
-    DoNormDiffRatio((imushort*)image1->data[0], (imushort*)image2->data[0], (float*)dst_image->data[0], count);
-    break;                                                                                
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormDiffRatio((imushort*)image1->data[0], (imushort*)image2->data[0], (float*)dst_image->data[0], count);
+    else
+      DoNormDiffRatio((imushort*)image1->data[0], (imushort*)image2->data[0], (double*)dst_image->data[0], count);
+    break;
   case IM_INT:                                                                           
-    DoNormDiffRatio((int*)image1->data[0], (int*)image2->data[0], (float*)dst_image->data[0], count);
-    break;                                                                                
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormDiffRatio((int*)image1->data[0], (int*)image2->data[0], (float*)dst_image->data[0], count);
+    else
+      DoNormDiffRatio((int*)image1->data[0], (int*)image2->data[0], (double*)dst_image->data[0], count);
+    break;
   case IM_FLOAT:                                                                           
     DoNormDiffRatio((float*)image1->data[0], (float*)image2->data[0], (float*)dst_image->data[0], count);
-    break;                                                                                
+    break;
   case IM_DOUBLE:
     DoNormDiffRatio((double*)image1->data[0], (double*)image2->data[0], (double*)dst_image->data[0], count);
     break;

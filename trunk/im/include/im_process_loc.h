@@ -494,7 +494,7 @@ void imProcessRotateKernel(imImage* kernel);
  * \verbatim im.ProcessDiffOfGaussianConvolve(src_image: imImage, dst_image: imImage, stddev1: number, stddev2: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessDiffOfGaussianConvolveNew(image: imImage, stddev1: number, stddev2: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev1, float stddev2);
+int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image, double stddev1, double stddev2);
 
 /** Convolution with a laplacian of a gaussian kernel. \n
  * Supports all data types, 
@@ -504,7 +504,7 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
  * \verbatim im.ProcessLapOfGaussianConvolve(src_image: imImage, dst_image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessLapOfGaussianConvolveNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev);
+int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image, double stddev);
 
 /** Convolution with a kernel full of "1"s inside a circle. \n
  * Supports all data types.
@@ -515,7 +515,7 @@ int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image,
  * \ingroup convolve */
 int imProcessMeanConvolve(const imImage* src_image, imImage* dst_image, int kernel_size);
 
-/** Convolution with a float gaussian kernel. \n
+/** Convolution with a gaussian kernel with floating point values. \n
  * If sdtdev is negative its magnitude will be used as the kernel size. \n
  * Supports all data types.
  * Returns zero if the counter aborted.
@@ -523,7 +523,7 @@ int imProcessMeanConvolve(const imImage* src_image, imImage* dst_image, int kern
  * \verbatim im.ProcessGaussianConvolve(src_image: imImage, dst_image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessGaussianConvolveNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, float stddev);
+int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, double stddev);
 
 /** Convolution with a barlett kernel. \n
  * Supports all data types.
@@ -586,20 +586,20 @@ int imProcessZeroCrossing(const imImage* src_image, imImage* dst_image);
  * \verbatim im.ProcessCanny(src_image: imImage, dst_image: imImage, stddev: number)-> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessCannyNew(image: imImage, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev);
+int imProcessCanny(const imImage* src_image, imImage* dst_image, double stddev);
 
 /** Calculates the kernel size given the standard deviation. \n
  * If sdtdev is negative its magnitude will be used as the kernel size.
  *
  * \verbatim im.GaussianStdDev2KernelSize(stddev: number) -> kernel_size: number [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imGaussianStdDev2KernelSize(float stddev);
+int imGaussianStdDev2KernelSize(double stddev);
 
 /** Calculates the standard deviation given the kernel size.
  *
  * \verbatim im.GaussianKernelSize2StdDev(kernel_size: number) -> stddev: number [in Lua 5] \endverbatim
  * \ingroup convolve */
-float imGaussianKernelSize2StdDev(int kernel_size);
+double imGaussianKernelSize2StdDev(int kernel_size);
 
 /** Edge enhancement using Unsharp mask. stddev control the gaussian filter, 
  *  amount controls how much the edges will enhance the image (0<amount<1), and
@@ -609,7 +609,7 @@ float imGaussianKernelSize2StdDev(int kernel_size);
  * \verbatim im.ProcessUnsharp(src_image: imImage, dst_image: imImage, stddev: number, amount: number, threshold: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessUnsharpNew(image: imImage, stddev: number, amount: number, threshold: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessUnsharp(const imImage* src_image, imImage* dst_image, float stddev, float amount, float threshold);
+int imProcessUnsharp(const imImage* src_image, imImage* dst_image, double stddev, double amount, double threshold);
 
 /** Edge enhancement using Laplacian8 mask. 
  *  amount controls how much the edges will enhance the image (0<amount<1), and
@@ -619,7 +619,7 @@ int imProcessUnsharp(const imImage* src_image, imImage* dst_image, float stddev,
  * \verbatim im.ProcessSharp(src_image: imImage, dst_image: imImage, amount: number, threshold: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSharpNew(image: imImage, amount: number, threshold: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessSharp(const imImage* src_image, imImage* dst_image, float amount, float threshold);
+int imProcessSharp(const imImage* src_image, imImage* dst_image, double amount, double threshold);
 
 /** Edge enhancement using a given kernel.
  *  If kernel has all positive values, then the unsharp technique is used, else sharp is used.
@@ -630,7 +630,7 @@ int imProcessSharp(const imImage* src_image, imImage* dst_image, float amount, f
  * \verbatim im.ProcessSharp(src_image: imImage, dst_image: imImage, amount: number, threshold: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSharpNew(image: imImage, amount: number, threshold: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup convolve */
-int imProcessSharpKernel(const imImage* src_image, const imImage* kernel, imImage* dst_image, float amount, float threshold);
+int imProcessSharpKernel(const imImage* src_image, const imImage* kernel, imImage* dst_image, double amount, double threshold);
 
 
 #if defined(__cplusplus)

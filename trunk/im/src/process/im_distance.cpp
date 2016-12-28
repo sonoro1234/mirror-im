@@ -14,265 +14,264 @@
 #include <memory.h>
 #include <math.h>
 
-const float DT_ONE    = 1.0f;             // 1x0
-const float DT_SQRT2  = 1.414213562373f;  // 1x1
-const float DT_SQRT5  = 2.2360679775f;    // 2x1
-const float DT_SQRT10 = 3.1622776601684f; // 3x1
-const float DT_SQRT13 = 3.605551275464f;  // 3x2
-const float DT_SQRT17 = 4.12310562562f;   // 4x1
-const float DT_SQRT25 = 5.0f;             // 4x3
+const double DT_ONE    = 1.0;             // 1x0
+const double DT_SQRT2 = 1.414213562373;  // 1x1
+const double DT_SQRT5 = 2.2360679775;    // 2x1
+const double DT_SQRT10 = 3.1622776601684; // 3x1
+const double DT_SQRT13 = 3.605551275464;  // 3x2
+const double DT_SQRT17 = 4.12310562562;   // 4x1
+const double DT_SQRT25 = 5.0;             // 4x3
 
-static inline void setValue(int r, int r1, int r2, int r3, int r4, float *image_data, int f) 
+template<class T>
+static inline void setValue(int r, int r1, int r2, int r3, int r4, T *image_data, int f)
 {
-  float v;
-  float minv = image_data[r];        // (x,y)
+  T v;
+  T minv = image_data[r];        // (x,y)
 
   if (f)
-    v = image_data[r - 1] + DT_ONE;      // (x-1,y)
+    v = image_data[r - 1] + (T)DT_ONE;      // (x-1,y)
   else
-    v = image_data[r + 1] + DT_ONE;      // (x+1,y)
+    v = image_data[r + 1] + (T)DT_ONE;      // (x+1,y)
   if (v < minv) minv = v;
 
-  v = image_data[r1] + DT_ONE;          // (x,y-1)           (x,y+1)
+  v = image_data[r1] + (T)DT_ONE;          // (x,y-1)           (x,y+1)
   if (v < minv) minv = v; 
 
-  if (minv < DT_SQRT2)
+  if (minv < (T)DT_SQRT2)
     goto min_attrib;
 
-  v = image_data[r1 - 1] + DT_SQRT2;    // (x-1,y-1)         (x-1,y+1)
+  v = image_data[r1 - 1] + (T)DT_SQRT2;    // (x-1,y-1)         (x-1,y+1)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r1 + 1] + DT_SQRT2;    // (x+1,y-1)         (x+1,y+1)
+  v = image_data[r1 + 1] + (T)DT_SQRT2;    // (x+1,y-1)         (x+1,y+1)
   if (v < minv) minv = v;                                      
 
-  if (minv < DT_SQRT5)
+  if (minv < (T)DT_SQRT5)
     goto min_attrib;
 
-  v = image_data[r1 + 2] + DT_SQRT5;    // (x+2,y-1)         (x+2,y+1)
+  v = image_data[r1 + 2] + (T)DT_SQRT5;    // (x+2,y-1)         (x+2,y+1)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r1 - 2] + DT_SQRT5;    // (x-2,y-1)         (x-2,y+1)
+  v = image_data[r1 - 2] + (T)DT_SQRT5;    // (x-2,y-1)         (x-2,y+1)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r2 - 1] + DT_SQRT5;    // (x-1,y-2)         (x-1,y+2)
+  v = image_data[r2 - 1] + (T)DT_SQRT5;    // (x-1,y-2)         (x-1,y+2)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r2 + 1] + DT_SQRT5;    // (x+1,y-2)         (x+1,y+2)
+  v = image_data[r2 + 1] + (T)DT_SQRT5;    // (x+1,y-2)         (x+1,y+2)
   if (v < minv) minv = v;                                      
 
-  if (minv < DT_SQRT10)
+  if (minv < (T)DT_SQRT10)
     goto min_attrib;
                                                              
-  v = image_data[r1 + 3] + DT_SQRT10;   // (x+3,y-1)         (x+3,y+1)
+  v = image_data[r1 + 3] + (T)DT_SQRT10;   // (x+3,y-1)         (x+3,y+1)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r1 - 3] + DT_SQRT10;   // (x-3,y-1)         (x-3,y+1)
+  v = image_data[r1 - 3] + (T)DT_SQRT10;   // (x-3,y-1)         (x-3,y+1)
   if (v < minv) minv = v;                                      
 
-  v = image_data[r3 - 1] + DT_SQRT10;   // (x-1,y-3)         (x-1,y+3)
+  v = image_data[r3 - 1] + (T)DT_SQRT10;   // (x-1,y-3)         (x-1,y+3)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r3 + 1] + DT_SQRT10;   // (x+1,y-3)         (x+1,y+3)
+  v = image_data[r3 + 1] + (T)DT_SQRT10;   // (x+1,y-3)         (x+1,y+3)
   if (v < minv) minv = v;                                      
 
-  if (minv < DT_SQRT13)
+  if (minv < (T)DT_SQRT13)
     goto min_attrib;
 
-  v = image_data[r2 - 3] + DT_SQRT13;   // (x-3,y-2)         (x-3,y+2)
+  v = image_data[r2 - 3] + (T)DT_SQRT13;   // (x-3,y-2)         (x-3,y+2)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r2 + 3] + DT_SQRT13;   // (x+3,y-2)         (x+3,y+2)
+  v = image_data[r2 + 3] + (T)DT_SQRT13;   // (x+3,y-2)         (x+3,y+2)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r3 + 2] + DT_SQRT13;   // (x+2,y-3)         (x+2,y+3)
+  v = image_data[r3 + 2] + (T)DT_SQRT13;   // (x+2,y-3)         (x+2,y+3)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r3 - 2] + DT_SQRT13;   // (x-2,y-3)         (x-2,y+3)
+  v = image_data[r3 - 2] + (T)DT_SQRT13;   // (x-2,y-3)         (x-2,y+3)
   if (v < minv) minv = v;
 
-  if (minv < DT_SQRT17)
+  if (minv < (T)DT_SQRT17)
     goto min_attrib;
                                                              
-  v = image_data[r1 + 4] + DT_SQRT17;   // (x+4,y-1)         (x+4,y+1)
+  v = image_data[r1 + 4] + (T)DT_SQRT17;   // (x+4,y-1)         (x+4,y+1)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r1 - 4] + DT_SQRT17;   // (x-4,y-1)         (x-4,y+1)
+  v = image_data[r1 - 4] + (T)DT_SQRT17;   // (x-4,y-1)         (x-4,y+1)
   if (v < minv) minv = v;                                      
 
-  v = image_data[r4 - 1] + DT_SQRT17;   // (x-1,y-4)         (x-1,y+4)
+  v = image_data[r4 - 1] + (T)DT_SQRT17;   // (x-1,y-4)         (x-1,y+4)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r4 + 1] + DT_SQRT17;   // (x+1,y-4)         (x+1,y+4)
+  v = image_data[r4 + 1] + (T)DT_SQRT17;   // (x+1,y-4)         (x+1,y+4)
   if (v < minv) minv = v;                                      
 
-  if (minv < DT_SQRT25)
+  if (minv < (T)DT_SQRT25)
     goto min_attrib;
 
-  v = image_data[r3 - 4] + DT_SQRT25;   // (x-4,y-3)         (x-4,y+3)
+  v = image_data[r3 - 4] + (T)DT_SQRT25;   // (x-4,y-3)         (x-4,y+3)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r3 + 4] + DT_SQRT25;   // (x+4,y-3)         (x+4,y+3)
+  v = image_data[r3 + 4] + (T)DT_SQRT25;   // (x+4,y-3)         (x+4,y+3)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r4 + 3] + DT_SQRT25;   // (x+3,y-4)         (x+3,y+4)
+  v = image_data[r4 + 3] + (T)DT_SQRT25;   // (x+3,y-4)         (x+3,y+4)
   if (v < minv) minv = v;                                      
                                                              
-  v = image_data[r4 - 3] + DT_SQRT25;   // (x-3,y-4)         (x-3,y+4)
+  v = image_data[r4 - 3] + (T)DT_SQRT25;   // (x-3,y-4)         (x-3,y+4)
   if (v < minv) minv = v;
 
 min_attrib:
   image_data[r] = minv;
 }
 
-static inline void setValueForwardEdge(int r, int r1, int r2, int width, int x, int y, float *image_data) 
+template<class T>
+static inline void setValueForwardEdge(int r, int r1, int r2, int width, int x, int y, T *image_data)
 {
-  float v;
-  float minv = image_data[r];        // (x,y)
+  T v;
+  T minv = image_data[r];        // (x,y)
 
   if (y > 0)
   {
-    v = image_data[r1] + DT_ONE;         // (x,y-1)
+    v = image_data[r1] + (T)DT_ONE;         // (x,y-1)
     if (v < minv) minv = v;
   }
 
   if (x > 0)
   {
-    v = image_data[r - 1] + DT_ONE;      // (x-1,y)
+    v = image_data[r - 1] + (T)DT_ONE;      // (x-1,y)
     if (v < minv) minv = v;
   }
 
   if (x > 0 && y > 0)
   {
-    v = image_data[r1 - 1] + DT_SQRT2;   // (x-1,y-1)
+    v = image_data[r1 - 1] + (T)DT_SQRT2;   // (x-1,y-1)
     if (v < minv) minv = v;
   }
 
   if (x < width-2 && y > 0)
   {
-    v = image_data[r1 + 1] + DT_SQRT2;   // (x+1,y-1)
+    v = image_data[r1 + 1] + (T)DT_SQRT2;   // (x+1,y-1)
     if (v < minv) minv = v;
   }
 
   if (x > 0 && y > 1)
   {
-    v = image_data[r2 - 1] + DT_SQRT5;   // (x-1,y-2)
+    v = image_data[r2 - 1] + (T)DT_SQRT5;   // (x-1,y-2)
     if (v < minv) minv = v;
   }
 
   if (x < width-2 && y > 1)
   {
-    v = image_data[r2 + 1] + DT_SQRT5;   // (x+1,y-2)
+    v = image_data[r2 + 1] + (T)DT_SQRT5;   // (x+1,y-2)
     if (v < minv) minv = v;
   }
 
   if (x < width-3 && y > 0)
   {
-    v = image_data[r1 + 2] + DT_SQRT5;   // (x+2,y-1)
+    v = image_data[r1 + 2] + (T)DT_SQRT5;   // (x+2,y-1)
     if (v < minv) minv = v;
   }
 
   if (x > 1 && y > 0)
   {
-    v = image_data[r1 - 2] + DT_SQRT5;   // (x-2,y-1)
+    v = image_data[r1 - 2] + (T)DT_SQRT5;   // (x-2,y-1)
     if (v < minv) minv = v;
   }
 
   image_data[r] = minv;
 }
 
-static inline void setValueBackwardEdge(int r, int r1, int r2, int width, int height, int x, int y, float *image_data) 
+template<class T>
+static inline void setValueBackwardEdge(int r, int r1, int r2, int width, int height, int x, int y, T *image_data)
 {
-  float  v;
-  float minv = image_data[r];        // (x,y)
+  T v;
+  T minv = image_data[r];        // (x,y)
 
   if (x < width-2)
   {
-    v = image_data[r + 1] + DT_ONE;      // (x+1,y)
+    v = image_data[r + 1] + (T)DT_ONE;      // (x+1,y)
     if (v < minv) minv = v;
   }
 
   if (y < height-2)
   {
-    v = image_data[r1] + DT_ONE;         // (x,y+1)
+    v = image_data[r1] + (T)DT_ONE;         // (x,y+1)
     if (v < minv) minv = v;
   }
 
   if (y < height-2 && x > 0)
   {
-    v = image_data[r1 - 1] + DT_SQRT2;   // (x-1,y+1)
+    v = image_data[r1 - 1] + (T)DT_SQRT2;   // (x-1,y+1)
     if (v < minv) minv = v;
   }
 
   if (y < height-2 && x < width-2)
   {
-    v = image_data[r1 + 1] + DT_SQRT2;   // (x+1,y+1)
+    v = image_data[r1 + 1] + (T)DT_SQRT2;   // (x+1,y+1)
     if (v < minv) minv = v;
   }
 
   if (y < height-2 && x < width-3)
   {
-    v = image_data[r1 + 2] + DT_SQRT5;   // (x+2,y+1)
+    v = image_data[r1 + 2] + (T)DT_SQRT5;   // (x+2,y+1)
     if (v < minv) minv = v;
   }
 
   if (y < height-3 && x < width-2)
   {
-    v = image_data[r2 + 1] + DT_SQRT5;   // (x+1,y+2)
+    v = image_data[r2 + 1] + (T)DT_SQRT5;   // (x+1,y+2)
     if (v < minv) minv = v;
   }
 
   if (y < height-3 && x > 0)
   {
-    v = image_data[r2 - 1] + DT_SQRT5;   // (x-1,y+2)
+    v = image_data[r2 - 1] + (T)DT_SQRT5;   // (x-1,y+2)
     if (v < minv) minv = v;
   }
 
   if (y < height-2 && x > 1)
   {
-    v = image_data[r1 - 2] + DT_SQRT5;   // (x-2,y+1)
+    v = image_data[r1 - 2] + (T)DT_SQRT5;   // (x-2,y+1)
     if (v < minv) minv = v;
   }
 
   image_data[r] = minv;
 }
 
-void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image)
+template<class T>
+static void iDoDistanceTransform(int width, int height, imbyte* src_data, T* dst_data)
 {
-  int width = src_image->width,
-     height = src_image->height;
-
-  imbyte* src_data = (imbyte*)src_image->data[0];
-  float* dst_data = (float*)dst_image->data[0];
-
-  float max_dist = (float)sqrt(double(width*width + height*height));
+  int count  = width*height;
+  double max_dist = sqrt(double(width*width + height*height));
 
 #ifdef _OPENMP
-#pragma omp parallel for if (IM_OMP_MINCOUNT(src_image->count))
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
-  for (int i = 0; i < src_image->count; i++)
+  for (int i = 0; i < count; i++)
   {
     // if pixel is background, then distance is zero.
     if (src_data[i])
-      dst_data[i] = max_dist;
+      dst_data[i] = (T)max_dist;
   }
 
   /* down->top, left->right */
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
-  for (int y = 0; y < height; y++) 
+  for (int y = 0; y < height; y++)
   {
     int offset = y * width;
     int offset1 = offset - width;
-    int offset2 = offset - 2*width;
-    int offset3 = offset - 3*width;
-    int offset4 = offset - 4*width;
+    int offset2 = offset - 2 * width;
+    int offset3 = offset - 3 * width;
+    int offset4 = offset - 4 * width;
 
-    for (int x = 0; x < width; x++) 
+    for (int x = 0; x < width; x++)
     {
       if (src_data[offset])
       {
-        if (x < 4 || x > width-5 || y < 4 || y > height-5)
+        if (x < 4 || x > width - 5 || y < 4 || y > height - 5)
           setValueForwardEdge(offset, offset1, offset2, width, x, y, dst_data);
         else
           setValue(offset, offset1, offset2, offset3, offset4, dst_data, 1);
@@ -290,19 +289,19 @@ void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image)
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
-  for (int y = height-1; y >= 0; y--) 
+  for (int y = height - 1; y >= 0; y--)
   {
-    int offset = y * width + width-1;
+    int offset = y * width + width - 1;
     int offset1 = offset + width;
-    int offset2 = offset + 2*width;
-    int offset3 = offset + 3*width;
-    int offset4 = offset + 4*width;
+    int offset2 = offset + 2 * width;
+    int offset3 = offset + 3 * width;
+    int offset4 = offset + 4 * width;
 
-    for (int x = width-1; x >= 0; x--) 
+    for (int x = width - 1; x >= 0; x--)
     {
-      if (src_data[offset]) 
+      if (src_data[offset])
       {
-        if (x < 4 || x > width-5 || y < 4 || y > height-5)
+        if (x < 4 || x > width - 5 || y < 4 || y > height - 5)
           setValueBackwardEdge(offset, offset1, offset2, width, height, x, y, dst_data);
         else
           setValue(offset, offset1, offset2, offset3, offset4, dst_data, 0);
@@ -315,6 +314,14 @@ void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image)
       offset4--;
     }
   }
+}
+
+void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image)
+{
+  if (dst_image->data_type == IM_FLOAT)
+    iDoDistanceTransform(src_image->width, src_image->height, (imbyte*)src_image->data[0], (float*)dst_image->data[0]);
+  else
+    iDoDistanceTransform(src_image->width, src_image->height, (imbyte*)src_image->data[0], (double*)dst_image->data[0]);
 }
 
 static void iFillValue(imbyte* img_data, int x, int y, int width, int value)
@@ -360,12 +367,13 @@ static void iFillValue(imbyte* img_data, int x, int y, int width, int value)
     iFillValue(img_data, x+1, y+1, width, value);
 }
 
-static inline int iCheckFalseMaximum(int r, int r2a, int r2b, int width, float *src_data) 
+template<class T>
+static inline int iCheckFalseMaximum(int r, int r2a, int r2b, int width, T *src_data)
 {
   /* we are ignoring valeys of 1 pixel. */
   /* this is not 100% fail proof */
-  float v;
-  float maxv = src_data[r];  // (x,y)
+  T v;
+  T maxv = src_data[r];  // (x,y)
   int r1a = r - width;
   int r1b = r + width;
 
@@ -422,11 +430,12 @@ static inline int iCheckFalseMaximum(int r, int r2a, int r2b, int width, float *
   return 0;
 }
 
-static inline void iCheckMaximum(int r, int r1a, int r1b, float *src_data, imbyte* dst_data) 
+template<class T>
+static inline void iCheckMaximum(int r, int r1a, int r1b, T *src_data, imbyte* dst_data)
 {
   int unique = 1;
-  float v;
-  float maxv = src_data[r];  // (x,y)
+  T v;
+  T maxv = src_data[r];  // (x,y)
 
   v = src_data[r1a];        // (x,y-1)
   if (v >= maxv) { maxv = v; unique = 0; }
@@ -463,31 +472,28 @@ static inline void iCheckMaximum(int r, int r1a, int r1b, float *src_data, imbyt
   }
 }
 
-void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image)
+template<class T>
+static void iDoRegionalMaximum(int width, int height, T* src_data, imbyte* dst_data)
 {
-  int width = src_image->width,
-     height = src_image->height;
-
-  float* src_data = (float*)src_image->data[0];
-  imbyte* dst_data = (imbyte*)dst_image->data[0];
+  int count = width*height;
 
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
-  for (int y = 1; y < height-1; y++) 
+  for (int y = 1; y < height - 1; y++)
   {
     int offset = y * width + 1;
     int offsetA = offset - width;
     int offsetB = offset + width;
 
-    for (int x = 1; x < width-1; x++) 
+    for (int x = 1; x < width - 1; x++)
     {
-      if (src_data[offset]) 
+      if (src_data[offset])
         iCheckMaximum(offset, offsetA, offsetB, src_data, dst_data);
 
       offset++;
-      offsetA++; 
-      offsetB++; 
+      offsetA++;
+      offsetB++;
     }
   }
 
@@ -495,13 +501,13 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image)
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINHEIGHT(height))
 #endif
-  for (int y = 2; y < height-2; y++) 
+  for (int y = 2; y < height - 2; y++)
   {
     int offset = y * width + 2;
-    int offsetA = offset - 2*width;
-    int offsetB = offset + 2*width;
+    int offsetA = offset - 2 * width;
+    int offsetB = offset + 2 * width;
 
-    for (int x = 2; x < width-2; x++) 
+    for (int x = 2; x < width - 2; x++)
     {
       if (dst_data[offset] == 2)
       {
@@ -510,18 +516,26 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image)
       }
 
       offset++;
-      offsetA++; 
-      offsetB++; 
+      offsetA++;
+      offsetB++;
     }
   }
 
   // update target with remaining maximum
 #ifdef _OPENMP
-#pragma omp parallel for if (IM_OMP_MINCOUNT(src_image->count))
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
-  for (int i = 0; i < src_image->count; i++) 
+  for (int i = 0; i < count; i++)
   {
     if (dst_data[i] == 2)
       dst_data[i] = 1;
   }
+}
+
+void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image)
+{
+  if (dst_image->data_type == IM_FLOAT)
+    iDoRegionalMaximum(src_image->width, src_image->height, (float*)src_image->data[0], (imbyte*)dst_image->data[0]);
+  else
+    iDoRegionalMaximum(src_image->width, src_image->height, (double*)src_image->data[0], (imbyte*)dst_image->data[0]);
 }

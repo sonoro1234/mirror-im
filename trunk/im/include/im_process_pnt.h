@@ -25,7 +25,7 @@ extern "C" {
  * In Lua, the params table is unpacked.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
-typedef int (*imUnaryPointOpFunc)(float src_value, float *dst_value, float* params, void* userdata, int x, int y, int d);
+typedef int (*imUnaryPointOpFunc)(double src_value, double *dst_value, double* params, void* userdata, int x, int y, int d);
 
 /** Apply an unary point operation using a custom function.
  * One pixel from the source affects the same pixel on target. \n
@@ -39,7 +39,7 @@ typedef int (*imUnaryPointOpFunc)(float src_value, float *dst_value, float* para
  * In Lua, the params table is passed to the function by using the Lua stack, 
  * so its table can contain any type of objects, but they all must be unnamed.
  * \ingroup point */
-int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name);
+int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryPointOpFunc func, double* params, void* userdata, const char* op_name);
 
 /** Custom unary point color function. \n
  * Data will be set only if the returned value is non zero.
@@ -48,7 +48,7 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
  * Also each color plane is passed as a separate value, instead of inside an array.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
-typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y);
+typedef int (*imUnaryPointColorOpFunc)(const double* src_value, double *dst_value, double* params, void* userdata, int x, int y);
 
 /** Apply an unary point color operation using a custom function.
  * One pixel from the source affects the same pixel on target. \n
@@ -62,7 +62,7 @@ typedef int (*imUnaryPointColorOpFunc)(const float* src_value, float *dst_value,
  * In Lua, the params table is passed to the function by using the Lua stack, 
  * so its table can contain any type of objects, but they all must be unnamed.
  * \ingroup point */
-int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name);
+int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, double* params, void* userdata, const char* op_name);
 
 /** Custom multiple point function. \n
  * Source values are copies, so they can be changed inside the function without affecting the original image. \n
@@ -71,7 +71,7 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
  * In Lua, the source images data and the params table are unpacked.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
-typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_image_count);
+typedef int(*imMultiPointOpFunc)(const double* src_value, double *dst_value, double* params, void* userdata, int x, int y, int d, int src_image_count);
 
 /** Apply an multiple point operation using a custom function.
  * One pixel from each source affects the same pixel on target. \n
@@ -86,7 +86,7 @@ typedef int(*imMultiPointOpFunc)(const float* src_value, float *dst_value, float
  * In Lua, the params table is passed to the function by using the Lua stack, 
  * so its table can contain any type of objects, but they all must be unnamed.
  * \ingroup point */
-int imProcessMultiPointOp(const imImage** src_image_list, int src_image_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name);
+int imProcessMultiPointOp(const imImage** src_image_list, int src_image_count, imImage* dst_image, imMultiPointOpFunc func, double* params, void* userdata, const char* op_name);
 
 /** Custom multiple point color function. \n
  * Source values are copies, so they can be changed inside the function without affecting the original image. \n
@@ -96,7 +96,7 @@ int imProcessMultiPointOp(const imImage** src_image_list, int src_image_count, i
  * Also each color plane is passed as a separate value, instead of inside an array.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
  * \ingroup point */
-typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float* params, void* userdata, int x, int y, int src_image_count, int src_depth, int dst_depth);
+typedef int(*imMultiPointColorOpFunc)(double* src_value, double* dst_value, double* params, void* userdata, int x, int y, int src_image_count, int src_depth, int dst_depth);
 
 /** Apply an multiple point color operation using a custom function.
  * One pixel from each source affects the same pixel on target. \n
@@ -111,7 +111,7 @@ typedef int(*imMultiPointColorOpFunc)(float* src_value, float* dst_value, float*
  * In Lua, the params table is passed to the function by using the Lua stack, 
  * so its table can contain any type of objects, but they all must be unnamed.
  * \ingroup point */
-int imProcessMultiPointColorOp(const imImage** src_image_list, int src_image_count, imImage* dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name);
+int imProcessMultiPointColorOp(const imImage** src_image_list, int src_image_count, imImage* dst_image, imMultiPointColorOpFunc func, double* params, void* userdata, const char* op_name);
 
 
 
@@ -201,7 +201,7 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
  * \verbatim im.ProcessArithmeticConstOp(src_image: imImage, src_const: number, dst_image: imImage, op: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessArithmeticConstOpNew(image: imImage, src_const: number, op: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup arithm */
-void imProcessArithmeticConstOp(const imImage* src_image, float src_const, imImage* dst_image, int op);
+void imProcessArithmeticConstOp(const imImage* src_image, double src_const, imImage* dst_image, int op);
 
 /** Blend two images using an alpha value = [a * alpha + b * (1 - alpha)]. \n
  * Can be done in-place, images must match. \n
@@ -210,7 +210,7 @@ void imProcessArithmeticConstOp(const imImage* src_image, float src_const, imIma
  * \verbatim im.ProcessBlendConst(src_image1: imImage, src_image2: imImage, dst_image: imImage, alpha: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessBlendConstNew(image1: imImage, image2: imImage, alpha: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup arithm */
-void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, float alpha);
+void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, double alpha);
 
 /** Blend two images using an alpha channel = [a * alpha + b * (1 - alpha)]. \n
  * Can be done in-place, images must match. \n
@@ -336,7 +336,7 @@ void imProcessQuantizeGrayUniform(const imImage* src_image, imImage* dst_image, 
  * \verbatim im.ProcessExpandHistogram(src_image: imImage, dst_image: imImage, percent: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessExpandHistogramNew(src_image: imImage, percent: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup histo */
-void imProcessExpandHistogram(const imImage* src_image, imImage* dst_image, float percent);
+void imProcessExpandHistogram(const imImage* src_image, imImage* dst_image, double percent);
 
 /** Performs an histogram equalization. \n
  * Images must be (IM_BYTE, IM_SHORT or IM_USHORT)/(IM_RGB or IM_GRAY). Can be done in-place. 
@@ -405,7 +405,7 @@ void imProcessMergeComponents(const imImage** src_image_list, imImage* dst_image
 
 /** Normalize the color components by their sum. Example: c1 = c1/(c1+c2+c3). \n
  * It will not change the alpha channel if any.
- * Target is IM_FLOAT, except if source is IM_DOUBLE.
+ * Target is IM_FLOAT or IM_DOUBLE.
  *
  * \verbatim im.ProcessNormalizeComponents(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessNormalizeComponentsNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -420,7 +420,7 @@ void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image);
  * \verbatim im.ProcessReplaceColor(src_image: imImage, dst_image: imImage, src_color: table of numbers, dst_color: table of numbers) [in Lua 5] \endverbatim
  * \verbatim im.ProcessReplaceColorNew(src_image: imImage, src_color: table of numbers, dst_color: table of numbers) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup colorproc */
-void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* src_color, float* dst_color);
+void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, double* src_color, double* dst_color);
 
 /** Sets the alpha channel in target where the given color occours in source,
  * elsewhere alpha remains untouched. \n
@@ -431,7 +431,7 @@ void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* 
  *
  * \verbatim im.ProcessSetAlphaColor(src_image: imImage, dst_image: imImage, src_color: table of numbers, dst_alpha: number) [in Lua 5] \endverbatim
  * \ingroup colorproc */
-void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, float* src_color, float dst_alpha);
+void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, double* src_color, double dst_alpha);
 
 
 /** \defgroup logic Logical Arithmetic Operations 
@@ -496,12 +496,12 @@ void imProcessBitPlane(const imImage* src_image, imImage* dst_image, int plane, 
 /** Render Funtion.
  * \verbatim func(x: number, y: number, d: number, params: table) -> value: number [in Lua 5] \endverbatim
  * \ingroup render */
-typedef float (*imRenderFunc)(int x, int y, int d, float* params);
+typedef double (*imRenderFunc)(int x, int y, int d, double* params);
 
 /** Render Conditional Funtion.
  * \verbatim func(x: number, y: number, d: number, params: table) -> value: number, cond: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-typedef float (*imRenderCondFunc)(int x, int y, int d, int *cond, float* params);
+typedef double (*imRenderCondFunc)(int x, int y, int d, int *cond, double* params);
 
 /** Render a synthetic image using a render function. \n
  * plus will make the render be added to the current image data, 
@@ -510,7 +510,7 @@ typedef float (*imRenderCondFunc)(int x, int y, int d, int *cond, float* params)
  *
  * \verbatim im.ProcessRenderOp(image: imImage, func: function, render_name: string, params: table, plus: boolean) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderOp(imImage* image, imRenderFunc func, const char* render_name, float* params, int plus);
+int imProcessRenderOp(imImage* image, imRenderFunc func, const char* render_name, double* params, int plus);
 
 /** Render a synthetic image using a conditional render function. \n
  * Data will be rendered only if the condional parameter is true. \n
@@ -518,28 +518,28 @@ int imProcessRenderOp(imImage* image, imRenderFunc func, const char* render_name
  *
  * \verbatim im.ProcessRenderCondOp(image: imImage, func: function, render_name: string, params: table) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderCondOp(imImage* image, imRenderCondFunc func, const char* render_name, float* params);
+int imProcessRenderCondOp(imImage* image, imRenderCondFunc func, const char* render_name, double* params);
 
 /** Render speckle noise on existing data. Can be done in-place.
  *
  * \verbatim im.ProcessRenderAddSpeckleNoise(src_image: imImage, dst_image: imImage, percent: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRenderAddSpeckleNoiseNew(src_image: imImage, percent: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderAddSpeckleNoise(const imImage* src_image, imImage* dst_image, float percent);
+int imProcessRenderAddSpeckleNoise(const imImage* src_image, imImage* dst_image, double percent);
 
 /** Render gaussian noise on existing data. Can be done in-place.
  *
  * \verbatim im.ProcessRenderAddGaussianNoise(src_image: imImage, dst_image: imImage, mean: number, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRenderAddGaussianNoiseNew(src_image: imImage, mean: number, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderAddGaussianNoise(const imImage* src_image, imImage* dst_image, float mean, float stddev);
+int imProcessRenderAddGaussianNoise(const imImage* src_image, imImage* dst_image, double mean, double stddev);
 
 /** Render uniform noise on existing data. Can be done in-place.
  *
  * \verbatim im.ProcessRenderAddUniformNoise(src_image: imImage, dst_image: imImage, mean: number, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \verbatim im.ProcessRenderAddUniformNoiseNew(src_image: imImage, mean: number, stddev: number) -> counter: boolean, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderAddUniformNoise(const imImage* src_image, imImage* dst_image, float mean, float stddev);
+int imProcessRenderAddUniformNoise(const imImage* src_image, imImage* dst_image, double mean, double stddev);
 
 /** Render random noise.
  *
@@ -551,7 +551,7 @@ int imProcessRenderRandomNoise(imImage* image);
  *
  * \verbatim im.ProcessRenderConstant(image: imImage, value: table of number) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderConstant(imImage* image, float* value);
+int imProcessRenderConstant(imImage* image, double* value);
 
 /** Render a centered wheel.
  *
@@ -587,25 +587,25 @@ int imProcessRenderBox(imImage* image, int box_width, int box_height);
  *
  * \verbatim im.ProcessRenderSinc(image: imImage, x_period: number, y_period: number) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderSinc(imImage* image, float x_period, float y_period);
+int imProcessRenderSinc(imImage* image, double x_period, double y_period);
 
 /** Render a centered gaussian.
  *
  * \verbatim im.ProcessRenderGaussian(image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderGaussian(imImage* image, float stddev);
+int imProcessRenderGaussian(imImage* image, double stddev);
 
 /** Render the laplacian of a centered gaussian.
  *
  * \verbatim im.ProcessRenderLapOfGaussian(image: imImage, stddev: number) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderLapOfGaussian(imImage* image, float stddev);
+int imProcessRenderLapOfGaussian(imImage* image, double stddev);
 
 /** Render a centered cosine.
  *
  * \verbatim im.ProcessRenderCosine(image: imImage, x_period: number, y_period: number) -> counter: boolean [in Lua 5] \endverbatim
  * \ingroup render */
-int imProcessRenderCosine(imImage* image, float x_period, float y_period);
+int imProcessRenderCosine(imImage* image, double x_period, double y_period);
 
 /** Render a centered grid.
  *
@@ -624,7 +624,7 @@ int imProcessRenderChessboard(imImage* image, int x_space, int y_space);
  *
  * \verbatim im.ProcessRenderFloodFill(image: imImage, start_x, start_y: number, replace_color: table of 3 numbers, tolerance: number)  [in Lua 5] \endverbatim
  * \ingroup render */
-void imProcessRenderFloodFill(imImage* image, int start_x, int start_y, float* replace_color, float tolerance);
+void imProcessRenderFloodFill(imImage* image, int start_x, int start_y, double* replace_color, double tolerance);
 
 
 
@@ -681,7 +681,7 @@ enum imToneGamutFlags {
  * \verbatim im.ProcessToneGamutNew(src_image: imImage, op: number, params: table of number) -> new_image: imImage [in Lua 5] \endverbatim
  * See also \ref imageenhance.
  * \ingroup tonegamut */
-void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, float* params);
+void imProcessToneGamut(const imImage* src_image, imImage* dst_image, int op, double* params);
 
 /** Converts from (0-1) to (0-255), crop out of bounds values. \n
  * Source image must be real, and target image must be IM_BYTE.
@@ -714,7 +714,7 @@ void imProcessNegative(const imImage* src_image, imImage* dst_image);
  *
  * \verbatim im.ProcessCalcAutoGamma(image: imImage) -> gamma: number [in Lua 5] \endverbatim
  * \ingroup tonegamut */
-float imProcessCalcAutoGamma(const imImage* image);
+double imProcessCalcAutoGamma(const imImage* image);
 
 /** Apply a shift using HSI coordinates. \n
  * Supports all data types except complex. \n
@@ -723,7 +723,7 @@ float imProcessCalcAutoGamma(const imImage* image);
  * \verbatim im.ProcessShiftHSI(src_image: imImage, dst_image: imImage, h_shift, s_shift, i_shift: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessShiftHSI(src_image: imImage, h_shift, s_shift, i_shift: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup tonegamut */
-void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shift, float s_shift, float i_shift);
+void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, double h_shift, double s_shift, double i_shift);
 
 
 /** \defgroup threshold Threshold Operations
@@ -742,7 +742,7 @@ void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, float h_shi
  * \verbatim im.ProcessThreshold(src_image: imImage, dst_image: imImage, level: number, value: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessThresholdNew(src_image: imImage, level: number, value: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup threshold */
-void imProcessThreshold(const imImage* src_image, imImage* dst_image, float level, int value);
+void imProcessThreshold(const imImage* src_image, imImage* dst_image, double level, int value);
 
 /** Apply a threshold by the difference of two images. \n
  * threshold = a1 <= a2 ? 0: 1   \n
@@ -794,15 +794,15 @@ void imProcessHysteresisThresEstimate(const imImage* image, int *low_level, int 
  * \ingroup threshold */
 int imProcessUniformErrThreshold(const imImage* src_image, imImage* dst_image);
 
-/** Apply a dithering on each image channel by using a difusion error method. \n
+/** Apply a dithering on each image channel by using a diffusion error method. \n
  * It can be applied on any IM_BYTE images. It will "threshold" each channel indivudually, so
  * source and target must be of the same depth.
  * Not using OpenMP when enabled.
  *
- * \verbatim im.ProcessDifusionErrThreshold(src_image: imImage, dst_image: imImage, level: number) [in Lua 5] \endverbatim
- * \verbatim im.ProcessDifusionErrThresholdNew(src_image: imImage, level: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessDiffusionErrThreshold(src_image: imImage, dst_image: imImage, level: number) [in Lua 5] \endverbatim
+ * \verbatim im.ProcessDiffusionErrThresholdNew(src_image: imImage, level: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup threshold */
-void imProcessDifusionErrThreshold(const imImage* src_image, imImage* dst_image, int level);
+void imProcessDiffusionErrThreshold(const imImage* src_image, imImage* dst_image, int level);
 
 /** Calculates the threshold level for manual threshold using a percentage of pixels
  * that should stay bellow the threshold. \n
@@ -813,7 +813,7 @@ void imProcessDifusionErrThreshold(const imImage* src_image, imImage* dst_image,
  * \verbatim im.ProcessPercentThreshold(src_image: imImage, dst_image: imImage, percent: number) -> level: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessPercentThresholdNew(src_image: imImage, percent: number) -> level: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup threshold */
-int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, float percent);
+int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, double percent);
 
 /** Calculates the threshold level for manual threshold using the Otsu approach. \n
  * Image can be IM_BYTE, IM_SHORT or IM_USHORT. \n
@@ -834,7 +834,7 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image);
  * \verbatim im.ProcessMinMaxThreshold(src_image: imImage, dst_image: imImage) -> level: number [in Lua 5] \endverbatim
  * \verbatim im.ProcessMinMaxThresholdNew(src_image: imImage) -> level: number, new_image: imImage [in Lua 5] \endverbatim
  * \ingroup threshold */
-float imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image);
+double imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image);
 
 /** Estimates Local Max threshold level for images.
  * Image can be IM_BYTE, IM_SHORT or IM_USHORT. \n
@@ -852,7 +852,7 @@ void imProcessLocalMaxThresEstimate(const imImage* image, int *level);
  * \verbatim im.ProcessSliceThreshold(src_image: imImage, dst_image: imImage, start_level: number, end_level: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessSliceThresholdNew(src_image: imImage, start_level: number, end_level: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup threshold */
-void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, float start_level, float end_level);
+void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, double start_level, double end_level);
 
 
 /** \defgroup effects Special Effects
@@ -958,19 +958,19 @@ int imProcessConvertToBitmap(const imImage* src_image, imImage* dst_image, int c
  *
  * \verbatim image:Gamma(gamma) [in Lua 5] \endverbatim
  * \ingroup imageenhance */
-#define imImageGamma(_image, _gamma) { float params[1]; params[0] = _gamma; imProcessToneGamut(_image, _image, IM_GAMUT_POW, params); }
+#define imImageGamma(_image, _gamma) { double params[1]; params[0] = _gamma; imProcessToneGamut(_image, _image, IM_GAMUT_POW, params); }
 
 /** Same as \ref imProcessToneGamut using \ref IM_GAMUT_BRIGHTCONT.
  *
  * \verbatim image:BrightnessContrast(bright_shift, contrast_factor: number)   [in Lua 5] \endverbatim
  * \ingroup imageenhance */
-#define imImageBrightnessContrast(_image, _bright_shift, _contrast_factor) { float _params[2]; _params[0] = bright_shift; _params[1] = contrast_factor; imProcessToneGamut(_image, _image, IM_GAMUT_BRIGHTCONT, _params); }
+#define imImageBrightnessContrast(_image, _bright_shift, _contrast_factor) { double _params[2]; _params[0] = bright_shift; _params[1] = contrast_factor; imProcessToneGamut(_image, _image, IM_GAMUT_BRIGHTCONT, _params); }
 
 /** Same as \ref imProcessToneGamut using \ref IM_GAMUT_EXPAND.
  *
  * \verbatim image:Level(start, end)  [in Lua 5] \endverbatim
  * \ingroup imageenhance */
-#define imImageLevel(_image, _start, _end) { float _params[2]; _params[0] = _start; _params[1] = _end; imProcessToneGamut(_image, _image, IM_GAMUT_EXPAND, _params); }
+#define imImageLevel(_image, _start, _end) { double _params[2]; _params[0] = _start; _params[1] = _end; imProcessToneGamut(_image, _image, IM_GAMUT_EXPAND, _params); }
 
 /** Same as \ref imProcessEqualizeHistogram.
  *

@@ -123,7 +123,7 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
  * FFTW 2.x can have float or double functions, not both. \n
  * FFTW 3.x can have both, but we use only one to keep the
  * code compatible with version 2. \n
- * So by default the pre-compiled binaries are built with "float" support only.
+ * So by default the pre-compiled binaries are built with "double" support only.
  * \par
  * See \ref im_process_glo.h
  * \ingroup process */
@@ -131,7 +131,7 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
 /** Forward FFT. \n
  * The result has its lowest frequency at the center of the image. \n
  * This is an unnormalized fft. \n
- * Images must be of the same size. Target image must be of type float complex.
+ * Images must be of the same size. Target image must be of type complex.
  *
  * \verbatim im.ProcessFFT(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessFFTNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -141,7 +141,7 @@ void imProcessFFT(const imImage* src_image, imImage* dst_image);
 /** Inverse FFT. \n
  * The image has its lowest frequency restored to the origin before the transform. \n
  * The result is normalized by (width*height). \n
- * Images must be of the same size and both must be of type float complex.
+ * Images must be of the same size and both must be of type complex.
  *
  * \verbatim im.ProcessIFFT(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessIFFTNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -153,7 +153,7 @@ void imProcessIFFT(const imImage* src_image, imImage* dst_image);
  * can be restored to the origin before inverse. \n
  * The result can be normalized after the transform by sqrt(w*h) [1] or by (w*h) [2], 
  * or left unnormalized [0]. \n
- * Images must be of the same size and both must be of type float complex.
+ * Images must be of the same size and both must be of type complex.
  *
  * \verbatim im.ProcessFFTraw(image: imImage, inverse: number, center: number, normalize: number) [in Lua 5] \endverbatim
  * \ingroup fourier */
@@ -165,7 +165,7 @@ void imProcessFFTraw(imImage* image, int inverse, int center, int normalize);
  * you must specify if its from center to origin (usually used before inverse) or
  * from origin to center (usually used after forward). \n
  * Notice that this function is used for images in the the frequency domain. \n
- * Image type must be float complex.
+ * Image type must be complex.
  *
  * \verbatim im.ProcessSwapQuadrants(image: imImage, center2origin: number) [in Lua 5] \endverbatim
  * \ingroup fourier */
