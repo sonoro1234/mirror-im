@@ -534,7 +534,7 @@ static void iDoRegionalMaximum(int width, int height, T* src_data, imbyte* dst_d
 
 void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image)
 {
-  if (dst_image->data_type == IM_FLOAT)
+  if (src_image->data_type == IM_FLOAT)
     iDoRegionalMaximum(src_image->width, src_image->height, (float*)src_image->data[0], (imbyte*)dst_image->data[0]);
   else
     iDoRegionalMaximum(src_image->width, src_image->height, (double*)src_image->data[0], (imbyte*)dst_image->data[0]);
