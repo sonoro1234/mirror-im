@@ -19,7 +19,7 @@
 
 
 template <class T1, class T2> 
-static int DoUnaryPointOp(T1 *src_map, T2 *dst_map, int width, int height, int depth, imUnaryPointOpFunc func, float* params, void* userdata, int counter)
+static int DoUnaryPointOp(T1 *src_map, T2 *dst_map, int width, int height, int depth, imUnaryPointOpFunc func, double* params, void* userdata, int counter)
 {
   int count = width * height;
   int size = count * depth;
@@ -35,12 +35,12 @@ static int DoUnaryPointOp(T1 *src_map, T2 *dst_map, int width, int height, int d
 #endif
     IM_BEGIN_PROCESSING; 
     
-    float dst_value;
+    double dst_value;
     int d = i%count;
     int y = (i - d*count)%width;
     int x = i - d*count - y*width;
 
-    if (func((float)src_map[i], &dst_value, params, userdata, x, y, d)) 
+    if (func((double)src_map[i], &dst_value, params, userdata, x, y, d))
       dst_map[i] = (T2)dst_value;
 
     if (x == width-1)
@@ -56,7 +56,7 @@ static int DoUnaryPointOp(T1 *src_map, T2 *dst_map, int width, int height, int d
   return processing;
 }
 
-int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name)
+int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryPointOpFunc func, double* params, void* userdata, const char* op_name)
 {
   int ret = 0;
   int depth = src_image->has_alpha? src_image->depth+1: src_image->depth;
@@ -158,7 +158,7 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
 }
 
 template <class T1, class T2> 
-static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height, int src_depth, int dst_depth, imUnaryPointColorOpFunc func, float* params, void* userdata, int counter)
+static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height, int src_depth, int dst_depth, imUnaryPointColorOpFunc func, double* params, void* userdata, int counter)
 {
   int count = width * height;
   IM_INT_PROCESSING;
@@ -177,11 +177,11 @@ static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height
     int x = i - y*width;
 
     int d;
-    float src_value[IM_MAXDEPTH];
-    float dst_value[IM_MAXDEPTH];
+    double src_value[IM_MAXDEPTH];
+    double dst_value[IM_MAXDEPTH];
 
     for(d = 0; d < src_depth; d++)
-      src_value[d] = (float)(src_map[d])[i];
+      src_value[d] = (double)(src_map[d])[i];
 
     if (func(src_value, dst_value, params, userdata, x, y))
     {
@@ -202,7 +202,7 @@ static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height
   return processing;
 }
 
-int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imUnaryPointColorOpFunc func, double* params, void* userdata, const char* op_name)
 {
   int ret = 0;
   int src_depth = src_image->has_alpha && dst_image->has_alpha? src_image->depth+1: src_image->depth;
@@ -305,12 +305,12 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
 }
 
 template <class T1, class T2> 
-static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int depth, int src_count, imMultiPointOpFunc func, float* params, void* userdata, int counter)
+static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int depth, int src_count, imMultiPointOpFunc func, double* params, void* userdata, int counter)
 {
   int count = width * height;
   int size = count * depth;
   int tcount = IM_MAX_THREADS;
-  float* src_value = new float [src_count*tcount];
+  double* src_value = new double[src_count*tcount];
   IM_INT_PROCESSING;
 
 #ifdef _OPENMP
@@ -323,14 +323,14 @@ static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int 
 #endif
     IM_BEGIN_PROCESSING; 
     
-    float dst_value;
+    double dst_value;
     int d = i%count;
     int y = (i - d*count)%width;
     int x = i - d*count - y*width;
     int toffset = IM_THREAD_NUM*src_count;
 
     for(int j = 0; j < src_count; j++)
-      src_value[toffset + j] = (float)(src_map[j])[i];
+      src_value[toffset + j] = (double)(src_map[j])[i];
 
     if (func(src_value + toffset, &dst_value, params, userdata, x, y, d, src_count))
       dst_map[i] = (T2)dst_value;
@@ -349,7 +349,7 @@ static int DoMultiPointOp(T1 **src_map, T2 *dst_map, int width, int height, int 
   return processing;
 }
 
-int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name)
+int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointOpFunc func, double* params, void* userdata, const char* op_name)
 {
   int ret = 0;
   int depth = src_image[0]->has_alpha && dst_image->has_alpha? src_image[0]->depth + 1 : src_image[0]->depth;
@@ -457,11 +457,11 @@ int imProcessMultiPointOp(const imImage** src_image, int src_count, imImage* dst
 }
 
 template <class T1, class T2> 
-static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int height, int src_depth, int dst_depth, int src_count, imMultiPointColorOpFunc func, float* params, void* userdata, int counter)
+static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int height, int src_depth, int dst_depth, int src_count, imMultiPointColorOpFunc func, double* params, void* userdata, int counter)
 {
   int count = width * height;
   int tcount = IM_MAX_THREADS;
-  float* src_value = new float [src_count*src_depth*tcount];
+  double* src_value = new double[src_count*src_depth*tcount];
   IM_INT_PROCESSING;
 
 #ifdef _OPENMP
@@ -474,7 +474,7 @@ static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int heigh
 #endif
     IM_BEGIN_PROCESSING; 
     
-    float dst_value[IM_MAXDEPTH];
+    double dst_value[IM_MAXDEPTH];
     int y = i%width;
     int x = i - y*width;
     int toffset = IM_THREAD_NUM*(src_count*src_depth);
@@ -482,7 +482,7 @@ static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int heigh
     for(int j = 0; j < src_count; j++)
     {
       for(int d = 0; d < src_depth; d++)
-        src_value[toffset + j*src_depth + d] = (float)((src_map[j])[d])[i];
+        src_value[toffset + j*src_depth + d] = (double)((src_map[j])[d])[i];
     }
 
     if (func(src_value + toffset, dst_value, params, userdata, x, y, src_count, src_depth, dst_depth))
@@ -505,7 +505,7 @@ static int DoMultiPointColorOp(T1 ***src_map, T2 **dst_map, int width, int heigh
   return processing;
 }
 
-int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name)
+int imProcessMultiPointColorOp(const imImage** src_image, int src_count, imImage* dst_image, imMultiPointColorOpFunc func, double* params, void* userdata, const char* op_name)
 {
   int ret = 0;
   int src_depth = src_image[0]->has_alpha && dst_image->has_alpha ? src_image[0]->depth + 1 : src_image[0]->depth;

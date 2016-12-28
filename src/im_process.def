@@ -80,7 +80,7 @@ EXPORTS
   imProcessBlend
   imProcessCompose
   imProcessCalcRotateSize
-  imProcessDifusionErrThreshold
+  imProcessDiffusionErrThreshold
   imProcessDirectConv
   imProcessEqualizeHistogram
   imProcessExpandHistogram

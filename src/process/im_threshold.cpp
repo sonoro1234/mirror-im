@@ -34,7 +34,7 @@ static void doThresholdSlice(T *src_map, imbyte *dst_map, int count, T start_lev
   }
 }
 
-void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, float start_level, float end_level)
+void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, double start_level, double end_level)
 {
   switch(src_image->data_type)
   {
@@ -120,7 +120,7 @@ static void doThreshold(T *src_map, imbyte *dst_map, int count, T level, int val
   }
 }
 
-void imProcessThreshold(const imImage* src_image, imImage* dst_image, float level, int value)
+void imProcessThreshold(const imImage* src_image, imImage* dst_image, double level, int value)
 {
   switch(src_image->data_type)
   {
@@ -256,13 +256,13 @@ static int thresUniErr(unsigned char* band, int width, int height)
 int imProcessUniformErrThreshold(const imImage* src_image, imImage* dst_image)
 {
   int level = thresUniErr((imbyte*)src_image->data[0], src_image->width, src_image->height);
-  imProcessThreshold(src_image, dst_image, (float)level, 1);
+  imProcessThreshold(src_image, dst_image, (double)level, 1);
   return level;
 }
 
 static void do_dither_error(imbyte* data1, imbyte* data2, int size, int t, int value)
 {
-  float scale = (float)(t/(255.0-t));
+  double scale = (double)t / (255.0 - t);
 
   int error = 0; /* always in [-127,127] */ 
 
@@ -281,7 +281,7 @@ static void do_dither_error(imbyte* data1, imbyte* data2, int size, int t, int v
   }
 }
 
-void imProcessDifusionErrThreshold(const imImage* src_image, imImage* dst_image, int level)
+void imProcessDiffusionErrThreshold(const imImage* src_image, imImage* dst_image, int level)
 {
   int value = src_image->depth > 1? 255: 1;
   for (int i = 0; i < src_image->depth; i++)
@@ -290,7 +290,7 @@ void imProcessDifusionErrThreshold(const imImage* src_image, imImage* dst_image,
   }
 }
 
-int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, float percent)
+int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, double percent)
 {
   int hcount;
   unsigned long* histo = imHistogramNew(src_image->data_type, &hcount);
@@ -313,7 +313,7 @@ int imProcessPercentThreshold(const imImage* src_image, imImage* dst_image, floa
   int level = (i==0? 0: i==hcount? hcount-1: i-1);
   level += imHistogramShift(src_image->data_type);
 
-  imProcessThreshold(src_image, dst_image, (float)level, 1);
+  imProcessThreshold(src_image, dst_image, (double)level, 1);
 
   imHistogramRelease(histo);
   return level;
@@ -372,7 +372,7 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image)
   int level = MaximizeDiscriminantFunction(p, hcount);
   level += imHistogramShift(src_image->data_type);
 
-  imProcessThreshold(src_image, dst_image, (float)level, 1);
+  imProcessThreshold(src_image, dst_image, (double)level, 1);
 
   imHistogramRelease(histo);
   delete [] p;
@@ -380,7 +380,7 @@ int imProcessOtsuThreshold(const imImage* src_image, imImage* dst_image)
   return level;
 }
 
-float imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image)
+double imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image)
 {
   imStats stats;
   if (!imCalcImageStatistics(src_image, &stats))
@@ -388,7 +388,7 @@ float imProcessMinMaxThreshold(const imImage* src_image, imImage* dst_image)
     // imProcessCounterEnd(counter);
     // return 0;
   }
-  float level = (stats.max - stats.min)/2.0f;
+  double level = (stats.max - stats.min) / 2.0;
   imProcessThreshold(src_image, dst_image, level, 1);
   return level;
 }

@@ -296,19 +296,19 @@ void imProcessArithmeticOp(const imImage* src_image1, const imImage* src_image2,
 }
 
 template <class T>
-static inline imComplex<T> blend_op(const imComplex<T>& v1, const imComplex<T>& v2, const float& alpha)
+static inline imComplex<T> blend_op(const imComplex<T>& v1, const imComplex<T>& v2, const double& alpha)
 {
   return v1*T(alpha) + v2*T(1.0f - alpha);
 }
 
 template <class T>
-static inline T blend_op(const T& v1, const T& v2, const float& alpha)
+static inline T blend_op(const T& v1, const T& v2, const double& alpha)
 {
   return (T)(v1*alpha + v2*(1.0f - alpha));
 }
 
 template <class T> 
-static void DoBlendConst(T *map1, T *map2, T *map, int count, float alpha)
+static void DoBlendConst(T *map1, T *map2, T *map, int count, double alpha)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
@@ -317,7 +317,7 @@ static void DoBlendConst(T *map1, T *map2, T *map, int count, float alpha)
     map[i] = blend_op(map1[i], map2[i], alpha);
 }
 
-void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, float alpha)
+void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, imImage* dst_image, double alpha)
 {
   int count = src_image1->count*src_image1->depth;
 
@@ -351,19 +351,19 @@ void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, i
 }
 
 template <class T, class TA> 
-static void DoBlend(T *map1, T *map2, TA *alpha, T *map, int count, float type_max)
+static void DoBlend(T *map1, T *map2, TA *alpha, T *map, int count, double type_max)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
-    map[i] = blend_op(map1[i], map2[i], ((float)alpha[i])/type_max);
+    map[i] = blend_op(map1[i], map2[i], ((double)alpha[i]) / type_max);
 }
 
 void imProcessBlend(const imImage* src_image1, const imImage* src_image2, const imImage* alpha, imImage* dst_image)
 {
   int count = src_image1->count*src_image1->depth;
-  float type_max = (float)imColorMax(src_image1->data_type);
+  double type_max = (double)imColorMax(src_image1->data_type);
 
   switch(src_image1->data_type)
   {
@@ -753,7 +753,7 @@ static void DoBinaryConstOpByte(T1 *map1, int value, imbyte *map, int count, int
   }
 }
 
-void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage* dst_image, int op)
+void imProcessArithmeticConstOp(const imImage* src_image1, double value, imImage* dst_image, int op)
 {
   int count = src_image1->count*src_image1->depth;  /* do NOT include alpha here */
 
@@ -817,7 +817,7 @@ void imProcessArithmeticConstOp(const imImage* src_image1, float value, imImage*
     break;
   case IM_FLOAT:
     if (dst_image->data_type == IM_DOUBLE)
-      DoBinaryConstOp((float*)src_image1->data[0], (float)value, (double*)dst_image->data[0], count, op);
+      DoBinaryConstOp((float*)src_image1->data[0], (double)value, (double*)dst_image->data[0], count, op);
     else
       DoBinaryConstOp((float*)src_image1->data[0], (float)value, (float*)dst_image->data[0], count, op);
     break;
@@ -864,7 +864,7 @@ void imProcessMultipleMean(const imImage** src_image_list, int src_image_count, 
       imProcessArithmeticOp(image, acum_image, acum_image, IM_BIN_ADD);  /* acum_image += image */
   }
 
-  imProcessArithmeticConstOp(acum_image, float(src_image_count), dst_image, IM_BIN_DIV);
+  imProcessArithmeticConstOp(acum_image, double(src_image_count), dst_image, IM_BIN_DIV);
 
   imImageDestroy(acum_image);
   if (aux_image)
@@ -893,7 +893,7 @@ void imProcessMultipleStdDev(const imImage** src_image_list, int src_image_count
   }
 
   // dst_image = dst_image / src_image_count;
-  imProcessArithmeticConstOp(dst_image, float(src_image_count), dst_image, IM_BIN_DIV);
+  imProcessArithmeticConstOp(dst_image, double(src_image_count), dst_image, IM_BIN_DIV);
 
   // dst_image = sqrt(dst_image);
   imProcessUnArithmeticOp(dst_image, dst_image, IM_UN_SQRT);
@@ -903,8 +903,8 @@ void imProcessMultipleStdDev(const imImage** src_image_list, int src_image_count
 
 static int compare_imFloat(const void *elem1, const void *elem2)
 {
-  float* v1 = (float*)elem1;
-  float* v2 = (float*)elem2;
+  double* v1 = (double*)elem1;
+  double* v2 = (double*)elem2;
 
   if (*v1 < *v2)
     return -1;
@@ -915,7 +915,7 @@ static int compare_imFloat(const void *elem1, const void *elem2)
   return 0;
 }
 
-static int imMultiMedianFunc(const float* src_value, float *dst_value, float* params, void* userdata, int x, int y, int d, int src_count)
+static int imMultiMedianFunc(const double* src_value, double *dst_value, double* params, void* userdata, int x, int y, int d, int src_count)
 {
   (void)params;
   (void)userdata;
@@ -923,7 +923,7 @@ static int imMultiMedianFunc(const float* src_value, float *dst_value, float* pa
   (void)y;
   (void)d;
 
-  qsort((float*)src_value, src_count, sizeof(float), compare_imFloat);
+  qsort((double*)src_value, src_count, sizeof(double), compare_imFloat);
   *dst_value = src_value[src_count / 2];
 
   return 1;
@@ -935,7 +935,7 @@ int imProcessMultipleMedian(const imImage** src_image_list, int src_image_count,
 }
 
 template <class DT>
-static float AutoCovCalc(int width, int height, DT *src_map, DT *mean_map, int x, int y, int count)
+static double AutoCovCalc(int width, int height, DT *src_map, DT *mean_map, int x, int y, int count)
 {
   double value = 0;
   int Ny = height - y;
@@ -956,7 +956,7 @@ static float AutoCovCalc(int width, int height, DT *src_map, DT *mean_map, int x
     }
   }
 
-  return (float)(value/(double)count);
+  return value/(double)count;
 }
 
 template <class ST, class DT> 
@@ -978,7 +978,7 @@ static int doAutoCov(int width, int height, ST *src_map, ST *mean_map, DT *dst_m
     int line_offset = y*width;
     for (int x = 0; x < width; x++)
     {
-      dst_map[line_offset + x] = AutoCovCalc(width, height, src_map, mean_map, x, y, count);
+      dst_map[line_offset + x] = (DT)AutoCovCalc(width, height, src_map, mean_map, x, y, count);
     }
 
     IM_COUNT_PROCESSING;
@@ -1003,16 +1003,28 @@ int imProcessAutoCovariance(const imImage* src_image, const imImage* mean_image,
     switch(src_image->data_type)
     {
     case IM_BYTE:
-      ret = doAutoCov(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      if (dst_image->data_type == IM_FLOAT)
+        ret = doAutoCov(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      else
+        ret = doAutoCov(src_image->width, src_image->height, (imbyte*)src_image->data[i], (imbyte*)mean_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_SHORT:
-      ret = doAutoCov(src_image->width, src_image->height, (short*)src_image->data[i], (short*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      if (dst_image->data_type == IM_FLOAT)
+        ret = doAutoCov(src_image->width, src_image->height, (short*)src_image->data[i], (short*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      else
+        ret = doAutoCov(src_image->width, src_image->height, (short*)src_image->data[i], (short*)mean_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_USHORT:
-      ret = doAutoCov(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      if (dst_image->data_type == IM_FLOAT)
+        ret = doAutoCov(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      else
+        ret = doAutoCov(src_image->width, src_image->height, (imushort*)src_image->data[i], (imushort*)mean_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_INT:
-      ret = doAutoCov(src_image->width, src_image->height, (int*)src_image->data[i], (int*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      if (dst_image->data_type == IM_FLOAT)
+        ret = doAutoCov(src_image->width, src_image->height, (int*)src_image->data[i], (int*)mean_image->data[i], (float*)dst_image->data[i], counter);
+      else
+        ret = doAutoCov(src_image->width, src_image->height, (int*)src_image->data[i], (int*)mean_image->data[i], (double*)dst_image->data[i], counter);
       break;
     case IM_FLOAT:
       ret = doAutoCov(src_image->width, src_image->height, (float*)src_image->data[i], (float*)mean_image->data[i], (float*)dst_image->data[i], counter);

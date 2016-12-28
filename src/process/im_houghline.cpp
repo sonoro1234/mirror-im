@@ -269,7 +269,7 @@ static listnode* findMaxima(const imImage* hough_points, int *line_count, const 
 static void drawLine(imImage* image, int theta, int rho)
 {
   int xsize, ysize, xstart, xstop, ystart, ystop, xhalf, yhalf;
-  float a, b;
+  double a, b;
   imbyte *map = (imbyte*)image->data[0];  // gray or red plane
 
   xsize = image->width;
@@ -297,8 +297,8 @@ static void drawLine(imImage* image, int theta, int rho)
     return;
   }
 
-  a = (float)(-costab[theta]/sintab[theta]);
-  b = (float)((rho + xhalf*costab[theta] + yhalf*sintab[theta])/sintab[theta]);
+  a = -costab[theta]/sintab[theta];
+  b = (rho + xhalf*costab[theta] + yhalf*sintab[theta])/sintab[theta];
 
   {
     int x[2];

@@ -87,7 +87,8 @@ static void DoSplitHSIReal(T** data, T* hue, T* saturation, T* intensity, int co
   }
 }
 
-static void DoSplitHSIByte(imbyte** data, float* hue, float* saturation, float* intensity, int count)
+template <class T>
+static void DoSplitHSIByte(imbyte** data, T* hue, T* saturation, T* intensity, int count)
 {
   imbyte *red=data[0],
        *green=data[1],
@@ -101,9 +102,9 @@ static void DoSplitHSIByte(imbyte** data, float* hue, float* saturation, float* 
   {
     imColorRGB2HSIbyte(red[ii], green[ii], blue[ii], &h, &s, &i);
 
-    hue[ii] = (float)h;
-    saturation[ii] = (float)s;
-    intensity[ii] = (float)i;
+    hue[ii] = (T)h;
+    saturation[ii] = (T)s;
+    intensity[ii] = (T)i;
   }
 }
 
@@ -112,8 +113,11 @@ void imProcessSplitHSI(const imImage* src_image, imImage* dst_image1, imImage* d
   switch(src_image->data_type)
   {
   case IM_BYTE:
-    DoSplitHSIByte((imbyte**)src_image->data, (float*)dst_image1->data[0], (float*)dst_image2->data[0], (float*)dst_image3->data[0], src_image->count);
-    break;                                                                                                                                    
+    if (dst_image1->data_type == IM_FLOAT)
+      DoSplitHSIByte((imbyte**)src_image->data, (float*)dst_image1->data[0], (float*)dst_image2->data[0], (float*)dst_image3->data[0], src_image->count);
+    else
+      DoSplitHSIByte((imbyte**)src_image->data, (double*)dst_image1->data[0], (double*)dst_image2->data[0], (double*)dst_image3->data[0], src_image->count);
+    break;
   case IM_FLOAT:                                                                                                                               
     DoSplitHSIReal((float**)src_image->data, (float*)dst_image1->data[0], (float*)dst_image2->data[0], (float*)dst_image3->data[0], src_image->count);
     break;                                                                                
@@ -146,7 +150,8 @@ static void DoMergeHSIReal(T** data, T* hue, T* saturation, T* intensity, int co
   }
 }
 
-static void DoMergeHSIByte(imbyte** data, float* hue, float* saturation, float* intensity, int count)
+template <class T>
+static void DoMergeHSIByte(imbyte** data, T* hue, T* saturation, T* intensity, int count)
 {
   imbyte *red=data[0],
        *green=data[1],
@@ -166,7 +171,10 @@ void imProcessMergeHSI(const imImage* src_image1, const imImage* src_image2, con
   switch(dst_image->data_type)
   {
   case IM_BYTE:
-    DoMergeHSIByte((imbyte**)dst_image->data, (float*)src_image1->data[0], (float*)src_image2->data[0], (float*)src_image3->data[0], dst_image->count);
+    if (src_image1->data_type == IM_FLOAT)
+      DoMergeHSIByte((imbyte**)dst_image->data, (float*)src_image1->data[0], (float*)src_image2->data[0], (float*)src_image3->data[0], dst_image->count);
+    else
+      DoMergeHSIByte((imbyte**)dst_image->data, (double*)src_image1->data[0], (double*)src_image2->data[0], (double*)src_image3->data[0], dst_image->count);
     break;                                                                                                                                    
   case IM_FLOAT:                                                                                                                               
     DoMergeHSIReal((float**)dst_image->data, (float*)src_image1->data[0], (float*)src_image2->data[0], (float*)src_image3->data[0], dst_image->count);
@@ -224,28 +232,46 @@ void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image)
   switch(src_image->data_type)
   {
   case IM_BYTE:
-    DoNormalizeComp((imbyte**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
-    break;                                                                                                                                    
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormalizeComp((imbyte**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
+    else
+      DoNormalizeComp((imbyte**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    break;
   case IM_SHORT:                                                                                                                               
-    DoNormalizeComp((short**)src_image->data,  (float**)dst_image->data, src_image->count, src_image->depth);
-    break;                                                                                                                                    
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormalizeComp((short**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
+    else
+      DoNormalizeComp((short**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    break;
   case IM_USHORT:                                                                                                                               
-    DoNormalizeComp((imushort**)src_image->data,  (float**)dst_image->data, src_image->count, src_image->depth);
-    break;                                                                                                                                    
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormalizeComp((imushort**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
+    else
+      DoNormalizeComp((imushort**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    break;
   case IM_INT:                                                                                                                               
-    DoNormalizeComp((int**)src_image->data,  (float**)dst_image->data, src_image->count, src_image->depth);
-    break;                                                                                                                                    
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormalizeComp((int**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
+    else
+      DoNormalizeComp((int**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    break;
   case IM_FLOAT:                                                                                                                               
-    DoNormalizeComp((float**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
-    break;                                                                                
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormalizeComp((float**)src_image->data, (float**)dst_image->data, src_image->count, src_image->depth);
+    else
+      DoNormalizeComp((float**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    break;
   case IM_DOUBLE:
-    DoNormalizeComp((double**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    if (dst_image->data_type == IM_FLOAT)
+      DoNormalizeComp((double**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
+    else
+      DoNormalizeComp((double**)src_image->data, (double**)dst_image->data, src_image->count, src_image->depth);
     break;
   }
 }
 
 template <class T> 
-static void DoReplaceColor(T *src_data, T *dst_data, int count, int depth, float* src_color, float* dst_color)
+static void DoReplaceColor(T *src_data, T *dst_data, int count, int depth, double* src_color, double* dst_color)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
@@ -272,7 +298,7 @@ static void DoReplaceColor(T *src_data, T *dst_data, int count, int depth, float
   }
 }
 
-void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* src_color, float* dst_color)
+void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, double* src_color, double* dst_color)
 {
   switch(src_image->data_type)
   {
@@ -298,7 +324,7 @@ void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, float* 
 }
 
 template <class ST, class DT> 
-static void DoSetAlphaColor(ST *src_data, DT *dst_data, int count, int depth, float* src_color, float dst_alpha)
+static void DoSetAlphaColor(ST *src_data, DT *dst_data, int count, int depth, double* src_color, double dst_alpha)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
@@ -320,7 +346,7 @@ static void DoSetAlphaColor(ST *src_data, DT *dst_data, int count, int depth, fl
   }
 }
 
-void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, float* src_color, float dst_alpha)
+void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, double* src_color, double dst_alpha)
 {
   int a = 0; // dst_image is a mask to be used as alpha
   if (dst_image->has_alpha)

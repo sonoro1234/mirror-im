@@ -472,7 +472,7 @@ int imAnalyzeMeasureArea(const imImage* image, int* data_area, int region_count)
   return processing;
 }
 
-int imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int region_count, float* data_cx, float* data_cy)
+int imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int region_count, double* data_cx, double* data_cy)
 {
   imushort* img_data = (imushort*)image->data[0];
   int* local_data_area = 0;
@@ -495,8 +495,8 @@ int imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int reg
     }
   }
 
-  if (data_cx) memset(data_cx, 0, region_count*sizeof(float));
-  if (data_cy) memset(data_cy, 0, region_count*sizeof(float));
+  if (data_cx) memset(data_cx, 0, region_count*sizeof(double));
+  if (data_cy) memset(data_cy, 0, region_count*sizeof(double));
 
   IM_INT_PROCESSING;
 
@@ -523,14 +523,14 @@ int imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int reg
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
-          data_cx[ri] += (float)x;
+          data_cx[ri] += (double)x;
         }
         if (data_cy) 
         {
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
-          data_cy[ri] += (float)y;
+          data_cy[ri] += (double)y;
         }
       }
     }
@@ -544,8 +544,8 @@ int imAnalyzeMeasureCentroid(const imImage* image, const int* data_area, int reg
 
   for (int i = 0; i < region_count; i++) 
   {
-    if (data_cx) data_cx[i] /= (float)data_area[i];
-    if (data_cy) data_cy[i] /= (float)data_area[i];
+    if (data_cx) data_cx[i] /= (double)data_area[i];
+    if (data_cy) data_cy[i] /= (double)data_area[i];
   }
 
   if (local_data_area)
@@ -563,7 +563,7 @@ static inline double ipow(double x, int j)
 	return r;
 }
 
-static int iCalcMoment(double* cm, int px, int py, const imImage* image, const float* cx, const float* cy, int region_count, int counter)
+static int iCalcMoment(double* cm, int px, int py, const imImage* image, const double* cx, const double* cy, int region_count, int counter)
 {
   imushort* img_data = (imushort*)image->data[0];
 
@@ -656,12 +656,12 @@ static inline int IsPerimeterPoint(T* map, int width, int height, int x, int y)
   return 0;
 }
 
-int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, const float* data_cx, const float* data_cy,
-                                   const int region_count, float* major_slope, float* major_length, 
-                                                           float* minor_slope, float* minor_length)
+int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, const double* data_cx, const double* data_cy,
+                                   const int region_count, double* major_slope, double* major_length, 
+                                                           double* minor_slope, double* minor_length)
 {
   int *local_data_area = 0;
-  float *local_data_cx = 0, *local_data_cy = 0;
+  double *local_data_cx = 0, *local_data_cy = 0;
   int ret = 0;
 
   int counter = imProcessCounterBegin("PrincipalAxis");
@@ -684,14 +684,14 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
   {
     if (!data_cx)
     {
-      local_data_cx = (float*)malloc(region_count*sizeof(float));
-      data_cx = (const float*)local_data_cx;
+      local_data_cx = (double*)malloc(region_count*sizeof(double));
+      data_cx = (const double*)local_data_cx;
     }
 
     if (!data_cy)
     {
-      local_data_cy = (float*)malloc(region_count*sizeof(float));
-      data_cy = (const float*)local_data_cy;
+      local_data_cy = (double*)malloc(region_count*sizeof(double));
+      data_cy = (const double*)local_data_cy;
     }
 
     ret = 1;
@@ -749,19 +749,19 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
     return 0;
   }
 
-  float *local_major_slope = 0, *local_minor_slope = 0;
+  double *local_major_slope = 0, *local_minor_slope = 0;
   if (!major_slope)
   {
-    local_major_slope = (float*)malloc(region_count*sizeof(float));
+    local_major_slope = (double*)malloc(region_count*sizeof(double));
     major_slope = local_major_slope;
   }
   if (!minor_slope)
   {
-    local_minor_slope = (float*)malloc(region_count*sizeof(float));
+    local_minor_slope = (double*)malloc(region_count*sizeof(double));
     minor_slope = local_minor_slope;
   }
 
-#define RAD2DEG  57.296
+#define RAD2DEG  57.295779513
 
   // We are going to find 2 axis parameters.
   // Axis 1 are located in quadrants 1-3
@@ -773,13 +773,13 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
   //    3 | 4
 
   // line coefficients for lines that belongs to axis 1 and 2
-  float* A1 = (float*)malloc(region_count*sizeof(float));
-  float* A2 = (float*)malloc(region_count*sizeof(float));
-  float* C1 = (float*)malloc(region_count*sizeof(float));
-  float* C2 = (float*)malloc(region_count*sizeof(float));
+  double* A1 = (double*)malloc(region_count*sizeof(double));
+  double* A2 = (double*)malloc(region_count*sizeof(double));
+  double* C1 = (double*)malloc(region_count*sizeof(double));
+  double* C2 = (double*)malloc(region_count*sizeof(double));
 
-  float *slope1 = major_slope; // Use major_slope as a storage place, 
-  float *slope2 = minor_slope; // and create an alias to make code clear.
+  double *slope1 = major_slope; // Use major_slope as a storage place, 
+  double *slope2 = minor_slope; // and create an alias to make code clear.
 
   for (int i = 0; i < region_count; i++) 
   {
@@ -800,8 +800,8 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
       double delta = sqrt(b*b + 4.0);
       double r1 = (-b-delta)/2.0;
       double r2 = (-b+delta)/2.0;
-      float a1 = (float)(atan(r1)*RAD2DEG + 90);  // to avoid negative results
-      float a2 = (float)(atan(r2)*RAD2DEG + 90);
+      double a1 = (double)(atan(r1)*RAD2DEG + 90);  // to avoid negative results
+      double a2 = (double)(atan(r2)*RAD2DEG + 90);
 
       if (a1 == 180) a1 = 0;
       if (a2 == 180) a2 = 0;
@@ -810,15 +810,15 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
       {                        
         slope1[i] = a1;   
         slope2[i] = a2;   
-        A1[i] = (float)r1;
-        A2[i] = (float)r2;
+        A1[i] = (double)r1;
+        A2[i] = (double)r2;
       }
       else                     // a2 is quadrants q1-q3
       {
         slope1[i] = a2;
         slope2[i] = a1;
-        A1[i] = (float)r2;
-        A2[i] = (float)r1;
+        A1[i] = (double)r2;
+        A2[i] = (double)r1;
       }
 
       C1[i] = data_cy[i] - A1[i] * data_cx[i];
@@ -850,14 +850,14 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
 
   // maximum distance from a point in the perimeter to an axis in each side of the axis
   // D1 is distance to axis 1, a and b are sides
-  float* D1a = (float*)malloc(region_count*sizeof(float));
-  float* D1b = (float*)malloc(region_count*sizeof(float));
-  float* D2a = (float*)malloc(region_count*sizeof(float));
-  float* D2b = (float*)malloc(region_count*sizeof(float));
-  memset(D1a, 0, region_count*sizeof(float));
-  memset(D1b, 0, region_count*sizeof(float));
-  memset(D2a, 0, region_count*sizeof(float));
-  memset(D2b, 0, region_count*sizeof(float));
+  double* D1a = (double*)malloc(region_count*sizeof(double));
+  double* D1b = (double*)malloc(region_count*sizeof(double));
+  double* D2a = (double*)malloc(region_count*sizeof(double));
+  double* D2b = (double*)malloc(region_count*sizeof(double));
+  memset(D1a, 0, region_count*sizeof(double));
+  memset(D1b, 0, region_count*sizeof(double));
+  memset(D2a, 0, region_count*sizeof(double));
+  memset(D2b, 0, region_count*sizeof(double));
 
   imushort* img_data = (imushort*)image->data[0];
   int width = image->width;
@@ -872,7 +872,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
       {
         int index = img_data[offset+x] - 1;
 
-        float d1, d2;
+        double d1, d2;
         if (slope2[index] == 90)
         {
           d2 = y - data_cy[index];   // I checked this many times, looks odd but it is correct.
@@ -886,7 +886,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
 
         if (d1 < 0)
         {
-          d1 = (float)fabs(d1);
+          d1 = (double)fabs(d1);
           if (d1 > D1a[index])         
             D1a[index] = d1;
         }
@@ -898,7 +898,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
 
         if (d2 < 0)
         {
-          d2 = (float)fabs(d2);
+          d2 = (double)fabs(d2);
           if (d2 > D2a[index])         
             D2a[index] = d2;
         }
@@ -919,11 +919,11 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
 
   for (int i = 0; i < region_count && ret != 0; i++) 
   {
-    float AB1 = (float)sqrt(A1[i]*A1[i] + 1);
-    float AB2 = (float)sqrt(A2[i]*A2[i] + 1);
+    double AB1 = (double)sqrt(A1[i]*A1[i] + 1);
+    double AB2 = (double)sqrt(A2[i]*A2[i] + 1);
 
-    float D1 = (D1a[i] + D1b[i]) / AB1; 
-    float D2 = (D2a[i] + D2b[i]) / AB2;
+    double D1 = (D1a[i] + D1b[i]) / AB1; 
+    double D2 = (D2a[i] + D2b[i]) / AB2;
 
     if (D1 < D2) // Major Axis in 2-4 quadrants
     {
@@ -931,7 +931,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
       // slope1 -> major_slope
       // slope2 -> minor_slope
 
-      float tmp = major_slope[i];
+      double tmp = major_slope[i];
       major_slope[i] = minor_slope[i];
       minor_slope[i] = tmp;
 
@@ -972,7 +972,7 @@ int imAnalyzeMeasurePrincipalAxis(const imImage* image, const int* data_area, co
   return ret;
 }
 
-int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int* count_data, int* area_data, float* perim_data)
+int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, int* count_data, int* area_data, double* perim_data)
 {
   int counter = imProcessCounterBegin("MeasureHoles");
   int ret;
@@ -990,7 +990,7 @@ int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, i
 
   memset(count_data, 0, region_count*sizeof(int));
   memset(area_data, 0, region_count*sizeof(int));
-  memset(perim_data, 0, region_count*sizeof(float));
+  memset(perim_data, 0, region_count*sizeof(double));
 
   // finds the holes in the inverted image
   for (i = 0; i < image->count; i++)
@@ -1038,10 +1038,10 @@ int imAnalyzeMeasureHoles(const imImage* image, int connect, int region_count, i
     return 0;
   }
 
-  float* holes_perim = 0;
+  double* holes_perim = 0;
   if (perim_data) 
   {
-    holes_perim = (float*)malloc(holes_count*sizeof(int));
+    holes_perim = (double*)malloc(holes_count*sizeof(int));
     ret = imAnalyzeMeasurePerimeter(holes_image, holes_perim, holes_count);
 
     if (!ret)
@@ -1214,7 +1214,7 @@ For 0.5 (1.0/2) [4]:
        64      8       2      16
 
 */
-static void iInitPerimTemplate(imbyte *templ, float *v)
+static void iInitPerimTemplate(imbyte *templ, double *v)
 {
   memset(templ, 0, 256);
 
@@ -1259,20 +1259,20 @@ static void iInitPerimTemplate(imbyte *templ, float *v)
   templ[2]  = 4;
   templ[16] = 4;
 
-const float DT_SQRT2   = 1.414213562373f;
-const float DT_SQRT2D2 = 0.707106781187f;
+const double DT_SQRT2   = 1.414213562373;
+const double DT_SQRT2D2 = 0.707106781187;
 
   v[1] = DT_SQRT2;   
   v[2] = DT_SQRT2D2 + 0.5f;   
-  v[0] = 1.0f;
+  v[0] = 1.0;
   v[3] = DT_SQRT2D2;
-  v[4] = 0.5f;
+  v[4] = 0.5;
 }
 
-int imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int region_count)
+int imAnalyzeMeasurePerimeter(const imImage* image, double* perim_data, int region_count)
 {
   static imbyte templ[256];
-  static float vt[5];
+  static double vt[5];
   static int first = 1;
   if (first)
   {
@@ -1285,7 +1285,7 @@ int imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regio
 
   imushort* map = (imushort*)image->data[0];
 
-  memset(perim_data, 0, region_count*sizeof(float));
+  memset(perim_data, 0, region_count*sizeof(double));
 
   int width = image->width;
   int height = image->height;
@@ -1333,7 +1333,7 @@ int imAnalyzeMeasurePerimeter(const imImage* image, float* perim_data, int regio
         if (T)
         {
           int index = map[offset+x] - 1;
-          float inc = vt[templ[T]];
+          double inc = vt[templ[T]];
 #ifdef _OPENMP
 #pragma omp atomic
 #endif
@@ -1405,7 +1405,7 @@ For "0.125" (6):
       20       3      192      40     144      9       6       96
 
 */
-static void iInitPerimAreaTemplate(imbyte *templ, float *v)
+static void iInitPerimAreaTemplate(imbyte *templ, double *v)
 {
   memset(templ, 0, 256);
 
@@ -1474,10 +1474,10 @@ static void iInitPerimAreaTemplate(imbyte *templ, float *v)
   v[6] = 0.125f;
 }
 
-int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int region_count)
+int imAnalyzeMeasurePerimArea(const imImage* image, double* perimarea_data, int region_count)
 {
   static imbyte templ[256];
-  static float vt[7];
+  static double vt[7];
   static int first = 1;
   if (first)
   {
@@ -1487,7 +1487,7 @@ int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int r
 
   imushort* map = (imushort*)image->data[0];
 
-  memset(perimarea_data, 0, region_count*sizeof(float));
+  memset(perimarea_data, 0, region_count*sizeof(double));
 
   int width = image->width;
   int height = image->height;
@@ -1529,7 +1529,7 @@ int imAnalyzeMeasurePerimArea(const imImage* image, float* perimarea_data, int r
         if (T)
         {
           int index = v-1;
-          float inc = vt[templ[T]];
+          double inc = vt[templ[T]];
 #ifdef _OPENMP
 #pragma omp atomic
 #endif

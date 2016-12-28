@@ -856,9 +856,9 @@ namespace im
 
   namespace Process
   {
-    inline int GaussianStdDev2KernelSize(float stddev) {
+    inline int GaussianStdDev2KernelSize(double stddev) {
       return imGaussianStdDev2KernelSize(stddev); }
-    inline float GaussianKernelSize2StdDev(int kernel_size) {
+    inline double GaussianKernelSize2StdDev(int kernel_size) {
       return imGaussianKernelSize2StdDev(kernel_size); }
     inline void CalcRotateSize(int width, int height, int &new_width, int &new_height, double cos0, double sin0) {
       imProcessCalcRotateSize(width, height, &new_width, &new_height, cos0, sin0); }
@@ -883,17 +883,17 @@ namespace im
       imProcessFFT(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void IFFT(const Image& src_image, Image& dst_image) {
       imProcessIFFT(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline int UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, float* params, void* userdata, const char* op_name) {
+    inline int UnaryPointOp(const Image& src_image, Image& dst_image, imUnaryPointOpFunc func, double* params, void* userdata, const char* op_name) {
       return imProcessUnaryPointOp(src_image.GetHandle(), dst_image.GetHandle(), func, params, userdata, op_name); }
-    inline int UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, float* params, void* userdata, const char* op_name) {
+    inline int UnaryPointColorOp(const Image& src_image, Image& dst_image, imUnaryPointColorOpFunc func, double* params, void* userdata, const char* op_name) {
       return imProcessUnaryPointColorOp(src_image.GetHandle(), dst_image.GetHandle(), func, params, userdata, op_name); }
-    inline int MultiPointOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, float* params, void* userdata, const char* op_name) {
+    inline int MultiPointOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointOpFunc func, double* params, void* userdata, const char* op_name) {
       imImage** c_src_image_list = new imImage*[src_image_count];
       for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
       int ret = imProcessMultiPointOp((const imImage**)c_src_image_list, src_image_count, dst_image.GetHandle(), func, params, userdata, op_name);
       delete[] c_src_image_list;
       return ret; }
-    inline int MultiPointColorOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, float* params, void* userdata, const char* op_name) {
+    inline int MultiPointColorOp(const Image *src_image_list, int src_image_count, Image& dst_image, imMultiPointColorOpFunc func, double* params, void* userdata, const char* op_name) {
       imImage** c_src_image_list = new imImage*[src_image_count];
       for (int i = 0; i < src_image_count; i++) c_src_image_list[i] = src_image_list[i].GetHandle();
       int ret = imProcessMultiPointColorOp((const imImage**)c_src_image_list, src_image_count, dst_image.GetHandle(), func, params, userdata, op_name);
@@ -903,9 +903,9 @@ namespace im
       imProcessUnArithmeticOp(src_image.GetHandle(), dst_image.GetHandle(), op); }
     inline void ArithmeticOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op) {
       imProcessArithmeticOp(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), op); }
-    inline void ArithmeticConstOp(const Image& src_image, float src_const, Image& dst_image, int op) {
+    inline void ArithmeticConstOp(const Image& src_image, double src_const, Image& dst_image, int op) {
       imProcessArithmeticConstOp(src_image.GetHandle(), src_const, dst_image.GetHandle(), op); }
-    inline void BlendConst(const Image& src_image1, const Image& src_image2, Image& dst_image, float alpha) {
+    inline void BlendConst(const Image& src_image1, const Image& src_image2, Image& dst_image, double alpha) {
       imProcessBlendConst(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), alpha); }
     inline void Blend(const Image& src_image1, const Image& src_image2, const Image& alpha_image, Image& dst_image) {
       imProcessBlend(src_image1.GetHandle(), src_image2.GetHandle(), alpha_image.GetHandle(), dst_image.GetHandle()); }
@@ -941,7 +941,7 @@ namespace im
       imProcessQuantizeRGBUniform(src_image.GetHandle(), dst_image.GetHandle(), do_dither); }
     inline void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays) {
       imProcessQuantizeGrayUniform(src_image.GetHandle(), dst_image.GetHandle(), grays); }
-    inline void ExpandHistogram(const Image& src_image, Image& dst_image, float percent) {
+    inline void ExpandHistogram(const Image& src_image, Image& dst_image, double percent) {
       imProcessExpandHistogram(src_image.GetHandle(), dst_image.GetHandle(), percent); }
     inline void EqualizeHistogram(const Image& src_image, Image& dst_image) {
       imProcessEqualizeHistogram(src_image.GetHandle(), dst_image.GetHandle()); }
@@ -971,9 +971,9 @@ namespace im
     }
     inline void NormalizeComponents(const Image& src_image, Image& dst_image) {
       imProcessNormalizeComponents(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void ReplaceColor(const Image& src_image, Image& dst_image, float* src_color, float* dst_color) {
+    inline void ReplaceColor(const Image& src_image, Image& dst_image, double* src_color, double* dst_color) {
       imProcessReplaceColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, dst_color); }
-    inline void SetAlphaColor(const Image& src_image, Image& dst_image, float* src_color, float dst_alpha) {
+    inline void SetAlphaColor(const Image& src_image, Image& dst_image, double* src_color, double dst_alpha) {
       imProcessSetAlphaColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, dst_alpha); }
     inline void BitwiseOp(const Image& src_image1, const Image& src_image2, Image& dst_image, int op) {
       imProcessBitwiseOp(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), op); }
@@ -983,13 +983,13 @@ namespace im
       imProcessBitMask(src_image.GetHandle(), dst_image.GetHandle(), mask, op); }
     inline void BitPlane(const Image& src_image, Image& dst_image, int plane, int do_reset) {
       imProcessBitPlane(src_image.GetHandle(), dst_image.GetHandle(), plane, do_reset); }
-    inline int RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, float percent) {
+    inline int RenderAddSpeckleNoise(const Image& src_image, Image& dst_image, double percent) {
       return imProcessRenderAddSpeckleNoise(src_image.GetHandle(), dst_image.GetHandle(), percent); }
-    inline int RenderAddGaussianNoise(const Image& src_image, Image& dst_image, float mean, float stddev) {
+    inline int RenderAddGaussianNoise(const Image& src_image, Image& dst_image, double mean, double stddev) {
       return imProcessRenderAddGaussianNoise(src_image.GetHandle(), dst_image.GetHandle(), mean, stddev); }
-    inline int RenderAddUniformNoise(const Image& src_image, Image& dst_image, float mean, float stddev) {
+    inline int RenderAddUniformNoise(const Image& src_image, Image& dst_image, double mean, double stddev) {
       return imProcessRenderAddUniformNoise(src_image.GetHandle(), dst_image.GetHandle(), mean, stddev); }
-    inline void ToneGamut(const Image& src_image, Image& dst_image, int op, float* params) {
+    inline void ToneGamut(const Image& src_image, Image& dst_image, int op, double* params) {
       imProcessToneGamut(src_image.GetHandle(), dst_image.GetHandle(), op, params); }
     inline void UnNormalize(const Image& src_image, Image& dst_image) {
       imProcessUnNormalize(src_image.GetHandle(), dst_image.GetHandle()); }
@@ -997,11 +997,11 @@ namespace im
       imProcessDirectConv(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void Negative(const Image& src_image, Image& dst_image) {
       imProcessNegative(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline float CalcAutoGamma(const Image& image) {
+    inline double CalcAutoGamma(const Image& image) {
       return imProcessCalcAutoGamma(image.GetHandle()); }
-    inline void ShiftHSI(const Image& src_image, Image& dst_image, float h_shift, float s_shift, float i_shift) {
+    inline void ShiftHSI(const Image& src_image, Image& dst_image, double h_shift, double s_shift, double i_shift) {
       imProcessShiftHSI(src_image.GetHandle(), dst_image.GetHandle(), h_shift, s_shift, i_shift); }
-    inline void Threshold(const Image& src_image, Image& dst_image, float level, int value) {
+    inline void Threshold(const Image& src_image, Image& dst_image, double level, int value) {
       imProcessThreshold(src_image.GetHandle(), dst_image.GetHandle(), level, value); }
     inline void ThresholdByDiff(const Image& src_image1, const Image& src_image2, Image& dst_image) {
       imProcessThresholdByDiff(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle()); }
@@ -1011,17 +1011,17 @@ namespace im
       imProcessHysteresisThresEstimate(image.GetHandle(), &low_level, &high_level); }
     inline int UniformErrThreshold(const Image& src_image, Image& dst_image) {
       return imProcessUniformErrThreshold(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline void DifusionErrThreshold(const Image& src_image, Image& dst_image, int level) {
-      imProcessDifusionErrThreshold(src_image.GetHandle(), dst_image.GetHandle(), level); }
-    inline int PercentThreshold(const Image& src_image, Image& dst_image, float percent) {
+    inline void DiffusionErrThreshold(const Image& src_image, Image& dst_image, int level) {
+      imProcessDiffusionErrThreshold(src_image.GetHandle(), dst_image.GetHandle(), level); }
+    inline int PercentThreshold(const Image& src_image, Image& dst_image, double percent) {
       return imProcessPercentThreshold(src_image.GetHandle(), dst_image.GetHandle(), percent); }
     inline int OtsuThreshold(const Image& src_image, Image& dst_image) {
       return imProcessOtsuThreshold(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline float MinMaxThreshold(const Image& src_image, Image& dst_image) {
+    inline double MinMaxThreshold(const Image& src_image, Image& dst_image) {
       return imProcessMinMaxThreshold(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void LocalMaxThresEstimate(const Image& image, int &level) {
       imProcessLocalMaxThresEstimate(image.GetHandle(), &level); }
-    inline void SliceThreshold(const Image& src_image, Image& dst_image, float start_level, float end_level) {
+    inline void SliceThreshold(const Image& src_image, Image& dst_image, double start_level, double end_level) {
       imProcessSliceThreshold(src_image.GetHandle(), dst_image.GetHandle(), start_level, end_level); }
     inline void Pixelate(const Image& src_image, Image& dst_image, int box_size) {
       imProcessPixelate(src_image.GetHandle(), dst_image.GetHandle(), box_size); }
@@ -1035,7 +1035,7 @@ namespace im
       return imProcessConvertDataType(src_image.GetHandle(), dst_image.GetHandle(), cpx2real, gamma, absolute, cast_mode); }
     inline int ConvertColorSpace(const Image& src_image, Image& dst_image) {
       return imProcessConvertColorSpace(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline int ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, float gamma, int absolute, int cast_mode) {
+    inline int ConvertToBitmap(const Image& src_image, Image& dst_image, int cpx2real, double gamma, int absolute, int cast_mode) {
       return imProcessConvertToBitmap(src_image.GetHandle(), dst_image.GetHandle(), cpx2real, gamma, absolute, cast_mode); }
     inline int Reduce(const Image& src_image, Image& dst_image, int order) {
       return imProcessReduce(src_image.GetHandle(), dst_image.GetHandle(), order); }
@@ -1121,13 +1121,13 @@ namespace im
       return imProcessConvolveRep(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle(), rep_count); }
     inline int CompassConvolve(const Image& src_image, Image& dst_image, Image& kernel) {
       return imProcessCompassConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel.GetHandle()); }
-    inline int DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev1, float stddev2) {
+    inline int DiffOfGaussianConvolve(const Image& src_image, Image& dst_image, double stddev1, double stddev2) {
       return imProcessDiffOfGaussianConvolve(src_image.GetHandle(), dst_image.GetHandle(), stddev1, stddev2); }
-    inline int LapOfGaussianConvolve(const Image& src_image, Image& dst_image, float stddev) {
+    inline int LapOfGaussianConvolve(const Image& src_image, Image& dst_image, double stddev) {
       return imProcessLapOfGaussianConvolve(src_image.GetHandle(), dst_image.GetHandle(), stddev); }
     inline int MeanConvolve(const Image& src_image, Image& dst_image, int kernel_size) {
       return imProcessMeanConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size); }
-    inline int GaussianConvolve(const Image& src_image, Image& dst_image, float stddev) {
+    inline int GaussianConvolve(const Image& src_image, Image& dst_image, double stddev) {
       return imProcessGaussianConvolve(src_image.GetHandle(), dst_image.GetHandle(), stddev); }
     inline int BarlettConvolve(const Image& src_image, Image& dst_image, int kernel_size) {
       return imProcessBarlettConvolve(src_image.GetHandle(), dst_image.GetHandle(), kernel_size); }
@@ -1139,13 +1139,13 @@ namespace im
       return imProcessSplineEdgeConvolve(src_image.GetHandle(), dst_image.GetHandle()); }
     inline int ZeroCrossing(const Image& src_image, Image& dst_image) {
       return imProcessZeroCrossing(src_image.GetHandle(), dst_image.GetHandle()); }
-    inline int Canny(const Image& src_image, Image& dst_image, float stddev) {
+    inline int Canny(const Image& src_image, Image& dst_image, double stddev) {
       return imProcessCanny(src_image.GetHandle(), dst_image.GetHandle(), stddev); }
-    inline int Unsharp(const Image& src_image, Image& dst_image, float stddev, float amount, float threshold) {
+    inline int Unsharp(const Image& src_image, Image& dst_image, double stddev, double amount, double threshold) {
       return imProcessUnsharp(src_image.GetHandle(), dst_image.GetHandle(), stddev, amount, threshold); }
-    inline int Sharp(const Image& src_image, Image& dst_image, float amount, float threshold) {
+    inline int Sharp(const Image& src_image, Image& dst_image, double amount, double threshold) {
       return imProcessSharp(src_image.GetHandle(), dst_image.GetHandle(), amount, threshold); }
-    inline int SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, float amount, float threshold) {
+    inline int SharpKernel(const Image& src_image, const Image& kernel, Image& dst_image, double amount, double threshold) {
       return imProcessSharpKernel(src_image.GetHandle(), kernel.GetHandle(), dst_image.GetHandle(), amount, threshold); }
     inline int PerimeterLine(const Image& src_image, Image& dst_image) {
       return imProcessPerimeterLine(src_image.GetHandle(), dst_image.GetHandle()); }
@@ -1160,13 +1160,13 @@ namespace im
     inline void SwapQuadrants(Image& image, int center2origin) {
       imProcessSwapQuadrants(image.GetHandle(), center2origin); }
 
-    inline int RenderOp(Image& image, imRenderFunc render_func, const char* render_name, float* params, int plus) {
+    inline int RenderOp(Image& image, imRenderFunc render_func, const char* render_name, double* params, int plus) {
       return imProcessRenderOp(image.GetHandle(), render_func, render_name, params, plus); }
-    inline int RenderCondOp(Image& image, imRenderCondFunc render_cond_func, const char* render_name, float* params) {
+    inline int RenderCondOp(Image& image, imRenderCondFunc render_cond_func, const char* render_name, double* params) {
       return imProcessRenderCondOp(image.GetHandle(), render_cond_func, render_name, params); }
     inline int RenderRandomNoise(Image& image) {
       return imProcessRenderRandomNoise(image.GetHandle()); }
-    inline int RenderConstant(Image& image, float* value) {
+    inline int RenderConstant(Image& image, double* value) {
       return imProcessRenderConstant(image.GetHandle(), value); }
     inline int RenderWheel(Image& image, int internal_radius, int external_radius) {
       return imProcessRenderWheel(image.GetHandle(), internal_radius, external_radius); }
@@ -1178,19 +1178,19 @@ namespace im
       return imProcessRenderRamp(image.GetHandle(), start, end, vert_dir); }
     inline int RenderBox(Image& image, int box_width, int box_height) {
       return imProcessRenderBox(image.GetHandle(), box_width, box_height); }
-    inline int RenderSinc(Image& image, float x_period, float y_period) {
+    inline int RenderSinc(Image& image, double x_period, double y_period) {
       return imProcessRenderSinc(image.GetHandle(), x_period, y_period); }
-    inline int RenderGaussian(Image& image, float stddev) {
+    inline int RenderGaussian(Image& image, double stddev) {
       return imProcessRenderGaussian(image.GetHandle(), stddev); }
-    inline int RenderLapOfGaussian(Image& image, float stddev) {
+    inline int RenderLapOfGaussian(Image& image, double stddev) {
       return imProcessRenderLapOfGaussian(image.GetHandle(), stddev); }
-    inline int RenderCosine(Image& image, float x_period, float y_period) {
+    inline int RenderCosine(Image& image, double x_period, double y_period) {
       return imProcessRenderCosine(image.GetHandle(), x_period, y_period); }
     inline int RenderGrid(Image& image, int x_space, int y_space) {
       return imProcessRenderGrid(image.GetHandle(), x_space, y_space); }
     inline int RenderChessboard(Image& image, int x_space, int y_space) {
       return imProcessRenderChessboard(image.GetHandle(), x_space, y_space); }
-    inline void RenderFloodFill(Image& image, int start_x, int start_y, float* replace_color, float tolerance) {
+    inline void RenderFloodFill(Image& image, int start_x, int start_y, double* replace_color, double tolerance) {
       imProcessRenderFloodFill(image.GetHandle(), start_x, start_y, replace_color, tolerance); }
   }
 
@@ -1252,7 +1252,7 @@ namespace im
       return imCalcHistogramStatistics(image.GetHandle(), &stats); }
     inline int HistoImageStatistics(const Image& image, int* median, int* mode) {
       return imCalcHistoImageStatistics(image.GetHandle(), median, mode); }
-    inline int PercentMinMax(const Image& image, float percent, int ignore_zero, int &min, int &max) {
+    inline int PercentMinMax(const Image& image, double percent, int ignore_zero, int &min, int &max) {
       return imCalcPercentMinMax(image.GetHandle(), percent, ignore_zero, &min, &max); }
   }
 
@@ -1282,8 +1282,9 @@ namespace im
 
     int* AddMeasureInt(const char* name) {
       return (int*)AddMeasure(name, IM_INT); }
-    float* AddMeasureFloat(const char* name) {
-      return (float*)AddMeasure(name, IM_FLOAT); }
+    double* AddMeasureDouble(const char* name) {
+      return (double*)AddMeasure(name, IM_DOUBLE);
+    }
     int* GetMeasureInt(const char* name) const {
       int data_type;
       const void* data = Get(name, &data_type);
@@ -1292,13 +1293,13 @@ namespace im
       else
         return (int*)data; 
     }
-    float* GetMeasureFloat(const char* name) const {
+    double* GetMeasureDouble(const char* name) const {
       int data_type;
       const void* data = Get(name, &data_type);
-      if (!data || data_type != IM_FLOAT)
-        return (float*)0;
+      if (!data || data_type != IM_DOUBLE)
+        return (double*)0;
       else
-        return (float*)data; 
+        return (double*)data; 
     }
   };
 
@@ -1310,23 +1311,23 @@ namespace im
     inline int MeasureArea(const Image& region_image, MeasureTable& measure_table) {
       return imAnalyzeMeasureArea(region_image.GetHandle(), measure_table.AddMeasureInt("Area"), measure_table.RegionCount()); }
     inline int MeasurePerimArea(const Image& region_image, MeasureTable& measure_table) {
-      return imAnalyzeMeasurePerimArea(region_image.GetHandle(), measure_table.AddMeasureFloat("PerimeterArea"), measure_table.RegionCount()); }
+      return imAnalyzeMeasurePerimArea(region_image.GetHandle(), measure_table.AddMeasureDouble("PerimeterArea"), measure_table.RegionCount()); }
     inline int MeasureCentroid(const Image& region_image, MeasureTable& measure_table) {
       return imAnalyzeMeasureCentroid(region_image.GetHandle(), measure_table.GetMeasureInt("Area"), measure_table.RegionCount(),
-                                                      measure_table.AddMeasureFloat("CentroidX"), measure_table.AddMeasureFloat("CentroidY")); }
+                                                      measure_table.AddMeasureDouble("CentroidX"), measure_table.AddMeasureDouble("CentroidY")); }
     inline int MeasurePrincipalAxis(const Image& region_image, MeasureTable& measure_table) {
       return imAnalyzeMeasurePrincipalAxis(region_image.GetHandle(), measure_table.GetMeasureInt("Area"),
-                                                           measure_table.GetMeasureFloat("CentroidX"), measure_table.GetMeasureFloat("CentroidY"), 
+                                                           measure_table.GetMeasureDouble("CentroidX"), measure_table.GetMeasureDouble("CentroidY"), 
                                                            measure_table.RegionCount(), 
-                                                           measure_table.AddMeasureFloat("MajorSlope"), measure_table.AddMeasureFloat("MajorLength"), 
-                                                           measure_table.AddMeasureFloat("MinorSlope"), measure_table.AddMeasureFloat("MinorLength")); }
+                                                           measure_table.AddMeasureDouble("MajorSlope"), measure_table.AddMeasureDouble("MajorLength"), 
+                                                           measure_table.AddMeasureDouble("MinorSlope"), measure_table.AddMeasureDouble("MinorLength")); }
     inline int MeasureHoles(const Image& region_image, int connect, MeasureTable& measure_table) {
       return imAnalyzeMeasureHoles(region_image.GetHandle(), connect, measure_table.RegionCount(),
                                                             measure_table.AddMeasureInt("HolesCount"),
                                                             measure_table.AddMeasureInt("HolesArea"), 
-                                                            measure_table.AddMeasureFloat("HolesPerimeter")); }
+                                                            measure_table.AddMeasureDouble("HolesPerimeter")); }
     inline int MeasurePerimeter(const Image& region_image, MeasureTable& measure_table) {
-      return imAnalyzeMeasurePerimeter(region_image.GetHandle(), measure_table.AddMeasureFloat("Perimeter"), measure_table.RegionCount()); }
+      return imAnalyzeMeasurePerimeter(region_image.GetHandle(), measure_table.AddMeasureDouble("Perimeter"), measure_table.RegionCount()); }
 
   }
 

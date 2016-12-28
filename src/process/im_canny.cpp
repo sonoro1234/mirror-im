@@ -15,100 +15,15 @@
 #include <memory.h>
 
 /* Scale floating point magnitudes to 8 bits */
-static float MAG_SCALE;
+static double MAG_SCALE;
 
 /* Biggest possible filter mask */
 #define MAX_MASK_SIZE 100
 
-static float ** f2d (int nr, int nc);
-static float gauss(float x, float sigma);
-static float dGauss (float x, float sigma);
-static float meanGauss (float x, float sigma);
-static int seperable_convolution(const imImage* im, float *gau, int width, float **smx, float **smy, int counter);
-static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int width, float **sm, int which, int counter);
-static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter);
 
-int imProcessCanny(const imImage* src_image, imImage* dst_image, float stddev)
+static inline double norm(double x, double y)
 {
-  int width = 1;
-  float **smx,**smy;
-  float **dx,**dy;
-  int i;
-  float gau[MAX_MASK_SIZE], dgau[MAX_MASK_SIZE];
-
-  int counter = imCounterBegin("Canny");
-
-  imCounterTotal(counter, 3* src_image->height + dst_image->height-2, "Processing...");
-
-/* Create a Gaussian and a derivative of Gaussian filter mask */
-  for(i=0; i<MAX_MASK_SIZE; i++)
-  {
-    gau[i] = meanGauss ((float)i, stddev);
-    if (gau[i] < 0.005)
-    {
-      width = i;
-      break;
-    }
-    dgau[i] = dGauss ((float)i, stddev);
-  }
-
-  smx = f2d (src_image->height, src_image->width);
-  smy = f2d (src_image->height, src_image->width);
-
-/* Convolution of source src_image with a Gaussian in X and Y directions  */
-  if (!seperable_convolution(src_image, gau, width, smx, smy, counter))
-  {
-    free(smx[0]); free(smx);
-    imCounterEnd(counter);
-    return 0;
-  }
-
-  MAG_SCALE = 0;
-
-/* Now convolve smoothed data with a derivative */
-  dx = f2d (src_image->height, src_image->width);
-  if (!dxy_seperable_convolution(smx, src_image->height, src_image->width, dgau, width, dx, 1, counter))
-  {
-    free(dx[0]); free(dx);
-    free(smx[0]); free(smx);
-    imCounterEnd(counter);
-    return 0;
-  }
-  free(smx[0]); free(smx);
-
-  dy = f2d (src_image->height, src_image->width);
-  if (!dxy_seperable_convolution(smy, src_image->height, src_image->width, dgau, width, dy, 0, counter))
-  {
-    free(dx[0]); free(dx);
-    free(dy[0]); free(dy);
-    free(smy[0]); free(smy);
-    imCounterEnd(counter);
-    return 0;
-  }
-  free(smy[0]); free(smy);
-
-  if (MAG_SCALE)
-    MAG_SCALE = 255.0f/(1.4142f*MAG_SCALE);
-
-  /* Non-maximum suppression - edge pixels should be a local max */
-  if (!nonmax_suppress(dx, dy, dst_image, counter))
-  {
-    free(dx[0]); free(dx);
-    free(dy[0]); free(dy);
-    imCounterEnd(counter);
-    return 0;
-  }
-
-  free(dx[0]); free(dx);
-  free(dy[0]); free(dy);
-
-  imCounterEnd(counter);
-  return 1;
-}
-
-static float norm (float x, float y)
-{
-  return (float) sqrt ( (double)(x*x + y*y) );
+  return sqrt (x*x + y*y);
 }
 
 static float ** f2d (int nr, int nc)
@@ -136,27 +51,26 @@ static float ** f2d (int nr, int nc)
 }
 
 /*      Gaussian        */
-static float gauss(float x, float sigma)
+static inline double gauss(double x, double sigma)
 {
-  return (float)exp((double) ((-x*x)/(2*sigma*sigma)));
+  return exp(((-x*x)/(2*sigma*sigma)));
 }
 
-static float meanGauss (float x, float sigma)
+static inline double meanGauss(double x, double sigma)
 {
-  float z;
-  z = (gauss(x,sigma)+gauss(x+0.5f,sigma)+gauss(x-0.5f,sigma))/3.0f;
+  double z = (gauss(x,sigma)+gauss(x+0.5,sigma)+gauss(x-0.5,sigma))/3.0;
 //  z = z/(3.1415f*2.0f*sigma*sigma);
   return z;
 }
 
 /*      First derivative of Gaussian    */
-static float dGauss (float x, float sigma)
+static double dGauss(double x, double sigma)
 {
 //  return -x/(sigma*sigma) * gauss(x, sigma);
   return -x * gauss(x, sigma);
 }
 
-static int seperable_convolution(const imImage* im, float *gau, int width, float **smx, float **smy, int counter)
+static int seperable_convolution(const imImage* im, double *gau, int width, float **smx, float **smy, int counter)
 {
   unsigned char* im_data = (unsigned char*)im->data[0];
   int nr = im->height;
@@ -176,8 +90,8 @@ static int seperable_convolution(const imImage* im, float *gau, int width, float
 
     for (int j = 0; j<nc; j++)
     {
-      float x = gau[0] * im_data[i*im->width + j]; 
-      float y = gau[0] * im_data[i*im->width + j];
+      double x = gau[0] * im_data[i*im->width + j];
+      double y = gau[0] * im_data[i*im->width + j];
 
       for (int k=1; k<width; k++)
       {
@@ -190,8 +104,8 @@ static int seperable_convolution(const imImage* im, float *gau, int width, float
         x += gau[k]*im_data[i*im->width + I1] + gau[k]*im_data[i*im->width + I2];
       }
 
-      smx[i][j] = x; 
-      smy[i][j] = y;
+      smx[i][j] = (float)x; 
+      smy[i][j] = (float)y;
     }
 
     IM_COUNT_PROCESSING;
@@ -204,7 +118,7 @@ static int seperable_convolution(const imImage* im, float *gau, int width, float
   return processing;
 }
 
-static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int width, float **sm, int which, int counter)
+static int dxy_seperable_convolution(float** im, int nr, int nc, double *gau, int width, float **sm, int which, int counter)
 {
   IM_INT_PROCESSING;
 
@@ -220,7 +134,7 @@ static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int
 
     for (int j = 0; j<nc; j++)
     {
-      float x = 0.0;
+      double x = 0.0;
       for (int k=1; k<width; k++)
       {
         if (which == 0)
@@ -236,7 +150,7 @@ static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int
           x += -gau[k]*im[i][I1] + gau[k]*im[i][I2];
         }
       }
-      sm[i][j] = x;
+      sm[i][j] = (float)x;
 
       if (x > MAG_SCALE)
         MAG_SCALE = x;
@@ -252,7 +166,7 @@ static int dxy_seperable_convolution(float** im, int nr, int nc, float *gau, int
   return processing;
 }
 
-static unsigned char tobyte(float x)
+static inline unsigned char tobyte(double x)
 {
   if (x > 255) return 255;
   return (unsigned char)x;
@@ -276,7 +190,7 @@ static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter)
 
     for (int j = 1; j<mag->width - 1; j++)
     {
-      float xx, yy, g2, g1, g3, g4, g, xc, yc;
+      double xx, yy, g2, g1, g3, g4, g, xc, yc;
 
       /* Treat the x and y derivatives as components of a vector */
       xc = dx[i][j];
@@ -291,7 +205,7 @@ static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter)
       if (fabs(yc) > fabs(xc))
       {
         /* The Y component is biggest, so gradient direction is basically UP/DOWN */
-        xx = (float)(fabs(xc)/fabs(yc));
+        xx = fabs(xc)/fabs(yc);
         yy = 1.0;
 
         g2 = norm (dx[i-1][j], dy[i-1][j]);
@@ -311,7 +225,7 @@ static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter)
       else
       {
         /* The X component is biggest, so gradient direction is basically LEFT/RIGHT */
-        xx = (float)(fabs(yc)/fabs(xc));
+        xx = fabs(yc)/fabs(xc);
         yy = 1.0;
 
         g2 = norm (dx[i][j+1], dy[i][j+1]);
@@ -344,3 +258,82 @@ static int nonmax_suppress(float **dx, float **dy, imImage* mag, int counter)
 
   return processing;
 }
+
+int imProcessCanny(const imImage* src_image, imImage* dst_image, double stddev)
+{
+  int width = 1;
+  float **smx, **smy;
+  float **dx, **dy;
+  int i;
+  double gau[MAX_MASK_SIZE], dgau[MAX_MASK_SIZE];
+
+  int counter = imCounterBegin("Canny");
+
+  imCounterTotal(counter, 3 * src_image->height + dst_image->height - 2, "Processing...");
+
+  /* Create a Gaussian and a derivative of Gaussian filter mask */
+  for (i = 0; i<MAX_MASK_SIZE; i++)
+  {
+    gau[i] = meanGauss((double)i, stddev);
+    if (gau[i] < 0.005)
+    {
+      width = i;
+      break;
+    }
+    dgau[i] = dGauss((double)i, stddev);
+  }
+
+  smx = f2d(src_image->height, src_image->width);
+  smy = f2d(src_image->height, src_image->width);
+
+  /* Convolution of source src_image with a Gaussian in X and Y directions  */
+  if (!seperable_convolution(src_image, gau, width, smx, smy, counter))
+  {
+    free(smx[0]); free(smx);
+    imCounterEnd(counter);
+    return 0;
+  }
+
+  MAG_SCALE = 0;
+
+  /* Now convolve smoothed data with a derivative */
+  dx = f2d(src_image->height, src_image->width);
+  if (!dxy_seperable_convolution(smx, src_image->height, src_image->width, dgau, width, dx, 1, counter))
+  {
+    free(dx[0]); free(dx);
+    free(smx[0]); free(smx);
+    imCounterEnd(counter);
+    return 0;
+  }
+  free(smx[0]); free(smx);
+
+  dy = f2d(src_image->height, src_image->width);
+  if (!dxy_seperable_convolution(smy, src_image->height, src_image->width, dgau, width, dy, 0, counter))
+  {
+    free(dx[0]); free(dx);
+    free(dy[0]); free(dy);
+    free(smy[0]); free(smy);
+    imCounterEnd(counter);
+    return 0;
+  }
+  free(smy[0]); free(smy);
+
+  if (MAG_SCALE)
+    MAG_SCALE = 255.0 / (1.4142*MAG_SCALE);
+
+  /* Non-maximum suppression - edge pixels should be a local max */
+  if (!nonmax_suppress(dx, dy, dst_image, counter))
+  {
+    free(dx[0]); free(dx);
+    free(dy[0]); free(dy);
+    imCounterEnd(counter);
+    return 0;
+  }
+
+  free(dx[0]); free(dx);
+  free(dy[0]); free(dy);
+
+  imCounterEnd(counter);
+  return 1;
+}
+

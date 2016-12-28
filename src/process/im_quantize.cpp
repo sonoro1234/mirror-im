@@ -53,8 +53,8 @@ void imProcessQuantizeGrayUniform(const imImage* src_image, imImage* dst_image, 
   imbyte re_map[256];
   memset(re_map, 0, 256);
 
-  float factor = (float)grays/256.0f;
-  float factor256 = 256.0f/(float)grays;
+  double factor = (double)grays / 256.0;
+  double factor256 = 256.0 / (double)grays;
 
   for (i = 0; i < 256; i++)  // for all src values
   {             
