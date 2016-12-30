@@ -8,31 +8,28 @@ SRC = process/im_fft.cpp
 
 INCLUDES = ../include
 
-DEFINES = USE_FFTW3 FFTW_ENABLE_FLOAT
+DEFINES = USE_FFTW3
 
 USE_IM = Yes
 IM = ..
 LIBS = im_process
 
+FFTW = $(TECTOOLS_HOME)/fftw3
 
 ifneq ($(findstring Win, $(TEC_SYSNAME)), )
   ifneq ($(findstring _64, $(TEC_UNAME)), )
-    FFTW = d:/lng/fftw64
+    LDIR = $(FFTW)/lib/Win64
   else
-    FFTW = d:/lng/fftw32
+    LDIR = $(FFTW)/lib/Win32
   endif
-  INCLUDES += $(FFTW)
-  LIBS += libfftw3f-3
-  LDIR = $(FFTW)
+  INCLUDES += $(FFTW)/include
+  LIBS += libfftw3f-3 libfftw3-3
 else  
-  LIBS += fftw3f
+  LIBS += fftw3f fftw3
 endif
 
 
 ifneq ($(findstring Win, $(TEC_SYSNAME)), )
-  ifneq ($(findstring gcc, $(TEC_UNAME)), )
-    DEFINES += HAVE_UINTPTR_T
-  endif
   ifneq ($(findstring ow, $(TEC_UNAME)), )
     DEFINES += IM_DEFMATHFLOAT
   endif         
@@ -40,20 +37,13 @@ ifneq ($(findstring Win, $(TEC_SYSNAME)), )
     DEFINES += IM_DEFMATHFLOAT
   endif
 else
-  ifneq ($(findstring IRIX, $(TEC_UNAME)), )
-    DEFINES += HAVE_UINTPTR_T
-  endif
   ifneq ($(findstring MacOS, $(TEC_UNAME)), )
     ifneq ($(TEC_SYSMINOR), 4)
       BUILD_DYLIB=Yes
     endif
-    DEFINES += HAVE_UINTPTR_T
-  endif
-  ifneq ($(findstring FreeBSD, $(TEC_UNAME)), )
-    DEFINES += HAVE_UINTPTR_T
   endif
   ifneq ($(findstring AIX, $(TEC_UNAME)), )
-    DEFINES += IM_DEFMATHFLOAT HAVE_UINTPTR_T
+    DEFINES += IM_DEFMATHFLOAT
   endif
   ifneq ($(findstring SunOS, $(TEC_UNAME)), )
     DEFINES += IM_DEFMATHFLOAT

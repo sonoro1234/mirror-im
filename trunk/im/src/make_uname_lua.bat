@@ -10,6 +10,7 @@ call tecmake %1 "MF=imlua_process5" "USE_OPENMP=Yes" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=imlua_jp25" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=imlua_avi5" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=imlua_fftw5" %2 %3 %4 %5 %6 %7 %8
+call tecmake %1 "MF=imlua_fftw5" "USE_FFTW3=Yes" %2 %3 %4 %5 %6 %7 %8
 
 REM WMV and Capture are NOT available in some compilers,
 REM so this may result in errors, just ignore them.

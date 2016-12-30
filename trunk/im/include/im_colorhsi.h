@@ -20,7 +20,8 @@ extern "C" {
  * "I" is defined along the cube diagonal. It ranges from 0 (black) to 1 (white). \n
  * HS are the polar coordinates of a plane normal to "I". \n
  * "S" is the normal distance from the diagonal of the RGB cube. It ranges from 0 to 1. \n
- * "H" is the angle starting from the red vector, given in degrees.
+ * "H" is the angle starting from the red vector, given in degrees. It ranges from 0 to 360. \n
+ * R,G,B when double must be normalized between 0-1.
  * \par
  * This is not a new color space, this is exactly the same gamut as RGB. \n
  * \par

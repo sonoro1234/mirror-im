@@ -125,7 +125,6 @@ int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, con
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
   imImage* fkernel = NULL;
-    
   if ((src_image->data_type == IM_FLOAT || src_image->data_type == IM_DOUBLE) && 
        kernel->data_type != src_image->data_type)
   {
@@ -163,6 +162,7 @@ int imProcessGrayMorphConvolve(const imImage* src_image, imImage* dst_image, con
   }
 
   if (fkernel) imImageDestroy(fkernel);
+
   imProcessCounterEnd(counter);
 
   return ret;

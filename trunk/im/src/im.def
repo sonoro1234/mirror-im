@@ -184,6 +184,7 @@ EXPORTS
   imConvertPacking
   imConvertMapToRGB
   imConvertRGB2Map
+  imConvertRGB2MapCounter
   imImageLoadFromResource
   imFileNewRaw
   imFileOpenRaw

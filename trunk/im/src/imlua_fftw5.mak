@@ -22,6 +22,11 @@ SRCLUADIR = lua5
 INCLUDES = lua5
 LIBS = im_fftw
 
+ifdef USE_FFTW3
+  LIBNAME = imlua_fftw3
+  LIBS = im_fftw3
+endif
+
 ifdef USE_LUA_VERSION
   USE_LUA51:=
   USE_LUA52:=

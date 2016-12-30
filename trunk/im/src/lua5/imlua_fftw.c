@@ -19,6 +19,10 @@
 #include "imlua_image.h"
 
 
+#define imlua_checkcomplex(_L, _a, _i) \
+  luaL_argcheck(L, ((_i)->data_type == IM_CFLOAT || (_i)->data_type == IM_CDOUBLE), _a, "image data type can be complex only");
+
+
 /*****************************************************************************\
  Domain Transform Operations
 \*****************************************************************************/
@@ -32,7 +36,7 @@ static int imluaProcessFFT (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
 
   imlua_matchsize(L, src_image, dst_image);
-  imlua_checkdatatype(L, 2, dst_image, IM_CFLOAT);
+  imlua_checkcomplex(L, 2, dst_image);
 
   imProcessFFT(src_image, dst_image);
   return 0;
@@ -47,8 +51,8 @@ static int imluaProcessIFFT (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
 
   imlua_matchsize(L, src_image, dst_image);
-  imlua_checkdatatype(L, 1, src_image, IM_CFLOAT);
-  imlua_checkdatatype(L, 2, dst_image, IM_CFLOAT);
+  imlua_checkcomplex(L, 1, src_image);
+  imlua_checkcomplex(L, 2, dst_image);
 
   imProcessIFFT(src_image, dst_image);
   return 0;
@@ -64,7 +68,7 @@ static int imluaProcessFFTraw (lua_State *L)
   int center = luaL_checkinteger(L, 3);
   int normalize = luaL_checkinteger(L, 4);
 
-  imlua_checkdatatype(L, 1, src_image, IM_CFLOAT);
+  imlua_checkcomplex(L, 1, src_image);
 
   imProcessFFTraw(src_image, inverse, center, normalize);
   return 0;
@@ -78,7 +82,7 @@ static int imluaProcessSwapQuadrants (lua_State *L)
   imImage* src_image = imlua_checkimage(L, 1);
   int center2origin = luaL_checkinteger(L, 2);
 
-  imlua_checkdatatype(L, 1, src_image, IM_CFLOAT);
+  imlua_checkcomplex(L, 1, src_image);
 
   imProcessSwapQuadrants(src_image, center2origin);
   return 0;
@@ -95,7 +99,7 @@ static int imluaProcessCrossCorrelation (lua_State *L)
 
   imlua_matchsize(L, image1, dst_image);
   imlua_matchsize(L, image2, dst_image);
-  imlua_checkdatatype(L, 3, dst_image, IM_CFLOAT);
+  imlua_checkcomplex(L, 3, dst_image);
 
   imProcessCrossCorrelation(image1, image2, dst_image);
   return 0;
@@ -110,7 +114,7 @@ static int imluaProcessAutoCorrelation (lua_State *L)
   imImage* dst_image = imlua_checkimage(L, 2);
 
   imlua_matchsize(L, src_image, dst_image);
-  imlua_checkdatatype(L, 2, dst_image, IM_CFLOAT);
+  imlua_checkcomplex(L, 2, dst_image);
 
   imProcessAutoCorrelation(src_image, dst_image);
   return 0;

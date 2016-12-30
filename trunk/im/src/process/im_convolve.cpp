@@ -11,6 +11,7 @@
 #include <im_math_op.h>
 #include <im_image.h>
 #include <im_kernel.h>
+#include <im_convert.h>
 
 #include "im_process_counter.h"
 #include "im_process_loc.h"
@@ -302,6 +303,15 @@ int imProcessCompassConvolve(const imImage* src_image, imImage* dst_image, imIma
   int counter = imProcessCounterBegin("CompassConvolve");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
+  imImage* dkernel = NULL;
+  if ((src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE) &&
+      kernel->data_type != IM_DOUBLE)
+  {
+    dkernel = imImageCreate(kernel->width, kernel->height, IM_GRAY, IM_DOUBLE);
+    imProcessConvertDataType(kernel, dkernel, 0, 0, 0, IM_CAST_DIRECT);
+    kernel = dkernel;
+  }
+
   for (int i = 0; i < src_image->depth; i++)
   {
     switch(src_image->data_type)
@@ -337,16 +347,15 @@ int imProcessCompassConvolve(const imImage* src_image, imImage* dst_image, imIma
         ret = DoCompassConvolve((float*)src_image->data[i], (float*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel->data[0], kernel->width, counter, (double)0);
       break;                                                                                
     case IM_DOUBLE:
-      if (kernel->data_type == IM_INT)
-        ret = DoCompassConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, counter, (double)0);
-      else
-        ret = DoCompassConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, counter, (double)0);
+      ret = DoCompassConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, counter, (double)0);
       break;
     }
     
     if (!ret) 
       break;
   }
+
+  if (dkernel) imImageDestroy(dkernel);
 
   imProcessCounterEnd(counter);
 
@@ -530,6 +539,24 @@ int imProcessConvolveDual(const imImage* src_image, imImage* dst_image, const im
   int counter = imProcessCounterBegin("ConvolveDual");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
+  imImage* dkernel1 = NULL;
+  if ((src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE) &&
+      kernel1->data_type != IM_DOUBLE)
+  {
+    dkernel1 = imImageCreate(kernel1->width, kernel1->height, IM_GRAY, IM_DOUBLE);
+    imProcessConvertDataType(kernel1, dkernel1, 0, 0, 0, IM_CAST_DIRECT);
+    kernel1 = dkernel1;
+  }
+
+  imImage* dkernel2 = NULL;
+  if ((src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE) &&
+      kernel2->data_type != IM_DOUBLE)
+  {
+    dkernel2 = imImageCreate(kernel2->width, kernel2->height, IM_GRAY, IM_DOUBLE);
+    imProcessConvertDataType(kernel2, dkernel2, 0, 0, 0, IM_CAST_DIRECT);
+    kernel2 = dkernel2;
+  }
+
   int ret = 0;
 
   for (int i = 0; i < src_image->depth; i++)
@@ -573,22 +600,19 @@ int imProcessConvolveDual(const imImage* src_image, imImage* dst_image, const im
         ret = DoConvolveDualCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel1->data[0], (float*)kernel2->data[0], kernel1->width, kernel1->height, counter);
       break;
     case IM_DOUBLE:
-      if (kernel1->data_type == IM_INT)
-        ret = DoConvolveDual((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel1->data[0], (int*)kernel2->data[0], kernel1->width, kernel1->height, counter, (double)0);
-      else
-        ret = DoConvolveDual((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel1->data[0], (double*)kernel2->data[0], kernel1->width, kernel1->height, counter, (double)0);
+      ret = DoConvolveDual((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel1->data[0], (double*)kernel2->data[0], kernel1->width, kernel1->height, counter, (double)0);
       break;
     case IM_CDOUBLE:
-      if (kernel1->data_type == IM_INT)
-        ret = DoConvolveDualCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel1->data[0], (int*)kernel2->data[0], kernel1->width, kernel1->height, counter);
-      else
-        ret = DoConvolveDualCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel1->data[0], (double*)kernel2->data[0], kernel1->width, kernel1->height, counter);
+      ret = DoConvolveDualCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel1->data[0], (double*)kernel2->data[0], kernel1->width, kernel1->height, counter);
       break;
     }
     
     if (!ret) 
       break;
   }
+
+  if (dkernel1) imImageDestroy(dkernel1);
+  if (dkernel2) imImageDestroy(dkernel2);
 
   imProcessCounterEnd(counter);
 
@@ -784,16 +808,10 @@ static int DoConvolveStep(const imImage* src_image, imImage* dst_image, const im
         ret = DoConvolveCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel->data[0], kernel->width, kernel->height, counter);
       break;
     case IM_DOUBLE:
-      if (kernel->data_type == IM_INT)
-        ret = DoConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
-      else
-        ret = DoConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
+      ret = DoConvolve((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
       break;
     case IM_CDOUBLE:
-      if (kernel->data_type == IM_INT)
-        ret = DoConvolveCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter);
-      else
-        ret = DoConvolveCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter);
+      ret = DoConvolveCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter);
       break;
     }
     
@@ -809,7 +827,18 @@ int imProcessConvolve(const imImage* src_image, imImage* dst_image, const imImag
   int counter = imProcessCounterBegin("Convolve");
   imCounterTotal(counter, src_image->depth*src_image->height, "Processing...");
 
+  imImage* dkernel = NULL;
+  if ((src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE) &&
+      kernel->data_type != IM_DOUBLE)
+  {
+    dkernel = imImageCreate(kernel->width, kernel->height, IM_GRAY, IM_DOUBLE);
+    imProcessConvertDataType(kernel, dkernel, 0, 0, 0, IM_CAST_DIRECT);
+    kernel = dkernel;
+  }
+
   int ret = DoConvolveStep(src_image, dst_image, kernel, counter);
+
+  if (dkernel) imImageDestroy(dkernel);
 
   imProcessCounterEnd(counter);
 
@@ -825,6 +854,15 @@ int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imI
   int counter = imProcessCounterBegin("ConvolveRep");
   imCounterTotal(counter, src_image->depth*src_image->height*ntimes, "Processing...");
 
+  imImage* dkernel = NULL;
+  if ((src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE) &&
+      kernel->data_type != IM_DOUBLE)
+  {
+    dkernel = imImageCreate(kernel->width, kernel->height, IM_GRAY, IM_DOUBLE);
+    imProcessConvertDataType(kernel, dkernel, 0, 0, 0, IM_CAST_DIRECT);
+    kernel = dkernel;
+  }
+
   const imImage *image1 = src_image;
   imImage *image2 = dst_image;
 
@@ -832,8 +870,9 @@ int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imI
   {
     if (!DoConvolveStep(image1, image2, kernel, counter))
     {
-      imProcessCounterEnd(counter);
+      if (dkernel) imImageDestroy(dkernel);
       imImageDestroy(AuxImage);
+      imProcessCounterEnd(counter);
       return 0;
     }
     
@@ -853,8 +892,11 @@ int imProcessConvolveRep(const imImage* src_image, imImage* dst_image, const imI
     AuxImage->data = (void**)temp;
   }
 
-  imProcessCounterEnd(counter);
+  if (dkernel) imImageDestroy(dkernel);
+
   imImageDestroy(AuxImage);
+
+  imProcessCounterEnd(counter);
 
   return 1;
 }
@@ -1120,6 +1162,15 @@ int imProcessConvolveSep(const imImage* src_image, imImage* dst_image, const imI
   int counter = imProcessCounterBegin("ConvolveSep");
   imCounterTotal(counter, 2 * src_image->depth*src_image->height, "Processing...");
 
+  imImage* dkernel = NULL;
+  if ((src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE) &&
+      kernel->data_type != IM_DOUBLE)
+  {
+    dkernel = imImageCreate(kernel->width, kernel->height, IM_GRAY, IM_DOUBLE);
+    imProcessConvertDataType(kernel, dkernel, 0, 0, 0, IM_CAST_DIRECT);
+    kernel = dkernel;
+  }
+
   int ret = 0;
 
   for (int i = 0; i < src_image->depth; i++)
@@ -1163,22 +1214,18 @@ int imProcessConvolveSep(const imImage* src_image, imImage* dst_image, const imI
         ret = DoConvolveSepCpx((imcfloat*)src_image->data[i], (imcfloat*)dst_image->data[i], src_image->width, src_image->height, (float*)kernel->data[0], kernel->width, kernel->height, counter);
       break;
     case IM_DOUBLE:
-      if (kernel->data_type == IM_INT)
-        ret = DoConvolveSep((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
-      else
-        ret = DoConvolveSep((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
+      ret = DoConvolveSep((double*)src_image->data[i], (double*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter, (double)0);
       break;
     case IM_CDOUBLE:
-      if (kernel->data_type == IM_INT)
-        ret = DoConvolveSepCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (int*)kernel->data[0], kernel->width, kernel->height, counter);
-      else
-        ret = DoConvolveSepCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter);
+      ret = DoConvolveSepCpx((imcdouble*)src_image->data[i], (imcdouble*)dst_image->data[i], src_image->width, src_image->height, (double*)kernel->data[0], kernel->width, kernel->height, counter);
       break;
     }
     
     if (!ret) 
       break;
   }
+
+  if (dkernel) imImageDestroy(dkernel);
 
   imProcessCounterEnd(counter);
 
@@ -1486,7 +1533,11 @@ int imProcessGaussianConvolve(const imImage* src_image, imImage* dst_image, doub
 
   int kernel_size = imGaussianStdDev2KernelSize(stddev);
 
-  imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, IM_FLOAT);
+  int data_type = IM_FLOAT;
+  if (src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE)
+    data_type = IM_DOUBLE;
+
+  imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, data_type);
   if (!kernel)
   {
     imProcessCounterEnd(counter);
@@ -1510,7 +1561,11 @@ int imProcessLapOfGaussianConvolve(const imImage* src_image, imImage* dst_image,
 
   int kernel_size = imGaussianStdDev2KernelSize(stddev);
 
-  imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, IM_FLOAT);
+  int data_type = IM_FLOAT;
+  if (src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE)
+    data_type = IM_DOUBLE;
+
+  imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, data_type);
   if (!kernel)
   {
     imProcessCounterEnd(counter);
@@ -1563,8 +1618,12 @@ int imProcessDiffOfGaussianConvolve(const imImage* src_image, imImage* dst_image
   int size = kernel_size1;
   if (kernel_size1 < kernel_size2) size = kernel_size2;
 
-  imImage* kernel1 = imImageCreate(size, size, IM_GRAY, IM_FLOAT);
-  imImage* kernel2 = imImageCreate(size, size, IM_GRAY, IM_FLOAT);
+  int data_type = IM_FLOAT;
+  if (src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE)
+    data_type = IM_DOUBLE;
+
+  imImage* kernel1 = imImageCreate(size, size, IM_GRAY, data_type);
+  imImage* kernel2 = imImageCreate(size, size, IM_GRAY, data_type);
   if (!kernel1 || !kernel2)
   {
     if (kernel1) imImageDestroy(kernel1);
@@ -1702,7 +1761,11 @@ int imProcessUnsharp(const imImage* src_image, imImage* dst_image, double stddev
 {
   int kernel_size = imGaussianStdDev2KernelSize(stddev);
 
-  imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, IM_FLOAT);
+  int data_type = IM_FLOAT;
+  if (src_image->data_type == IM_DOUBLE || src_image->data_type == IM_CDOUBLE)
+    data_type = IM_DOUBLE;
+
+  imImage* kernel = imImageCreate(kernel_size, kernel_size, IM_GRAY, data_type);
   if (!kernel)
     return 0;
 

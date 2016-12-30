@@ -14,6 +14,9 @@ EXPORTS
   imlua_toarrayulongopt
   imlua_toarrayfloat
   imlua_toarrayfloatopt
+  imlua_toarraydouble
+  imlua_newarraydouble
+  imlua_toarraydoubleopt
   imlua_toarrayimage 
   imlua_checkmask
   imlua_regconstants

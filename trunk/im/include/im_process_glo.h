@@ -86,7 +86,7 @@ void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image);
  * assigned a value equal to its distance from the nearest
  * black pixel. \n
  * Uses a two-pass algorithm incrementally calculating the distance. \n
- * Source image must be IM_BINARY, target must be IM_FLOAT.
+ * Source image must be IM_BINARY, target must be IM_FLOAT or IM_DOUBLE.
  *
  * \verbatim im.ProcessDistanceTransform(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessDistanceTransformNew(image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
@@ -94,7 +94,7 @@ void imProcessAutoCorrelation(const imImage* src_image, imImage* dst_image);
 void imProcessDistanceTransform(const imImage* src_image, imImage* dst_image);
 
 /** Marks all the regional maximum of the distance transform. \n
- * source is IMGRAY/IM_FLOAT target in IM_BINARY. \n
+ * source must be IM_GRAY+IM_FLOAT/IM_DOUBLE, target must be IM_BINARY. \n
  * We consider maximum all connected pixel values that have smaller pixel values around it.
  *
  * \verbatim im.ProcessRegionalMaximum(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
@@ -107,9 +107,8 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
 /** \defgroup fourier Fourier Transform Operations
  * \par
  * All Fourier transforms use FFTW library. \n
- * The pre-compiled binaries for FFTW version 2.1.5 includes all the necessary files.
- * The pre-compiled binaries for FFTW version 3.x depends on an external library, not provided.
- * To build the code that uses FFTW version 3 you must define USE_FFTW3.
+ * The pre-compiled binaries for FFTW version 2.1.5 includes all the necessary files. \n
+ * The pre-compiled binaries for FFTW version 3.x depends on an external library. For Windows the FFTW DLLs are included in the package. For Linux you must use the libfftw3 included with your sysytem.
  * \par
  * FFTW Copyright Matteo Frigo, Steven G. Johnson and the MIT. \n
  * http://www.fftw.org                                         \n
@@ -120,10 +119,8 @@ void imProcessRegionalMaximum(const imImage* src_image, imImage* dst_image);
  * IMPORTANT: The FFTW lib has a GPL license. The license of the "im_fftw" library is automatically the GPL.
  * So you cannot use it for commercial applications without contacting the authors. 
  * \par
- * FFTW 2.x can have float or double functions, not both. \n
- * FFTW 3.x can have both, but we use only one to keep the
- * code compatible with version 2. \n
- * So by default the pre-compiled binaries are built with "double" support only.
+ * FFTW 2.x can have float or double functions, not both. Use build only for float. \n
+ * FFTW 3.x can have both.
  * \par
  * See \ref im_process_glo.h
  * \ingroup process */

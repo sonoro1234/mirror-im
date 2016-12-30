@@ -7,6 +7,7 @@ call tecmake %1 "MF=im_process" "USE_OPENMP=Yes" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=im_jp2" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=im_avi" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=im_fftw" %2 %3 %4 %5 %6 %7 %8
+call tecmake %1 "MF=im_fftw3" %2 %3 %4 %5 %6 %7 %8
 call tecmake %1 "MF=im_lzo" %2 %3 %4 %5 %6 %7 %8
 
 REM WMV and Capture are NOT available in some compilers,

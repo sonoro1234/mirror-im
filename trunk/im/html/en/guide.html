@@ -109,14 +109,18 @@ im_ecw -&gt; im
        -&gt; <strong><span class="style3">NCSEcw</span></strong> (system)
 im_capture -&gt; <strong><span class="style3">strmiids</span></strong> (system - Windows)
 im_process -&gt; im
-im_fftw -&gt; im
+im_fftw -&gt; im_process
         -&gt; <strong><span class="style2">fftw</span></strong> (included)
+im_fftw3 -&gt; im_process
+         -&gt; <strong><span class="style2">fftw3</span></strong>
 imlua51 -&gt; im
         -&gt; <span class="style1"><strong>lua5.1</strong></span>
 imlua_capture51 -&gt; imlua51
                 -&gt; im_capture
 imlua_fftw51 -&gt; imlua51
              -&gt; im_fftw
+imlua_fftw351 -&gt; imlua51
+              -&gt; im_fftw3
 imlua_process51 -&gt; imlua51
                 -&gt; im_process</pre>
 <p>As a general rule (excluding system dependencies and included third party 
