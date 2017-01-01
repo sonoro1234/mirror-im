@@ -65,23 +65,23 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
   /* Making r=0, g=0, b=0, r=1, g=1 or b=1 in the parametric equations and 
      writing s in function of H and I. */
 
-  hr = fabs(cosH / 1.5);
-  hg = fabs(-cosH + sinH*sqrt3) / 3.0;
-  hb = fabs(-cosH - sinH*sqrt3) / 3.0;
+  hr = cosH / 1.5;
+  hg = (-cosH + sinH*sqrt3) / 3.0;
+  hb = (-cosH - sinH*sqrt3) / 3.0;
 
   /* at bottom */
   if (i <= 1.0/3.0)
   {
     /* face B=0 */
     if (h < rad120)
-      return i/hb;
+      return i / fabs(hb);
 
     /* face R=0 */
     if (h < rad240)
-      return i/hr;
+      return i / fabs(hr);
 
     /* face G=0 */
-    return i/hg;
+    return i / fabs(hg);
   }
 
   /* at top */
@@ -89,14 +89,14 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
   {
     /* face R=1 */
     if (h < rad60 || h > rad300)
-      return (1.0 - i) / hr;
+      return (1.0 - i) / fabs(hr);
 
     /* face G=1 */
     if (h < rad180)
-      return (1.0 - i) / hg;
+      return (1.0 - i) / fabs(hg);
 
     /* face B=1 */
-    return (1.0 - i) / hb;
+    return (1.0 - i) / fabs(hb);
   }
 
   /* in the middle */
@@ -111,9 +111,9 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
     imax = h0 / (h0 - h1);
 
   if (i < imax) 
-    return i/h0;
+    return i / fabs(h0);
   else
-    return (1.0 - i)/h1;
+    return (1.0 - i) / fabs(h1);
 }
 
 /* Given H, returns I where S is max,
@@ -130,8 +130,8 @@ double imColorHSI_ImaxS(double h, double cosH, double sinH)
     return 2.0/3.0;
 
   hr = cosH / 1.5;
-  hg = (-cosH + sinH*sqrt3)/ 3.0;
-  hb = (-cosH - sinH*sqrt3)/ 3.0;
+  hg = (-cosH + sinH*sqrt3) / 3.0;
+  hb = (-cosH - sinH*sqrt3) / 3.0;
 
   iColorSmax01(h, hr, hb, hg, &h0, &h1);
 
