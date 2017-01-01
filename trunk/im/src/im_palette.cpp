@@ -291,7 +291,7 @@ long* imPaletteHues(void)
   }
 
   /* red */
-  *(ct++) = imColorEncode((imbyte)255, 0, 0);;
+  *(ct++) = imColorEncode((imbyte)255, 0, 0);
 
   return palette;
 }
