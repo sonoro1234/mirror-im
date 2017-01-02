@@ -65,7 +65,7 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
   /* Making r=0, g=0, b=0, r=1, g=1 or b=1 in the parametric equations and 
      writing s in function of H and I. */
 
-  hr = cosH / 1.5;
+  hr = (2.0 * cosH) / 3.0;
   hg = (-cosH + sinH*sqrt3) / 3.0;
   hb = (-cosH - sinH*sqrt3) / 3.0;
 
@@ -74,14 +74,14 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
   {
     /* face B=0 */
     if (h < rad120)
-      return i / fabs(hb);
+      return fabs(-i / hb);
 
     /* face R=0 */
     if (h < rad240)
-      return i / fabs(hr);
+      return fabs(-i / hr);
 
     /* face G=0 */
-    return i / fabs(hg);
+    return fabs(-i / hg);
   }
 
   /* at top */
@@ -89,14 +89,14 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
   {
     /* face R=1 */
     if (h < rad60 || h > rad300)
-      return (1.0 - i) / fabs(hr);
+      return fabs((1.0 - i) / hr);
 
     /* face G=1 */
     if (h < rad180)
-      return (1.0 - i) / fabs(hg);
+      return fabs((1.0 - i) / hg);
 
     /* face B=1 */
-    return (1.0 - i) / fabs(hb);
+    return fabs((1.0 - i) / hb);
   }
 
   /* in the middle */
@@ -104,20 +104,22 @@ static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
   iColorSmax01(h, hr, hb, hg, &h0, &h1);
 
   if (h == 0.0 || h == rad120 || h == rad240)
-    imax = 1.0/3.0;
+    imax = 1.0 / 3.0;
   else if (h == rad60 || h == rad180 || h == rad300)
-    imax = 2.0/3.0;
+    imax = 2.0 / 3.0;
   else
-    imax = h0 / (h0 - h1);
+    imax = fabs(h0 / (h0 - h1));
 
   if (i < imax) 
-    return i / fabs(h0);
+    return fabs(-i / h0);
   else
-    return (1.0 - i) / fabs(h1);
+    return fabs((1.0 - i) / h1);
 }
 
 /* Given H, returns I where S is max,
-   BUT the maximum S here is 1 at the corners of the cube. */
+   The maximum S is where top meets bottom. 
+   - i / h0 = (1 - i) / h1
+   */
 double imColorHSI_ImaxS(double h, double cosH, double sinH)
 {
   double i, h0, h1;
@@ -127,9 +129,9 @@ double imColorHSI_ImaxS(double h, double cosH, double sinH)
     return 1.0 / 3.0;
 
   if (h == rad60 || h == rad180 || h == rad300)
-    return 2.0/3.0;
+    return 2.0 / 3.0;
 
-  hr = cosH / 1.5;
+  hr = (2.0 * cosH) / 3.0;
   hg = (-cosH + sinH*sqrt3) / 3.0;
   hb = (-cosH - sinH*sqrt3) / 3.0;
 
@@ -137,7 +139,7 @@ double imColorHSI_ImaxS(double h, double cosH, double sinH)
 
   i = h0 / (h0 - h1);
 
-  return i;
+  return fabs(i);
 }
 
 /**********************************/               
@@ -150,10 +152,10 @@ void imColorRGB2HSI(double R, double G, double B, double *fh, double *fs, double
   double I, S, H;
 
   /* Parametric equations */
-  v = R - (G + B)/2;
-  u = (G - B) * (sqrt3/2);
+  v = R - (G + B) / 2.0;
+  u = (G - B) * (sqrt3/2.0);
 
-  I = (R + G + B)/3;   /* already normalized to 0-1 */
+  I = (R + G + B) / 3.0;   /* already normalized to 0-1 */
   S = sqrt(v*v + u*u);  /* s is between 0-1, it is linear in the cube and it is in u,v space. */
   
   if (S == 0)
@@ -162,18 +164,19 @@ void imColorRGB2HSI(double R, double G, double B, double *fh, double *fs, double
   {
     H = atan2(u, v);
     H = iColorNormHue(H);
-    H = H * rad2deg;
 
-    /* must scale S from 0-Smax to 0-1 */
-    double Smax = iColorHSI_Smax(H, cos(H), sin(H), I);
-    if (Smax == 0.0)
-      S = 0.0;
+    if (I == 0.0 || I == 1.0)
+      S = 0.0;  /* by definition */
     else
     {
+      /* must scale S from 0-Smax to 0-1 */
+      double Smax = iColorHSI_Smax(H, cos(H), sin(H), I);
       S /= Smax;
       if (S > 1.0) /* because of round problems when calculating S and Smax */
         S = 1.0;
     }
+
+    H = H * rad2deg;
   }
 
   *fi = I;
@@ -198,11 +201,11 @@ void imColorHSI2RGB(double H, double S, double I, double *r, double *g, double *
 {
   double cosH, sinH, v, u, R, G, B;
 
-  if (I < 0) I = 0;
-  else if (I > 1) I = 1;
+  if (I < 0.0) I = 0.0;
+  else if (I > 1.0) I = 1.0;
   
-  if (S < 0) S = 0;
-  else if (S > 1) S = 1;
+  if (S < 0) S = 0.0;
+  else if (S > 1.0) S = 1.0;
 
   if (S == 0.0 || I == 1.0 || I == 0.0 || H == 360.0)
   {
@@ -228,18 +231,18 @@ void imColorHSI2RGB(double H, double S, double I, double *r, double *g, double *
   u = S * sinH;
 
   /* Inverse of the Parametric equations, using I normalized to 0-1 */
-  R = I + v/1.5;
+  R = I + (2.0 * v)/3.0;
   G = I - (v - u*sqrt3)/3.0;
   B = I - (v + u*sqrt3)/3.0;
 
   /* fix round errors */
-  if (R < 0) R = 0;
-  if (G < 0) G = 0;
-  if (B < 0) B = 0;
+  if (R < 0.0) R = 0.0;
+  if (G < 0.0) G = 0.0;
+  if (B < 0.0) B = 0.0;
 
-  if (R > 1) R = 1.0;
-  if (G > 1) G = 1.0;
-  if (B > 1) B = 1.0;
+  if (R > 1.0) R = 1.0;
+  if (G > 1.0) G = 1.0;
+  if (B > 1.0) B = 1.0;
 
   *r = R;
   *g = G;
