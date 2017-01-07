@@ -20,7 +20,10 @@ extern "C" {
 
 
 /** Custom unary point function. \n
- * Data will be set only if the returned value is non zero.
+ * Data will be set only if the returned value is non zero. \n
+ * It is called (width * height * depth).\n
+ *  *dst_value must contains the result (it is not an array)
+ *
  * \verbatim func(src_value: number, params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the params table is unpacked.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
@@ -43,6 +46,10 @@ int imProcessUnaryPointOp(const imImage* src_image, imImage* dst_image, imUnaryP
 
 /** Custom unary point color function. \n
  * Data will be set only if the returned value is non zero.
+ * It is called (width * height).\n
+ * src_value is an array with src_image->depth values. \n
+ * dst_value is an array with dst_image->depth values.
+ *
  * \verbatim func(src_value_plane0: number, src_value_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the params table is unpacked.
  * Also each color plane is passed as a separate value, instead of inside an array.
@@ -67,6 +74,10 @@ int imProcessUnaryPointColorOp(const imImage* src_image, imImage* dst_image, imU
 /** Custom multiple point function. \n
  * Source values are copies, so they can be changed inside the function without affecting the original image. \n
  * Data will be set only if the returned value is non zero.
+ * It is called (width * height * depth).\n
+ * src_value is an array with src_image_count values (one value from each image). \n
+ *  *dst_value must contains the result (it is not an array)
+ *
  * \verbatim func(src_value1: number, src_value2: number, ... , params1, param2, ..., x: number, y: number, d: number) -> dst_value: number  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
  * And the returned value contains only the target values to update, or nil (also no return value) to leave target intact.
@@ -91,6 +102,10 @@ int imProcessMultiPointOp(const imImage** src_image_list, int src_image_count, i
 /** Custom multiple point color function. \n
  * Source values are copies, so they can be changed inside the function without affecting the original image. \n
  * Data will be set only if the returned value is non zero.
+ * It is called (width * height).\n
+ * src_value is an array with (src_image_count * src_image->depth) values (one value from each image times the depth). \n
+ * dst_value is an array with dst_image->depth values.
+ *
  * \verbatim func(src_value1_plane0: number, src_value1_plane1: number, ..., src_value2_plane0: number, src_value2_plane1: number, ... , params1, param2, ..., x: number, y: number) -> dst_value_plane0: number, dst_value_plane1: number, ...  [in Lua 5] \endverbatim
  * In Lua, the source images data and the params table are unpacked.
  * Also each color plane is passed as a separate value, instead of inside an array.
@@ -446,10 +461,19 @@ void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, double
  * The colors are created from gray values using them to index Hue angles from 0 to 360,
  * and as Intensity values, with maximum Saturation.
  *
- * \verbatim im.PseudoColor(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
- * \verbatim im.PseudoColorNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \verbatim im.ProcessPseudoColor(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
+ * \verbatim im.ProcessPseudoColorNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup colorproc */
 void imProcessPseudoColor(const imImage* src_image, imImage* dst_image);
+
+/** Fix BGR order to RGB.
+ * Images must match. Ans must have color space RGB.
+ *
+ * \verbatim im.ProcessFixBGR(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
+ * \verbatim im.ProcessFixBGRNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \ingroup colorproc */
+void imProcessFixBGR(const imImage* src_image, imImage* dst_image);
+
 
 
 /** \defgroup logic Logical Arithmetic Operations 

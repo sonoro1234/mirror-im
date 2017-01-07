@@ -2572,6 +2572,18 @@ static int imluaProcessPseudoColor(lua_State *L)
   return 0;
 }
 
+static int imluaProcessFixBGR(lua_State *L)
+{
+  imImage *src_image = imlua_checkimage(L, 1);
+  imImage *dst_image = imlua_checkimage(L, 2);
+
+  imlua_match(L, src_image, dst_image);
+  imlua_checkcolorspace(L, 1, src_image, IM_RGB);
+
+  imProcessFixBGR(src_image, dst_image);
+  return 0;
+}
+
 /*****************************************************************************\
  im.ProcessReplaceColor
 \*****************************************************************************/
@@ -3693,6 +3705,7 @@ static const luaL_Reg improcess_lib[] = {
   {"ProcessReplaceColor", imluaProcessReplaceColor},
   {"ProcessSetAlphaColor", imluaProcessSetAlphaColor},
   { "ProcessPseudoColor", imluaProcessPseudoColor },
+  { "ProcessFixBGR", imluaProcessFixBGR },
 
   {"ProcessBitwiseOp", imluaProcessBitwiseOp},
   {"ProcessBitwiseNot", imluaProcessBitwiseNot},

@@ -975,6 +975,8 @@ namespace im
       imProcessNormalizeComponents(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void PseudoColor(const Image& src_image, Image& dst_image) {
       imProcessPseudoColor(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline void FixBGR(const Image& src_image, Image& dst_image) {
+      imProcessFixBGR(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void ReplaceColor(const Image& src_image, Image& dst_image, double* src_color, double* dst_color) {
       imProcessReplaceColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, dst_color); }
     inline void SetAlphaColor(const Image& src_image, Image& dst_image, double* src_color, double dst_alpha) {
