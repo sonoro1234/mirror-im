@@ -937,6 +937,8 @@ namespace im
       return imProcessAutoCovariance(src_image.GetHandle(), mean_image.GetHandle(), dst_image.GetHandle()); }
     inline void MultiplyConj(const Image& src_image1, const Image& src_image2, Image& dst_image) {
       imProcessMultiplyConj(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle()); }
+    inline void BackSub(const Image& src_image1, const Image& src_image2, Image& dst_image, double tol, int diff) {
+      imProcessBackSub(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), tol, diff); }
     inline void QuantizeRGBUniform(const Image& src_image, Image& dst_image, int do_dither) {
       imProcessQuantizeRGBUniform(src_image.GetHandle(), dst_image.GetHandle(), do_dither); }
     inline void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays) {
@@ -971,6 +973,8 @@ namespace im
     }
     inline void NormalizeComponents(const Image& src_image, Image& dst_image) {
       imProcessNormalizeComponents(src_image.GetHandle(), dst_image.GetHandle()); }
+    inline void PseudoColor(const Image& src_image, Image& dst_image) {
+      imProcessPseudoColor(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void ReplaceColor(const Image& src_image, Image& dst_image, double* src_color, double* dst_color) {
       imProcessReplaceColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, dst_color); }
     inline void SetAlphaColor(const Image& src_image, Image& dst_image, double* src_color, double dst_alpha) {

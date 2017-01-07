@@ -19,6 +19,62 @@
 #include <memory.h>
 
 
+template <class T>
+static inline T backsub_op(const T& v1, const T& v2, const double& tol, int use_diff)
+{
+  T diff = diff_op(v1, v2);
+
+  if (diff <= tol)
+    return (T)0; // subtract background
+  else
+  {
+    if (use_diff)
+      return (T)diff; // show the difference
+    else
+      return (T)v1;  // show the original image
+  }
+}
+
+template <class T>
+static void DoBackSub(T *map1, T *map2, T *map, int count, double tol, int diff)
+{
+  for (int i = 0; i < count; i++)
+    map[i] = backsub_op(map1[i], map2[i], tol, diff);
+}
+
+void imProcessBackSub(const imImage* src_image1, imImage* src_image2, imImage* dst_image, double tol, int diff)
+{
+  int count = src_image1->count;
+
+  for (int i = 0; i < src_image1->depth; i++)
+  {
+    switch (src_image1->data_type)
+    {
+    case IM_BYTE:
+      DoBackSub((imbyte*)src_image1->data[i], (imbyte*)src_image2->data[i], (imbyte*)dst_image->data[i], count, tol, diff);
+      break;
+    case IM_USHORT:
+      DoBackSub((imushort*)src_image1->data[i], (imushort*)src_image2->data[i], (imushort*)dst_image->data[i], count, tol, diff);
+      break;
+    case IM_INT:
+      DoBackSub((int*)src_image1->data[i], (int*)src_image2->data[i], (int*)dst_image->data[i], count, tol, diff);
+      break;
+    case IM_FLOAT:
+      DoBackSub((float*)src_image1->data[i], (float*)src_image2->data[i], (float*)dst_image->data[i], count, tol, diff);
+      break;
+    case IM_CFLOAT:
+      DoBackSub((imcfloat*)src_image1->data[i], (imcfloat*)src_image2->data[i], (imcfloat*)dst_image->data[i], count, tol, diff);
+      break;
+    case IM_DOUBLE:
+      DoBackSub((double*)src_image1->data[i], (double*)src_image2->data[i], (double*)dst_image->data[i], count, tol, diff);
+      break;
+    case IM_CDOUBLE:
+      DoBackSub((imcdouble*)src_image1->data[i], (imcdouble*)src_image2->data[i], (imcdouble*)dst_image->data[i], count, tol, diff);
+      break;
+    }
+  }
+}
+
 template <class T1, class T2, class T3> 
 static void DoBinaryOp(T1 *map1, T2 *map2, T3 *map, int count, int op)
 {

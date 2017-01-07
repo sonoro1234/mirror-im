@@ -292,6 +292,14 @@ int imProcessAutoCovariance(const imImage* src_image, const imImage* mean_image,
  * \ingroup arithm */
 void imProcessMultiplyConj(const imImage* src_image1, const imImage* src_image2, imImage* dst_image);
 
+/** Subtracts a background image using a tolerance. \n
+ * If different is less than the tolerance background is detected and assigned to 0.\
+ * Else keeps the original image or show the difference. 
+ *
+ * \verbatim im.ProcessBackSub(src_image1: imImage, src_image2: imImage, dst_image: imImage, tol: number, show_diff: boolean) [in Lua 5] \endverbatim
+ * \verbatim im.ProcessBackSubNew(src_image1: imImage, src_image2: imImage, tol: number, show_diff: boolean) -> new_image: imImage [in Lua 5] \endverbatim
+ *\ingroup arithm */
+void imProcessBackSub(const imImage* src_image1, imImage* src_image2, imImage* dst_image, double tol, int show_diff);
 
 
 /** \defgroup quantize Additional Image Quantization Operations
@@ -422,7 +430,7 @@ void imProcessNormalizeComponents(const imImage* src_image, imImage* dst_image);
  * \ingroup colorproc */
 void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, double* src_color, double* dst_color);
 
-/** Sets the alpha channel in target where the given color occours in source,
+/** Sets the alpha channel in target where the given color occurs in source,
  * elsewhere alpha remains untouched. \n
  * The color must have the same number of components of the source image. \n
  * If target does not have an alpha channel, then its plane=0 is used. \n
@@ -432,6 +440,16 @@ void imProcessReplaceColor(const imImage* src_image, imImage* dst_image, double*
  * \verbatim im.ProcessSetAlphaColor(src_image: imImage, dst_image: imImage, src_color: table of numbers, dst_alpha: number) [in Lua 5] \endverbatim
  * \ingroup colorproc */
 void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, double* src_color, double dst_alpha);
+
+/** Creates a pseudo color version of a GRAY image. \n
+ * Images must have same size. Destiny must be IM_RGB/IM_BYTE. \n
+ * The colors are created from gray values using them to index Hue angles from 0 to 360,
+ * and as Intensity values, with maximum Saturation.
+ *
+ * \verbatim im.PseudoColor(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
+ * \verbatim im.PseudoColorNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \ingroup colorproc */
+void imProcessPseudoColor(const imImage* src_image, imImage* dst_image);
 
 
 /** \defgroup logic Logical Arithmetic Operations 
