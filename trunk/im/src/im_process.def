@@ -124,7 +124,9 @@ EXPORTS
   imProcessAbnormalHyperionCorrection
   imProcessCanny
   imProcessMultiplyConj
+  imProcessBackSub
   imProcessNormalizeComponents
+  imProcessPseudoColor
   imGaussianStdDev2KernelSize
   imProcessBitwiseNot
   imProcessDistanceTransform

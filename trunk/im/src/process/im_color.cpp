@@ -17,6 +17,54 @@
 #include <memory.h>
 
 
+template <class T>
+static void DoPseudoColor(T* src_data, imbyte** dst_data, int count)
+{
+  imbyte *red = dst_data[0],
+    *green = dst_data[1],
+    *blue = dst_data[2];
+  T min, max;
+  unsigned char r, g, b;
+
+  imMinMaxType(src_data, count, min, max);
+
+#ifdef _OPENMP
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#endif
+  for (int i = 0; i < count; i++)
+  {
+    double norm = (double)(src_data[i] - min) / (double)(max - min);  // now 0 <= norm <= 1
+
+    imColorHSI2RGBbyte(norm * 360, 1.0, norm, &r, &g, &b);
+
+    red[i] = r;
+    green[i] = g;
+    blue[i] = b;
+  }
+}
+
+void imProcessPseudoColor(const imImage* src_image, imImage* dst_image)
+{
+  switch (src_image->data_type)
+  {
+  case IM_BYTE:
+    DoPseudoColor((imbyte*)src_image->data[0], (imbyte**)dst_image->data, src_image->count);
+    break;
+  case IM_SHORT:
+    DoPseudoColor((short*)src_image->data[0], (imbyte**)dst_image->data, src_image->count);
+    break;
+  case IM_USHORT:
+    DoPseudoColor((imushort*)src_image->data[0], (imbyte**)dst_image->data, src_image->count);
+    break;
+  case IM_FLOAT:
+    DoPseudoColor((float*)src_image->data[0], (imbyte**)dst_image->data, src_image->count);
+    break;
+  case IM_DOUBLE:
+    DoPseudoColor((double*)src_image->data[0], (imbyte**)dst_image->data, src_image->count);
+    break;
+  }
+}
+
 static void rgb2yrgb(imbyte* r, imbyte* g, imbyte* b, imbyte* y)
 {
   int ri,gi,bi;

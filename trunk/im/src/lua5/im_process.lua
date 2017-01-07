@@ -299,7 +299,8 @@ function im.ProcessMultipleMedianNew (src_image_list, dst_image)
 end
 
 TwoSourcesOneDest("ProcessAutoCovariance")
-OneSourceOneDest("ProcessMultiplyConj")
+TwoSourcesOneDest("ProcessMultiplyConj")
+TwoSourcesOneDest("ProcessBackSub")
 OneSourceOneDest("ProcessQuantizeRGBUniform", nil, nil, im.MAP, nil)
 OneSourceOneDest("ProcessQuantizeGrayUniform")
 OneSourceOneDest("ProcessExpandHistogram")
@@ -366,6 +367,12 @@ function im.ProcessNormalizeComponentsNew(src_image)
   if (src_image:DataType() == im.DOUBLE) then data_type = im.DOUBLE end
   local dst_image = im.ImageCreateBased(src_image, nil, nil, nil, data_type)
   im.ProcessNormalizeComponents(src_image, dst_image)
+  return dst_image
+end
+
+function im.ProcessPseudoColorNew(src_image)
+  local dst_image = im.ImageCreateBased(src_image, nil, nil, im.RGB, im.BYTE)
+  im.ProcessPseudoColor(src_image, dst_image)
   return dst_image
 end
 
