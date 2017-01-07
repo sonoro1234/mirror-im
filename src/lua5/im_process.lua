@@ -338,6 +338,7 @@ function im.ProcessMergeComponentsNew (src_image_list)
 end
 
 OneSourceOneDest("ProcessReplaceColor")
+OneSourceOneDest("ProcessFixBGR")
 TwoSourcesOneDest("ProcessBitwiseOp")
 OneSourceOneDest("ProcessBitwiseNot")
 OneSourceOneDest("ProcessBitMask")

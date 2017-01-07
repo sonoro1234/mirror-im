@@ -543,3 +543,54 @@ void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, double
   }
 }
 
+template <class T>
+static void DoFixBGR(T** src_data, T** dst_data, int count)
+{
+  T* src_b = src_data[0];
+  T* src_g = src_data[1];
+  T* src_r = src_data[2];
+  T* dst_r = dst_data[0];
+  T* dst_g = dst_data[1];
+  T* dst_b = dst_data[2];
+
+#ifdef _OPENMP
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#endif
+  for (int i = 0; i < count; i++)
+  {
+    // tem values to allow in-place operation
+    T b = src_b[i];
+    T g = src_g[i];
+    T r = src_r[i];
+
+    dst_r[i] = r;
+    dst_g[i] = g;
+    dst_b[i] = b;
+  }
+}
+
+void imProcessFixBGR(const imImage* src_image, imImage* dst_image)
+{
+  switch (src_image->data_type)
+  {
+  case IM_BYTE:
+    DoFixBGR((imbyte**)src_image->data, (imbyte**)dst_image->data, src_image->count);
+    break;
+  case IM_SHORT:
+    DoFixBGR((short**)src_image->data, (short**)dst_image->data, src_image->count);
+    break;
+  case IM_USHORT:
+    DoFixBGR((imushort**)src_image->data, (imushort**)dst_image->data, src_image->count);
+    break;
+  case IM_INT:
+    DoFixBGR((int**)src_image->data, (int**)dst_image->data, src_image->count);
+    break;
+  case IM_FLOAT:
+    DoFixBGR((float**)src_image->data, (float**)dst_image->data, src_image->count);
+    break;
+  case IM_DOUBLE:
+    DoFixBGR((double**)src_image->data, (double**)dst_image->data, src_image->count);
+    break;
+  }
+}
+

@@ -177,7 +177,7 @@ static int DoUnaryPointColorOp(T1 **src_map, T2 **dst_map, int width, int height
     int x = i - y*width;
 
     int d;
-    double src_value[IM_MAXDEPTH];
+    double src_value[IM_MAXDEPTH];   // TODO: is this going to work in OpenMP?
     double dst_value[IM_MAXDEPTH];
 
     for(d = 0; d < src_depth; d++)
