@@ -112,12 +112,12 @@ long* imPaletteYellow(void);
  * \ingroup palette */
 long* imPaletteMagenta(void);
 
-/** Creates a palette of a gradient of cian colors.
- * The colors are arranged from black to pure cian.
+/** Creates a palette of a gradient of cyan colors.
+ * The colors are arranged from black to pure cyan.
  *
- * \verbatim im.PaletteCian() -> pal: imPalette [in Lua 5] \endverbatim
+ * \verbatim im.PaletteCyan() -> pal: imPalette [in Lua 5] \endverbatim
  * \ingroup palette */
-long* imPaletteCian(void);
+long* imPaletteCyan(void);
 
 /** Creates a palette of rainbow colors.
  * The colors are arranged in the light wave length spectrum order (starting from purple).

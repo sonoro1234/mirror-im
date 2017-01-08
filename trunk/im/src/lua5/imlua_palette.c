@@ -158,11 +158,11 @@ static int imluaPaletteMagenta (lua_State *L)
 }
 
 /*****************************************************************************\
- im.PaletteCian
+ im.PaletteCyan
 \*****************************************************************************/
-static int imluaPaletteCian (lua_State *L)
+static int imluaPaletteCyan (lua_State *L)
 {
-  imlua_pushpalette(L, imPaletteCian(), 256);
+  imlua_pushpalette(L, imPaletteCyan(), 256);
   return 1;
 }
 
@@ -355,7 +355,7 @@ static const luaL_Reg impalette_lib[] = {
   {"PaletteBlue", imluaPaletteBlue },
   {"PaletteYellow", imluaPaletteYellow },
   {"PaletteMagenta", imluaPaletteMagenta },
-  {"PaletteCian", imluaPaletteCian },
+  {"PaletteCyan", imluaPaletteCyan },
   {"PaletteRainbow", imluaPaletteRainbow },
   {"PaletteHues", imluaPaletteHues },
   {"PaletteBlueIce", imluaPaletteBlueIce },

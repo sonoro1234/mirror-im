@@ -108,6 +108,12 @@ void imColorDecode(unsigned char *red, unsigned char *green, unsigned char *blue
  * \ingroup colormodeutl */
 const char* imColorModeSpaceName(int color_mode);
 
+/** Returns the color mode space component name.
+*
+* \verbatim im.ColorModeComponentName(color_mode: number) -> name: string [in Lua 5] \endverbatim
+* \ingroup colormodeutl */
+const char* imColorModeComponentName(int color_space, int component);
+
 /** Returns the number of components of the color space including alpha.
  *
  * \verbatim im.ColorModeDepth(color_mode: number) -> depth: number [in Lua 5] \endverbatim

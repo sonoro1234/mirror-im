@@ -36,7 +36,7 @@ enum imColorSpace
   IM_MAP,    /**< Indexed by RGB color map (data_type=IM_BYTE). */
   IM_GRAY,   /**< Shades of gray, luma (nonlinear Luminance), or an intensity value that is not related to color. */
   IM_BINARY, /**< Indexed by 2 colors: black (0) and white (1) (data_type=IM_BYTE).     */
-  IM_CMYK,   /**< Cian, Magenta, Yellow and Black (nonlinear).                          */
+  IM_CMYK,   /**< Cyan, Magenta, Yellow and Black (nonlinear).                          */
   IM_YCBCR,  /**< ITU-R 601 Y'CbCr. Y' is luma (nonlinear Luminance).                   */
   IM_LAB,    /**< CIE L*a*b*. L* is Lightness (nonlinear Luminance, nearly perceptually uniform). */
   IM_LUV,    /**< CIE L*u*v*. L* is Lightness (nonlinear Luminance, nearly perceptually uniform). */

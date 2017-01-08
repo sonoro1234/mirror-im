@@ -20,10 +20,10 @@
 \*****************************************************************************/
 static int imluaImageDataSize (lua_State *L)
 {
-  int width = luaL_checkinteger(L, 1);
-  int height = luaL_checkinteger(L, 2);
-  int color_mode = luaL_checkinteger(L, 3);
-  int data_type = luaL_checkinteger(L, 4);
+  int width = (int)luaL_checkinteger(L, 1);
+  int height = (int)luaL_checkinteger(L, 2);
+  int color_mode = (int)luaL_checkinteger(L, 3);
+  int data_type = (int)luaL_checkinteger(L, 4);
 
   lua_pushinteger(L, imImageDataSize(width, height, color_mode, data_type));
   return 1;
@@ -34,9 +34,9 @@ static int imluaImageDataSize (lua_State *L)
 \*****************************************************************************/
 static int imluaImageLineSize (lua_State *L)
 {
-  int width = luaL_checkinteger(L, 1);
-  int color_mode = luaL_checkinteger(L, 2);
-  int data_type = luaL_checkinteger(L, 3);
+  int width = (int)luaL_checkinteger(L, 1);
+  int color_mode = (int)luaL_checkinteger(L, 2);
+  int data_type = (int)luaL_checkinteger(L, 3);
 
   lua_pushinteger(L, imImageLineSize(width, color_mode, data_type));
   return 1;
@@ -47,8 +47,8 @@ static int imluaImageLineSize (lua_State *L)
 \*****************************************************************************/
 static int imluaImageLineCount (lua_State *L)
 {
-  int width = luaL_checkinteger(L, 1);
-  int color_mode = luaL_checkinteger(L, 2);
+  int width = (int)luaL_checkinteger(L, 1);
+  int color_mode = (int)luaL_checkinteger(L, 2);
 
   lua_pushinteger(L, imImageLineCount(width, color_mode));
   return 1;
@@ -59,8 +59,8 @@ static int imluaImageLineCount (lua_State *L)
 \*****************************************************************************/
 static int imluaImageCheckFormat (lua_State *L)
 {
-  int color_mode = luaL_checkinteger(L, 1);
-  int data_type = luaL_checkinteger(L, 2);
+  int color_mode = (int)luaL_checkinteger(L, 1);
+  int data_type = (int)luaL_checkinteger(L, 2);
 
   lua_pushboolean(L, imImageCheckFormat(color_mode, data_type));
   return 1;
@@ -71,16 +71,23 @@ static int imluaImageCheckFormat (lua_State *L)
 \*****************************************************************************/
 static int imluaColorModeSpaceName (lua_State *L)
 {
-  lua_pushstring(L, imColorModeSpaceName(luaL_checkinteger(L, 1)));
+  lua_pushstring(L, imColorModeSpaceName((int)luaL_checkinteger(L, 1)));
   return 1;
 }
+
+static int imluaColorModeComponentName(lua_State *L)
+{
+  lua_pushstring(L, imColorModeComponentName((int)luaL_checkinteger(L, 1), (int)luaL_checkinteger(L, 2)));
+  return 1;
+}
+
 
 /*****************************************************************************\
  im.ColorModeDepth(color_mode)
 \*****************************************************************************/
 static int imluaColorModeDepth (lua_State *L)
 {
-  lua_pushinteger(L, imColorModeDepth(luaL_checkinteger(L, 1)));
+  lua_pushinteger(L, imColorModeDepth((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -120,7 +127,7 @@ static int imluaColorModeHasAlpha (lua_State *L)
 \*****************************************************************************/
 static int imluaColorModeIsPacked (lua_State *L)
 {
-  lua_pushboolean(L, imColorModeIsPacked(luaL_checkinteger(L, 1)));
+  lua_pushboolean(L, imColorModeIsPacked((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -129,7 +136,7 @@ static int imluaColorModeIsPacked (lua_State *L)
 \*****************************************************************************/
 static int imluaColorModeIsTopDown (lua_State *L)
 {
-  lua_pushboolean(L, imColorModeIsTopDown(luaL_checkinteger(L, 1)));
+  lua_pushboolean(L, imColorModeIsTopDown((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -138,7 +145,7 @@ static int imluaColorModeIsTopDown (lua_State *L)
 \*****************************************************************************/
 static int imluaColorModeToBitmap (lua_State *L)
 {
-  lua_pushinteger(L, imColorModeToBitmap(luaL_checkinteger(L, 1)));
+  lua_pushinteger(L, imColorModeToBitmap((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -147,8 +154,8 @@ static int imluaColorModeToBitmap (lua_State *L)
 \*****************************************************************************/
 static int imluaColorModeIsBitmap (lua_State *L)
 {
-  int color_mode = luaL_checkinteger(L, 1);
-  int data_type = luaL_checkinteger(L, 2);
+  int color_mode = (int)luaL_checkinteger(L, 1);
+  int data_type = (int)luaL_checkinteger(L, 2);
 
   lua_pushboolean(L, imColorModeIsBitmap(color_mode, data_type));
   return 1;
@@ -159,7 +166,7 @@ static int imluaColorModeIsBitmap (lua_State *L)
 \*****************************************************************************/
 static int imluaDataTypeSize (lua_State *L)
 {
-  lua_pushinteger(L, imDataTypeSize(luaL_checkinteger(L, 1)));
+  lua_pushinteger(L, imDataTypeSize((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -168,7 +175,7 @@ static int imluaDataTypeSize (lua_State *L)
 \*****************************************************************************/
 static int imluaDataTypeName (lua_State *L)
 {
-  lua_pushstring(L, imDataTypeName(luaL_checkinteger(L, 1)));
+  lua_pushstring(L, imDataTypeName((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -177,7 +184,7 @@ static int imluaDataTypeName (lua_State *L)
 \*****************************************************************************/
 static int imluaDataTypeIntMax(lua_State *L)
 {
-  lua_pushinteger(L, imDataTypeIntMax(luaL_checkinteger(L, 1)));
+  lua_pushinteger(L, imDataTypeIntMax((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -186,7 +193,7 @@ static int imluaDataTypeIntMax(lua_State *L)
 \*****************************************************************************/
 static int imluaDataTypeIntMin(lua_State *L)
 {
-  lua_pushinteger(L, imDataTypeIntMin(luaL_checkinteger(L, 1)));
+  lua_pushinteger(L, imDataTypeIntMin((int)luaL_checkinteger(L, 1)));
   return 1;
 }
 
@@ -201,9 +208,9 @@ static int imlua_colorencode(lua_State *L)
   unsigned char red_i, green_i, blue_i;
   long color_i;
 
-  red_f   = luaL_checkinteger(L, 1);
-  green_f = luaL_checkinteger(L, 2);
-  blue_f  = luaL_checkinteger(L, 3);
+  red_f   = (int)luaL_checkinteger(L, 1);
+  green_f = (int)luaL_checkinteger(L, 2);
+  blue_f  = (int)luaL_checkinteger(L, 3);
 
   if (red_f < 0 || red_f > 255)
     luaL_argerror(L, 1, "color components values should be in range [0, 255]");
@@ -253,7 +260,9 @@ static const luaL_Reg imutil_lib[] = {
 
   {"ColorModeSpace", imluaColorModeSpace},
   {"ColorModeSpaceName", imluaColorModeSpaceName},
-  {"ColorModeDepth", imluaColorModeDepth},
+  { "ColorModeComponentName", imluaColorModeComponentName },
+  { "ColorModeDepth", imluaColorModeDepth },
+  
 
   {"ColorModeToBitmap", imluaColorModeToBitmap},
   {"ColorModeIsBitmap", imluaColorModeIsBitmap},
