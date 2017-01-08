@@ -95,8 +95,8 @@ namespace im
       return Palette(imPaletteYellow()); }
     static Palette Magenta() {
       return Palette(imPaletteMagenta()); }
-    static Palette Cian() {
-      return Palette(imPaletteCian()); }
+    static Palette Cyan() {
+      return Palette(imPaletteCyan()); }
     static Palette Rainbow() {
       return Palette(imPaletteRainbow()); }
     static Palette Hues() {
@@ -1007,6 +1007,8 @@ namespace im
       return imProcessCalcAutoGamma(image.GetHandle()); }
     inline void ShiftHSI(const Image& src_image, Image& dst_image, double h_shift, double s_shift, double i_shift) {
       imProcessShiftHSI(src_image.GetHandle(), dst_image.GetHandle(), h_shift, s_shift, i_shift); }
+    inline void ShiftComponent(const Image& src_image, Image& dst_image, double h_shift, double s_shift, double i_shift) {
+      imProcessShiftComponent(src_image.GetHandle(), dst_image.GetHandle(), h_shift, s_shift, i_shift); }
     inline void Threshold(const Image& src_image, Image& dst_image, double level, int value) {
       imProcessThreshold(src_image.GetHandle(), dst_image.GetHandle(), level, value); }
     inline void ThresholdByDiff(const Image& src_image1, const Image& src_image2, Image& dst_image) {

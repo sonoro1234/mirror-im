@@ -3248,12 +3248,27 @@ static int imluaProcessShiftHSI(lua_State *L)
   imImage *src_image = imlua_checkimage(L, 1);
   imImage *dst_image = imlua_checkimage(L, 2);
 
+  imlua_checkcolorspace(L, 1, src_image, IM_RGB);
   imlua_checknotcomplex(L, 1, src_image);
   imlua_match(L, src_image, dst_image);
 
   imProcessShiftHSI(src_image, dst_image, luaL_checknumber(L, 3), 
                                           luaL_checknumber(L, 4), 
                                           luaL_checknumber(L, 5));
+  return 0;
+}
+
+static int imluaProcessShiftComponent(lua_State *L)
+{
+  imImage *src_image = imlua_checkimage(L, 1);
+  imImage *dst_image = imlua_checkimage(L, 2);
+
+  imlua_checknotcomplex(L, 1, src_image);
+  imlua_match(L, src_image, dst_image);
+
+  imProcessShiftComponent(src_image, dst_image, luaL_checknumber(L, 3),
+                    luaL_checknumber(L, 4),
+                    luaL_checknumber(L, 5));
   return 0;
 }
 
@@ -3738,6 +3753,7 @@ static const luaL_Reg improcess_lib[] = {
   {"ProcessNegative", imluaProcessNegative},
   {"ProcessCalcAutoGamma", imluaProcessCalcAutoGamma},
   {"ProcessShiftHSI", imluaProcessShiftHSI},
+  { "ProcessShiftComponent", imluaProcessShiftComponent },
 
   {"ProcessRangeContrastThreshold", imluaProcessRangeContrastThreshold},
   {"ProcessLocalMaxThreshold", imluaProcessLocalMaxThreshold},

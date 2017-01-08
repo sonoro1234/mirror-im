@@ -189,3 +189,4 @@ EXPORTS
   imProcessOpenMPSetNumThreads
   imProcessCalcAutoGamma
   imProcessShiftHSI
+  imProcessShiftComponent

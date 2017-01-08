@@ -206,7 +206,7 @@ long* imPaletteMagenta(void)
   return palette;
 }
 
-long* imPaletteCian(void)
+long* imPaletteCyan(void)
 {
   long* palette = imPaletteNew(256);
   long* ct = palette;
@@ -214,7 +214,7 @@ long* imPaletteCian(void)
   for (int lIndex = 0; lIndex < 256; lIndex++)
   {
     /* From (0, 0, 0) to (0, 255, 255)*/
-    /* From   Black   to     Cian    */
+    /* From   Black   to     Cyan    */
     *(ct++) = imColorEncode(0, (imbyte)lIndex, (imbyte)lIndex);
   }
 
@@ -256,7 +256,7 @@ long* imPaletteHues(void)
   for (tone = step2, i = 0; i < 42; i++, tone += step2)
   {
     /* From (0, 255, 0) to (0, 255, 255) */
-    /* From    Green    to     Cian      */
+    /* From    Green    to     Cyan      */
     *(ct++) = imColorEncode(0, (imbyte)255, (imbyte)tone);
   }
 
@@ -266,7 +266,7 @@ long* imPaletteHues(void)
   for (tone = step1, i = 0; i < 41; i++, tone += step1)
   {
     /* From (0, 255, 255) to (0, 0, 255) */
-    /* From     Cian      to     Blue    */
+    /* From     Cyan      to     Blue    */
     *(ct++) = imColorEncode(0, (imbyte)(255.0f-tone), (imbyte)255);
   }
 

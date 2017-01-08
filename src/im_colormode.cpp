@@ -12,6 +12,56 @@
 #include "im.h"
 #include "im_util.h"
 
+
+const char* imColorModeComponentName(int color_mode, int component)
+{
+  const char* comp_name[4];
+  int color_space = imColorModeSpace(color_mode);
+
+  switch (color_space)
+  {
+  default:
+    comp_name[0] = "Red";
+    comp_name[1] = "Green";
+    comp_name[2] = "Blue";
+    break;
+  case IM_CMYK:
+    comp_name[0] = "Cyan";
+    comp_name[1] = "Magenta";
+    comp_name[2] = "Yellow";
+    comp_name[3] = "Black";
+    break;
+  case IM_YCBCR:
+    comp_name[0] = "Y";
+    comp_name[1] = "Cb";
+    comp_name[2] = "Cr";
+    break;
+  case IM_XYZ:
+    comp_name[0] = "X";
+    comp_name[1] = "Y";
+    comp_name[2] = "Z";
+    break;
+  case IM_LAB:
+    comp_name[0] = "L";
+    comp_name[1] = "a";
+    comp_name[2] = "b";
+    break;
+  case IM_LUV:
+    comp_name[0] = "L";
+    comp_name[1] = "u";
+    comp_name[2] = "v";
+    break;
+  case IM_MAP:    
+    return "Index";
+  case IM_GRAY:   
+    return "Gray";
+  case IM_BINARY: 
+    return "Binary";
+  }
+
+  return comp_name[component];
+}
+
 const char* imColorModeSpaceName(int color_mode)
 {
   int color_space = imColorModeSpace(color_mode);

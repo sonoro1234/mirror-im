@@ -383,6 +383,74 @@ void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, double h_sh
   }
 }
 
+template <class T>
+static void DoShiftComponent(T **map, T **new_map, int count, double c0_shift, double c1_shift, double c2_shift)
+{
+  double min, max, range;
+  T tmin, tmax;
+  int tcount = count * 3;
+
+  imMinMaxType(map[0], tcount, tmin, tmax);
+
+  min = (double)tmin;
+  max = (double)tmax;
+
+  range = max - min;
+
+#ifdef _OPENMP
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#endif
+  for (int j = 0; j < count; j++)
+  {
+    double c0, c1, c2;
+
+    // Normalize to 0-1
+    c0 = normal_op((double)map[0][j], (double)min, (double)range);
+    c1 = normal_op((double)map[1][j], (double)min, (double)range);
+    c2 = normal_op((double)map[2][j], (double)min, (double)range);
+
+    c0 += c0_shift;
+    if (c0 < 0) c0 = 0;
+    if (c0 > 1) c0 = 1;
+    c1 += c1_shift;
+    if (c1 < 0) c1 = 0;
+    if (c1 > 1) c1 = 1;
+    c2 += c2_shift;
+    if (c2 < 0) c2 = 0;
+    if (c2 > 1) c2 = 1;
+
+    // Expand to min-max
+    new_map[0][j] = (T)(c0*range + min);
+    new_map[1][j] = (T)(c1*range + min);
+    new_map[2][j] = (T)(c2*range + min);
+  }
+}
+
+void imProcessShiftComponent(const imImage* src_image, imImage* dst_image, double c0_shift, double c1_shift, double c2_shift)
+{
+  switch (src_image->data_type)
+  {
+  case IM_BYTE:
+    DoShiftComponent((imbyte**)src_image->data, (imbyte**)dst_image->data, src_image->count, c0_shift, c1_shift, c2_shift);
+    break;
+  case IM_SHORT:
+    DoShiftComponent((short**)src_image->data, (short**)dst_image->data, src_image->count, c0_shift, c1_shift, c2_shift);
+    break;
+  case IM_USHORT:
+    DoShiftComponent((imushort**)src_image->data, (imushort**)dst_image->data, src_image->count, c0_shift, c1_shift, c2_shift);
+    break;
+  case IM_INT:
+    DoShiftComponent((int**)src_image->data, (int**)dst_image->data, src_image->count, c0_shift, c1_shift, c2_shift);
+    break;
+  case IM_FLOAT:
+    DoShiftComponent((float**)src_image->data, (float**)dst_image->data, src_image->count, c0_shift, c1_shift, c2_shift);
+    break;
+  case IM_DOUBLE:
+    DoShiftComponent((double**)src_image->data, (double**)dst_image->data, src_image->count, c0_shift, c1_shift, c2_shift);
+    break;
+  }
+}
+
 double imProcessCalcAutoGamma(const imImage* image)
 {
   double mean, min, max;

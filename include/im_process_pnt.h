@@ -760,12 +760,23 @@ double imProcessCalcAutoGamma(const imImage* image);
 
 /** Apply a shift using HSI coordinates. \n
  * Supports all data types except complex. \n
+ * shift is between -1.0 and 1.0, except for Hue where shift is in degrees. \n
  * Can be done in-place.
  *
  * \verbatim im.ProcessShiftHSI(src_image: imImage, dst_image: imImage, h_shift, s_shift, i_shift: number) [in Lua 5] \endverbatim
  * \verbatim im.ProcessShiftHSI(src_image: imImage, h_shift, s_shift, i_shift: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup tonegamut */
 void imProcessShiftHSI(const imImage* src_image, imImage* dst_image, double h_shift, double s_shift, double i_shift);
+
+/** Apply a shift to the components in normalized space 0-1. \n
+* Supports all data types except complex. \n
+* shift is between -1.0 and 1.0 \n
+* Can be done in-place.
+*
+* \verbatim im.ProcessShiftComponent(src_image: imImage, dst_image: imImage, c0_shift, c1_shift, c2_shift: number) [in Lua 5] \endverbatim
+* \verbatim im.ProcessShiftComponent(src_image: imImage, c0_shift, c1_shift, c2_shift: number) -> new_image: imImage [in Lua 5] \endverbatim
+* \ingroup tonegamut */
+void imProcessShiftComponent(const imImage* src_image, imImage* dst_image, double c0_shift, double c1_shift, double c2_shift);
 
 
 /** \defgroup threshold Threshold Operations
