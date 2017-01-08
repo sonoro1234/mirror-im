@@ -27,10 +27,10 @@ static int imluaConvertDataType (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
-  int cpx2real = luaL_checkinteger(L, 3);
+  int cpx2real = (int)luaL_checkinteger(L, 3);
   double gamma = luaL_checknumber(L, 4);
   int absolute = lua_toboolean(L, 5);
-  int cast_mode = luaL_checkinteger(L, 6);
+  int cast_mode = (int)luaL_checkinteger(L, 6);
 
   imlua_matchcolorspace(L, src_image, dst_image);
 #ifdef IM_PROCESS
@@ -65,10 +65,10 @@ static int imluaConvertToBitmap (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
   imImage* dst_image = imlua_checkimage(L, 2);
-  int cpx2real = luaL_checkinteger(L, 3);
+  int cpx2real = (int)luaL_checkinteger(L, 3);
   double gamma = luaL_checknumber(L, 4);
   int absolute = lua_toboolean(L, 5);
-  int cast_mode = luaL_checkinteger(L, 6);
+  int cast_mode = (int)luaL_checkinteger(L, 6);
 
   imlua_matchsize(L, src_image, dst_image);
   imlua_matchcheck(L, imImageIsBitmap(dst_image), "image must be a bitmap");
