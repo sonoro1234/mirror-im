@@ -64,9 +64,9 @@ static int imluaProcessIFFT (lua_State *L)
 static int imluaProcessFFTraw (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
-  int inverse = luaL_checkinteger(L, 2);
-  int center = luaL_checkinteger(L, 3);
-  int normalize = luaL_checkinteger(L, 4);
+  int inverse = (int)luaL_checkinteger(L, 2);
+  int center = (int)luaL_checkinteger(L, 3);
+  int normalize = (int)luaL_checkinteger(L, 4);
 
   imlua_checkcomplex(L, 1, src_image);
 
@@ -80,7 +80,7 @@ static int imluaProcessFFTraw (lua_State *L)
 static int imluaProcessSwapQuadrants (lua_State *L)
 {
   imImage* src_image = imlua_checkimage(L, 1);
-  int center2origin = luaL_checkinteger(L, 2);
+  int center2origin = (int)luaL_checkinteger(L, 2);
 
   imlua_checkcomplex(L, 1, src_image);
 
