@@ -7,6 +7,7 @@
 
 #include <im.h>
 #include <im_util.h>
+#include <im_math_op.h>
 
 #include "im_process_counter.h"
 #include "im_process_pnt.h"
@@ -18,6 +19,55 @@
 #include <string.h>
 #include <math.h>
 
+
+template <class T, class S>
+static void DoThresholdColor(T *src_data, imbyte *dst_data, int count, int depth, double* src_color, S tol)
+{
+#ifdef _OPENMP
+#pragma omp parallel for if (IM_OMP_MINCOUNT(count))
+#endif
+  for (int i = 0; i < count; i++)
+  {
+    int d;
+
+    S diff = 0;
+    for (d = 0; d < depth; d++)
+    {
+      diff += sqr_op((S)src_data[i + d*count] - (S)src_color[d]);
+    }
+
+    diff = sqrt_op(diff);
+    if (diff < tol)
+      dst_data[i] = 1;
+    else
+      dst_data[i] = 0;
+  }
+}
+
+void imProcessThresholdColor(const imImage* src_image, imImage* dst_image, double* src_color, double tol)
+{
+  switch (src_image->data_type)
+  {
+  case IM_BYTE:
+    DoThresholdColor((imbyte*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->count, src_image->depth, src_color, (int)tol);
+    break;
+  case IM_SHORT:
+    DoThresholdColor((short*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->count, src_image->depth, src_color, (int)tol);
+    break;
+  case IM_USHORT:
+    DoThresholdColor((imushort*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->count, src_image->depth, src_color, (int)tol);
+    break;
+  case IM_INT:
+    DoThresholdColor((int*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->count, src_image->depth, src_color, (int)tol);
+    break;
+  case IM_FLOAT:
+    DoThresholdColor((float*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->count, src_image->depth, src_color, (double)tol);
+    break;
+  case IM_DOUBLE:
+    DoThresholdColor((double*)src_image->data[0], (imbyte*)dst_image->data[0], src_image->count, src_image->depth, src_color, (double)tol);
+    break;
+  }
+}
 
 template <class T> 
 static void doThresholdSlice(T *src_map, imbyte *dst_map, int count, T start_level, T end_level)

@@ -907,6 +907,16 @@ void imProcessLocalMaxThresEstimate(const imImage* image, int *level);
  * \ingroup threshold */
 void imProcessSliceThreshold(const imImage* src_image, imImage* dst_image, double start_level, double end_level);
 
+/** Threshold using a color and a tolerance value. \n
+* The color will be type casted to the image data type. \n
+* The color must have the same number of components of the images. \n
+* Supports all color spaces and all data types except complex.
+*
+* \verbatim im.ProcessThresholdColor(src_image: imImage, dst_image: imImage, src_color: table of numbers, tol: number) [in Lua 5] \endverbatim
+* \verbatim im.ProcessThresholdColorNew(src_image: imImage, src_color: table of numbers, tol: number) -> new_image: imImage [in Lua 5] \endverbatim
+* \ingroup threshold */
+void imProcessThresholdColor(const imImage* src_image, imImage* dst_image, double* src_color, double tol);
+
 
 /** \defgroup effects Special Effects
  * \par
