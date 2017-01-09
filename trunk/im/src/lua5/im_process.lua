@@ -360,6 +360,7 @@ OneSourceOneDest("ProcessPercentThreshold")
 OneSourceOneDest("ProcessOtsuThreshold")
 OneSourceOneDest("ProcessMinMaxThreshold", nil, nil, im.BINARY, nil)
 OneSourceOneDest("ProcessSliceThreshold", nil, nil, im.BINARY, nil)
+OneSourceOneDest("ProcessThresholdColor", nil, nil, im.BINARY, nil)
 OneSourceOneDest("ProcessPixelate")
 OneSourceOneDest("ProcessPosterize")
 

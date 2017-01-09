@@ -3510,6 +3510,32 @@ static int imluaProcessSliceThreshold (lua_State *L)
   return 0;
 }
 
+static int imluaProcessThresholdColor(lua_State *L)
+{
+  int src_count;
+  double *src_color;
+  imImage *src_image = imlua_checkimage(L, 1);
+  imImage *dst_image = imlua_checkimage(L, 2);
+
+  double tol = luaL_checknumber(L, 4);
+
+  imlua_checknotcomplex(L, 1, src_image);
+  imlua_checkcolorspace(L, 2, dst_image, IM_BINARY);
+  imlua_matchsize(L, src_image, dst_image);
+
+  src_color = imlua_toarraydouble(L, 3, &src_count, 1);
+  if (src_count != src_image->depth)
+  {
+    free(src_color);
+    luaL_argerror(L, 3, "the colors must have the same number of components of the images");
+    return 0;
+  }
+
+  imProcessThresholdColor(src_image, dst_image, src_color, tol);
+  free(src_color);
+  return 0;
+}
+
 
 /*****************************************************************************\
  Special Effects
@@ -3768,7 +3794,8 @@ static const luaL_Reg improcess_lib[] = {
   {"ProcessMinMaxThreshold", imluaProcessMinMaxThreshold},
   {"ProcessLocalMaxThresEstimate", imluaProcessLocalMaxThresEstimate},
   {"ProcessSliceThreshold", imluaProcessSliceThreshold},
-
+  { "ProcessThresholdColor", imluaProcessThresholdColor },
+  
   {"ProcessPixelate", imluaProcessPixelate},
   {"ProcessPosterize", imluaProcessPosterize},
   {"ProcessNormDiffRatio", imluaProcessNormDiffRatio},

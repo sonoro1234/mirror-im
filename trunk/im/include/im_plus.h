@@ -1031,6 +1031,8 @@ namespace im
       imProcessLocalMaxThresEstimate(image.GetHandle(), &level); }
     inline void SliceThreshold(const Image& src_image, Image& dst_image, double start_level, double end_level) {
       imProcessSliceThreshold(src_image.GetHandle(), dst_image.GetHandle(), start_level, end_level); }
+    inline void ThresholdColor(const Image& src_image, Image& dst_image, double *src_color, double tol) {
+      imProcessThresholdColor(src_image.GetHandle(), dst_image.GetHandle(), src_color, tol); }
     inline void Pixelate(const Image& src_image, Image& dst_image, int box_size) {
       imProcessPixelate(src_image.GetHandle(), dst_image.GetHandle(), box_size); }
     inline void Posterize(const Image& src_image, Image& dst_image, int level) {

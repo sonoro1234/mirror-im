@@ -142,6 +142,7 @@ EXPORTS
   imProcessFillHoles
   imAnalyzeMeasurePerimArea
   imProcessSliceThreshold
+  imProcessThresholdColor
   imProcessRenderGrid
   imProcessRenderChessboard
   imProcessRenderFloodFill
