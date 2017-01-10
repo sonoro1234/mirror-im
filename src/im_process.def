@@ -96,7 +96,9 @@ EXPORTS
   imProcessMultipleMedian
   imProcessMultipleStdDev
   imProcessQuantizeGrayUniform
+  imProcessQuantizeGrayMedianCut
   imProcessQuantizeRGBUniform
+  imProcessQuantizeRGBMedianCut
   imProcessReduceBy4
   imProcessRotate180
   imProcessRotate90

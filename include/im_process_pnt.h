@@ -324,13 +324,21 @@ void imProcessBackSub(const imImage* src_image1, imImage* src_image2, imImage* d
  * See \ref im_process_pnt.h
  * \ingroup process */
 
-/** Converts a RGB image to a MAP image using uniform quantization 
+/** Converts a RGB image to a MAP image using uniform quantization. \n
  * with an optional 8x8 ordered dither. The RGB image must have data type IM_BYTE.
  *
  * \verbatim im.ProcessQuantizeRGBUniform(src_image: imImage, dst_image: imImage, do_dither: boolean) [in Lua 5] \endverbatim
  * \verbatim im.ProcessQuantizeRGBUniformNew(src_image: imImage, do_dither: boolean) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup quantize */
 void imProcessQuantizeRGBUniform(const imImage* src_image, imImage* dst_image, int do_dither);
+
+/** Converts a RGB image to a MAP image using median cut quantization. \n
+* The RGB image must have data type IM_BYTE.
+*
+* \verbatim im.ProcessQuantizeRGBMedianCut(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
+* \verbatim im.ProcessQuantizeRGBMedianCutNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+* \ingroup quantize */
+void imProcessQuantizeRGBMedianCut(const imImage* image, imImage* NewImage);
 
 /** Quantizes a gray scale image in less that 256 grays using uniform quantization. \n
  * Both images should be IM_BYTE/IM_GRAY, the target can be IM_MAP. Can be done in-place. \n
@@ -340,6 +348,14 @@ void imProcessQuantizeRGBUniform(const imImage* src_image, imImage* dst_image, i
  * \verbatim im.ProcessQuantizeGrayUniformNew(src_image: imImage, grays: number) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup quantize */
 void imProcessQuantizeGrayUniform(const imImage* src_image, imImage* dst_image, int grays);
+
+/** Quantizes a gray scale image in less that 256 grays using median cut quantization. \n
+ * Both images should be IM_BYTE/IM_GRAY. Can be done in-place. \n
+ *
+ * \verbatim im.ProcessQuantizeGrayMedianCut(src_image: imImage, dst_image: imImage, grays: number) [in Lua 5] \endverbatim
+ * \verbatim im.ProcessQuantizeGrayMedianCutNew(src_image: imImage, grays: number) -> new_image: imImage [in Lua 5] \endverbatim
+ * \ingroup quantize */
+void imProcessQuantizeGrayMedianCut(imImage* src_image, imImage* dst_image, int grays);
 
 
 
