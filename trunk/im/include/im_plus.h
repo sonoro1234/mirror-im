@@ -941,8 +941,12 @@ namespace im
       imProcessBackSub(src_image1.GetHandle(), src_image2.GetHandle(), dst_image.GetHandle(), tol, diff); }
     inline void QuantizeRGBUniform(const Image& src_image, Image& dst_image, int do_dither) {
       imProcessQuantizeRGBUniform(src_image.GetHandle(), dst_image.GetHandle(), do_dither); }
+    inline void QuantizeRGBMedianCut(const Image& src_image, Image& dst_image) {
+      imProcessQuantizeRGBMedianCut(src_image.GetHandle(), dst_image.GetHandle()); }
     inline void QuantizeGrayUniform(const Image& src_image, Image& dst_image, int grays) {
       imProcessQuantizeGrayUniform(src_image.GetHandle(), dst_image.GetHandle(), grays); }
+    inline void QuantizeGrayMedianCut(const Image& src_image, Image& dst_image, int grays) {
+      imProcessQuantizeGrayMedianCut(src_image.GetHandle(), dst_image.GetHandle(), grays); }
     inline void ExpandHistogram(const Image& src_image, Image& dst_image, double percent) {
       imProcessExpandHistogram(src_image.GetHandle(), dst_image.GetHandle(), percent); }
     inline void EqualizeHistogram(const Image& src_image, Image& dst_image) {
