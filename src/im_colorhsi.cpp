@@ -235,6 +235,12 @@ void imColorHSI2RGB(double H, double S, double I, double *r, double *g, double *
   G = I - (v - u*sqrt3)/3.0;
   B = I - (v + u*sqrt3)/3.0;
 
+  /* Other form: 
+  R = I + S * (2.0 * cosH)/3.0;
+  G = I + S * (-cosH + sinH*sqrt3)/3.0;
+  B = I + S * (-cosH - sinH*sqrt3)/3.0;
+  */
+
   /* fix round errors */
   if (R < 0.0) R = 0.0;
   if (G < 0.0) G = 0.0;
