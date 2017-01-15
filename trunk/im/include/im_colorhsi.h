@@ -29,10 +29,6 @@ extern "C" {
  * \ingroup color */
 
 
-/** Returns I where S is maximum given H (here in radians).
- * \ingroup hsi */
-double imColorHSI_ImaxS(double H, double cosh, double sinh);
-
 /** Converts from RGB to HSI.
  * \ingroup hsi */
 void imColorRGB2HSI(double r, double g, double b, double *h, double *s, double *i);
@@ -48,6 +44,17 @@ void imColorHSI2RGB(double h, double s, double i, double *r, double *g, double *
 /** Converts from HSI to RGB (byte).
  * \ingroup hsi */
 void imColorHSI2RGBbyte(double h, double s, double i, unsigned char *r, unsigned char *g, unsigned char *b);
+
+/***********************************************/
+
+/** Returns I where S is maximum given H (here in radians).
+* \ingroup hsi */
+double imColorHSI_ImaxS(double h, double cosH, double sinH);
+
+
+/** Returns maximum S (unnormalized) given I and H (here in radians).
+* \ingroup hsi */
+double imColorHSI_Smax(double h, double cosH, double sinH, double i);
 
 
 #if defined(__cplusplus)

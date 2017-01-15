@@ -53,7 +53,7 @@ static void iColorSmax01(double h, double hr, double hb, double hg, double *h0, 
     *h1 = hb;
 }
 
-static double iColorHSI_Smax(double h, double cosH, double sinH, double i)
+double imColorHSI_Smax(double h, double cosH, double sinH, double i)
 {
   double hr, hb, hg, imax, h0, h1;
 
@@ -170,7 +170,7 @@ void imColorRGB2HSI(double R, double G, double B, double *fh, double *fs, double
     else
     {
       /* must scale S from 0-Smax to 0-1 */
-      double Smax = iColorHSI_Smax(H, cos(H), sin(H), I);
+      double Smax = imColorHSI_Smax(H, cos(H), sin(H), I);
       S /= Smax;
       if (S > 1.0) /* because of round problems when calculating S and Smax */
         S = 1.0;
@@ -222,7 +222,7 @@ void imColorHSI2RGB(double H, double S, double I, double *r, double *g, double *
   sinH = sin(H);
     
   /* must scale S from 0-1 to 0-Smax */
-  double Smax = iColorHSI_Smax(H, cosH, sinH, I);
+  double Smax = imColorHSI_Smax(H, cosH, sinH, I);
   S *= Smax;
   if (S > 1.0) /* because of round problems when calculating S and Smax */
     S = 1.0;
@@ -235,7 +235,7 @@ void imColorHSI2RGB(double H, double S, double I, double *r, double *g, double *
   G = I - (v - u*sqrt3)/3.0;
   B = I - (v + u*sqrt3)/3.0;
 
-  /* Other form: 
+  /* Other form (S is unnormalized): 
   R = I + S * (2.0 * cosH)/3.0;
   G = I + S * (-cosH + sinH*sqrt3)/3.0;
   B = I + S * (-cosH - sinH*sqrt3)/3.0;
