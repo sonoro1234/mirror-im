@@ -27,7 +27,7 @@ class imFileFormatKRN: public imFileFormatBase
   imBinFile* handle;          /* the binary file handle */
 
 public:
-  imFileFormatKRN(const imFormat* _iformat): imFileFormatBase(_iformat) {}
+  imFileFormatKRN(const imFormat* _iformat) : imFileFormatBase(_iformat), handle(0) {}
   ~imFileFormatKRN() {}
 
   int Open(const char* file_name);

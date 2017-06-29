@@ -102,11 +102,15 @@ int imProcessBinMorphConvolve(const imImage* src_image, imImage* dst_image, cons
     miss_value = 1;
   }
 
+  if (iter > 1)
+  {
+    tmp = malloc(src_image->size);
+    if (!tmp)
+      return IM_ERR_MEM;
+  }
+
   counter = imProcessCounterBegin("BinMorphConvolve");
   imCounterTotal(counter, src_image->height*iter, "Processing...");
-
-  if (iter > 1)
-    tmp = malloc(src_image->size);
 
   for (j = 0; j < iter; j++)
   {
