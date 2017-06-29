@@ -105,7 +105,7 @@ unsigned long imBinMemoryFile::ReadBuf(void* pValues, unsigned long pSize)
 {
   assert(this->Buffer);
 
-  unsigned long lOffset = this->CurPos - this->Buffer;
+  unsigned long lOffset = (unsigned long)(this->CurPos - this->Buffer);
 
   this->Error = 0;
   if (lOffset + pSize > this->CurrentSize)
@@ -127,7 +127,7 @@ unsigned long imBinMemoryFile::WriteBuf(void* pValues, unsigned long pSize)
 {
   assert(this->Buffer);
 
-  unsigned long lOffset = this->CurPos - this->Buffer;
+  unsigned long lOffset = (unsigned long)(this->CurPos - this->Buffer);
 
   this->Error = 0;
   if (lOffset + pSize > this->BufferSize)
@@ -226,7 +226,7 @@ void imBinMemoryFile::SeekFrom(long pOffset)
 void imBinMemoryFile::SeekOffset(long pOffset)
 {
   assert(this->Buffer);
-  long lOffset = this->CurPos - this->Buffer;
+  long lOffset = (long)(this->CurPos - this->Buffer);
 
   this->Error = 0;
   if (lOffset + pOffset < 0 || lOffset + pOffset > (long)this->BufferSize)
@@ -245,15 +245,15 @@ void imBinMemoryFile::SeekOffset(long pOffset)
 unsigned long imBinMemoryFile::Tell() const
 {
   assert(this->Buffer);
-  unsigned long lOffset = this->CurPos - this->Buffer;
+  unsigned long lOffset = (unsigned long)(this->CurPos - this->Buffer);
   return lOffset;
 }
 
 int imBinMemoryFile::EndOfFile() const
 {
   assert(this->Buffer);
-  unsigned long lOffset = this->CurPos - this->Buffer;
-  return lOffset == this->CurrentSize? 1: 0;
+  unsigned long lOffset = (unsigned long)(this->CurPos - this->Buffer);
+  return lOffset == this->CurrentSize ? 1 : 0;
 }
 
 /**************************************************
@@ -293,7 +293,7 @@ static imBinFileBase* iBinSubFileNewFunc()
 void imBinSubFile::Open(const char* pFileName)
 {
   this->FileHandle = iBinFileBaseHandle(pFileName);
-  this->FileByteOrder = this->FileByteOrder;
+  this->FileByteOrder = this->FileHandle->FileByteOrder;
   this->IsNew = 0;
   
   StartOffset = this->FileHandle->Tell();
@@ -302,7 +302,7 @@ void imBinSubFile::Open(const char* pFileName)
 void imBinSubFile::New(const char* pFileName)
 {
   this->FileHandle = iBinFileBaseHandle(pFileName);
-  this->FileByteOrder = this->FileByteOrder;
+  this->FileByteOrder = this->FileHandle->FileByteOrder;
   this->IsNew = 1;
   
   StartOffset = this->FileHandle->Tell();
@@ -425,13 +425,13 @@ unsigned long imBinStreamFile::FileSize()
 unsigned long imBinStreamFile::ReadBuf(void* pValues, unsigned long pSize)
 {
   assert(this->FileHandle);
-	return fread(pValues, 1, pSize, this->FileHandle);
+  return (unsigned long)fread(pValues, 1, pSize, this->FileHandle);
 }
                              
 unsigned long imBinStreamFile::WriteBuf(void* pValues, unsigned long pSize)
 {
   assert(this->FileHandle);
-	return fwrite(pValues, 1, pSize, this->FileHandle);
+  return (unsigned long)fwrite(pValues, 1, pSize, this->FileHandle);
 }
 
 int imBinStreamFile::HasError() const

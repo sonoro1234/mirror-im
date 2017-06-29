@@ -109,7 +109,7 @@ class imFileFormatJP2: public imFileFormatBase
   jas_image_t *image;
 
 public:
-  imFileFormatJP2(const imFormat* _iformat): imFileFormatBase(_iformat), image(0) {}
+  imFileFormatJP2(const imFormat* _iformat) : imFileFormatBase(_iformat), image(0), stream(0), fmtid(-1) {}
   ~imFileFormatJP2() {}
 
   int Open(const char* file_name);
@@ -124,10 +124,6 @@ public:
 
 class imFormatJP2: public imFormat
 {
-  int fmtid;
-  jas_stream_t *stream;
-  jas_image_t *image;
-
 public:
   imFormatJP2()
     :imFormat("JP2", 
@@ -187,6 +183,7 @@ int imFileFormatJP2::Open(const char* file_name)
   if (this->fmtid < 0)
   {
     jas_stream_close(this->stream);
+    this->stream = NULL;
     return IM_ERR_FORMAT;
   }
 
@@ -214,6 +211,7 @@ void imFileFormatJP2::Close()
     jas_image_destroy(this->image);
 
   jas_stream_close(this->stream);
+  this->stream = NULL;
 }
 
 void* imFileFormatJP2::Handle(int index)
