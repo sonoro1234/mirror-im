@@ -3112,15 +3112,32 @@ static int imluaProcessRenderFloodFill(lua_State *L)
   double*color;
 
   imlua_checknotcomplex(L, 1, image);
-  imlua_checkcolorspace(L, 1, image, IM_RGB);
+  if (image->color_space != IM_RGB && image->color_space != IM_GRAY)
+  {
+    luaL_argerror(L, 1, "color space must be RGB or GRAY");
+    return 0;
+  }
 
   /* minimize leak when error, checking array after other checks */
-  color = imlua_toarraydouble(L, 4, &count, 1);
-  if (count != 3)
+  if (image->color_space == IM_RGB)
   {
-    free(color);
-    luaL_argerror(L, 4, "the color must have 3 components");
-    return 0;
+    color = imlua_toarraydouble(L, 4, &count, 1);
+    if (count != 3)
+    {
+      free(color);
+      luaL_argerror(L, 4, "the color must have 3 components");
+      return 0;
+    }
+  }
+  else
+  {
+    color = imlua_toarraydouble(L, 4, &count, 1);
+    if (count != 1)
+    {
+      free(color);
+      luaL_argerror(L, 4, "the color must have 1 component");
+      return 0;
+    }
   }
 
   imProcessRenderFloodFill(image, start_x, start_y, color, tolerance);

@@ -624,10 +624,20 @@ static inline void xyStackArrayPop(xyStackArray* stack, int &x, int &y)
 }
 
 template <class T>
-static inline int color_is_similar(const T* color, const T& r, const T& g, const T& b, T tol)
+static inline int color_is_similar(const T* target_color, const T& r, const T& g, const T& b, const T& tol)
 {
-  T sqr_dist = (T)sqrt_op((color[0] - r)*(color[0] - r) + (color[1] - g)*(color[1] - g) + (color[2] - b)*(color[2] - b));
+  T sqr_dist = (T)sqrt_op((target_color[0] - r)*(target_color[0] - r) + (target_color[1] - g)*(target_color[1] - g) + (target_color[2] - b)*(target_color[2] - b));
   if (sqr_dist < tol)
+    return 1;
+  else
+    return 0;
+}
+
+template <class T>
+static inline int gray_is_similar(const T& target, const T& map, const T& tol)
+{
+  T dist = (T)abs_op(target - map);
+  if (dist < tol)
     return 1;
   else
     return 0;
@@ -666,6 +676,17 @@ static inline void fill_color(xyStackArray* stack, const T* replace_color, const
   {
     xyStackArrayPush(stack, x, y);
     color_copy(replace_color, r[offset], g[offset], b[offset]);
+  }
+}
+
+template <class T>
+static inline void fill_gray(xyStackArray* stack, const T replace, const T target, T* map, int width, int x, int y, T tol)
+{
+  int offset = y * width + x;
+  if (replace != map[offset] && gray_is_similar(target, map[offset], tol))
+  {
+    xyStackArrayPush(stack, x, y);
+    map[offset] = replace;
   }
 }
 
@@ -721,27 +742,95 @@ static void DoRenderFloodFillRGB(T** data, int width, int height, int start_x, i
   xyStackArrayDestroy(stack);
 }
 
+template <class T>
+static void DoRenderFloodFillGray(T** data, int width, int height, int start_x, int start_y, double* replace_data, double tolerance)
+{
+  T* map = data[0];
+  int offset, x, y;
+  T target;
+  T replace;
+  T tol = (T)tolerance;
+
+  replace = (T)replace_data[0];
+
+  offset = start_y * width + start_x;
+  if (replace == map[offset])
+    return;
+
+  target = map[offset];
+
+  /* very simple 4 neighbors stack based flood fill */
+
+  xyStackArray* stack = xyStackArrayCreate();
+
+  /* a color in the xy_stack is always similar to the target color,
+  and it was already replaced */
+  xyStackArrayPush(stack, start_x, start_y);
+  map[offset] = replace;
+
+  while (xyStackArrayHasData(stack))
+  {
+    xyStackArrayPop(stack, x, y);
+
+    /* right */
+    if (x < width - 1)
+      fill_gray(stack, replace, target, map, width, x + 1, y, tol);
+
+    /* left */
+    if (x > 0)
+      fill_gray(stack, replace, target, map, width, x - 1, y, tol);
+
+    /* top */
+    if (y < height - 1)
+      fill_gray(stack, replace, target, map, width, x, y + 1, tol);
+
+    /* bottom */
+    if (y > 0)
+      fill_gray(stack, replace, target, map, width, x, y - 1, tol);
+  }
+
+  xyStackArrayDestroy(stack);
+}
+
 void imProcessRenderFloodFill(imImage* image, int start_x, int start_y, double* replace_color, double tolerance)
 {
   switch (image->data_type)
   {
   case IM_BYTE:
-    DoRenderFloodFillRGB((imbyte**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    if (image->color_space == IM_RGB)
+      DoRenderFloodFillRGB((imbyte**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    else
+      DoRenderFloodFillGray((imbyte**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
     break;
   case IM_SHORT:
-    DoRenderFloodFillRGB((short**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    if (image->color_space == IM_RGB)
+      DoRenderFloodFillRGB((short**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    else
+      DoRenderFloodFillGray((short**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
     break;
   case IM_USHORT:
-    DoRenderFloodFillRGB((imushort**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    if (image->color_space == IM_RGB)
+      DoRenderFloodFillRGB((imushort**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    else
+      DoRenderFloodFillGray((imushort**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
     break;
   case IM_INT:
-    DoRenderFloodFillRGB((int**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    if (image->color_space == IM_RGB)
+      DoRenderFloodFillRGB((int**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    else
+      DoRenderFloodFillGray((int**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
     break;
   case IM_FLOAT:
-    DoRenderFloodFillRGB((float**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    if (image->color_space == IM_RGB)
+      DoRenderFloodFillRGB((float**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    else
+      DoRenderFloodFillGray((float**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
     break;
   case IM_DOUBLE:
-    DoRenderFloodFillRGB((double**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    if (image->color_space == IM_RGB)
+      DoRenderFloodFillRGB((double**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
+    else
+      DoRenderFloodFillGray((double**)image->data, image->width, image->height, start_x, start_y, replace_color, tolerance);
     break;
   }
 }

@@ -677,8 +677,9 @@ int imProcessRenderGrid(imImage* image, int x_space, int y_space);
  * \ingroup render */
 int imProcessRenderChessboard(imImage* image, int x_space, int y_space);
 
-/** Render a color flood fill. \n
- * Image must the IM_RGB color space. replace_color must have 3 components.
+/** Render a color or gray flood fill. \n
+ * If image has the IM_RGB color space, then replace_color must have 3 components. \n
+ * If image has the IM_GRAY color space, then replace_color must have 1 component.
  *
  * \verbatim im.ProcessRenderFloodFill(image: imImage, start_x, start_y: number, replace_color: table of 3 numbers, tolerance: number)  [in Lua 5] \endverbatim
  * \ingroup render */
