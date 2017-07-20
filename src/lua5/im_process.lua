@@ -341,6 +341,7 @@ end
 
 OneSourceOneDest("ProcessReplaceColor")
 OneSourceOneDest("ProcessFixBGR")
+OneSourceOneDest("ProcessSelectHue")
 TwoSourcesOneDest("ProcessBitwiseOp")
 OneSourceOneDest("ProcessBitwiseNot")
 OneSourceOneDest("ProcessBitMask")
