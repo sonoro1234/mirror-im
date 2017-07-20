@@ -483,13 +483,21 @@ void imProcessSetAlphaColor(const imImage* src_image, imImage* dst_image, double
 void imProcessPseudoColor(const imImage* src_image, imImage* dst_image);
 
 /** Fix BGR order to RGB.
- * Images must match. Ans must have color space RGB.
+ * Images must match. And must have color space RGB.
  *
  * \verbatim im.ProcessFixBGR(src_image: imImage, dst_image: imImage) [in Lua 5] \endverbatim
  * \verbatim im.ProcessFixBGRNew(src_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
  * \ingroup colorproc */
 void imProcessFixBGR(const imImage* src_image, imImage* dst_image);
 
+
+/** Uses a hue interval to isolate where color predominates.
+* Images must match. And must have color space RGB.
+*
+* \verbatim im.ProcessSelectHue(src_image: imImage, dst_image: imImage, hue_start, hue_end: number) [in Lua 5] \endverbatim
+* \verbatim im.ProcessSelectHueNew(src_image: imImage, hue_start, hue_end: number) -> new_image: imImage [in Lua 5] \endverbatim
+* \ingroup colorproc */
+void imProcessSelectHue(const imImage* src_image, imImage* dst_image, double hue_start, double hue_end);
 
 
 /** \defgroup logic Logical Arithmetic Operations 
