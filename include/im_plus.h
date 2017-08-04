@@ -1041,6 +1041,8 @@ namespace im
       imProcessPixelate(src_image.GetHandle(), dst_image.GetHandle(), box_size); }
     inline void Posterize(const Image& src_image, Image& dst_image, int level) {
       imProcessPosterize(src_image.GetHandle(), dst_image.GetHandle(), level); }
+    inline void BinaryMask(const Image& src_image, Image& dst_image, Image& mask_image) {
+      imProcessBinaryMask(src_image.GetHandle(), dst_image.GetHandle(), mask_image.GetHandle()); }
     inline void NormDiffRatio(const Image& image1, const Image& image2, Image& dst_image) {
       imProcessNormDiffRatio(image1.GetHandle(), image2.GetHandle(), dst_image.GetHandle()); }
     inline void AbnormalHyperionCorrection(const Image& src_image, Image& dst_image, int threshold_consecutive, int threshold_percent, Image& image_abnormal) {

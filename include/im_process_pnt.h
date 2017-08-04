@@ -968,6 +968,15 @@ void imProcessPixelate(const imImage* src_image, imImage* dst_image, int box_siz
  * \ingroup effects */
 void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level);
 
+/** Applies a binary mask to an image. The mask must be a IM_BINARY image. Where the mask is 1, the original image is preserved.
+ * Where it is 0, the value is replaced by the minimum (0 for imbyte images). \n
+ * Can be done in-place.
+ *
+ * \verbatim im.ProcessBinaryMask(src_image: imImage, dst_image, mask_image: imImage) [in Lua 5] \endverbatim
+ * \verbatim im.ProcessBinaryMaskNew(src_image, mask_image: imImage) -> new_image: imImage [in Lua 5] \endverbatim
+ * \ingroup effects */
+void imProcessBinaryMask(const imImage* src_image, imImage* dst_image, const imImage* mask_image);
+
 
 /** \defgroup remotesens Remote Sensing Operations
  * \par
