@@ -88,3 +88,53 @@ void imProcessPosterize(const imImage* src_image, imImage* dst_image, int level)
   imProcessBitMask(src_image, dst_image, mask, IM_BIT_AND);
 }
 
+template <class T>
+static void DoBinaryMask(T* src_map, T* dst_map, imbyte* mask_map, int count)
+{
+  int i;
+
+  T min, max;
+  imMinMaxType(src_map, count, min, max);
+
+  for (i = 0; i < count; i++)
+  {
+    if (*mask_map)
+      *dst_map = *src_map;
+    else
+      *dst_map = (T)min;
+
+    mask_map++;
+    dst_map++;
+    src_map++;
+  }
+}
+
+void imProcessBinaryMask(const imImage* src_image, imImage* dst_image, const imImage* mask_image)
+{
+  int d;
+
+  for (d = 0; d < src_image->depth; d++)
+  {
+    switch (src_image->data_type)
+    {
+    case IM_BYTE:
+      DoBinaryMask((imbyte*)src_image->data[d], (imbyte*)dst_image->data[d], (imbyte*)mask_image->data[0], src_image->count);
+      break;
+    case IM_SHORT:
+      DoBinaryMask((short*)src_image->data[d], (short*)dst_image->data[d], (imbyte*)mask_image->data[0], src_image->count);
+      break;
+    case IM_USHORT:
+      DoBinaryMask((imushort*)src_image->data[d], (imushort*)dst_image->data[d], (imbyte*)mask_image->data[0], src_image->count);
+      break;
+    case IM_INT:
+      DoBinaryMask((int*)src_image->data[d], (int*)dst_image->data[d], (imbyte*)mask_image->data[0], src_image->count);
+      break;
+    case IM_FLOAT:
+      DoBinaryMask((float*)src_image->data[d], (float*)dst_image->data[d], (imbyte*)mask_image->data[0], src_image->count);
+      break;
+    case IM_DOUBLE:
+      DoBinaryMask((double*)src_image->data[d], (double*)dst_image->data[d], (imbyte*)mask_image->data[0], src_image->count);
+      break;
+    }
+  }
+}

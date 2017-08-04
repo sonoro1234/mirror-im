@@ -383,7 +383,7 @@ inline void imMinMax(const T *map, int count, T& min, T& max, int absolute = 0)
 }
 
 /** Calculates minimum and maximum values 
- * with addtional considerations for data type conversion and normalized operations.
+ * with additional considerations for data type conversion and normalized operations.
  * \ingroup math */
 template <class T> 
 inline void imMinMaxType(const T *map, int count, T& min, T& max, int absolute = 0)

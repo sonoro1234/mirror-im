@@ -121,6 +121,7 @@ EXPORTS
   imProcessReplaceColor
   imProcessSetAlphaColor
   imProcessPosterize
+  imProcessBinaryMask
   imProcessNegative
   imProcessNormDiffRatio
   imProcessAbnormalHyperionCorrection

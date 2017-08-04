@@ -3631,6 +3631,20 @@ static int imluaProcessPosterize (lua_State *L)
   return 0;
 }
 
+static int imluaProcessBinaryMask(lua_State *L)
+{
+  imImage *src_image = imlua_checkimage(L, 1);
+  imImage *dst_image = imlua_checkimage(L, 2);
+  imImage *mask_image = imlua_checkimage(L, 3);
+
+  imlua_match(L, src_image, dst_image);
+  imlua_matchsize(L, src_image, mask_image);
+  imlua_checkcolorspace(L, 3, mask_image, IM_BINARY);
+
+  imProcessBinaryMask(src_image, dst_image, mask_image);
+  return 0;
+}
+
 static int imluaProcessNormDiffRatio(lua_State *L)
 {
   imImage *src_image1 = imlua_checkimage(L, 1);
@@ -3859,6 +3873,8 @@ static const luaL_Reg improcess_lib[] = {
   
   {"ProcessPixelate", imluaProcessPixelate},
   {"ProcessPosterize", imluaProcessPosterize},
+  {"ProcessBinaryMask", imluaProcessBinaryMask},
+  
   {"ProcessNormDiffRatio", imluaProcessNormDiffRatio},
   {"ProcessAbnormalHyperionCorrection", imluaProcessAbnormalHyperionCorrection},
   
