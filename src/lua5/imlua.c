@@ -270,7 +270,8 @@ void imlua_register_lib(lua_State *L, const luaL_Reg* funcs)
     if (!lua_isnil(L, -1))
       luaL_error(L, "name conflict for module \"%s\"", im_globaltable);
 
-    luaL_newlib(L, funcs);
+    lua_newtable(L);
+    luaL_setfuncs(L, funcs, 0);
     lua_pushvalue(L, -1);
     lua_setglobal(L, im_globaltable);
   }
