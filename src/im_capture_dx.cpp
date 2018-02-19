@@ -559,14 +559,17 @@ static void vc_RemoveGraphFromRot(DWORD pdwRegister)
 
 typedef int (*vcDialogFunc)(imVideoCapture* vc, HWND parent);
 
+#define VC_DIALOG_MAX 9
+#define VC_FORMAT_MAX 1000
+
 struct _imVideoCapture
 {
   int registered_graph,
       live,
       device;                     /* current connected device. -1 if not connected. */
 
-  char* dialog_desc[6];
-  vcDialogFunc dialog_func[6];
+  char* dialog_desc[VC_DIALOG_MAX];
+  vcDialogFunc dialog_func[VC_DIALOG_MAX];
   int dialog_count;                /* number of available configuration dialogs for the current connection. */
 
   IGraphBuilder* filter_builder;  /* The Filter Graph Manager */
@@ -587,7 +590,7 @@ struct _imVideoCapture
 
   int format_count;   /* number of supported formats */
   int format_current; /* current format */
-  int format_map[100]; /* table to map returned formats to direct X formats */
+  int format_map[VC_FORMAT_MAX]; /* table to map returned formats to direct X formats */
 };
 
 int imVideoCaptureDeviceCount(void)
@@ -1252,6 +1255,9 @@ static void vc_UpdateFormatList(imVideoCapture* vc)
 
       vc_DeleteMediaType(pmt);
     }
+
+    if (vc->format_count == VC_FORMAT_MAX)
+      break;
   }
 
   vc_DeleteMediaType(curr_pmt);
@@ -1738,6 +1744,8 @@ static void vc_UpdateDialogs(imVideoCapture* vc)
 
     pTVT->Release();  
   }
+
+  // Maximum of VC_DIALOG_MAX = 9
 }
 
 int imVideoCaptureDialogCount(imVideoCapture* vc)
