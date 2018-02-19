@@ -64,9 +64,13 @@ imVideoCaptureDestroy(vc);</pre>
   &quot;im_capture.lib&quot; library. This library is independent of all IM libraries.&nbsp; 
 	In Lua call require&quot;imlua_capture&quot;.</p>
   <p>To link with the capture library in Windows using Visual C you will need 
-  the file &quot;<a href="../download/strmiids.zip">strmiids.lib</a>&quot;. To link it 
-  using Dev-C++ or Mingw 3 you will need the &quot;<b>im_capture.dll</b>&quot;.</p>
-  <p>To compile the capture source code you will need the Direct X 9 SDK. Notice 
+  the file &quot;<a href="../download/strmiids.zip">strmiids.lib</a>&quot;. </p>
+<p>To link it 
+  using Dev-C++ or Mingw 3 you will need the &quot;<b>im_capture.dll</b>&quot; 
+from one of the Visual C++ build. Then use the dlltool to get a .a library:</p>
+<pre>dlltool -d im_capture.def -D im_capture.dll -l libim_capture.a</pre>
+<p>But you will also depend on the msvcr*.dll.</p>
+<p>To compile the capture source code you will need the Direct X 9 SDK. Notice 
   that since Direct X uses COM, CoInitialize(NULL) is called when the devices 
   are enumerated.</p>
   <p>For more information on Direct X capture, i.e. Direct Show see:</p>
