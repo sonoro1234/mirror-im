@@ -39,26 +39,26 @@ static void imlua_errorcomplex(lua_State *L, int index)
 }
 
 #define imlua_checknotcomplex(_L, _a, _i) \
-  if ((_i)->data_type == IM_CFLOAT || (_i)->data_type == IM_CDOUBLE) \
+  if (((_i)->data_type == IM_CFLOAT) || ((_i)->data_type == IM_CDOUBLE)) \
     imlua_errorcomplex(_L, _a)
 
 #define imlua_checkinteger(_L, _a, _i) \
   luaL_argcheck(_L, ((_i)->data_type < IM_FLOAT), _a, "image data type can be integer only")
 
 #define imlua_checkreal(_L, _a, _i) \
-  luaL_argcheck(L, ((_i)->data_type == IM_FLOAT || (_i)->data_type == IM_DOUBLE), _a, "image data type can be real only");
+  luaL_argcheck(L, (((_i)->data_type == IM_FLOAT) || ((_i)->data_type == IM_DOUBLE)), _a, "image data type can be real only");
 
 #define imlua_checkcomplex(_L, _a, _i) \
-  luaL_argcheck(L, ((_i)->data_type == IM_CFLOAT || (_i)->data_type == IM_CDOUBLE), _a, "image data type can be complex only");
+  luaL_argcheck(L, (((_i)->data_type == IM_CFLOAT) || ((_i)->data_type == IM_CDOUBLE)), _a, "image data type can be complex only");
 
 #define imlua_checkreal_dst(_L, _da, _si, _di)                          \
-  if ((_si)->data_type == IM_DOUBLE || (_si)->data_type == IM_CDOUBLE)  \
+  if (((_si)->data_type == IM_DOUBLE) || ((_si)->data_type == IM_CDOUBLE))  \
     imlua_checkdatatype(_L, _da, _di, IM_DOUBLE);                       \
   else                                                                  \
     imlua_checkdatatype(_L, _da, _di, IM_FLOAT)
 
 #define imlua_checkcomplex_dst(_L, _da, _si, _di)                       \
-  if ((_si)->data_type == IM_DOUBLE || (_si)->data_type == IM_CDOUBLE)  \
+  if (((_si)->data_type == IM_DOUBLE) || ((_si)->data_type == IM_CDOUBLE))  \
     imlua_checkdatatype(_L, _da, _di, IM_CDOUBLE);                      \
   else                                                                  \
     imlua_checkdatatype(_L, _da, _di, IM_CFLOAT)
