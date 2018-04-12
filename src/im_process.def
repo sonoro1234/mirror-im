@@ -131,6 +131,7 @@ EXPORTS
   imProcessNormalizeComponents
   imProcessPseudoColor
   imProcessFixBGR
+  imProcessSelectHue
   imGaussianStdDev2KernelSize
   imProcessBitwiseNot
   imProcessDistanceTransform
