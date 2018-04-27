@@ -820,6 +820,7 @@ void imDibDecodeToRGBA(const imDib* dib, unsigned char* red, unsigned char* gree
   }
   else if (dib->bmih->biBitCount == 16)
   {
+    /* default mask if BI_BITFIELDS is not used */
     bmask = 0x001F;
     gmask = 0x03E0;
     rmask = 0x7C00;
