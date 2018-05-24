@@ -407,13 +407,16 @@ void imProcessBlendConst(const imImage* src_image1, const imImage* src_image2, i
 }
 
 template <class T, class TA> 
-static void DoBlend(T *map1, T *map2, TA *alpha, T *map, int count, double type_max)
+static void DoBlend(T *map1, T *map2, TA *alpha, T *map, int count, int alpha_count, double type_max)
 {
 #ifdef _OPENMP
 #pragma omp parallel for if (IM_OMP_MINCOUNT(count))
 #endif
   for (int i = 0; i < count; i++)
-    map[i] = blend_op(map1[i], map2[i], ((double)alpha[i]) / type_max);
+  {
+    int a = i % alpha_count;
+    map[i] = blend_op(map1[i], map2[i], ((double)alpha[a]) / type_max);
+  }
 }
 
 void imProcessBlend(const imImage* src_image1, const imImage* src_image2, const imImage* alpha, imImage* dst_image)
@@ -424,28 +427,28 @@ void imProcessBlend(const imImage* src_image1, const imImage* src_image2, const 
   switch(src_image1->data_type)
   {
   case IM_BYTE:
-    DoBlend((imbyte*)src_image1->data[0], (imbyte*)src_image2->data[0], (imbyte*)alpha->data[0], (imbyte*)dst_image->data[0], count, type_max);
+    DoBlend((imbyte*)src_image1->data[0], (imbyte*)src_image2->data[0], (imbyte*)alpha->data[0], (imbyte*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_SHORT:
-    DoBlend((short*)src_image1->data[0], (short*)src_image2->data[0], (short*)alpha->data[0], (short*)dst_image->data[0], count, type_max);
+    DoBlend((short*)src_image1->data[0], (short*)src_image2->data[0], (short*)alpha->data[0], (short*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_USHORT:
-    DoBlend((imushort*)src_image1->data[0], (imushort*)src_image2->data[0], (imushort*)alpha->data[0], (imushort*)dst_image->data[0], count, type_max);
+    DoBlend((imushort*)src_image1->data[0], (imushort*)src_image2->data[0], (imushort*)alpha->data[0], (imushort*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_INT:
-    DoBlend((int*)src_image1->data[0], (int*)src_image2->data[0], (int*)alpha->data[0], (int*)dst_image->data[0], count, type_max);
+    DoBlend((int*)src_image1->data[0], (int*)src_image2->data[0], (int*)alpha->data[0], (int*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_FLOAT:
-    DoBlend((float*)src_image1->data[0], (float*)src_image2->data[0], (float*)alpha->data[0], (float*)dst_image->data[0], count, type_max);
+    DoBlend((float*)src_image1->data[0], (float*)src_image2->data[0], (float*)alpha->data[0], (float*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_CFLOAT:
-    DoBlend((imcfloat*)src_image1->data[0], (imcfloat*)src_image2->data[0], (float*)alpha->data[0], (imcfloat*)dst_image->data[0], count, type_max);
+    DoBlend((imcfloat*)src_image1->data[0], (imcfloat*)src_image2->data[0], (float*)alpha->data[0], (imcfloat*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_DOUBLE:
-    DoBlend((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)alpha->data[0], (double*)dst_image->data[0], count, type_max);
+    DoBlend((double*)src_image1->data[0], (double*)src_image2->data[0], (double*)alpha->data[0], (double*)dst_image->data[0], count, alpha->count, type_max);
     break;
   case IM_CDOUBLE:
-    DoBlend((imcdouble*)src_image1->data[0], (imcdouble*)src_image2->data[0], (double*)alpha->data[0], (imcdouble*)dst_image->data[0], count, type_max);
+    DoBlend((imcdouble*)src_image1->data[0], (imcdouble*)src_image2->data[0], (double*)alpha->data[0], (imcdouble*)dst_image->data[0], count, alpha->count, type_max);
     break;
   }
 }
