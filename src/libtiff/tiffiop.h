@@ -64,6 +64,9 @@ extern void *lfind(const void *, const void *, size_t *, size_t,
 #if _MSC_VER >= 1900 /* IMLIB vc14 */
 #undef snprintf
 #endif
+#if __GNUC__ >= 6 /* IMLIB mingw6 */
+#undef snprintf
+#endif
 #endif
 
 #if !defined(HAVE_SNPRINTF) && !defined(HAVE__SNPRINTF)
