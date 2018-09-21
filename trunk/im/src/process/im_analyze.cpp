@@ -1263,7 +1263,7 @@ const double DT_SQRT2   = 1.414213562373;
 const double DT_SQRT2D2 = 0.707106781187;
 
   v[1] = DT_SQRT2;   
-  v[2] = DT_SQRT2D2 + 0.5f;   
+  v[2] = DT_SQRT2D2 + 0.5;   
   v[0] = 1.0;
   v[3] = DT_SQRT2D2;
   v[4] = 0.5;
@@ -1465,13 +1465,13 @@ static void iInitPerimAreaTemplate(imbyte *templ, double *v)
   templ[6] = 6;
   templ[96] = 6;
 
-  v[0] = 1.0f;
-  v[1] = 0.75f;  
-  v[2] = 0.625f;  
-  v[3] = 0.5f;
-  v[4] = 0.375f;
-  v[5] = 0.25f;
-  v[6] = 0.125f;
+  v[0] = 1.0;
+  v[1] = 0.75;  
+  v[2] = 0.625;  
+  v[3] = 0.5;
+  v[4] = 0.375;
+  v[5] = 0.25;
+  v[6] = 0.125;
 }
 
 int imAnalyzeMeasurePerimArea(const imImage* image, double* perimarea_data, int region_count)

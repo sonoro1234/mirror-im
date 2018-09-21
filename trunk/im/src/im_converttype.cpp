@@ -515,7 +515,7 @@ IM_STATIC int iDemoteRealToInt(int count, int width, const SRCT *src_map, DSTT *
       else if (ivalue <= dst_type_min)
         dst_map[i] = dst_type_min;
       else
-        dst_map[i] = (DSTT)imRound(value - 0.5f);
+        dst_map[i] = (DSTT)imRound(value - 0.5);
     }
 
     if (i % width == 0)
