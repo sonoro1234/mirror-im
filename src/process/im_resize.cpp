@@ -19,8 +19,8 @@
 
 static inline void iResizeInverse(int x, int y, double *xl, double *yl, double x_invfactor, double y_invfactor)
 {
-  *xl = (x + 0.5f) * x_invfactor;
-  *yl = (y + 0.5f) * y_invfactor;
+  *xl = (x + 0.5) * x_invfactor;
+  *yl = (y + 0.5) * y_invfactor;
 }
 
 template <class DT, class DTU> 
