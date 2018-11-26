@@ -7,8 +7,15 @@
 project(im C CXX)
 cmake_minimum_required(VERSION 2.8)
 #include ( cmake/dist.cmake )
-macro(install_library)
-endmacro()
+macro ( install_library )
+  foreach ( _file ${ARGN} )
+    install ( TARGETS ${_file}
+              RUNTIME DESTINATION ${LUAJIT_BIN}/immodules
+              #LIBRARY DESTINATION ./lib 
+              #ARCHIVE DESTINATION ./arch 
+			  )
+  endforeach()
+endmacro ()
 macro ( install_executable )
 endmacro ()
 macro ( install_header )
@@ -16,10 +23,10 @@ endmacro ()
 #include ( lua )
 
 # Find packages
-	find_package(Lua)
+	#find_package(Lua)
 	find_package(OpenMP)
-	find_package(DirectShow)
-	find_package(ECW)
+	#find_package(DirectShow)
+	#find_package(ECW)
 
 # platform tests for libtiff
 	INCLUDE (TestBigEndian)
@@ -309,10 +316,12 @@ endif()
 
 ############################################################################################
 
+
 # install all libs
 install_library ( im im_process im_jp2 im_fftw )
+install(FILES imffi.lua DESTINATION ${LUAJIT_BIN}/lua)
 # install headers
-install_header ( include/ )
+#install_header ( include/ )
 # install other
 #install_data ( COPYRIGHT README )
 # install documentation
