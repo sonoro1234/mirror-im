@@ -74,18 +74,18 @@ endmacro ()
 	SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS "-DUSE_EXIF" )
 	
 	#files not from im
-		#MESSAGE("removing "${CMAKE_SOURCE_DIR}/src/im_capture_dx.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_capture_dx.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_format_ecw.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_format_wmv.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_sysfile_win32.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_sysfile_unix.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_dib.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_dibxbitmap.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/jas_binfile.c)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_format_jp2.cpp)
-		list(REMOVE_ITEM SRC ${CMAKE_SOURCE_DIR}/src/im_format_avi.cpp)
-		#MESSAGE(${SRC})
+		#MESSAGE(STATUS "removing " ${PROJECT_SOURCE_DIR}/src/im_capture_dx.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_capture_dx.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_ecw.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_wmv.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_sysfile_win32.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_sysfile_unix.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_dib.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_dibxbitmap.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/jas_binfile.c)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_jp2.cpp)
+		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_avi.cpp)
+		#MESSAGE(STATUS ${SRC})
 	IF(WIN32)
 		SET(SRC ${SRC} src/im_sysfile_win32.cpp src/im_dib.cpp src/im_dibxbitmap.cpp)
 	ELSE()
@@ -103,7 +103,7 @@ endmacro ()
 
 # im_process lib
 	FILE(GLOB SRC_IM_PROCESS "src/process/*.cpp")
-	list(REMOVE_ITEM SRC_IM_PROCESS ${CMAKE_SOURCE_DIR}/src/process/im_fft.cpp)
+	list(REMOVE_ITEM SRC_IM_PROCESS ${PROJECT_SOURCE_DIR}/src/process/im_fft.cpp)
  	SET(SRC_IM_PROCESS ${SRC_IM_PROCESS} src/im_convertbitmap.cpp src/im_convertcolor.cpp src/im_converttype.cpp) # copied into process folder - wtf???
 	SET_SOURCE_FILES_PROPERTIES(${SRC_IM_PROCESS} PROPERTIES COMPILE_FLAGS "-DIM_PROCESS" )
 
@@ -174,6 +174,7 @@ endmacro ()
 	# needs "dshow.h" and "strmiids.lib" (which is available in MinGW) -> NOT WORKING !
 
 	IF(WIN32 AND NOT MINGW)
+		message(STATUS "WIN32 AND NOT MINGW")
 #~ 		FIND_PATH(DXTRANS_INCLUDE_DIR dxtrans.h)
 #~ 		FIND_LIBRARY( STRMIIDS_LIBRARY NAMES strmiids)
 
