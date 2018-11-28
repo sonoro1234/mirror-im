@@ -6,6 +6,7 @@
 
 project(im C CXX)
 cmake_minimum_required(VERSION 2.8)
+set(CMAKE_SHARED_LIBRARY_PREFIX "")
 #include ( cmake/dist.cmake )
 macro ( install_library )
   foreach ( _file ${ARGN} )

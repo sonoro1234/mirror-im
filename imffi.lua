@@ -144,8 +144,8 @@ end
 
 -- local imffi = ffi.load"imdlls_debug/libim"
 -- local improc = ffi.load"imdlls_debug/libim_process_omp"
-local imffi = ffi.load"immodules/libim"
-local improc = ffi.load"immodules/libim_process"
+local imffi = ffi.load"immodules/im"
+local improc = ffi.load"immodules/im_process"
 -- local imffi = ffi.load"iupdlls/im"
 -- local improc = ffi.load"iupdlls/im_process_omp"
 
