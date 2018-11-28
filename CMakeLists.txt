@@ -67,13 +67,9 @@ endmacro ()
 # im lib
 	FILE(GLOB SRCC "src/*.c")
 	FILE(GLOB SRCCPP "src/*.cpp")
-
-	SET(SRC ${SRCC} ${SRCCPP} ${SRCLZO} ${SRCTIFF} ${SRCJPEG} ${SRCPNG} ${SRCLZF} ${SRCEXIF})
-
-#~ 	SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS "-DIM_PROCESS -DUSE_EXIF" )
-	SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS "-DUSE_EXIF" )
 	
-	#files not from im
+	SET(SRC ${SRCC} ${SRCCPP} ${SRCLZO} ${SRCTIFF} ${SRCJPEG} ${SRCPNG} ${SRCLZF} ${SRCEXIF})
+		#files not from im
 		#MESSAGE(STATUS "removing " ${PROJECT_SOURCE_DIR}/src/im_capture_dx.cpp)
 		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_capture_dx.cpp)
 		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_ecw.cpp)
@@ -86,14 +82,19 @@ endmacro ()
 		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_jp2.cpp)
 		list(REMOVE_ITEM SRC ${PROJECT_SOURCE_DIR}/src/im_format_avi.cpp)
 		#MESSAGE(STATUS ${SRC})
+#SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS "-DIM_PROCESS -DUSE_EXIF" )
+	#SET_SOURCE_FILES_PROPERTIES(${SRC} PROPERTIES COMPILE_FLAGS "-DUSE_EXIF" )
+	
+	
+
 	IF(WIN32)
 		SET(SRC ${SRC} src/im_sysfile_win32.cpp src/im_dib.cpp src/im_dibxbitmap.cpp)
 	ELSE()
 		SET(SRC ${SRC} src/im_sysfile_unix.cpp)
 	ENDIF()
 	
-	ADD_LIBRARY(im SHARED ${SRC}) # resources/im.rc resources/im.def )
-
+	ADD_LIBRARY(im SHARED ${SRC}  src/im.rc src/im.def )
+set_target_properties(im PROPERTIES COMPILE_FLAGS "-DUSE_EXIF")
 	IF(MSYS OR MINGW OR CYGWIN)
 		TARGET_LINK_LIBRARIES(im gdi32 comdlg32) # TODO GDI+ detection
 	ENDIF ()
@@ -105,10 +106,10 @@ endmacro ()
 	FILE(GLOB SRC_IM_PROCESS "src/process/*.cpp")
 	list(REMOVE_ITEM SRC_IM_PROCESS ${PROJECT_SOURCE_DIR}/src/process/im_fft.cpp)
  	SET(SRC_IM_PROCESS ${SRC_IM_PROCESS} src/im_convertbitmap.cpp src/im_convertcolor.cpp src/im_converttype.cpp) # copied into process folder - wtf???
-	SET_SOURCE_FILES_PROPERTIES(${SRC_IM_PROCESS} PROPERTIES COMPILE_FLAGS "-DIM_PROCESS" )
+	#SET_SOURCE_FILES_PROPERTIES(${SRC_IM_PROCESS} PROPERTIES COMPILE_FLAGS "-DIM_PROCESS" )
 
-	ADD_LIBRARY(im_process SHARED ${SRC_IM_PROCESS})# resources/im_process.def)
-
+	ADD_LIBRARY(im_process SHARED ${SRC_IM_PROCESS} src/im_process.def)
+set_target_properties(im_process PROPERTIES COMPILE_FLAGS "-DIM_PROCESS")
 	IF(CYGWIN OR MSYS OR MINGW)
 		TARGET_LINK_LIBRARIES(im_process im gdi32)
 	ELSE ()
@@ -118,12 +119,12 @@ endmacro ()
 	ADD_DEPENDENCIES(im_process im)
 
 	IF(OPENMP_FOUND)
-		ADD_LIBRARY(im_process_omp SHARED ${SRC_IM_PROCESS})# resources/im_process.def)
+		ADD_LIBRARY(im_process_omp SHARED ${SRC_IM_PROCESS} src/im_process.def)
 
 		# IMPORTANT !!! Do NOT set these flags on source files !!!!
 		SET_TARGET_PROPERTIES(im_process_omp PROPERTIES
-#~ 			COMPILE_FLAGS "${OpenMP_C_FLAGS} ${OpenMP_CXX_FLAGS} -DIM_PROCESS"
-			COMPILE_FLAGS "${OpenMP_C_FLAGS} ${OpenMP_CXX_FLAGS}"
+ 			COMPILE_FLAGS "${OpenMP_C_FLAGS} ${OpenMP_CXX_FLAGS} -DIM_PROCESS"
+			#COMPILE_FLAGS "${OpenMP_C_FLAGS} ${OpenMP_CXX_FLAGS}"
 			LINK_FLAGS "${OpenMP_C_FLAGS} ${OpenMP_CXX_FLAGS}" )
 
 		IF(CYGWIN OR MSYS OR MINGW)
@@ -150,7 +151,7 @@ endmacro ()
 	COMPILE_DEFINITIONS  "EXCLUDE_JPG_SUPPORT;EXCLUDE_MIF_SUPPORT;EXCLUDE_PNM_SUPPORT;EXCLUDE_BMP_SUPPORT;EXCLUDE_PGX_SUPPORT;EXCLUDE_RAS_SUPPORT;EXCLUDE_TIFF_SUPPORT;JAS_GEO_OMIT_PRINTING_CODE;JAS_TYPES:HAVE_UNISTD_H;HAVE_STDINT_H" )
 	ENDIF()
 
-	ADD_LIBRARY(im_jp2 SHARED ${SRC_IM_JP2})# resources/im_jp2.def)
+	ADD_LIBRARY(im_jp2 SHARED ${SRC_IM_JP2} src/im_jp2.def)
 	TARGET_LINK_LIBRARIES (im_jp2 im)
 
 	ADD_DEPENDENCIES(im_jp2 im)
@@ -159,10 +160,11 @@ endmacro ()
 	FILE(GLOB SRC_IM_FFTW "src/fftw/*.c")
 	SET(SRC_IM_FFTW ${SRC_IM_FFTW} src/process/im_fft.cpp)
 
- 	SET_SOURCE_FILES_PROPERTIES(${SRC_IM_FFTW} PROPERTIES COMPILE_FLAGS "-DFFTW_ENABLE_FLOAT -DIM_PROCESS" )
+ 	#SET_SOURCE_FILES_PROPERTIES(${SRC_IM_FFTW} PROPERTIES COMPILE_FLAGS "-DFFTW_ENABLE_FLOAT -DIM_PROCESS" )
 #	SET_SOURCE_FILES_PROPERTIES(${SRC_IM_FFTW} PROPERTIES COMPILE_FLAGS "-DFFTW_ENABLE_FLOAT" )
 
-	ADD_LIBRARY(im_fftw SHARED ${SRC_IM_FFTW})# resources/im_fftw.def)
+	ADD_LIBRARY(im_fftw SHARED ${SRC_IM_FFTW} src/im_fftw.def)
+	set_target_properties(im_fftw PROPERTIES COMPILE_FLAGS "-DFFTW_ENABLE_FLOAT")# -DIM_PROCESS")
 	TARGET_LINK_LIBRARIES (im_fftw im_process im)
 
 	ADD_DEPENDENCIES(im_fftw im_process im)
@@ -210,7 +212,7 @@ endmacro ()
 			SET_SOURCE_FILES_PROPERTIES(src/im_format_wmv.cpp
 				PROPERTIES COMPILE_FLAGS "-D_CRT_NON_CONFORMING_SWPRINTFS" )
 
-			ADD_LIBRARY(im_wmv SHARED src/im_format_wmv.cpp resources/im_wmv.def)
+			ADD_LIBRARY(im_wmv SHARED src/im_format_wmv.cpp src/im_wmv.def)
 			TARGET_LINK_LIBRARIES (im_wmv im ${WMVCORE_LIBRARY})
 
 			ADD_DEPENDENCIES(im_wmv im)
@@ -225,7 +227,7 @@ endmacro ()
 		MESSAGE("VFW32_LIBRARY:" ${VFW32_LIBRARY})
 
 		IF(VFW32_LIBRARY)
-			ADD_LIBRARY(im_avi SHARED src/avi/im_format_avi.cpp resources/im_avi.def)
+			ADD_LIBRARY(im_avi SHARED src/im_format_avi.cpp src/im_avi.def)
 			TARGET_LINK_LIBRARIES (im_avi im ${VFW32_LIBRARY})
 
 			ADD_DEPENDENCIES(im_avi im)
@@ -245,7 +247,7 @@ endmacro ()
 	IF( ECW_FOUND )
 		INCLUDE_DIRECTORIES ( ${NCSECWCLIENT_INCLUDE_DIR} )
 
-		ADD_LIBRARY(im_ecw SHARED src/im_format_ecw.cpp resources/im_ecw.def)
+		ADD_LIBRARY(im_ecw SHARED src/im_format_ecw.cpp src/im_ecw.def)
 		TARGET_LINK_LIBRARIES (im_ecw im ${NCSECW_LIBRARY})
 
 		ADD_DEPENDENCIES(im_ecw im)
