@@ -12,7 +12,7 @@ macro ( install_library )
   foreach ( _file ${ARGN} )
     install ( TARGETS ${_file}
               RUNTIME DESTINATION ${LUAJIT_BIN}/immodules
-              #LIBRARY DESTINATION ./lib 
+              LIBRARY DESTINATION ${LUAJIT_BIN}/immodules 
               #ARCHIVE DESTINATION ./arch 
 			  )
   endforeach()
