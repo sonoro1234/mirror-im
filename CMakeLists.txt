@@ -6,7 +6,9 @@
 
 project(im C CXX)
 cmake_minimum_required(VERSION 2.8)
+if(WIN32) #to mingw work as all the others
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif(WIN32)
 #include ( cmake/dist.cmake )
 macro ( install_library )
   foreach ( _file ${ARGN} )
