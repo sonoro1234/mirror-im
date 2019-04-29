@@ -13,8 +13,8 @@ endif(WIN32)
 macro ( install_library )
   foreach ( _file ${ARGN} )
     install ( TARGETS ${_file}
-              RUNTIME DESTINATION ${LUAJIT_BIN}/immodules
-              LIBRARY DESTINATION ${LUAJIT_BIN}/immodules 
+              RUNTIME DESTINATION ${LUAJIT_BIN}
+              LIBRARY DESTINATION ${LUAJIT_BIN} 
               #ARCHIVE DESTINATION ./arch 
 			  )
   endforeach()
