@@ -117,9 +117,12 @@ int imFileWriteImageInfo(void * ifile,int width,int height,int user_color_mode,i
 int imFileWriteImageData(void * ifile,void * data);	
 void 	imConvertPacking (const void *src_data, void *dst_data, int width, int height, int src_depth, int dst_depth, int data_type, int src_is_packed);							
 void imProcessFlip(const imImage* src_image, imImage* dst_image);
+void imProcessInsert (const imImage *src_image, const imImage *region_image, imImage *dst_image, int xmin, int ymin);
 void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int ymin);
 void imProcessMirror(const imImage* src_image, imImage* dst_image);
 void imProcessReduceBy4(const imImage* src_image, imImage* dst_image);
+int 	imProcessResize (const imImage *src_image, imImage *dst_image, int order);
+int 	imProcessAddMargins (const imImage *src_image, imImage *dst_image, int xmin, int ymin);
 imImage* imImageCreateBased(const imImage* image, int width, int height, int color_space, int data_type);
 
 const char* imColorModeSpaceName(int color_mode);
@@ -233,6 +236,15 @@ function im.ProcessFlip(src,dst)
 end
 function im.ProcessCrop(src_image, dst_image, xmin, ymin)
 	improc.imProcessCrop(src_image, dst_image, xmin, ymin)
+end
+function im.ProcessInsert(src_image, region_image, dst_image, xmin, ymin)
+	improc.imProcessInsert(src_image, region_image, dst_image, xmin, ymin)
+end
+function im.ProcessResize(src_image, dst_image,order)
+	return improc.imProcessResize (src_image, dst_image,order)
+end
+function im.ProcessAddMargins(src_image,dst_image, xmin, ymin)
+	return improc.imProcessAddMargins (src_image,dst_image, xmin, ymin)
 end
 function im.ProcessMirror(src,dst)
 	improc.imProcessMirror(src, dst);
