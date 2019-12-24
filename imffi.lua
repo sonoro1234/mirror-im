@@ -95,6 +95,19 @@ enum imColorModeConfig
   IM_PACKED   = 0x200,  /**< packed components (rgbrgbrgb...) */
   IM_TOPDOWN  = 0x400   /**< orientation from top down to bottom */
 };
+enum imComplex2Real { IM_CPX_REAL, IM_CPX_IMAG, IM_CPX_MAG, IM_CPX_PHASE };
+enum imGammaFactor {
+  IM_GAMMA_LINEAR = 0, IM_GAMMA_LOGLITE = -10, IM_GAMMA_LOGHEAVY = -1000, IM_GAMMA_EXPLITE = 2,
+  IM_GAMMA_EXPHEAVY = 7
+};
+enum imCastMode { IM_CAST_MINMAX, IM_CAST_FIXED, IM_CAST_DIRECT, IM_CAST_USER };
+enum  	imToneGamut {
+  IM_GAMUT_NORMALIZE, IM_GAMUT_POW, IM_GAMUT_LOG, IM_GAMUT_EXP,
+  IM_GAMUT_INVERT, IM_GAMUT_ZEROSTART, IM_GAMUT_SOLARIZE, IM_GAMUT_SLICE,
+  IM_GAMUT_EXPAND, IM_GAMUT_CROP, IM_GAMUT_BRIGHTCONT
+};
+enum  	imToneGamutFlags { IM_GAMUT_MINMAX = 0x0100 };
+
 imImage* imFileImageLoad(const char *file_name, int index, int *error);	
 imImage * 	imFileImageLoadBitmap (const char *file_name, int index, int *error);
 void* imImageGetOpenGLData(const imImage* image, int *glformat);
@@ -131,6 +144,24 @@ int imImageDataSize(int width, int height, int color_mode, int data_type);
 
 void imFileGetAttributeList(imFile* ifile, char** attrib, int *attrib_count);
 const void* imFileGetAttribute(imFile* ifile, const char* attrib, int *data_type, int *count);
+int imProcessConvertDataType (const imImage *src_image, imImage *dst_image, int cpx2real, double gamma, int absolute, int cast_mode);
+int imConvertDataType(const imImage *src_image,imImage *dst_image,int cpx2real,double gamma,int absolute,int cast_mode);
+int imProcessConvertColorSpace (const imImage *src_image, imImage *dst_image);
+int imConvertColorSpace (const imImage *src_image, imImage *dst_image);
+void imProcessThreshold (const imImage *src_image, imImage *dst_image, double level, int value);
+
+int 	imProcessGrayMorphConvolve (const imImage *src_image, imImage *dst_image, const imImage *kernel, int ismax);
+int 	imProcessGrayMorphErode (const imImage *src_image, imImage *dst_image, int kernel_size);
+int 	imProcessGrayMorphDilate (const imImage *src_image, imImage *dst_image, int kernel_size);
+int 	imProcessGrayMorphOpen (const imImage *src_image, imImage *dst_image, int kernel_size);
+int 	imProcessGrayMorphClose (const imImage *src_image, imImage *dst_image, int kernel_size);
+int 	imProcessGrayMorphTopHat (const imImage *src_image, imImage *dst_image, int kernel_size);
+int 	imProcessGrayMorphWell (const imImage *src_image, imImage *dst_image, int kernel_size);
+int 	imProcessGrayMorphGradient (const imImage *src_image, imImage *dst_image, int kernel_size);
+
+void 	imProcessNegative (const imImage *src_image, imImage *dst_image);
+void 	imProcessToneGamut (const imImage *src_image, imImage *dst_image, int op, double *params);
+int 	imProcessOtsuThreshold (const imImage *src_image, imImage *dst_image);
 ]]
 
 --[[
