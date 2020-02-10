@@ -107,7 +107,7 @@ enum  	imToneGamut {
   IM_GAMUT_EXPAND, IM_GAMUT_CROP, IM_GAMUT_BRIGHTCONT
 };
 enum  	imToneGamutFlags { IM_GAMUT_MINMAX = 0x0100 };
-
+void imImageAddAlpha 	( 	imImage *  	image 	 ) ;
 imImage* imFileImageLoad(const char *file_name, int index, int *error);	
 imImage * 	imFileImageLoadBitmap (const char *file_name, int index, int *error);
 void* imImageGetOpenGLData(const imImage* image, int *glformat);
@@ -413,9 +413,9 @@ im.imFile = ffi.metatype("imFile",imFile)
 
 im = setmetatable(im, {
 	__index = function(self, k)
-		print("pcall",self,k)
+		--print("pcall",self,k)
 		local ok, typ = pcall(function(K) return imffi["IM_"..K] end, k)
-		print("ret pcall",ok,typ)
+		--print("ret pcall",ok,typ)
 		if not ok then 
 			print(typ)
 			error("no se pue") --peta
