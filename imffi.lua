@@ -135,6 +135,7 @@ void imProcessCrop(const imImage* src_image, imImage* dst_image, int xmin, int y
 void imProcessMirror(const imImage* src_image, imImage* dst_image);
 void imProcessReduceBy4(const imImage* src_image, imImage* dst_image);
 int 	imProcessResize (const imImage *src_image, imImage *dst_image, int order);
+int imProcessReduce (const imImage *src_image,imImage *dst_image,int order);
 int 	imProcessAddMargins (const imImage *src_image, imImage *dst_image, int xmin, int ymin);
 imImage* imImageCreateBased(const imImage* image, int width, int height, int color_space, int data_type);
 
@@ -273,6 +274,9 @@ function im.ProcessInsert(src_image, region_image, dst_image, xmin, ymin)
 end
 function im.ProcessResize(src_image, dst_image,order)
 	return improc.imProcessResize (src_image, dst_image,order)
+end
+function im.ProcessReduce(src_image, dst_image,order)
+	return improc.imProcessReduce (src_image, dst_image,order)
 end
 function im.ProcessAddMargins(src_image,dst_image, xmin, ymin)
 	return improc.imProcessAddMargins (src_image,dst_image, xmin, ymin)
