@@ -116,6 +116,7 @@ int imFileImageSave(const char* file_name, const char* format, const void* image
 void imImageDestroy (void *image);
 void* imFileNew(const char *  file_name,const char *  	format,int *  	error) ;
 void imImageSetAttribute (const void *  image,const char *  attrib,int  data_type,int  	count,const void *  	data) ;	
+void imImageSetAttribInteger(const imImage * image,const char * attrib,int data_type,int value );
 void imFileSetAttribute(void *  ifile,const char *  	attrib,int  	data_type,int  	count,const void *  data) ;			
 int imFileReadImageInfo(imFile* ifile, int index, int *width, int *height, int *file_color_mode, int *file_data_type);
 void imImageSetAttribReal(const void *  image,const char *  attrib,int  data_type,double  	value) 	;
@@ -326,6 +327,9 @@ function imImage:GetOpenGLData()
 	local glformat = ffi.new("int[1]")
 	local data = imffi.imImageGetOpenGLData(self, glformat)
 	return data,glformat[0]
+end
+function imImage:SetAttribInteger(attstr, data_type, value )
+	imffi.imImageSetAttribInteger(self, attstr, data_type, value );
 end
 function imImage:FileSave(file_name,format)
 	return imffi.imFileImageSave(file_name, format,self);
