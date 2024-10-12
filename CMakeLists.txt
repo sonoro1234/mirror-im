@@ -5,7 +5,7 @@
 # Please note that the package source code is licensed under its own license.
 
 project(im C CXX)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.22)
 if(WIN32) #to mingw work as all the others
 set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif(WIN32)
@@ -154,10 +154,11 @@ set_target_properties(im_process PROPERTIES COMPILE_FLAGS "-DIM_PROCESS")
 	COMPILE_DEFINITIONS  "EXCLUDE_JPG_SUPPORT;EXCLUDE_MIF_SUPPORT;EXCLUDE_PNM_SUPPORT;EXCLUDE_BMP_SUPPORT;EXCLUDE_PGX_SUPPORT;EXCLUDE_RAS_SUPPORT;EXCLUDE_TIFF_SUPPORT;JAS_GEO_OMIT_PRINTING_CODE;JAS_TYPES:HAVE_UNISTD_H;HAVE_STDINT_H" )
 	ENDIF()
 
-	ADD_LIBRARY(im_jp2 SHARED ${SRC_IM_JP2} src/im_jp2.def)
-	TARGET_LINK_LIBRARIES (im_jp2 im)
+	#fails with mingw-w64 14.0
+	#ADD_LIBRARY(im_jp2 SHARED ${SRC_IM_JP2} src/im_jp2.def)
+	#TARGET_LINK_LIBRARIES (im_jp2 im)
 
-	ADD_DEPENDENCIES(im_jp2 im)
+	#ADD_DEPENDENCIES(im_jp2 im)
 
 # im_fftw
 	FILE(GLOB SRC_IM_FFTW "src/fftw/*.c")
@@ -324,7 +325,8 @@ endif()
 
 
 # install all libs
-install_library ( im im_process im_jp2 im_fftw )
+#install_library ( im im_process im_jp2 im_fftw )
+install_library ( im im_process im_fftw )
 install(FILES imffi.lua DESTINATION ${LUAJIT_BIN}/lua)
 # install headers
 #install_header ( include/ )
